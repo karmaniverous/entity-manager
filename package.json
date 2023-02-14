@@ -1,5 +1,5 @@
 {
-  "name": "@veterancrowd/shard-id",
+  "name": "@veterancrowd/shard-manager",
   "bin": {
     "mycli": "bin/mycli/index.js"
   },
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/veterancrowd/shard-id"
+    "url": "https://github.com/veterancrowd/shard-manager"
   },
   "author": "Jason G. Williscroft",
   "bugs": {
-    "url": "https://github.com/veterancrowd/shard-id/issues"
+    "url": "https://github.com/veterancrowd/shard-manager/issues"
   },
   "description": "Configurably generates an entity-specific shard id based on entity id and timestamp.",
-  "homepage": "https://github.com/veterancrowd/shard-id#readme",
+  "homepage": "https://github.com/veterancrowd/shard-manager#readme",
   "keywords": [
     "dynamo-db",
     "sharding"

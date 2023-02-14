@@ -1,3 +1,3 @@
-# shard-id
+# shard-manager
 
-Configurably generates an entity-specific shard id based on entity id and timestamp.
+Configurably generate and scale partition shards over time.
