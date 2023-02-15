@@ -1,3 +1,3 @@
-# shard-manager
+# shard-key-manager
 
-Configurably generate and scale partition shards over time.
+Configurably generate & scale partition shard keys over time.

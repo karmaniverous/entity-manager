@@ -1,5 +1,5 @@
 {
-  "name": "@veterancrowd/shard-manager",
+  "name": "@veterancrowd/shard-key-manager",
   "bin": {
     "mycli": "bin/mycli/index.js"
   },
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/veterancrowd/shard-manager"
+    "url": "https://github.com/veterancrowd/shard-key-manager"
   },
   "author": "Jason G. Williscroft",
   "bugs": {
-    "url": "https://github.com/veterancrowd/shard-manager/issues"
+    "url": "https://github.com/veterancrowd/shard-key-manager/issues"
   },
-  "description": "Configurably generates an entity-specific shard id based on entity id and timestamp.",
-  "homepage": "https://github.com/veterancrowd/shard-manager#readme",
+  "description": "Configurably generate & scale entity-specific partition shard keys over time.",
+  "homepage": "https://github.com/veterancrowd/shard-key-manager#readme",
   "keywords": [
     "dynamo-db",
     "sharding"
