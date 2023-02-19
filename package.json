@@ -23,6 +23,7 @@
   ],
   "license": "BSD-3-Clause",
   "dependencies": {
+    "@karmaniverous/tagged-templates": "^0.0.2",
     "jsonschema": "^1.4.1",
     "lodash": "^4.17.21"
   },
@@ -33,6 +34,7 @@
     "@babel/plugin-syntax-import-assertions": "^7.20.0",
     "@babel/preset-env": "^7.20.2",
     "@babel/register": "^7.18.9",
+    "@karmaniverous/edge-logger": "^1.0.2",
     "@karmaniverous/get-dotenv": "^0.1.0",
     "@types/node": "^18.11.18",
     "babel-plugin-lodash": "^3.3.4",
