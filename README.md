@@ -48,7 +48,7 @@ Create an EntityManager instance.
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>object</code> | Options object. |
-| [options.config] | <code>object</code> | EntityManager configuration object (see [unit tests](https://github.com/VeteranCrowd/entity-manager/blob/3c654ce62a0d7adf4850e0b84d77f57df3a2fcbf/lib/EntityManager/EntityManager.test.js#L17-L54) for an example). |
+| [options.config] | <code>object</code> | EntityManager configuration object (see [unit tests](https://github.com/VeteranCrowd/entity-manager/blob/369d6bc22512cf58916551569cd2c8312077a038/lib/EntityManager/EntityManager.test.js#L17-L55) for an example). |
 | [options.logger] | <code>object</code> | Logger instance (defaults to console, must support error & debug methods). |
 
 <a name="module_EntityManager.EntityManager+addKeys"></a>
