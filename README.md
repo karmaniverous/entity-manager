@@ -10,15 +10,6 @@ npm install @veterancrowd/entity-manager
 
 # API Documentation
 
-## Modules
-
-<dl>
-<dt><a href="#module_EntityManager">EntityManager</a></dt>
-<dd></dd>
-<dt><a href="#module_PrivateEntityManager">PrivateEntityManager</a></dt>
-<dd></dd>
-</dl>
-
 <a name="module_EntityManager"></a>
 
 ## EntityManager
@@ -50,9 +41,6 @@ Create an EntityManager instance.
 | [options.config] | <code>object</code> | EntityManager configuration object. |
 | [options.logger] | <code>object</code> | Logger instance (defaults to console, must support error & debug methods). |
 
-<a name="module_PrivateEntityManager"></a>
-
-## PrivateEntityManager
 
 ---
 
