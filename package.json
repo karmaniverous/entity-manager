@@ -25,7 +25,8 @@
   "dependencies": {
     "@karmaniverous/tagged-templates": "^0.0.2",
     "jsonschema": "^1.4.1",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "string-hash": "^1.1.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.20.7",
