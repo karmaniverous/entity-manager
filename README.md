@@ -48,7 +48,7 @@ Create an EntityManager instance.
 | Param | Type | Description |
 | --- | --- | --- |
 | options | <code>object</code> | Options object. |
-| [options.config] | <code>object</code> | EntityManager configuration object. |
+| [options.config] | <code>object</code> | EntityManager configuration object (see [unit tests](https://github.com/VeteranCrowd/entity-manager/blob/main/lib/EntityManager/EntityManager.test.js) for an example). |
 | [options.logger] | <code>object</code> | Logger instance (defaults to console, must support error & debug methods). |
 
 <a name="module_EntityManager.EntityManager+addKeys"></a>
@@ -82,6 +82,7 @@ Return an array of sharded keys valid for a given entity token & timestamp.
 - <code>Error</code> If entityToken is invalid.
 - <code>Error</code> If item is invalid.
 - <code>Error</code> If keyToken is invalid.
+- <code>Error</code> If timestamp is invalid.
 
 
 | Param | Type | Description |
