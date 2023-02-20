@@ -151,6 +151,7 @@ entityManager.addKeys(transaction);
 // debug:      "userId": "userIdValue"
 // debug:    }
 // debug:    generated shard key '7' for transaction id 'transactionIdValue' at timestamp 1676869312851.
+// debug:
 // debug:    done
 // debug:    {
 // debug:      "methodId": "methodIdValue",
@@ -180,7 +181,7 @@ entityManager.getKeySpace('transaction', transaction, 'userPK', 1686874972686);
 // debug:      "transactionId": "transactionIdValue",
 // debug:      "userId": "userIdValue"
 // debug:    }
-
+// debug:
 // debug:    done
 // debug:    [
 // debug:      "user#userIdValue|transaction",
