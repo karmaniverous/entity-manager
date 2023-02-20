@@ -1,8 +1,5 @@
 {
   "name": "@karmaniverous/entity-manager",
-  "bin": {
-    "mycli": "bin/mycli/index.js"
-  },
   "version": "0.0.7",
   "publishConfig": {
     "access": "public"
