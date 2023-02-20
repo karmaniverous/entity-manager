@@ -1,5 +1,5 @@
 {
-  "name": "@veterancrowd/entity-manager",
+  "name": "@karmaniverous/entity-manager",
   "bin": {
     "mycli": "bin/mycli/index.js"
   },
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/veterancrowd/entity-manager"
+    "url": "https://github.com/karmaniverous/entity-manager"
   },
   "author": "Jason G. Williscroft",
   "bugs": {
-    "url": "https://github.com/veterancrowd/entity-manager/issues"
+    "url": "https://github.com/karmaniverous/entity-manager/issues"
   },
   "description": "Configurably decorate entity objects with sharded index keys.",
-  "homepage": "https://github.com/veterancrowd/entity-manager#readme",
+  "homepage": "https://github.com/karmaniverous/entity-manager#readme",
   "keywords": [
     "dynamo-db",
     "sharding"

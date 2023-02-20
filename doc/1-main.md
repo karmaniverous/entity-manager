@@ -26,7 +26,7 @@ This package shifts the implementation of DynamoDB structure & scaling from logi
 ## Installation
 
 ```bash
-npm install @veterancrowd/entity-manager
+npm install @karmaniverous/entity-manager
 ```
 
 ## Configuration
@@ -124,7 +124,7 @@ import { Logger } from '@karmaniverous/edge-logger';
 const logger = new Logger('debug');
 
 // Import EntityManager & config object.
-import { EntityManager } from '@veterancrowd/entity-manager';
+import { EntityManager } from '@karmaniverous/entity-manager';
 import { config } from './entityConfig.js';
 
 // Create & configure an EntityManager (logger defaults to console object).
@@ -196,7 +196,7 @@ entityManager.getKeySpace('transaction', transaction, 'userPK', 1686874972686);
 // debug:    ]
 ```
 
-See [unit tests](https://github.com/VeteranCrowd/entity-manager/blob/main/lib/EntityManager/EntityManager.test.js) for more usage examples.
+See [unit tests](https://github.com/karmaniverous/entity-manager/blob/main/lib/EntityManager/EntityManager.test.js) for more usage examples.
 
 ## Future-Proofing
 
