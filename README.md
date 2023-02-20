@@ -46,10 +46,10 @@ export const config = {
   entities: {
     // Repeat this structure for each entity type. Valid keys match /\w+/
     transaction: {
-      // Each property of this object defines a structured index key for this
-      // entity. Each property value is a function expects an entity object as
-      // its one argument. In the examples below, entity attributes are
-      // destructured in the function declaration and the return value is
+      // Each property of the keys object defines a structured index key for
+      // this entity. Each property value is a function expects an entity
+      // object as its one argument. In the examples below, entity attributes
+      // are destructured in the function declaration and the return value is
       // expressed as a template literal.
       keys: {
         // Table HASH key. Note the optional shardId.
@@ -196,6 +196,16 @@ entityManager.getKeySpace('transaction', transaction, 'userPK', 1686874972686);
 ```
 
 See [unit tests](https://github.com/VeteranCrowd/entity-manager/blob/main/lib/EntityManager/EntityManager.test.js) for more usage examples.
+
+## Future-Proofing
+
+The current design provides for scaling via planned increases in shard key length. The number of shards per key character does not need to be decided until shard keys are first applied.
+
+This design assumes that currently-defined key structures will remain stable across the life of the database, meaning new ones could be layered on but existing ones should not be changed once in use.
+
+The same technique that provides for shard key length bumps could also be applied to such schema changes, permitting unified query across schema changes in the same manner as the package currently supports unified query across shards.
+
+This change can be accomplished with no breaking changes to existing inplementations.
 
 # API Documentation
 
