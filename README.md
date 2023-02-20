@@ -206,7 +206,7 @@ This design assumes that currently-defined key structures will remain stable acr
 
 The same technique that provides for shard key length bumps could also be applied to such schema changes, permitting unified query across schema changes in the same manner as the package currently supports unified query across shards.
 
-This change can be accomplished with no breaking changes to existing inplementations.
+This change can be accomplished with no breaking changes to existing implementations.
 
 # API Documentation
 
