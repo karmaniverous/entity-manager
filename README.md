@@ -81,7 +81,7 @@ export const config = {
 
         // users GSI RANGE key.
         userSK: ({ merchantId, timestamp, transactionId }) =>
-          `timestamp#${timestamp}|merchantId#${merchantId}|transactionId#${transactionId}`,
+          sn2u`timestamp#${timestamp}|merchantId#${merchantId}|transactionId#${transactionId}`,
       },
 
       // The sharding configuration for this entity.
