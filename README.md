@@ -92,7 +92,7 @@ export const config = {
         // Bits represented by each shard key character. 3 bits means an octal
         // shard key, so the first character yields 8 shards and the second
         // yields 64.
-        nibbleBits: 4,
+        nibbleBits: 3,
 
         // Scheduled increases in shard key length. Keys are expressed as
         // millisecond UTC timestamps. In production, these should not be
@@ -110,8 +110,8 @@ export const config = {
       },
     },
   },
-  // Will be added to every entity object. Pick a value that won't collide with
-  // entity data!
+  // Will be added to every entity object as appropriate. Pick a value that
+  // won't collide with entity data!
   shardKeyToken: 'shardId',
 };
 ```
