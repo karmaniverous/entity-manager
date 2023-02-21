@@ -89,9 +89,10 @@ export const config = {
         // Default number of shard key characters (0 means no shard key).
         nibbles: 0,
 
-        // Bits represented by each shard key character. 3 bits means an octal
-        // shard key, so the first character yields 8 shards and the second
-        // yields 64.
+        // Bits represented by each shard key character, so 3 bits means an
+        // octal shard key. Running with no shard key produces a single shard.
+        // The first shard key character yields another 8 shards, and the second
+        // yields an additional 64, for an eventual total of 73.
         nibbleBits: 3,
 
         // Scheduled increases in shard key length. Keys are expressed as
