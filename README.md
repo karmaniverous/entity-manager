@@ -134,7 +134,7 @@ const entityManager = new EntityManager({ config, logger });
 const transaction = {
   methodId: 'methodIdValue',
   merchantId: 'merchantIdValue',
-  timestamp: now + 1000,
+  timestamp: 1676869312851,
   transactionId: 'transactionIdValue',
   userId: 'userIdValue',
 };
