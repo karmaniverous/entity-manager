@@ -33,7 +33,7 @@
     "@babel/register": "^7.18.9",
     "@karmaniverous/edge-logger": "^1.0.2",
     "@karmaniverous/get-dotenv": "^0.1.0",
-    "@karmaniverous/tagged-templates": "^0.0.2",
+    "@karmaniverous/tagged-templates": "^0.0.4",
     "@types/node": "^18.11.18",
     "babel-plugin-lodash": "^3.3.4",
     "chai": "^4.3.7",
