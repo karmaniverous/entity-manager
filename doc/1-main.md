@@ -38,8 +38,8 @@ The `entity-manager` configuration object describes each entity's structured key
 
 // These tagged templates are used below to simplify template literals.
 // sn2e - Template literal returns empty string if any expression is nil.
-// sn2n - Template literal returns undefined if any expression is nil.
-import { sn2e, sn2n } from '@karmaniverous/tagged-templates';
+// sn2u - Template literal returns undefined if any expression is nil.
+import { sn2e, sn2u } from '@karmaniverous/tagged-templates';
 
 // Entity config object named export.
 export const config = {
@@ -57,31 +57,31 @@ export const config = {
 
         // Table RANGE key.
         entitySK: ({ timestamp, transactionId }) =>
-          sn2n`timestamp#${timestamp}|transactionId#${transactionId}`,
+          sn2u`timestamp#${timestamp}|transactionId#${transactionId}`,
 
         // merchants GSI HASH key. Note the optional shardId.
         merchantPK: ({ merchantId, shardId }) =>
-          sn2n`merchantId#${merchantId}|transaction${sn2e`!${shardId}`}`,
+          sn2u`merchantId#${merchantId}|transaction${sn2e`!${shardId}`}`,
 
         // merchants GSI RANGE key.
         merchantSK: ({ methodId, timestamp, transactionId }) =>
-          sn2n`timestamp#${timestamp}|methodId#${methodId}|transactionId#${transactionId}`,
+          sn2u`timestamp#${timestamp}|methodId#${methodId}|transactionId#${transactionId}`,
 
         // methods GSI HASH key. Note the optional shardId.
         methodPK: ({ methodId, shardId }) =>
-          sn2n`method#${methodId}|transaction${sn2e`!${shardId}`}`,
+          sn2u`method#${methodId}|transaction${sn2e`!${shardId}`}`,
 
         // methods GSI RANGE key.
         methodSK: ({ merchantId, timestamp, transactionId }) =>
-          sn2n`timestamp#${timestamp}|merchantId#${merchantId}|transactionId#${transactionId}`,
+          sn2u`timestamp#${timestamp}|merchantId#${merchantId}|transactionId#${transactionId}`,
 
         // users GSI HASH key. Note the optional shardId.
         userPK: ({ shardId, userId }) =>
-          sn2n`user#${userId}|transaction${sn2e`!${shardId}`}`,
+          sn2u`user#${userId}|transaction${sn2e`!${shardId}`}`,
 
         // users GSI RANGE key.
         userSK: ({ merchantId, timestamp, transactionId }) =>
-          sn2n`timestamp#${timestamp}|merchantId#${merchantId}|transactionId#${transactionId}`,
+          sn2u`timestamp#${timestamp}|merchantId#${merchantId}|transactionId#${transactionId}`,
       },
 
       // The sharding configuration for this entity.
