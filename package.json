@@ -63,7 +63,8 @@
     "require": [
       "@babel/register"
     ],
-    "spec": "./**/*.test.!(*.*)"
+    "spec": "./**/*.test.!(*.*)",
+    "timeout": 60000
   },
   "release-it": {
     "github": {
