@@ -221,7 +221,7 @@ This change can be accomplished with no breaking changes to existing implementat
             * [new exports.EntityManager(options)](#new_module_entity-manager.EntityManager_new)
             * [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
             * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
-            * [.query(entityToken, keyToken, item, shardQuery, [shardPageKeys])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+            * [.query(entityToken, keyToken, item, shardQuery, [pageKeys])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
     * _inner_
         * [~ShardQueryResult](#module_entity-manager..ShardQueryResult) : <code>object</code>
         * [~ShardQueryFunction](#module_entity-manager..ShardQueryFunction) ⇒ <code>Promise.&lt;ShardQueryResult&gt;</code>
@@ -238,7 +238,7 @@ Manage DynamoDb entities.
     * [new exports.EntityManager(options)](#new_module_entity-manager.EntityManager_new)
     * [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
     * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
-    * [.query(entityToken, keyToken, item, shardQuery, [shardPageKeys])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+    * [.query(entityToken, keyToken, item, shardQuery, [pageKeys])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
 
 <a name="new_module_entity-manager.EntityManager_new"></a>
 
@@ -301,7 +301,7 @@ Return an array of sharded keys valid for a given entity token & timestamp.
 
 <a name="module_entity-manager.EntityManager+query"></a>
 
-#### entityManager.query(entityToken, keyToken, item, shardQuery, [shardPageKeys]) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+#### entityManager.query(entityToken, keyToken, item, shardQuery, [pageKeys]) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
 Query an entity across shards.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
@@ -313,7 +313,7 @@ Query an entity across shards.
 | keyToken | <code>string</code> | Key token. |
 | item | <code>object</code> | Entity item sufficiently populated to generate property keyToken. |
 | shardQuery | <code>ShardQueryFunction</code> | Sharded query function. |
-| [shardPageKeys] | <code>object</code> | Map of shard page keys. |
+| [pageKeys] | <code>object</code> | Map of shard page keys. |
 
 <a name="module_entity-manager..ShardQueryResult"></a>
 
@@ -348,7 +348,7 @@ Shard query function
 | Name | Type | Description |
 | --- | --- | --- |
 | items | <code>Array.&lt;any&gt;</code> | Query result array. |
-| shardPageKeys | <code>object</code> | Shard page keys. |
+| pageKeys | <code>object</code> | Shard page keys. |
 
 
 ---
