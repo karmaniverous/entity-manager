@@ -222,6 +222,7 @@ This change can be accomplished with no breaking changes to existing implementat
             * [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
             * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
             * [.query(entityToken, keyToken, item, shardQuery, [pageKeys])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+            * [.removeKeys(entityToken, item)](#module_entity-manager.EntityManager+removeKeys) ⇒ <code>object</code>
     * _inner_
         * [~ShardQueryResult](#module_entity-manager..ShardQueryResult) : <code>object</code>
         * [~ShardQueryFunction](#module_entity-manager..ShardQueryFunction) ⇒ <code>Promise.&lt;ShardQueryResult&gt;</code>
@@ -239,6 +240,7 @@ Manage DynamoDb entities.
     * [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
     * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
     * [.query(entityToken, keyToken, item, shardQuery, [pageKeys])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+    * [.removeKeys(entityToken, item)](#module_entity-manager.EntityManager+removeKeys) ⇒ <code>object</code>
 
 <a name="new_module_entity-manager.EntityManager_new"></a>
 
@@ -261,7 +263,7 @@ Create an EntityManager instance.
 <a name="module_entity-manager.EntityManager+addKeys"></a>
 
 #### entityManager.addKeys(entityToken, item, [overwrite]) ⇒ <code>object</code>
-Decorate an entity item with keys.
+Add sharded keys to an entity item. Does not mutate original item.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
 **Returns**: <code>object</code> - Decorated entity item.  
@@ -314,6 +316,24 @@ Query an entity across shards.
 | item | <code>object</code> | Entity item sufficiently populated to generate property keyToken. |
 | shardQuery | <code>ShardQueryFunction</code> | Sharded query function. |
 | [pageKeys] | <code>object</code> | Map of shard page keys. |
+
+<a name="module_entity-manager.EntityManager+removeKeys"></a>
+
+#### entityManager.removeKeys(entityToken, item) ⇒ <code>object</code>
+Remove sharded keys from an entity item. Does not mutate original item.
+
+**Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
+**Returns**: <code>object</code> - Stripped entity item.  
+**Throws**:
+
+- <code>Error</code> If entityToken is invalid.
+- <code>Error</code> If item is invalid.
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| entityToken | <code>string</code> | Entity token. |
+| item | <code>object</code> | Entity item. |
 
 <a name="module_entity-manager..ShardQueryResult"></a>
 
