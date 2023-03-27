@@ -221,10 +221,10 @@ This change can be accomplished with no breaking changes to existing implementat
             * [new exports.EntityManager(options)](#new_module_entity-manager.EntityManager_new)
             * [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
             * [.calcShardKey(entityToken, item)](#module_entity-manager.EntityManager+calcShardKey) ⇒ <code>string</code>
-            * [.dehydrateIndex(entityToken, indexToken, item, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
-            * [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
+            * [.dehydrateIndex(entityToken, indexToken, index, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
             * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
             * [.query(entityToken, keyToken, item, shardQuery, [options])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+            * [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
             * [.removeKeys(entityToken, item)](#module_entity-manager.EntityManager+removeKeys) ⇒ <code>object</code>
     * _inner_
         * [~ShardQueryResult](#module_entity-manager..ShardQueryResult) : <code>object</code>
@@ -242,10 +242,10 @@ Manage DynamoDb entities.
     * [new exports.EntityManager(options)](#new_module_entity-manager.EntityManager_new)
     * [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
     * [.calcShardKey(entityToken, item)](#module_entity-manager.EntityManager+calcShardKey) ⇒ <code>string</code>
-    * [.dehydrateIndex(entityToken, indexToken, item, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
-    * [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
+    * [.dehydrateIndex(entityToken, indexToken, index, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
     * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
     * [.query(entityToken, keyToken, item, shardQuery, [options])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+    * [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
     * [.removeKeys(entityToken, item)](#module_entity-manager.EntityManager+removeKeys) ⇒ <code>object</code>
 
 <a name="new_module_entity-manager.EntityManager_new"></a>
@@ -300,8 +300,8 @@ Calculated the shard key for an entity item.
 
 <a name="module_entity-manager.EntityManager+dehydrateIndex"></a>
 
-#### entityManager.dehydrateIndex(entityToken, indexToken, item, [delimiter]) ⇒ <code>string</code>
-Convert a item into a delimited string containing the properties of a named index.
+#### entityManager.dehydrateIndex(entityToken, indexToken, index, [delimiter]) ⇒ <code>string</code>
+Condense an index object into a delimited string.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
 **Returns**: <code>string</code> - Dehydrated index.  
@@ -316,27 +316,7 @@ Convert a item into a delimited string containing the properties of a named inde
 | --- | --- | --- | --- |
 | entityToken | <code>string</code> |  | Entity token. |
 | indexToken | <code>string</code> |  | Index token. |
-| item | <code>object</code> |  | Entity item. |
-| [delimiter] | <code>string</code> | <code>&quot;~&quot;</code> | Delimiter. |
-
-<a name="module_entity-manager.EntityManager+rehydrateIndex"></a>
-
-#### entityManager.rehydrateIndex(entityToken, indexToken, value, [delimiter]) ⇒ <code>object</code>
-Convert a delimited string into a named index key.
-
-**Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
-**Returns**: <code>object</code> - Rehydrated index key.  
-**Throws**:
-
-- <code>Error</code> If entityToken is invalid.
-- <code>Error</code> If indexToken is invalid.
-
-
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| entityToken | <code>string</code> |  | Entity token. |
-| indexToken | <code>string</code> |  | Index token. |
-| value | <code>string</code> |  | Dehydrated index value. |
+| index | <code>object</code> |  | Index object. |
 | [delimiter] | <code>string</code> | <code>&quot;~&quot;</code> | Delimiter. |
 
 <a name="module_entity-manager.EntityManager+getKeySpace"></a>
@@ -378,6 +358,26 @@ Query an entity across shards.
 | [options] | <code>object</code> | Options object. |
 | [options.limit] | <code>number</code> | Request limit. |
 | [options.pageKeys] | <code>object</code> | Map of shard page keys. |
+
+<a name="module_entity-manager.EntityManager+rehydrateIndex"></a>
+
+#### entityManager.rehydrateIndex(entityToken, indexToken, value, [delimiter]) ⇒ <code>object</code>
+Convert a delimited string into a named index key.
+
+**Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
+**Returns**: <code>object</code> - Rehydrated index key.  
+**Throws**:
+
+- <code>Error</code> If entityToken is invalid.
+- <code>Error</code> If indexToken is invalid.
+
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| entityToken | <code>string</code> |  | Entity token. |
+| indexToken | <code>string</code> |  | Index token. |
+| value | <code>string</code> |  | Dehydrated index value. |
+| [delimiter] | <code>string</code> | <code>&quot;~&quot;</code> | Delimiter. |
 
 <a name="module_entity-manager.EntityManager+removeKeys"></a>
 
