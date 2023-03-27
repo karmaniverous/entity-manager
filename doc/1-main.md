@@ -50,7 +50,7 @@ export const config = {
       // this entity. Each property value is a function expects an entity
       // object as its one argument. In the examples below, entity attributes
       // are destructured in the function declaration and the return value is
-      // expressed as a template literal.
+      // expressed as a template literal..
       keys: {
         // Table HASH key. Note the optional shardId.
         entityPK: ({ shardId }) => `transaction${sn2e`!${shardId}`}`,
