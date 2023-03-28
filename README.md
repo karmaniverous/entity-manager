@@ -315,7 +315,7 @@ Condense an index object into a delimited string.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | entityToken | <code>string</code> |  | Entity token. |
-| indexToken | <code>string</code> |  | Index token. |
+| indexToken | <code>string</code> \| <code>Array.&lt;string&gt;</code> |  | Index token or array of key tokens. |
 | index | <code>object</code> |  | Index object. |
 | [delimiter] | <code>string</code> | <code>&quot;~&quot;</code> | Delimiter. |
 
