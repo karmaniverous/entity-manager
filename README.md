@@ -375,7 +375,7 @@ Convert a delimited string into a named index key.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | entityToken | <code>string</code> |  | Entity token. |
-| indexToken | <code>string</code> |  | Index token. |
+| indexToken | <code>string</code> \| <code>Array.&lt;string&gt;</code> |  | Index token or array of key tokens. |
 | value | <code>string</code> |  | Dehydrated index value. |
 | [delimiter] | <code>string</code> | <code>&quot;~&quot;</code> | Delimiter. |
 
