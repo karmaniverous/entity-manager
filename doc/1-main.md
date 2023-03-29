@@ -56,7 +56,7 @@ export const config = {
         entityPK: ({ shardId }) => `transaction${sn2e`!${shardId}`}`,
 
         // Table RANGE key.
-        entitySK: ({ timestamp, transactionId }) =>
+        transactionSK: ({ timestamp, transactionId }) =>
           sn2u`timestamp#${timestamp}|transactionId#${transactionId}`,
 
         // merchants GSI HASH key. Note the optional shardId.
@@ -162,7 +162,7 @@ entityManager.addKeys(transaction);
 // debug:      "userId": "userIdValue",
 // debug:      "shardId": "7",
 // debug:      "entityPK": "transaction!7",
-// debug:      "entitySK": "timestamp#1676869312851|transactionId#transactionIdValue",
+// debug:      "transactionSK": "timestamp#1676869312851|transactionId#transactionIdValue",
 // debug:      "merchantPK": "merchantId#merchantIdValue|transaction!7",
 // debug:      "merchantSK": "timestamp#1676869312851|methodId#methodIdValue|transactionId#transactionIdValue",
 // debug:      "methodPK": "method#methodIdValue|transaction!7",

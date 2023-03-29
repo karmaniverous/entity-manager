@@ -56,7 +56,7 @@ export const config = {
         entityPK: ({ shardId }) => `transaction${sn2e`!${shardId}`}`,
 
         // Table RANGE key.
-        entitySK: ({ timestamp, transactionId }) =>
+        transactionSK: ({ timestamp, transactionId }) =>
           sn2u`timestamp#${timestamp}|transactionId#${transactionId}`,
 
         // merchants GSI HASH key. Note the optional shardId.
@@ -162,7 +162,7 @@ entityManager.addKeys(transaction);
 // debug:      "userId": "userIdValue",
 // debug:      "shardId": "7",
 // debug:      "entityPK": "transaction!7",
-// debug:      "entitySK": "timestamp#1676869312851|transactionId#transactionIdValue",
+// debug:      "transactionSK": "timestamp#1676869312851|transactionId#transactionIdValue",
 // debug:      "merchantPK": "merchantId#merchantIdValue|transaction!7",
 // debug:      "merchantSK": "timestamp#1676869312851|methodId#methodIdValue|transactionId#transactionIdValue",
 // debug:      "methodPK": "method#methodIdValue|transaction!7",
@@ -222,6 +222,7 @@ This change can be accomplished with no breaking changes to existing implementat
             * [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
             * [.calcShardKey(entityToken, item)](#module_entity-manager.EntityManager+calcShardKey) ⇒ <code>string</code>
             * [.dehydrateIndex(entityToken, indexToken, index, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
+            * [.getKey(entityToken, keyToken)](#module_entity-manager.EntityManager+getKey) ⇒ <code>object</code>
             * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
             * [.query(entityToken, keyToken, item, shardQuery, [options])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
             * [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
@@ -243,6 +244,7 @@ Manage DynamoDb entities.
     * [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
     * [.calcShardKey(entityToken, item)](#module_entity-manager.EntityManager+calcShardKey) ⇒ <code>string</code>
     * [.dehydrateIndex(entityToken, indexToken, index, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
+    * [.getKey(entityToken, keyToken)](#module_entity-manager.EntityManager+getKey) ⇒ <code>object</code>
     * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
     * [.query(entityToken, keyToken, item, shardQuery, [options])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
     * [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
@@ -318,6 +320,19 @@ Condense an index object into a delimited string.
 | indexToken | <code>string</code> \| <code>Array.&lt;string&gt;</code> |  | Index token or array of key tokens. |
 | index | <code>object</code> |  | Index object. |
 | [delimiter] | <code>string</code> | <code>&quot;~&quot;</code> | Delimiter. |
+
+<a name="module_entity-manager.EntityManager+getKey"></a>
+
+#### entityManager.getKey(entityToken, keyToken) ⇒ <code>object</code>
+Return the config for a given entity key token.
+
+**Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
+**Returns**: <code>object</code> - Entity key config.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| entityToken | <code>string</code> | Entity token. |
+| keyToken | <code>string</code> | Key token. |
 
 <a name="module_entity-manager.EntityManager+getKeySpace"></a>
 
