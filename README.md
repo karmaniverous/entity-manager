@@ -224,7 +224,7 @@ This change can be accomplished with no breaking changes to existing implementat
             * [.dehydrateIndex(entityToken, indexToken, index, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
             * [.getKey(entityToken, keyToken)](#module_entity-manager.EntityManager+getKey) ⇒ <code>object</code>
             * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
-            * [.query(entityToken, keyToken, item, shardQuery, [options])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+            * [.query(options)](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
             * [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
             * [.removeKeys(entityToken, item)](#module_entity-manager.EntityManager+removeKeys) ⇒ <code>object</code>
     * _inner_
@@ -246,7 +246,7 @@ Manage DynamoDb entities.
     * [.dehydrateIndex(entityToken, indexToken, index, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
     * [.getKey(entityToken, keyToken)](#module_entity-manager.EntityManager+getKey) ⇒ <code>object</code>
     * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
-    * [.query(entityToken, keyToken, item, shardQuery, [options])](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+    * [.query(options)](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
     * [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
     * [.removeKeys(entityToken, item)](#module_entity-manager.EntityManager+removeKeys) ⇒ <code>object</code>
 
@@ -358,21 +358,21 @@ Return an array of sharded keys valid for a given entity token & timestamp.
 
 <a name="module_entity-manager.EntityManager+query"></a>
 
-#### entityManager.query(entityToken, keyToken, item, shardQuery, [options]) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+#### entityManager.query(options) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
 Query an entity across shards.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
 **Returns**: <code>Promise.&lt;ShardedQueryResult&gt;</code> - Sharded query result.  
 
-| Param | Type | Description |
-| --- | --- | --- |
-| entityToken | <code>string</code> | Entity token. |
-| keyToken | <code>string</code> | Key token. |
-| item | <code>object</code> | Entity item sufficiently populated to generate property keyToken. |
-| shardQuery | <code>ShardQueryFunction</code> | Sharded query function. |
-| [options] | <code>object</code> | Options object. |
-| [options.limit] | <code>number</code> | Request limit. |
-| [options.pageKeys] | <code>object</code> | Map of shard page keys. |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| options | <code>object</code> |  | Query options. |
+| options.entityToken | <code>string</code> |  | Entity token. |
+| [options.keyToken] | <code>string</code> | <code>&quot;entityPK&quot;</code> | Key token. |
+| [options.item] | <code>object</code> | <code>{}</code> | Entity item sufficiently populated to generate property keyToken. |
+| options.shardQuery | <code>ShardQueryFunction</code> |  | Sharded query function. |
+| [options.limit] | <code>number</code> |  | Request limit. |
+| [options.pageKeys] | <code>object</code> |  | Map of shard page keys. |
 
 <a name="module_entity-manager.EntityManager+rehydrateIndex"></a>
 
@@ -434,9 +434,8 @@ Shard query function
 | Param | Type | Description |
 | --- | --- | --- |
 | shardedKey | <code>string</code> | Sharded key. |
-| [options] | <code>object</code> | Options object. |
-| [options.limit] | <code>number</code> | Request limit. |
-| [options.pageKey] | <code>\*</code> | Page key. |
+| [limit] | <code>number</code> | Request limit. |
+| [pageKey] | <code>\*</code> | Page key. |
 
 <a name="module_entity-manager..ShardedQueryResult"></a>
 
