@@ -364,15 +364,15 @@ Query an entity across shards.
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
 **Returns**: <code>Promise.&lt;ShardedQueryResult&gt;</code> - Sharded query result.  
 
-| Param | Type | Default | Description |
-| --- | --- | --- | --- |
-| options | <code>object</code> |  | Query options. |
-| options.entityToken | <code>string</code> |  | Entity token. |
-| [options.keyToken] | <code>string</code> | <code>&quot;entityPK&quot;</code> | Key token. |
-| [options.item] | <code>object</code> | <code>{}</code> | Entity item sufficiently populated to generate property keyToken. |
-| options.shardQuery | <code>ShardQueryFunction</code> |  | Sharded query function. |
-| [options.limit] | <code>number</code> |  | Request limit. |
-| [options.pageKeys] | <code>object</code> |  | Map of shard page keys. |
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>object</code> | Query options. |
+| options.entityToken | <code>string</code> | Entity token. |
+| [options.keyToken] | <code>string</code> | Key token. |
+| [options.item] | <code>object</code> | Entity item sufficiently populated to generate property keyToken. |
+| options.shardQuery | <code>ShardQueryFunction</code> | Sharded query function. |
+| [options.limit] | <code>number</code> | Request limit. |
+| [options.pageKeys] | <code>object</code> | Map of shard page keys. |
 
 <a name="module_entity-manager.EntityManager+rehydrateIndex"></a>
 

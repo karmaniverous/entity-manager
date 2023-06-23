@@ -16,5 +16,8 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["mocha", "promise"]
+  "plugins": ["mocha", "promise"],
+  "rules": {
+    "jsdoc/tag-lines": "off"
+  }
 }
