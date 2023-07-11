@@ -373,6 +373,7 @@ Query an entity across shards.
 | options.shardQuery | <code>ShardQueryFunction</code> | Sharded query function. |
 | [options.limit] | <code>number</code> | Request limit. |
 | [options.pageKeys] | <code>object</code> | Map of shard page keys. |
+| [options.pages] | <code>number</code> \| <code>&#x27;all&#x27;</code> | Max number of pages to query. |
 
 <a name="module_entity-manager.EntityManager+rehydrateIndex"></a>
 
