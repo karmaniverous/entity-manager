@@ -43,6 +43,7 @@
     "eslint-plugin-mocha": "^10.4.3",
     "eslint-plugin-promise": "^6.2.0",
     "jsdoc-to-markdown": "^8.0.1",
+    "knip": "^5.21.2",
     "mocha": "^10.4.0",
     "release-it": "^17.3.0"
   },
@@ -78,6 +79,7 @@
     "test": "mocha",
     "build": "babel lib -d dist/default/lib --delete-dir-on-start --config-file ./dist/default/.babelrc",
     "doc": "jsdoc2md -c doc/jsdoc.config.json -f lib/**/*.* -t doc/api-template.hbs > doc/2-api.jsdoc2.md && concat-md doc --hide-anchor-links > README.md",
+    "knip": "knip",
     "prerelease": "npm run lint && npm run test && npm run build && npm run doc",
     "release": "release-it"
   },
