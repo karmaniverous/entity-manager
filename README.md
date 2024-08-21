@@ -215,46 +215,44 @@ This change can be accomplished with no breaking changes to existing implementat
 
 ## entity-manager
 
-- [entity-manager](#module_entity-manager)
-  - _static_
-    - [.EntityManager](#module_entity-manager.EntityManager)
-      - [new exports.EntityManager(options)](#new_module_entity-manager.EntityManager_new)
-      - [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
-      - [.calcShardKey(entityToken, item)](#module_entity-manager.EntityManager+calcShardKey) ⇒ <code>string</code>
-      - [.dehydrateIndex(entityToken, indexToken, index, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
-      - [.getKey(entityToken, keyToken)](#module_entity-manager.EntityManager+getKey) ⇒ <code>object</code>
-      - [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
-      - [.query(options)](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
-      - [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
-      - [.removeKeys(entityToken, item)](#module_entity-manager.EntityManager+removeKeys) ⇒ <code>object</code>
-  - _inner_
-    - [~ShardQueryResult](#module_entity-manager..ShardQueryResult) : <code>object</code>
-    - [~ShardQueryFunction](#module_entity-manager..ShardQueryFunction) ⇒ <code>Promise.&lt;ShardQueryResult&gt;</code>
-    - [~ShardedQueryResult](#module_entity-manager..ShardedQueryResult) : <code>object</code>
+* [entity-manager](#module_entity-manager)
+    * _static_
+        * [.EntityManager](#module_entity-manager.EntityManager)
+            * [new exports.EntityManager(options)](#new_module_entity-manager.EntityManager_new)
+            * [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
+            * [.calcShardKey(entityToken, item)](#module_entity-manager.EntityManager+calcShardKey) ⇒ <code>string</code>
+            * [.dehydrateIndex(entityToken, indexToken, index, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
+            * [.getKey(entityToken, keyToken)](#module_entity-manager.EntityManager+getKey) ⇒ <code>object</code>
+            * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
+            * [.query(options)](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+            * [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
+            * [.removeKeys(entityToken, item)](#module_entity-manager.EntityManager+removeKeys) ⇒ <code>object</code>
+    * _inner_
+        * [~ShardQueryResult](#module_entity-manager..ShardQueryResult) : <code>object</code>
+        * [~ShardQueryFunction](#module_entity-manager..ShardQueryFunction) ⇒ <code>Promise.&lt;ShardQueryResult&gt;</code>
+        * [~ShardedQueryResult](#module_entity-manager..ShardedQueryResult) : <code>object</code>
 
 <a name="module_entity-manager.EntityManager"></a>
 
 ### entity-manager.EntityManager
-
 Manage DynamoDb entities.
 
-**Kind**: static class of [<code>entity-manager</code>](#module_entity-manager)
+**Kind**: static class of [<code>entity-manager</code>](#module_entity-manager)  
 
-- [.EntityManager](#module_entity-manager.EntityManager)
-  - [new exports.EntityManager(options)](#new_module_entity-manager.EntityManager_new)
-  - [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
-  - [.calcShardKey(entityToken, item)](#module_entity-manager.EntityManager+calcShardKey) ⇒ <code>string</code>
-  - [.dehydrateIndex(entityToken, indexToken, index, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
-  - [.getKey(entityToken, keyToken)](#module_entity-manager.EntityManager+getKey) ⇒ <code>object</code>
-  - [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
-  - [.query(options)](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
-  - [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
-  - [.removeKeys(entityToken, item)](#module_entity-manager.EntityManager+removeKeys) ⇒ <code>object</code>
+* [.EntityManager](#module_entity-manager.EntityManager)
+    * [new exports.EntityManager(options)](#new_module_entity-manager.EntityManager_new)
+    * [.addKeys(entityToken, item, [overwrite])](#module_entity-manager.EntityManager+addKeys) ⇒ <code>object</code>
+    * [.calcShardKey(entityToken, item)](#module_entity-manager.EntityManager+calcShardKey) ⇒ <code>string</code>
+    * [.dehydrateIndex(entityToken, indexToken, index, [delimiter])](#module_entity-manager.EntityManager+dehydrateIndex) ⇒ <code>string</code>
+    * [.getKey(entityToken, keyToken)](#module_entity-manager.EntityManager+getKey) ⇒ <code>object</code>
+    * [.getKeySpace(entityToken, keyToken, item, timestamp)](#module_entity-manager.EntityManager+getKeySpace) ⇒ <code>Array.&lt;string&gt;</code>
+    * [.query(options)](#module_entity-manager.EntityManager+query) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
+    * [.rehydrateIndex(entityToken, indexToken, value, [delimiter])](#module_entity-manager.EntityManager+rehydrateIndex) ⇒ <code>object</code>
+    * [.removeKeys(entityToken, item)](#module_entity-manager.EntityManager+removeKeys) ⇒ <code>object</code>
 
 <a name="new_module_entity-manager.EntityManager_new"></a>
 
 #### new exports.EntityManager(options)
-
 Create an EntityManager instance.
 
 **Returns**: <code>EntityManager</code> - EntityManager instance.  
@@ -263,16 +261,16 @@ Create an EntityManager instance.
 - <code>Error</code> If config is invalid.
 - <code>Error</code> If logger is invalid.
 
-| Param            | Type                | Description                                                                                                                       |
-| ---------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| options          | <code>object</code> | Options object.                                                                                                                   |
+
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>object</code> | Options object. |
 | [options.config] | <code>object</code> | EntityManager configuration object (see [README](https://github.com/karmaniverous/entity-manager#configuration) for a breakdown). |
-| [options.logger] | <code>object</code> | Logger instance (defaults to console, must support error & debug methods).                                                        |
+| [options.logger] | <code>object</code> | Logger instance (defaults to console, must support error & debug methods). |
 
 <a name="module_entity-manager.EntityManager+addKeys"></a>
 
 #### entityManager.addKeys(entityToken, item, [overwrite]) ⇒ <code>object</code>
-
 Add sharded keys to an entity item. Does not mutate original item.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
@@ -282,30 +280,29 @@ Add sharded keys to an entity item. Does not mutate original item.
 - <code>Error</code> If entityToken is invalid.
 - <code>Error</code> If item is invalid.
 
-| Param       | Type                 | Default            | Description                    |
-| ----------- | -------------------- | ------------------ | ------------------------------ |
-| entityToken | <code>string</code>  |                    | Entity token.                  |
-| item        | <code>object</code>  |                    | Entity item.                   |
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| entityToken | <code>string</code> |  | Entity token. |
+| item | <code>object</code> |  | Entity item. |
 | [overwrite] | <code>boolean</code> | <code>false</code> | Overwrite existing properties. |
 
 <a name="module_entity-manager.EntityManager+calcShardKey"></a>
 
 #### entityManager.calcShardKey(entityToken, item) ⇒ <code>string</code>
-
 Calculated the shard key for an entity item.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
-**Returns**: <code>string</code> - Shard key.
+**Returns**: <code>string</code> - Shard key.  
 
-| Param       | Type                | Description   |
-| ----------- | ------------------- | ------------- |
+| Param | Type | Description |
+| --- | --- | --- |
 | entityToken | <code>string</code> | Entity token. |
-| item        | <code>object</code> | Entity item.  |
+| item | <code>object</code> | Entity item. |
 
 <a name="module_entity-manager.EntityManager+dehydrateIndex"></a>
 
 #### entityManager.dehydrateIndex(entityToken, indexToken, index, [delimiter]) ⇒ <code>string</code>
-
 Condense an index object into a delimited string.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
@@ -316,31 +313,30 @@ Condense an index object into a delimited string.
 - <code>Error</code> If indexToken is invalid.
 - <code>Error</code> If item is invalid.
 
-| Param       | Type                                                     | Default                    | Description                         |
-| ----------- | -------------------------------------------------------- | -------------------------- | ----------------------------------- |
-| entityToken | <code>string</code>                                      |                            | Entity token.                       |
-| indexToken  | <code>string</code> \| <code>Array.&lt;string&gt;</code> |                            | Index token or array of key tokens. |
-| index       | <code>object</code>                                      |                            | Index object.                       |
-| [delimiter] | <code>string</code>                                      | <code>&quot;~&quot;</code> | Delimiter.                          |
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| entityToken | <code>string</code> |  | Entity token. |
+| indexToken | <code>string</code> \| <code>Array.&lt;string&gt;</code> |  | Index token or array of key tokens. |
+| index | <code>object</code> |  | Index object. |
+| [delimiter] | <code>string</code> | <code>&quot;~&quot;</code> | Delimiter. |
 
 <a name="module_entity-manager.EntityManager+getKey"></a>
 
 #### entityManager.getKey(entityToken, keyToken) ⇒ <code>object</code>
-
 Return the config for a given entity key token.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
-**Returns**: <code>object</code> - Entity key config.
+**Returns**: <code>object</code> - Entity key config.  
 
-| Param       | Type                | Description   |
-| ----------- | ------------------- | ------------- |
+| Param | Type | Description |
+| --- | --- | --- |
 | entityToken | <code>string</code> | Entity token. |
-| keyToken    | <code>string</code> | Key token.    |
+| keyToken | <code>string</code> | Key token. |
 
 <a name="module_entity-manager.EntityManager+getKeySpace"></a>
 
 #### entityManager.getKeySpace(entityToken, keyToken, item, timestamp) ⇒ <code>Array.&lt;string&gt;</code>
-
 Return an array of sharded keys valid for a given entity token & timestamp.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
@@ -352,37 +348,36 @@ Return an array of sharded keys valid for a given entity token & timestamp.
 - <code>Error</code> If keyToken is invalid.
 - <code>Error</code> If timestamp is invalid.
 
-| Param       | Type                | Description                                                       |
-| ----------- | ------------------- | ----------------------------------------------------------------- |
-| entityToken | <code>string</code> | Entity token.                                                     |
-| keyToken    | <code>string</code> | Key token.                                                        |
-| item        | <code>object</code> | Entity item sufficiently populated to generate property keyToken. |
-| timestamp   | <code>number</code> | Timestamp.                                                        |
+
+| Param | Type | Description |
+| --- | --- | --- |
+| entityToken | <code>string</code> | Entity token. |
+| keyToken | <code>string</code> | Key token. |
+| item | <code>object</code> | Entity item sufficiently populated to generate property keyToken. |
+| timestamp | <code>number</code> | Timestamp. |
 
 <a name="module_entity-manager.EntityManager+query"></a>
 
 #### entityManager.query(options) ⇒ <code>Promise.&lt;ShardedQueryResult&gt;</code>
-
 Query an entity across shards.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
-**Returns**: <code>Promise.&lt;ShardedQueryResult&gt;</code> - Sharded query result.
+**Returns**: <code>Promise.&lt;ShardedQueryResult&gt;</code> - Sharded query result.  
 
-| Param               | Type                            | Description                                                       |
-| ------------------- | ------------------------------- | ----------------------------------------------------------------- |
-| options             | <code>object</code>             | Query options.                                                    |
-| options.entityToken | <code>string</code>             | Entity token.                                                     |
-| [options.keyToken]  | <code>string</code>             | Key token.                                                        |
-| [options.item]      | <code>object</code>             | Entity item sufficiently populated to generate property keyToken. |
-| options.shardQuery  | <code>ShardQueryFunction</code> | Sharded query function.                                           |
-| [options.limit]     | <code>number</code>             | Request limit.                                                    |
-| [options.pageKeys]  | <code>object</code>             | Map of shard page keys.                                           |
-| [options.pageSize]  | <code>number</code>             | Request page size.                                                |
+| Param | Type | Description |
+| --- | --- | --- |
+| options | <code>object</code> | Query options. |
+| options.entityToken | <code>string</code> | Entity token. |
+| [options.keyToken] | <code>string</code> | Key token. |
+| [options.item] | <code>object</code> | Entity item sufficiently populated to generate property keyToken. |
+| options.shardQuery | <code>ShardQueryFunction</code> | Sharded query function. |
+| [options.limit] | <code>number</code> | Request limit. |
+| [options.pageKeys] | <code>object</code> | Map of shard page keys. |
+| [options.pageSize] | <code>number</code> | Request page size. |
 
 <a name="module_entity-manager.EntityManager+rehydrateIndex"></a>
 
 #### entityManager.rehydrateIndex(entityToken, indexToken, value, [delimiter]) ⇒ <code>object</code>
-
 Convert a delimited string into a named index key.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
@@ -392,17 +387,17 @@ Convert a delimited string into a named index key.
 - <code>Error</code> If entityToken is invalid.
 - <code>Error</code> If indexToken is invalid.
 
-| Param       | Type                                                     | Default                    | Description                         |
-| ----------- | -------------------------------------------------------- | -------------------------- | ----------------------------------- |
-| entityToken | <code>string</code>                                      |                            | Entity token.                       |
-| indexToken  | <code>string</code> \| <code>Array.&lt;string&gt;</code> |                            | Index token or array of key tokens. |
-| value       | <code>string</code>                                      |                            | Dehydrated index value.             |
-| [delimiter] | <code>string</code>                                      | <code>&quot;~&quot;</code> | Delimiter.                          |
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| entityToken | <code>string</code> |  | Entity token. |
+| indexToken | <code>string</code> \| <code>Array.&lt;string&gt;</code> |  | Index token or array of key tokens. |
+| value | <code>string</code> |  | Dehydrated index value. |
+| [delimiter] | <code>string</code> | <code>&quot;~&quot;</code> | Delimiter. |
 
 <a name="module_entity-manager.EntityManager+removeKeys"></a>
 
 #### entityManager.removeKeys(entityToken, item) ⇒ <code>object</code>
-
 Remove sharded keys from an entity item. Does not mutate original item.
 
 **Kind**: instance method of [<code>EntityManager</code>](#module_entity-manager.EntityManager)  
@@ -412,49 +407,48 @@ Remove sharded keys from an entity item. Does not mutate original item.
 - <code>Error</code> If entityToken is invalid.
 - <code>Error</code> If item is invalid.
 
-| Param       | Type                | Description   |
-| ----------- | ------------------- | ------------- |
+
+| Param | Type | Description |
+| --- | --- | --- |
 | entityToken | <code>string</code> | Entity token. |
-| item        | <code>object</code> | Entity item.  |
+| item | <code>object</code> | Entity item. |
 
 <a name="module_entity-manager..ShardQueryResult"></a>
 
 ### entity-manager~ShardQueryResult : <code>object</code>
-
 **Kind**: inner typedef of [<code>entity-manager</code>](#module_entity-manager)  
 **Properties**
 
-| Name    | Type                           | Description         |
-| ------- | ------------------------------ | ------------------- |
-| items   | <code>Array.&lt;any&gt;</code> | Query result array. |
-| pageKey | <code>\*</code>                | Shard page key.     |
+| Name | Type | Description |
+| --- | --- | --- |
+| items | <code>Array.&lt;any&gt;</code> | Query result array. |
+| pageKey | <code>\*</code> | Shard page key. |
 
 <a name="module_entity-manager..ShardQueryFunction"></a>
 
 ### entity-manager~ShardQueryFunction ⇒ <code>Promise.&lt;ShardQueryResult&gt;</code>
-
 Shard query function
 
 **Kind**: inner typedef of [<code>entity-manager</code>](#module_entity-manager)  
-**Returns**: <code>Promise.&lt;ShardQueryResult&gt;</code> - Sharded query result.
+**Returns**: <code>Promise.&lt;ShardQueryResult&gt;</code> - Sharded query result.  
 
-| Param      | Type                | Description    |
-| ---------- | ------------------- | -------------- |
-| shardedKey | <code>string</code> | Sharded key.   |
-| [pageKey]  | <code>\*</code>     | Page key.      |
-| [limit]    | <code>number</code> | Request limit. |
+| Param | Type | Description |
+| --- | --- | --- |
+| shardedKey | <code>string</code> | Sharded key. |
+| [pageKey] | <code>\*</code> | Page key. |
+| [limit] | <code>number</code> | Request limit. |
 
 <a name="module_entity-manager..ShardedQueryResult"></a>
 
 ### entity-manager~ShardedQueryResult : <code>object</code>
-
 **Kind**: inner typedef of [<code>entity-manager</code>](#module_entity-manager)  
 **Properties**
 
-| Name     | Type                           | Description         |
-| -------- | ------------------------------ | ------------------- |
-| items    | <code>Array.&lt;any&gt;</code> | Query result array. |
-| pageKeys | <code>object</code>            | Shard page keys.    |
+| Name | Type | Description |
+| --- | --- | --- |
+| items | <code>Array.&lt;any&gt;</code> | Query result array. |
+| pageKeys | <code>object</code> | Shard page keys. |
+
 
 ---
 
