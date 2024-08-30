@@ -211,4 +211,5 @@ This change can be accomplished with no breaking changes to existing implementat
 
 ---
 
-Built with ❤️ on Bali! Find more great tools & templates on [my GitHub Profile](https://github.com/karmaniverous).
+Built for you with ❤️ on Bali! Find more great tools & templates on [my GitHub Profile](https://github.com/karmaniverous).
+

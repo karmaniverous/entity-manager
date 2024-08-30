@@ -1,1 +1,1 @@
-export { EntityManager } from './EntityManager/EntityManager.js';
+export { EntityManager } from './EntityManager.js';

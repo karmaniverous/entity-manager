@@ -4,11 +4,11 @@
     "url": "https://github.com/karmaniverous/entity-manager/issues"
   },
   "dependencies": {
-    "inspect-parameters-declaration": "^0.1.0",
+    "@karmaniverous/string-utilities": "^0.2.0",
     "jsonschema": "^1.4.1",
-    "lodash": "^4.17.21",
+    "radash": "^12.1.0",
     "string-hash": "^1.1.3",
-    "tslog": "^4.9.3"
+    "zod": "^3.23.8"
   },
   "description": "Configurably decorate entity objects with sharded index keys.",
   "devDependencies": {
@@ -24,6 +24,7 @@
     "@types/eslint-plugin-mocha": "^10.4.0",
     "@types/mocha": "^10.0.7",
     "@types/node": "^20.16.1",
+    "@types/string-hash": "^1.1.3",
     "auto-changelog": "^2.4.0",
     "chai": "^5.1.1",
     "cross-env": "^7.0.3",

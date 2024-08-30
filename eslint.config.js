@@ -12,7 +12,7 @@ export default tseslint.config(
   mochaPlugin.configs.flat.recommended,
   {
     extends: [prettierPlugin],
-    ignores: ['coverage/**/*', 'dist/**/*'],
+    ignores: ['coverage/**/*', 'dist/**/*', 'old/**/*'],
 
     languageOptions: {
       parserOptions: {
@@ -25,6 +25,7 @@ export default tseslint.config(
       tsdoc: tsDocPlugin,
     },
     rules: {
+      '@typescript-eslint/no-dynamic-delete': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/no-unused-vars': 'error',
       'mocha/no-skipped-tests': 'off',
