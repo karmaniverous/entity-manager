@@ -46,6 +46,8 @@
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.2",
     "tslib": "^2.6.3",
+    "typedoc": "^0.26.6",
+    "typedoc-plugin-replace-text": "^4.0.0",
     "typescript": "^5.5.4",
     "typescript-eslint": "^7.18.0"
   },
@@ -78,7 +80,7 @@
   },
   "release-it": {
     "git": {
-      "changelog": "npx auto-changelog --stdout --commit-limit false -u --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
+      "changelog": "npx auto-changelog --stdout --commit-limit false --unreleased --template https://raw.githubusercontent.com/release-it/release-it/main/templates/changelog-compact.hbs",
       "commitMessage": "chore: release v${version}",
       "requireBranch": "main"
     },
@@ -86,10 +88,14 @@
       "release": true
     },
     "hooks": {
+      "after:bump": "npx auto-changelog -p",
       "after:init": [
         "npm run lint",
         "npm run test",
-        "npm run build"
+        "npm run build",
+        "npm run docs",
+        "git add -A",
+        "git commit -m \"updated docs\""
       ],
       "after:release": [
         "git switch -c release/${version}",
@@ -107,12 +113,13 @@
   },
   "scripts": {
     "build": "rimraf dist && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
+    "docs": "typedoc",
     "knip": "knip",
     "lint": "eslint src/** && prettier -c src",
     "lint:fix": "eslint --fix src/** && prettier --write src",
-    "release": "release-it",
-    "release:pre": "release-it --no-git.requireBranch --github.prerelease --preRelease",
-    "test": "cross-env LOG_LEVEL=debug nyc mocha"
+    "release": "dotenvx run -f .env.local -- release-it",
+    "release:pre": "dotenvx run -f .env.local -- release-it --no-git.requireBranch --github.prerelease --preRelease",
+    "test": "dotenvx run --quiet --log-level=LOG_LEVEL=debug -- nyc mocha"
   },
   "type": "module",
   "types": "dist/index.d.ts",
