@@ -1,1 +1,2 @@
-export { EntityManager } from './EntityManager.js';
+export { EntityManager } from './EntityManager';
+export { type Config, configSchema, type RawConfig } from './Config';

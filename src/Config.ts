@@ -7,6 +7,9 @@ type DeepRequired<T> = {
   [K in keyof T]-?: T[K] extends object ? DeepRequired<T[K]> : T[K];
 };
 
+/**
+ * configSchema
+ */
 export const configSchema = z
   .object({
     entities: z
@@ -218,6 +221,12 @@ export const configSchema = z
     return data as DeepRequired<typeof data>;
   });
 
+/**
+ * RawConfig
+ */
 export type RawConfig = z.input<typeof configSchema>;
 
+/**
+ * Config
+ */
 export type Config = z.output<typeof configSchema>;
