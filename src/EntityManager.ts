@@ -1,3 +1,9 @@
+/**
+ * EntityManager module.
+ *
+ * @module
+ */
+
 import {
   alphabetical,
   isInt,
@@ -21,6 +27,11 @@ import {
   validateEntityItem,
 } from './util';
 
+/**
+ * Logger interface.
+ *
+ * @category Options
+ */
 export interface Logger {
   debug: (...args: unknown[]) => void;
   error: (...args: unknown[]) => void;
@@ -28,6 +39,8 @@ export interface Logger {
 
 /**
  * EntityManager constructor options.
+ *
+ * @category Options
  */
 export interface EntityManagerOptions {
   config?: RawConfig;
@@ -36,8 +49,10 @@ export interface EntityManagerOptions {
 
 /**
  * A result returned by an individual shard query.
+ *
+ * @category Query
  */
-interface ShardQueryResult {
+export interface ShardQueryResult {
   count: number;
   items: EntityItem[];
   pageKey?: EntityIndexItem;
@@ -45,24 +60,35 @@ interface ShardQueryResult {
 
 /**
  * A function that queries an individual shard.
+ *
+ * @param shardedKey - The key of the individual shard being queried.
+ * @param pageKey - The page key returned by the previous query on this shard.
+ * @param limit - The maximum number of items to return from this query.
+ *
+ * @category Query
  */
 export type ShardQueryFunction = (
-  /** The key of the individual shard being queries. */
   shardedKey: string,
-
-  /** The page key returned by the previous query on this shard. */
   pageKey?: EntityIndexItem,
-
-  /** The maximum number of items to return from this query. */
   limit?: number,
 ) => Promise<ShardQueryResult>;
 
-interface QueryResult {
+/**
+ * A result returned by a query.
+ *
+ * @category Query
+ */
+export interface QueryResult {
   count: number;
   items: EntityItem[];
   pageKeys: Record<string, EntityIndexItem | undefined>;
 }
 
+/**
+ * Query options.
+ *
+ * @category Query
+ */
 export interface QueryOptions {
   entityToken: string;
   keyToken?: string;
@@ -87,6 +113,11 @@ export interface QueryOptions {
   timestampTo?: number;
 }
 
+/**
+ * EntityManager class.
+ *
+ * @category Entity Manager
+ */
 export class EntityManager {
   #config: Config;
   #logger: Logger;
@@ -398,7 +429,7 @@ export class EntityManager {
    * Convert a delimited string into a named index key.
    *
    * @param entityToken - Entity token.
-   * @param indexToken - Index token or array of key tokens.
+   * @param index - Index token or array of key tokens.
    * @param value - Dehydrated index value.
    * @param delimiter - Delimiter.
    * @returns Rehydrated index key.

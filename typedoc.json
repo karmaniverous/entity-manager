@@ -1,5 +1,7 @@
 {
-  "entryPoints": ["./src/index.ts"],
+  "categoryOrder": ["Entity Manager", "Options", "Items", "Query"],
+  "defaultCategory": "Entity Manager",
+  "entryPoints": ["./src"],
   "highlightLanguages": [
     "bash",
     "console",
@@ -13,8 +15,8 @@
     "tsx",
     "typescript"
   ],
-  "navigationLinks": {
-    "@karmaniverous": "https://github.com/karmaniverous"
+  "navigation": {
+    "includeCategories": true
   },
   "out": "./docs/",
   "plugin": ["typedoc-plugin-replace-text", "typedoc-plugin-zod"],
@@ -28,5 +30,7 @@
       }
     ]
   },
-  "titleLink": "https://github.com/karmaniverous/npm-package-template-ts"
+  "sidebarLinks": {
+    "GitHub Repo": "https://github.com/karmaniverous/entity-manager"
+  }
 }

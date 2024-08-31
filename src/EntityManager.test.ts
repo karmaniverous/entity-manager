@@ -70,14 +70,13 @@ const defaultConfig: RawConfig = {
           elements: ['entity', 'shardKey'],
           encode: ({ entity, shardKey }) => n2e`${entity}!${shardKey}`,
           decode: (value: string) =>
-            value.match(/^(?<entity>.*)!(?<shardKey>.*)$/)?.groups,
+            /^(?<entity>.*)!(?<shardKey>.*)$/.exec(value)?.groups,
         },
 
         entitySK: {
           elements: ['txnId'],
           encode: ({ txnId }) => sn2u`txnId#${txnId}`,
-          decode: (value: string) =>
-            value.match(/^txnId#(?<txnId>.*)$/)?.groups,
+          decode: (value: string) => /^txnId#(?<txnId>.*)$/.exec(value)?.groups,
         },
 
         txnBeneficiaryPK: {
@@ -85,8 +84,8 @@ const defaultConfig: RawConfig = {
           encode: ({ entity, beneficiaryId, shardKey }) =>
             sn2u`${n2e`${entity}!${shardKey}`}|beneficiaryId#${beneficiaryId}`,
           decode: (value: string) =>
-            value.match(
-              /^(?<entity>.*)!(?<shardKey>.*)\|beneficiaryId#(?<beneficiaryId>.*)$/,
+            /^(?<entity>.*)!(?<shardKey>.*)\|beneficiaryId#(?<beneficiaryId>.*)$/.exec(
+              value,
             )?.groups,
         },
 
@@ -95,8 +94,8 @@ const defaultConfig: RawConfig = {
           encode: ({ entity, groupId, shardKey }) =>
             sn2u`${n2e`${entity}!${shardKey}`}|groupId#${groupId}`,
           decode: (value: string) =>
-            value.match(
-              /^(?<entity>.*)!(?<shardKey>.*)\|groupId#(?<groupId>.*)$/,
+            /^(?<entity>.*)!(?<shardKey>.*)\|groupId#(?<groupId>.*)$/.exec(
+              value,
             )?.groups,
         },
 
@@ -105,8 +104,8 @@ const defaultConfig: RawConfig = {
           encode: ({ entity, merchantId, shardKey }) =>
             sn2u`${n2e`${entity}!${shardKey}`}|merchantId#${merchantId}`,
           decode: (value: string) =>
-            value.match(
-              /^(?<entity>.*)!(?<shardKey>.*)\|merchantId#(?<merchantId>.*)$/,
+            /^(?<entity>.*)!(?<shardKey>.*)\|merchantId#(?<merchantId>.*)$/.exec(
+              value,
             )?.groups,
         },
 
@@ -115,8 +114,8 @@ const defaultConfig: RawConfig = {
           encode: ({ entity, methodId, shardKey }) =>
             sn2u`${n2e`${entity}!${shardKey}`}|methodId#${methodId}`,
           decode: (value: string) =>
-            value.match(
-              /^(?<entity>.*)!(?<shardKey>.*)\|methodId#(?<methodId>.*)$/,
+            /^(?<entity>.*)!(?<shardKey>.*)\|methodId#(?<methodId>.*)$/.exec(
+              value,
             )?.groups,
         },
 
@@ -125,8 +124,8 @@ const defaultConfig: RawConfig = {
           encode: ({ entity, offerId, shardKey }) =>
             sn2u`${n2e`${entity}!${shardKey}`}|offerId#${offerId}`,
           decode: (value: string) =>
-            value.match(
-              /^(?<entity>.*)!(?<shardKey>.*)\|offerId#(?<offerId>.*)$/,
+            /^(?<entity>.*)!(?<shardKey>.*)\|offerId#(?<offerId>.*)$/.exec(
+              value,
             )?.groups,
         },
 
@@ -135,8 +134,8 @@ const defaultConfig: RawConfig = {
           encode: ({ entity, storeId, shardKey }) =>
             sn2u`${n2e`${entity}!${shardKey}`}|storeId#${storeId}`,
           decode: (value: string) =>
-            value.match(
-              /^(?<entity>.*)!(?<shardKey>.*)\|storeId#(?<storeId>.*)$/,
+            /^(?<entity>.*)!(?<shardKey>.*)\|storeId#(?<storeId>.*)$/.exec(
+              value,
             )?.groups,
         },
 
@@ -145,7 +144,7 @@ const defaultConfig: RawConfig = {
           encode: ({ entity, userId, shardKey }) =>
             sn2u`${n2e`${entity}!${shardKey}`}|userId#${userId}`,
           decode: (value: string) =>
-            value.match(/^(?<entity>.*)!(?<shardKey>.*)\|userId#(?<userId>.*)$/)
+            /^(?<entity>.*)!(?<shardKey>.*)\|userId#(?<userId>.*)$/.exec(value)
               ?.groups,
         },
 

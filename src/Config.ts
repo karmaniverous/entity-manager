@@ -3,13 +3,59 @@ import { z } from 'zod';
 
 const defaultBump = { timestamp: 0, nibbleBits: 1, nibbles: 0 };
 
-type DeepRequired<T> = {
-  [K in keyof T]-?: T[K] extends object ? DeepRequired<T[K]> : T[K];
-};
+// EncodeFunction zod schema
+const encodeFunctionSchema = z
+  .function()
+  .args(z.record(z.unknown()))
+  .returns(z.unknown());
 
 /**
- * configSchema
+ * EncodeFunction
+ *
+ * @category Options
  */
+export type EncodeFunction = z.infer<typeof encodeFunctionSchema>;
+
+// DecodeFunction zod schema
+const decodeFunctionSchema = z
+  .function()
+  .args(z.any())
+  .returns(z.record(z.unknown()).optional());
+
+/**
+ * DecodeFunction
+ *
+ * @category Options
+ */
+export type DecodeFunction = z.infer<typeof decodeFunctionSchema>;
+
+// DecodeFunction zod schema
+const entityKeyFunctionSchema = z
+  .function()
+  .args(z.record(z.unknown()))
+  .returns(z.string());
+
+/**
+ * EntityKeyFunction
+ *
+ * @category Options
+ */
+export type EntityKeyFunction = z.infer<typeof entityKeyFunctionSchema>;
+
+// TimestampFunction zod schema
+const timestampFunctionSchema = z
+  .function()
+  .args(z.record(z.unknown()))
+  .returns(z.number());
+
+/**
+ * TimestampFunction
+ *
+ * @category Options
+ */
+export type TimestampFunction = z.infer<typeof timestampFunctionSchema>;
+
+// Config zod schema
 export const configSchema = z
   .object({
     entities: z
@@ -37,17 +83,16 @@ export const configSchema = z
           keys: z
             .record(
               z.object({
-                elements: z.array(z.string().min(1)).optional(), // must be unique, defaults to [keyToken]
-                encode: z
-                  .function()
-                  .args(z.record(z.unknown()))
-                  .returns(z.unknown())
-                  .optional(), // defaults to (item) => item[keyToken]
-                decode: z
-                  .function()
-                  .args(z.any())
-                  .returns(z.record(z.unknown()).optional())
-                  .optional(), // defauts to (value) => {[keyToken]: value}
+                elements: z
+                  .array(z.string().min(1))
+                  .optional()
+                  .refine((data): data is string[] => z.NEVER), // elements must be unique, defaults to [keyToken]
+                encode: encodeFunctionSchema
+                  .optional()
+                  .refine((data): data is EncodeFunction => z.NEVER), // defaults to (item) => item[keyToken]
+                decode: decodeFunctionSchema
+                  .optional()
+                  .refine((data): data is DecodeFunction => z.NEVER), // defauts to (value) => {[keyToken]: value}
                 retain: z.boolean().default(false),
               }),
             ) // no token collisions
@@ -57,23 +102,19 @@ export const configSchema = z
               bumps: z
                 .array(
                   z.object({
-                    timestamp: z.number().nonnegative().safe(), // must be unique
+                    timestamp: z.number().nonnegative().safe(), // must be unique in bumps array
                     nibbleBits: z.number().int().min(1).max(5),
                     nibbles: z.number().int().min(0).max(40), // must increase monotonically with timestamp
                   }),
                 )
 
                 .default([defaultBump]),
-              entityKey: z
-                .function()
-                .args(z.record(z.unknown()))
-                .returns(z.string())
-                .optional(), // required if positive-nibble bumps defined
-              timestamp: z
-                .function()
-                .args(z.record(z.unknown()))
-                .returns(z.number())
-                .optional(), // required if positive-nibble bumps defined
+              entityKey: entityKeyFunctionSchema
+                .optional()
+                .refine((data): data is EntityKeyFunction => z.NEVER), // required if positive-nibble bumps defined
+              timestamp: timestampFunctionSchema
+                .optional()
+                .refine((data): data is TimestampFunction => z.NEVER), // required if positive-nibble bumps defined
             })
             .default({ bumps: [defaultBump] }),
         }),
@@ -123,8 +164,9 @@ export const configSchema = z
       }
 
       // validate keys
+      // recast to RawConfig type
       for (const [keyToken, key] of Object.entries(entity.keys))
-        if (key.elements) {
+        if (key.elements as string[] | undefined) {
           // validate elements
           const counts = counting(key.elements, (element) => element);
 
@@ -173,16 +215,16 @@ export const configSchema = z
 
         // if positive-nibble bumps are defined...
         if (entity.sharding.bumps.some(({ nibbles }) => !!nibbles)) {
-          // entityKey function must be defined
-          if (!entity.sharding.entityKey)
+          // entityKey function must be defined, recast to RawConfig type
+          if (!(entity.sharding.entityKey as EntityKeyFunction | undefined))
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `entity ${entityToken} sharding entityToken function required when positive-nibble bumps defined`,
               path: ['entities', entityToken, 'sharding'],
             });
 
-          // timestamp function must be defined.
-          if (!entity.sharding.timestamp)
+          // timestamp function must be defined, recast to RawConfig type
+          if (!(entity.sharding.timestamp as TimestampFunction | undefined))
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               message: `entity ${entityToken} sharding timestamp function required when positive-nibble bumps defined`,
@@ -197,14 +239,16 @@ export const configSchema = z
     for (const entity of Object.values(data.entities)) {
       // Normalize keys.
       for (const [keyToken, key] of Object.entries(entity.keys)) {
-        // Default elements.
-        key.elements ??= [keyToken];
+        // default elements, recast to RawConfig type
+        (key.elements as string[] | undefined) ??= [keyToken];
 
-        // Default encode function.
-        key.encode ??= (item) => item[keyToken];
+        // default encode function, recast to RawConfig type
+        (key.encode as EncodeFunction | undefined) ??= (item) => item[keyToken];
 
-        // Default decode function.
-        key.decode ??= (value: unknown) => ({ [keyToken]: value });
+        // default decode function, recast to RawConfig type
+        (key.decode as DecodeFunction | undefined) ??= (value: unknown) => ({
+          [keyToken]: value,
+        });
       }
 
       // Sort sharding bumps by timestamp.
@@ -218,15 +262,19 @@ export const configSchema = z
         entity.sharding.bumps = [defaultBump, ...entity.sharding.bumps];
     }
 
-    return data as DeepRequired<typeof data>;
+    return data;
   });
 
 /**
  * RawConfig
+ *
+ * @category Options
  */
 export type RawConfig = z.input<typeof configSchema>;
 
 /**
  * Config
+ *
+ * @category Options
  */
-export type Config = z.output<typeof configSchema>;
+export type Config = z.infer<typeof configSchema>;

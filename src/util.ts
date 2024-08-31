@@ -199,6 +199,8 @@ export const getShardKeySpace = (
 
 /**
  * Entity item type.
+ *
+ * @category Items
  */
 export type EntityItem = Record<string, unknown>;
 
@@ -217,6 +219,8 @@ export const validateEntityItem = (item: EntityItem) => {
 
 /**
  * Entity index item type.
+ *
+ * @category Items
  */
 export type EntityIndexItem = Record<string, Stringifiable>;
 
