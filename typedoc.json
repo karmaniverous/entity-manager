@@ -30,7 +30,12 @@
       }
     ]
   },
+  "searchInComments": true,
+  "searchInDocuments": true,
   "sidebarLinks": {
     "GitHub Repo": "https://github.com/karmaniverous/entity-manager"
+  },
+  "visibilityFilters": {
+    "external": true
   }
 }

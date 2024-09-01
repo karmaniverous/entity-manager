@@ -6,6 +6,8 @@
 
 import {
   alphabetical,
+  construct,
+  crush,
   isInt,
   objectify,
   omit,
@@ -28,7 +30,7 @@ import {
 } from './util';
 
 /**
- * Logger interface.
+ * Injectable logger interface.
  *
  * @category Options
  */
@@ -43,70 +45,142 @@ export interface Logger {
  * @category Options
  */
 export interface EntityManagerOptions {
+  /** An EntityManager {@link RawConfig | `RawConfig`} object. */
   config?: RawConfig;
+
+  /**
+   * Logger object.
+   * @defaultValue `console` */
   logger?: Logger;
 }
 
 /**
- * A result returned by an individual shard query.
+ * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
  *
  * @category Query
  */
 export interface ShardQueryResult {
+  /** The number of records returned. */
   count: number;
+
+  /** The returned records. */
   items: EntityItem[];
+
+  /** The page key for the next query on this shard. */
   pageKey?: EntityIndexItem;
 }
 
 /**
- * A function that queries an individual shard.
+ * A query function that returns a single page of results from an individual
+ * shard. This function will typically be composed dynamically to express a
+ * specific query index & logic. The arguments to this function will be
+ * provided by the {@link EntityManager.query | `EntityManager.query`} method, which assembles many returned
+ * pages queried across multiple shards into a single query result.
  *
  * @param shardedKey - The key of the individual shard being queried.
  * @param pageKey - The page key returned by the previous query on this shard.
- * @param limit - The maximum number of items to return from this query.
+ * @param pageSize - The maximum number of items to return from this query.
  *
  * @category Query
  */
 export type ShardQueryFunction = (
   shardedKey: string,
   pageKey?: EntityIndexItem,
-  limit?: number,
+  pageSize?: number,
 ) => Promise<ShardQueryResult>;
 
 /**
- * A result returned by a query.
+ * A result returned by a query across multiple shards, where each shard may
+ * receive multiple page queries via a dynamically-generated {@link ShardQueryFunction | `ShardQueryFunction`}.
  *
  * @category Query
  */
 export interface QueryResult {
+  /** Total number of records returned across all shards. */
   count: number;
+
+  /** The returned records. */
   items: EntityItem[];
+
+  /**
+   * A map of page keys, used to query the next page of data on each shard.
+   *
+   * The keys of this object are the `shardedKey` value passed to each {@link ShardQueryFunction | `ShardQueryFunction`}.
+   *
+   * The values are the `pageKey` returned by the previous query on that shard.
+   */
   pageKeys: Record<string, EntityIndexItem | undefined>;
 }
 
 /**
- * Query options.
+ * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
  *
  * @category Query
  */
 export interface QueryOptions {
+  /** Identifies the entity to be queried. Key of {@link Config | `EntityManager.config.entities`}. */
   entityToken: string;
-  keyToken?: string;
+
+  /**
+   * Identifies the entity key across which the query will be sharded. Key of
+   * {@link Config | `EntityManager.config.entities.<entityToken>.keys`}.
+   */
+  keyToken: string;
+
+  /**
+   * A partial {@link EntityItem | `EntityItem`} object containing at least the properties specified in
+   * {@link Config | `EntityManager.config.entities.<entityToken>.keys.<keyToken>.elements`}, except for the property specified in {@link Config | `EntityManager.config.tokens.shardKey`}.
+   *
+   * Values may be `undefined` if it makes sense within the context of the data.
+   * This data will be used to generate query keys across all shards.
+   */
   item?: EntityItem;
+
+  /** A valid {@link ShardQueryFunction | 'ShardQueryFunction'} that specifies the query of a single page of data on a single shard. */
   shardQuery: ShardQueryFunction;
+
+  /**
+   * The target maximum number of records to be returned by the query across
+   * all shards.
+   *
+   * The actual number of records returned will be a product of {@link QueryOptions.pageSize | `pageSize`} and the
+   * number of shards queried, unless limited by available records in a given
+   * shard.
+   */
   limit?: number;
+
+  /**
+   * {@link QueryResult.pageKeys | `pageKeys`} returned by the previous iteration of this query.
+   */
   pageKeys?: Record<string, EntityIndexItem | undefined>;
+
+  /**
+   * The maximum number of records to be returned by each individual query to a
+   * single shard (i.e. {@link ShardQueryFunction | `ShardQueryFunction`} execution).
+   *
+   * Note that, within a given {@link EntityManager.query | `query`} method execution, these queries will be
+   * repeated until either available data is exhausted or the {@link QueryOptions.limit | `limit`} value is
+   * reached.
+   */
   pageSize?: number;
 
   /**
    * Lower limit to query shard space.
+   *
+   * Only valid if the query is constrained along the dimension used by the
+   * {@link Config | `EntityManager.config.entities.<entityToken>.sharding.timestamptokens.timestamp`}
+   * function to generate `shardKey`.
    *
    * @defaultValue `0`
    */
   timestampFrom?: number;
 
   /**
-   * Lower limit to query shard space.
+   * Upper limit to query shard space.
+   *
+   * Only valid if the query is constrained along the dimension used by the
+   * {@link Config | `EntityManager.config.entities.<entityToken>.sharding.timestamptokens.timestamp`}
+   * function to generate `shardKey`.
    *
    * @defaultValue `Date.now()`
    */
@@ -114,7 +188,8 @@ export interface QueryOptions {
 }
 
 /**
- * EntityManager class.
+ * The EntityManager class applies a configuration-driven sharded data model &
+ * query strategy to NoSql data.
  *
  * @category Entity Manager
  */
@@ -133,9 +208,9 @@ export class EntityManager {
   }
 
   /**
-   * Get the current config.
+   * Get the current EntityManager Config object.
    *
-   * @returns Current config.
+   * @returns Current config object.
    */
   get config() {
     return this.#config;
@@ -156,21 +231,25 @@ export class EntityManager {
    * @param entityToken - Entity token.
    * @param item - Entity item.
    * @param overwrite - Overwrite existing properties.
-   * @returns Decorated entity item.
+   *
+   * @returns Decorated clone of {@link EntityItem | `EntityItem`}.
    */
   addKeys(entityToken: string, item: EntityItem, overwrite = false) {
     // Validate item.
     validateEntityItem(item);
 
     // Get tokens.
-    const { entity, shardKey } = this.config.tokens;
+    const { entity, shardKey: shardKeyToken } = this.config.tokens;
 
     // Clone item.
-    const newItem = { ...item, [entity]: entityToken };
+    const newItem = {
+      ...construct(crush(item)),
+      [entity]: entityToken,
+    } as EntityItem;
 
     // Add shardKey.
-    if (overwrite || isNil(newItem[shardKey])) {
-      newItem[shardKey] = getShardKey(this.config, entityToken, newItem);
+    if (overwrite || isNil(newItem[shardKeyToken])) {
+      newItem[shardKeyToken] = getShardKey(this.config, entityToken, newItem);
     }
 
     // Add keys.
@@ -194,13 +273,26 @@ export class EntityManager {
   }
 
   /**
-   * Condense an index object into a delimited string.
+   * Condense a partial {@link EntityItem | `EntityItem`} into a delimited string representing an index.
+   *
+   * @remarks
+   * `index` can either be an array of {@link Config | entity keys} or a string representing a {@link Config | named entity index}.
+   *
+   * The create the output value, this method:
+   *
+   * * Dedupes the provided index keys & sorts them alphabetically.
+   * * Runs each key's encode function on `item` to generate index component values.
+   * * Joins the index component values with `delimiter`.
    *
    * @param entityToken - Entity token.
    * @param index - Index token or array of entity key tokens.
    * @param item - Entity item.
    * @param delimiter - Delimiter.
+   *
    * @returns  Dehydrated index.
+   *
+   * @throws Error if a provided index component is not a valid entity key.
+   * @throws Error if a named index is not a valid entity index.
    */
   dehydrateIndex(
     entityToken: string,
@@ -245,7 +337,7 @@ export class EntityManager {
   }
 
   /**
-   * Return an array of sharded keys valid for a given entity token & timestamp.
+   * Generates an array of sharded keys from an {@link EntityItem | `EntityItem`} valid across a given timestamp range.
    *
    * @param entityToken - Entity token.
    * @param keyToken - Key token.
@@ -293,10 +385,14 @@ export class EntityManager {
   }
 
   /**
-   * Remove sharded keys from an entity item. Does not mutate original item.
+   * Reverses {@link EntityManager.addKeys | `EntityManager.addKeys `}.
+   *
+   * Remove sharded keys from an entity item. Does not mutate original item or
+   * remove keys marked with `retain = true`.
    *
    * @param entityToken - Entity token.
    * @param item - Entity item.
+   *
    * @returns Stripped entity item.
    */
   removeKeys(entityToken: string, item: EntityItem) {
@@ -318,14 +414,32 @@ export class EntityManager {
   }
 
   /**
-   * Query an entity across shards.
+   * Query an entity across shards in a provider-generic fashion.
+   *
+   * @remarks
+   * The provided {@link ShardQueryFunction | `ShardQueryFunction`} performs the actual query of individual
+   * data pages on individual shards. This function is presumed to express
+   * provider-specific query logic, including any necessary indexing or search
+   * constraints.
+   *
+   * Shards will generally not be in alignment with provided sort
+   * indexes. The resulting data set will therefore NOT be sorted despite any
+   * sort imposed by `shardQuery`, and will require an additional sort to
+   * present a sorted result to the end user.
+   *
+   * As a result, returned data pages will also be somewhat unordered. Expect
+   * the leading and trailing edges of returned data pages to interleave
+   * somewhat with preceding & following pages.
+   *
+   * Unsharded query results should sort & page as expected.
    *
    * @param options - Query options.
-   * @returns Query result.
+   *
+   * @returns Query results combined across shards.
    */
   async query({
     entityToken,
-    keyToken = 'entityPK',
+    keyToken,
     item = {},
     shardQuery,
     limit,
@@ -426,7 +540,12 @@ export class EntityManager {
   }
 
   /**
-   * Convert a delimited string into a named index key.
+   * Convert a delimited string into a named index key. Reverses {@link EntityManager.dehydrateIndex | `EntityManager.dehydrateIndex`}.
+   *
+   * @remarks
+   * {@link EntityManager.dehydrateIndex | `EntityManager.dehydrateIndex`} alphebetically sorts index component keys
+   * during the dehydration process. This method assumes dehydrated index
+   * component values are presented in the same order.
    *
    * @param entityToken - Entity token.
    * @param index - Index token or array of key tokens.
