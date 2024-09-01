@@ -2,9 +2,11 @@
 
 > EntityManager implements rational indexing & cross-shard querying at scale in your NoSQL database so you can focus on your application logic.
 
-**This package is currently undergoing a complete Typescript refactor. The underlying code base is HIGHLY stable, but it will be a few weeks before the package is ready for you to use.**
+This package is currently undergoing a complete Typescript refactor. The underlying code base is HIGHLY stable, but it will be a few weeks before the package is ready for you to use.
 
-**If you have any questions, please [start a discussion](https://github.com/karmaniverous/entity-manager/discussions). Otherwise stay tuned!**
+If you have any questions, please [start a discussion](https://github.com/karmaniverous/entity-manager/discussions). Otherwise stay tuned!
+
+> [API Documentation](https://karmaniverous.github.io/entity-manager/)
 
 ## Why?
 
