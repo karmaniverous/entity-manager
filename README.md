@@ -24,7 +24,7 @@ With EntityManager, you can:
 
 - Add or remove structured index keys from entity data objects with a single method call.
 
-- Perform paged, cross-shard queries with a single method call.
+- Perform paged, cross-shard, multi-index queries with a single method call.
 
 ---
 
