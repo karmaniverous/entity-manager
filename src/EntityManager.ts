@@ -82,7 +82,7 @@ export interface EntityManagerOptions {
   /**
    * Default maximum number of shards to query in parallel.
    *
-   * @defaultValue `Infinity`
+   * @defaultValue `10`
    */
   throttle?: number;
 }
@@ -163,11 +163,11 @@ export interface QueryOptions {
 
   /**
    * A partial {@link EntityItem | `EntityItem`} object containing at least the properties specified in
-   * {@link Config | `EntityManager.config.entities.<entityToken>.keys.<keyToken>.elements`}, except for the property specified in {@link Config | `EntityManager.config.tokens.shardKey`}.
+   * {@link Config | `EntityManager.config.entities.<entityToken>.keys.<keyToken>.elements`}, except for the properties specified in {@link Config | `EntityManager.config.tokens`}.
    *
    * This data will be used to generate query keys across all shards.
    */
-  item: EntityItem;
+  item?: EntityItem;
 
   /**
    * The target maximum number of records to be returned by the query across
@@ -264,7 +264,7 @@ export class EntityManager {
   constructor({
     config = {},
     logger = console,
-    throttle = Infinity,
+    throttle = 10,
   }: EntityManagerOptions = {}) {
     this.#config = configSchema.parse(config);
     this.#logger = logger;
@@ -302,7 +302,7 @@ export class EntityManager {
   getKeySpace(
     entityToken: string,
     keyToken: string,
-    item: EntityItem,
+    item: EntityItem = {},
     timestampFrom = 0,
     timestampTo = Date.now(),
   ) {
@@ -598,7 +598,7 @@ export class EntityManager {
       ),
     );
 
-    this.#logger.debug('dehydrated page key map', {
+    this.#logger.debug('compressed page key map', {
       entityToken,
       pageKeyMap,
       indexTokens,
@@ -773,23 +773,26 @@ export class EntityManager {
       // Query every shard on every index in pageKeyMap.
       const shardQueryResults = await parallel(
         throttle,
-        Object.entries(crush(pageKeyMap)),
-        async ([crushedKey, pageKeys]: [
+        Object.entries(pageKeyMap).flatMap(([indexToken, indexPageKeys]) =>
+          Object.entries(indexPageKeys).map(([shardedKey, pageKey]) => [
+            indexToken,
+            shardedKey,
+            pageKey,
+          ]),
+        ) as [string, string, EntityIndexItem | undefined][],
+        async ([indexToken, shardedKey, pageKey]: [
+          string,
           string,
           PageKeyMap[string][string],
-        ]) => {
-          const [indexToken, shardedKey] = crushedKey.split('.');
-
-          return {
-            indexToken,
-            queryResult: await queryMap[indexToken](
-              shardedKey,
-              pageKeys,
-              pageSize,
-            ),
+        ]) => ({
+          indexToken,
+          queryResult: await queryMap[indexToken](
             shardedKey,
-          };
-        },
+            pageKey,
+            pageSize,
+          ),
+          shardedKey,
+        }),
       );
 
       // Reduce shardQueryResults & update result.

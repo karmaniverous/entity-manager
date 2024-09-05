@@ -13,6 +13,7 @@ import {
   EntityManager,
   PageKeyMap,
   ShardQueryFunction,
+  ShardQueryResult,
 } from './EntityManager';
 import { type EntityIndexItem } from './util';
 
@@ -34,7 +35,7 @@ describe('EntityManager', function () {
       },
     });
 
-    users = getUsers(100, 0, 3).map((user) =>
+    users = getUsers(100, 0, 2).map((user) =>
       entityManager.addKeys(entity, user),
     );
 
@@ -425,33 +426,130 @@ describe('EntityManager', function () {
     });
   });
 
+  let firstNameQuery: ShardQueryFunction;
+  let lastNameQuery: ShardQueryFunction;
+
   describe('query', function () {
-    it('simple query', async function () {
-      const lastNameQuery: ShardQueryFunction = async (
-        shardedKey,
-        pageKey,
-        pageSize,
-      ) =>
-        await mockDb.query({
+    beforeEach(function () {
+      lastNameQuery = async (shardedKey, pageKey, pageSize) =>
+        (await mockDb.query({
           hashKey: 'entityPK',
           hashValue: shardedKey,
-          indexComponents:
-            entityManager.config.entities.user.keys.lastNameSK.elements,
+          indexComponents: entityManager.config.entities.user.indexes.lastName,
           limit: pageSize,
-          pageKeys: pageKey,
+          pageKey,
           sortKey: 'lastNameSK',
-        });
+        })) as ShardQueryResult;
 
-      const result = await entityManager.query({
+      firstNameQuery = async (shardedKey, pageKey, pageSize) =>
+        (await mockDb.query({
+          hashKey: 'entityPK',
+          hashValue: shardedKey,
+          indexComponents: entityManager.config.entities.user.indexes.firstName,
+          limit: pageSize,
+          pageKey,
+          sortKey: 'firstNameSK',
+        })) as ShardQueryResult;
+    });
+
+    it('simple query', async function () {
+      let result = await entityManager.query({
         entityToken: entity,
-        item: { entityPK: 'user!' },
         keyToken: 'entityPK',
         queryMap: { lastName: lastNameQuery },
       });
 
-      console.log(result);
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit,
+      );
 
-      expect(true).to.be.false;
+      result = await entityManager.query({
+        entityToken: entity,
+        keyToken: 'entityPK',
+        pageKeyMap: result.pageKeyMap,
+        queryMap: { lastName: lastNameQuery },
+      });
+
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit,
+      );
+    });
+
+    it('simple sharded query', async function () {
+      let result = await entityManager.query({
+        entityToken: entity,
+        keyToken: 'entityPK',
+        queryMap: { lastName: lastNameQuery },
+        timestampFrom: now,
+        timestampTo: now + day,
+      });
+
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit * 5,
+      );
+
+      result = await entityManager.query({
+        entityToken: entity,
+        keyToken: 'entityPK',
+        pageKeyMap: result.pageKeyMap,
+        queryMap: { lastName: lastNameQuery },
+        timestampFrom: now,
+        timestampTo: now + day,
+      });
+
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit * 5,
+      );
+    });
+
+    it('complex query', async function () {
+      let result = await entityManager.query({
+        entityToken: entity,
+        keyToken: 'entityPK',
+        queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      });
+
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit * 2,
+      );
+
+      result = await entityManager.query({
+        entityToken: entity,
+        keyToken: 'entityPK',
+        pageKeyMap: result.pageKeyMap,
+        queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      });
+
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit * 2,
+      );
+    });
+
+    it('complex sharded query', async function () {
+      let result = await entityManager.query({
+        entityToken: entity,
+        keyToken: 'entityPK',
+        queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+        timestampFrom: now,
+        timestampTo: now + day,
+      });
+
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit * 10,
+      );
+
+      result = await entityManager.query({
+        entityToken: entity,
+        keyToken: 'entityPK',
+        pageKeyMap: result.pageKeyMap,
+        queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+        timestampFrom: now,
+        timestampTo: now + day,
+      });
+
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit * 10,
+      );
     });
   });
 });
