@@ -346,7 +346,11 @@ export class EntityManager {
    *
    * @returns Decorated clone of {@link EntityItem | `EntityItem`}.
    */
-  addKeys(entityToken: string, item: EntityItem, overwrite = false) {
+  addKeys<T extends EntityItem>(
+    entityToken: string,
+    item: T,
+    overwrite = false,
+  ): T {
     // Validate item.
     validateEntityItem(item);
 
@@ -357,11 +361,16 @@ export class EntityManager {
     const newItem = {
       ...construct(crush(item)),
       [entity]: entityToken,
-    } as EntityItem;
+    } as T;
 
     // Add shardKey.
     if (overwrite || isNil(newItem[shardKeyToken])) {
-      newItem[shardKeyToken] = getShardKey(this.config, entityToken, newItem);
+      // @ts-expect-error Type 'string | undefined' is not assignable to type 'T[keyof T]'.
+      newItem[shardKeyToken as keyof T] = getShardKey(
+        this.config,
+        entityToken,
+        newItem,
+      );
     }
 
     // Add keys.
@@ -369,7 +378,8 @@ export class EntityManager {
 
     for (const [keyToken, { encode }] of Object.entries(keys))
       if (overwrite || isNil(newItem[keyToken]))
-        newItem[keyToken] = encode(newItem);
+        // @ts-expect-error Type 'string | undefined' is not assignable to type 'T[keyof T]'.
+        newItem[keyToken as keyof T] = encode(newItem);
 
     // Remove shaken item.
     const result = shake(omit(newItem, [entity]), isNil);
@@ -381,7 +391,7 @@ export class EntityManager {
       result,
     });
 
-    return result as EntityItem;
+    return result as T;
   }
 
   /**

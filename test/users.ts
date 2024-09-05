@@ -3,7 +3,7 @@ import { normstr } from '@karmaniverous/string-utilities';
 
 import { type EntityItem } from '../src';
 
-interface User extends EntityItem {
+export interface User extends EntityItem {
   created: number;
   firstName: string;
   lastName: string;
@@ -17,7 +17,7 @@ interface User extends EntityItem {
   lastNameSK?: string;
 }
 
-export const getUsers = (count = 1, daysFromNow = 0) => {
+export const getUsers = (count = 1, daysFromNow = 0, forDays = 1) => {
   const now = Date.now();
   const day = 24 * 60 * 60 * 1000;
 
@@ -29,7 +29,7 @@ export const getUsers = (count = 1, daysFromNow = 0) => {
 
     users.push({
       created: faker.date
-        .soon({ days: 1, refDate: now + day * daysFromNow })
+        .soon({ days: forDays, refDate: now + day * daysFromNow })
         .getTime(),
       firstName,
       firstNameCanonical: normstr(firstName)!,

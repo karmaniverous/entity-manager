@@ -1,18 +1,26 @@
 /* eslint-env mocha */
 
+import { MockDb } from '@karmaniverous/mock-db';
 import { n2e } from '@karmaniverous/string-utilities';
 import { expect } from 'chai';
 import { pick } from 'radash';
 import { inspect } from 'util';
 
 import { config, day, now } from '../test/config';
-import { getUsers } from '../test/users';
-import { emptyPageKeyMap, EntityManager, PageKeyMap } from './EntityManager';
+import { getUsers, User } from '../test/users';
+import {
+  emptyPageKeyMap,
+  EntityManager,
+  PageKeyMap,
+  ShardQueryFunction,
+} from './EntityManager';
 import { type EntityIndexItem } from './util';
 
 const entity = 'user';
 
 let entityManager: EntityManager;
+let users: User[];
+let mockDb: MockDb<User>;
 
 describe('EntityManager', function () {
   beforeEach(function () {
@@ -25,6 +33,12 @@ describe('EntityManager', function () {
         },
       },
     });
+
+    users = getUsers(100, 0, 3).map((user) =>
+      entityManager.addKeys(entity, user),
+    );
+
+    mockDb = new MockDb(users);
   });
 
   describe('addKeys', function () {
@@ -408,6 +422,36 @@ describe('EntityManager', function () {
       );
 
       expect(decompressed).to.deep.equal(pageKeyMap);
+    });
+  });
+
+  describe('query', function () {
+    it('simple query', async function () {
+      const lastNameQuery: ShardQueryFunction = async (
+        shardedKey,
+        pageKey,
+        pageSize,
+      ) =>
+        await mockDb.query({
+          hashKey: 'entityPK',
+          hashValue: shardedKey,
+          indexComponents:
+            entityManager.config.entities.user.keys.lastNameSK.elements,
+          limit: pageSize,
+          pageKeys: pageKey,
+          sortKey: 'lastNameSK',
+        });
+
+      const result = await entityManager.query({
+        entityToken: entity,
+        item: { entityPK: 'user!' },
+        keyToken: 'entityPK',
+        queryMap: { lastName: lastNameQuery },
+      });
+
+      console.log(result);
+
+      expect(true).to.be.false;
     });
   });
 });

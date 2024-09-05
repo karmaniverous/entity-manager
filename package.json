@@ -4,6 +4,7 @@
     "url": "https://github.com/karmaniverous/entity-manager/issues"
   },
   "dependencies": {
+    "@karmaniverous/mock-db": "file:../mock-db",
     "@karmaniverous/string-utilities": "^0.2.0",
     "jsonschema": "^1.4.1",
     "lz-string": "^1.5.0",
@@ -13,9 +14,9 @@
   },
   "description": "Configurably decorate entity objects with sharded index keys.",
   "devDependencies": {
+    "@dotenvx/dotenvx": "^1.14.0",
     "@eslint/js": "^9.9.1",
     "@faker-js/faker": "^8.4.1",
-    "@karmaniverous/mock-db": "^0.0.5",
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",
