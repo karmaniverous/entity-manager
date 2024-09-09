@@ -13,7 +13,7 @@ import {
   zipToObject,
 } from 'radash';
 
-import { type Config, configSchema, type RawConfig } from './Config';
+import { Config } from './types';
 import {
   type EntityIndexItem,
   type EntityItem,
@@ -66,13 +66,6 @@ export interface Logger {
  */
 export interface EntityManagerOptions {
   /**
-   * An EntityManager {@link RawConfig | `RawConfig`} object.
-   *
-   * @defaultValue `{}`
-   */
-  config?: RawConfig;
-
-  /**
    * Logger object.
    *
    * @defaultValue `console`
@@ -92,12 +85,12 @@ export interface EntityManagerOptions {
  *
  * @category Query
  */
-export interface ShardQueryResult {
+export interface ShardQueryResult<Entity> {
   /** The number of records returned. */
   count: number;
 
   /** The returned records. */
-  items: EntityItem[];
+  items: Entity[];
 
   /** The page key for the next query on this shard. */
   pageKey?: EntityIndexItem;
@@ -116,11 +109,11 @@ export interface ShardQueryResult {
  *
  * @category Query
  */
-export type ShardQueryFunction = (
+export type ShardQueryFunction<Entity> = (
   shardedKey: string,
   pageKey?: EntityIndexItem,
   pageSize?: number,
-) => Promise<ShardQueryResult>;
+) => Promise<ShardQueryResult<Entity>>;
 
 /**
  * A result returned by a query across multiple shards, where each shard may
@@ -128,12 +121,12 @@ export type ShardQueryFunction = (
  *
  * @category Query
  */
-export interface QueryResult {
+export interface QueryResult<Entity> {
   /** Total number of records returned across all shards. */
   count: number;
 
   /** The returned records. */
-  items: EntityItem[];
+  items: Entity[];
 
   /**
    * A compressed, two-layer map of page keys, used to query the next page of
@@ -142,7 +135,10 @@ export interface QueryResult {
   pageKeyMap: string;
 }
 
-type UncompressedQueryResult = Omit<QueryResult, 'pageKeyMap'> & {
+type UncompressedQueryResult<Entity> = Omit<
+  QueryResult<Entity>,
+  'pageKeyMap'
+> & {
   pageKeyMap: PageKeyMap;
 };
 
@@ -251,8 +247,12 @@ const emptyQueryResult: QueryResult = {
  *
  * @category Entity Manager
  */
-export class EntityManager {
-  #config: Config;
+export class EntityManager<
+  EntityMap,
+  HashKey extends string,
+  UniqueKey extends string,
+> {
+  #config: Required<Config<EntityMap, HashKey, UniqueKey>>;
   #logger: Logger;
   #throttle: number;
 
@@ -261,12 +261,11 @@ export class EntityManager {
    *
    * @param options - EntityManager options.
    */
-  constructor({
-    config = {},
-    logger = console,
-    throttle = 10,
-  }: EntityManagerOptions = {}) {
-    this.#config = configSchema.parse(config);
+  constructor(
+    config: Config<EntityMap, HashKey, UniqueKey>,
+    { logger = console, throttle = 10 }: EntityManagerOptions = {},
+  ) {
+    this.#config = config;
     this.#logger = logger;
     this.#throttle = throttle;
   }
