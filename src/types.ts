@@ -109,8 +109,3 @@ export interface Config<
   hashKey: ExclusiveKey<HashKey, EntityMap, UniqueKey>;
   uniqueKey: ExclusiveKey<UniqueKey, EntityMap, HashKey>;
 }
-
-type Test = Record<never, string> | Record<string, never>;
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const test: Test = { a: 'a', b: 'b', c: 'c' };
