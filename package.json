@@ -94,11 +94,13 @@
       "release": true
     },
     "hooks": {
-      "after:bump": "npx auto-changelog -p",
       "after:init": [
         "npm run lint",
         "npm run test",
-        "npm run build",
+        "npm run build"
+      ],
+      "before:npm": [
+        "npx auto-changelog -p",
         "npm run docs",
         "git add -A",
         "git commit -m \"updated docs\""
