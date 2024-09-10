@@ -3,6 +3,7 @@ import { isInt, isObject, range } from 'radash';
 import stringHash from 'string-hash';
 
 import { type Config } from './Config';
+import { ShardBump } from './types';
 
 /**
  * Tests whether an entityToken is valid.
@@ -159,31 +160,30 @@ export const getShardKey = (
 };
 
 /**
- * Return an array of shard keys valid for a given entity token & timestamp
+ * Return an array of shard keys valid for a given shardBumps array & timestamp
  * range.
  *
- * @param config - Config object.
- * @param entityToken - Entity token.
+ * @param shardBumps - Array of ShardBump.
  * @param timestampFrom - Lower timestamp limit of shard key space. Defaults to `0`.
  * @param timestampTo - Upper timestamp limit of shard key space Defaults to `Date.now()`.
  * @returns Shard key space.
  */
 export const getShardKeySpace = (
-  config: Config,
-  entityToken: string,
+  shardBumps: ShardBump[],
   timestampFrom = 0,
   timestampTo = Date.now(),
 ) => {
+  if (!shardBumps.length) throw new Error('no shardBumps defined');
+
   validateTimestamp(timestampFrom);
   validateTimestamp(timestampTo);
 
-  const { bumps } = getEntityConfig(config, entityToken).sharding;
-  const lastBump = bumps.length - 1;
+  const lastBump = shardBumps.length - 1;
 
-  return bumps
+  return shardBumps
     .filter(
       (bump, i) =>
-        (i === lastBump || bumps[i + 1].timestamp > timestampFrom) &&
+        (i === lastBump || shardBumps[i + 1].timestamp > timestampFrom) &&
         bump.timestamp <= timestampTo,
     )
     .flatMap(({ nibbleBits, nibbles }) => {

@@ -13,7 +13,13 @@ import {
   zipToObject,
 } from 'radash';
 
-import { Config } from './types';
+import { configSchema } from './Config2';
+import {
+  Config,
+  ConfigEntities,
+  ParsedConfig,
+  PropertiesOfType,
+} from './types';
 import {
   type EntityIndexItem,
   type EntityItem,
@@ -252,7 +258,7 @@ export class EntityManager<
   HashKey extends string,
   UniqueKey extends string,
 > {
-  #config: Required<Config<EntityMap, HashKey, UniqueKey>>;
+  #config: Config<EntityMap, HashKey, UniqueKey>;
   #logger: Logger;
   #throttle: number;
 
@@ -265,7 +271,11 @@ export class EntityManager<
     config: Config<EntityMap, HashKey, UniqueKey>,
     { logger = console, throttle = 10 }: EntityManagerOptions = {},
   ) {
-    this.#config = config;
+    this.#config = configSchema.parse(config) as unknown as Config<
+      EntityMap,
+      HashKey,
+      UniqueKey
+    >;
     this.#logger = logger;
     this.#throttle = throttle;
   }
@@ -285,7 +295,22 @@ export class EntityManager<
    * @param value - RawConfig object.
    */
   set config(value) {
-    this.#config = configSchema.parse(value);
+    this.#config = configSchema.parse(value) as unknown as Config<
+      EntityMap,
+      HashKey,
+      UniqueKey
+    >;
+  }
+
+  encode<Entity extends keyof EntityMap>(
+    entity: Entity,
+    property: PropertiesOfType<EntityMap[Entity], never>,
+    item: EntityMap[Entity],
+  ) {
+    const { elements, sharded } =
+      this.config.entities![entity].generated![property];
+
+    return elements.map((element) => `${element}#${item[element]}`);
   }
 
   /**
@@ -299,15 +324,14 @@ export class EntityManager<
    * @returns Array of keys.
    */
   getKeySpace(
-    entityToken: string,
+    entityToken: keyof ConfigEntities<EntityMap, HashKey, UniqueKey>,
     keyToken: string,
     item: EntityItem = {},
     timestampFrom = 0,
     timestampTo = Date.now(),
   ) {
     const shardKeySpace = getShardKeySpace(
-      this.config,
-      entityToken,
+      this.config.entities![entityToken].shardBumps!,
       timestampFrom,
       timestampTo,
     );

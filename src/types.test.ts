@@ -1,13 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-  Config,
-  DefaultIndexablePropertyTypes,
-  DefaultPropertyTypes,
-  Entity,
-  EntityMap,
-  ExclusiveKey,
-  PropertiesOfType,
-} from './types';
+import { Config, ExclusiveKey, PropertiesOfType } from './types';
 
 interface User {
   created: number;
@@ -79,4 +71,10 @@ const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
   },
   hashKey: 'entityPK',
   uniqueKey: 'entitySK',
+};
+
+// Default configuration retuens no errors.
+const degenerateConfig: Config = {
+  hashKey: 'hashKey',
+  uniqueKey: 'uniqueKey',
 };
