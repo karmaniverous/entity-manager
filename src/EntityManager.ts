@@ -8,6 +8,7 @@ import type {
   Stringifiable,
 } from './Config';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
+import { objectify } from 'radash';
 
 /**
  * Injectable logger interface.
@@ -163,43 +164,45 @@ export class EntityManager<
     return item;
   }
 
-  encodeGeneratedProperty<Entity extends keyof EntityMap>(
+  encodeGeneratedProperty<
+    Entity extends keyof EntityMap,
+    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+  >(
     entity: Entity,
+    item: Item,
     property: PropertiesOfType<EntityMap[Entity], never>,
-    item: EntityMap[Entity],
   ): string {
     const { elements, sharded } =
-      this.config.entities[entity as keyof ParsedConfig].generated[property];
+      this.config.entities[entity].generated[property];
 
     return [
-      ...(sharded ? [item[this.config.hashKey] as string] : []),
+      ...(sharded ? [item[this.config.hashKey as keyof Item]] : []),
       ...elements.map((element) =>
-        [element, (item[element] as Stringifiable).toString()].join(
-          this.config.generatedValueDelimiter,
-        ),
+        [
+          element,
+          (item[element as keyof Item] as Stringifiable).toString(),
+        ].join(this.config.generatedValueDelimiter),
       ),
     ].join(this.config.generatedKeyDelimiter);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-  decodeGeneratedProperty<Entity extends keyof EntityMap>(
-    entity: Entity,
-    value: string,
-  ): Partial<EntityMap[Entity]> {
+  decodeGeneratedProperty<
+    Entity extends keyof EntityMap,
+    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+  >(entity: Entity, value: string): Partial<Item> {
     const parts = value.split(this.config.generatedKeyDelimiter);
 
-    const result: Partial<EntityMap[Entity]> = {};
+    const result = parts[0].includes(this.config.shardKeyDelimiter)
+      ? { [this.config.hashKey]: parts.shift() }
+      : {};
 
-    if (parts[0].includes(this.config.shardKeyDelimiter))
-      result[this.config.hashKey] = parts.shift();
-
-    return parts.reduce((result, part) => {
-      const [key, value] = part.split(this.config.generatedValueDelimiter);
-
-      return {
-        ...result,
-        [key]: value,
-      };
-    }, result);
+    return Object.assign(
+      result,
+      objectify(
+        parts.map((part) => part.split(this.config.generatedValueDelimiter)),
+        ([key]) => key,
+        ([, value]) => value,
+      ),
+    ) as Partial<Item>;
   }
 }
