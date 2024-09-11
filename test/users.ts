@@ -6,9 +6,9 @@ import { type Entity } from '../src/Config';
 export interface User extends Entity {
   created: number;
   firstNameCanonical: string;
-  firstNameRK: never;
+  firstNameRK?: never;
   lastNameCanonical: string;
-  lastNameRK: never;
+  lastNameRK?: never;
   phone?: string;
   updated: number;
   userId: string;
@@ -18,7 +18,7 @@ export const getUsers = (count = 1, daysFromNow = 0, forDays = 1) => {
   const now = Date.now();
   const day = 24 * 60 * 60 * 1000;
 
-  const users: Partial<User>[] = [];
+  const users: User[] = [];
 
   for (let i = 0; i < count; i++) {
     const firstName = faker.person.firstName();
