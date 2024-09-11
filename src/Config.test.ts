@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Config, ExclusiveKey, PropertiesOfType } from './Config';
+import {
+  Config,
+  Entity,
+  EntityMap,
+  ExclusiveKey,
+  PropertiesOfType,
+} from './Config';
 
-interface User {
+interface User extends Entity {
   created: number;
   firstNameCanonical: string;
   firstNameRK: never;
@@ -12,13 +18,13 @@ interface User {
   userId: string;
 }
 
-interface Email {
+interface Email extends Entity {
   created: number;
   email: string;
   userId: string;
 }
 
-interface MyEntityMap {
+interface MyEntityMap extends EntityMap {
   user: User;
   email: Email;
 }
@@ -39,6 +45,8 @@ type testStringProperties = PropertiesOfType<User, string>;
 type testNumberProperties = PropertiesOfType<User, number>;
 
 type noGeneratedProperties = PropertiesOfType<Email, never>;
+
+type neverProperties = PropertiesOfType<User, never>;
 
 const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
   entities: {

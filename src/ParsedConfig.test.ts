@@ -2,7 +2,7 @@
 
 import { expect } from 'chai';
 
-import type { Config } from './Config';
+import type { Config, EntityMap } from './Config';
 import { configSchema } from './ParsedConfig';
 
 describe('Config', function () {
@@ -19,11 +19,11 @@ describe('Config', function () {
   });
 
   it('should apply entity defaults', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           timestampProperty: 'baz',
@@ -46,11 +46,11 @@ describe('Config', function () {
   });
 
   it('should fail when entity index is empty', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           indexes: { id: [] },
@@ -66,11 +66,11 @@ describe('Config', function () {
   });
 
   it('should fail when entity index contains dupes', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           indexes: { id: ['bar', 'bar'] },
@@ -88,11 +88,11 @@ describe('Config', function () {
   });
 
   it('should fail when entity generated elements is empty', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number; boo: never };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           generated: {
@@ -110,11 +110,11 @@ describe('Config', function () {
   });
 
   it('should fail when entity generated elements contains dupes', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number; boo: never };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           generated: {
@@ -134,11 +134,11 @@ describe('Config', function () {
   });
 
   it('should fail on negative entity sharding bump nibbles value', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           shardBumps: [{ timestamp: 0, nibbles: -1, nibbleBits: 1 }],
@@ -156,11 +156,11 @@ describe('Config', function () {
   });
 
   it('should fail on entity sharding bump nibbles value over 40', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           shardBumps: [{ timestamp: 0, nibbles: 41, nibbleBits: 1 }],
@@ -178,11 +178,11 @@ describe('Config', function () {
   });
 
   it('should fail when entity sharding bumps contain duplicate timestamp', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           shardBumps: [
@@ -203,11 +203,11 @@ describe('Config', function () {
   });
 
   it('should add missing entity sharding bumps zero-timestamp bump', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           shardBumps: [{ timestamp: 1, nibbles: 1, nibbleBits: 1 }],
@@ -229,11 +229,11 @@ describe('Config', function () {
   });
 
   it('should sort entity sharding bumps by timestamp', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           shardBumps: [
@@ -258,11 +258,11 @@ describe('Config', function () {
   });
 
   it('should fail when entity sharding bumps nibbles do not increase monotonically with timestamp', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           shardBumps: [
@@ -283,11 +283,11 @@ describe('Config', function () {
   });
 
   it('should keep configured zero-timestamp bump', function () {
-    interface EntityMap {
+    interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
 
-    const config: Config<EntityMap> = {
+    const config: Config<MyEntityMap> = {
       entities: {
         foo: {
           shardBumps: [

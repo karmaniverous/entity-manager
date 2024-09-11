@@ -13,7 +13,7 @@ import {
   zipToObject,
 } from 'radash';
 
-import { Config, ConfigEntities, PropertiesOfType } from './Config';
+import { Config, ConfigEntities, EntityMap, PropertiesOfType } from './Config';
 import { configSchema, ParsedConfig } from './ParsedConfig';
 import {
   type EntityIndexItem,
@@ -249,14 +249,10 @@ const emptyQueryResult: QueryResult = {
  * @category Entity Manager
  */
 export class EntityManager<
-  EntityMap,
-  HashKey extends string = 'hashKey',
-  UniqueKey extends string = 'uniqueKey',
-  C extends Config<EntityMap, HashKey, UniqueKey> = Config<
-    EntityMap,
-    HashKey,
-    UniqueKey
-  >,
+  C extends Config<M, HashKey, UniqueKey>,
+  M extends EntityMap,
+  HashKey extends string,
+  UniqueKey extends string,
 > {
   #config: ParsedConfig;
   #logger: Logger;
@@ -301,6 +297,8 @@ export class EntityManager<
   ) {
     const { elements, sharded } =
       this.config.entities[entity as keyof ParsedConfig].generated[property];
+
+    const shardedPart = sharded ? [item[this.config.hashKey] as string] : [];
 
     const parts = elements.map((element) => [
       element,
