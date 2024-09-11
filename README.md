@@ -6,7 +6,7 @@
 
 - Where we can either refer to an index name or provide an array of key tokens, should we use an `...Index` suffix?
 
-- Add a `uniqueKey` parameter that ensures uniqueness of the combined result. Should this be an entity property?
+- Add a `rangeKey` parameter that ensures uniqueness of the combined result. Should this be an entity property?
 
 # entity-manager
 

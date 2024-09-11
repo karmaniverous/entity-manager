@@ -151,7 +151,7 @@ export const configSchema = z
     generatedValueDelimiter: z.string().regex(/\W+/).optional().default('#'),
     shardKeyDelimiter: z.string().regex(/\W+/).optional().default('!'),
     hashKey: z.string().optional().default('hashKey'),
-    uniqueKey: z.string().optional().default('uniqueKey'),
+    rangeKey: z.string().optional().default('rangeKey'),
   })
   .superRefine((data, ctx) => {
     // validate no generated key delimiter collision
@@ -214,14 +214,14 @@ export const configSchema = z
     validateKeyExclusive(
       data.hashKey,
       'hashKey',
-      [...reservedKeys, data.uniqueKey],
+      [...reservedKeys, data.rangeKey],
       ctx,
     );
 
-    // validate uniqueKey is not a reserved key.
+    // validate rangeKey is not a reserved key.
     validateKeyExclusive(
-      data.uniqueKey,
-      'uniqueKey',
+      data.rangeKey,
+      'rangeKey',
       [...reservedKeys, data.hashKey],
       ctx,
     );

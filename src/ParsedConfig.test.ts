@@ -17,7 +17,7 @@ describe('Config', function () {
       generatedValueDelimiter: '#',
       hashKey: 'hashKey',
       shardKeyDelimiter: '!',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     });
   });
 
@@ -35,7 +35,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     const parsedConfig = configSchema.parse(config);
@@ -65,7 +65,7 @@ describe('Config', function () {
       },
       generatedKeyDelimiter: 'foo',
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw('regex');
@@ -86,7 +86,7 @@ describe('Config', function () {
       },
       generatedKeyDelimiter: '#',
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw(
@@ -109,7 +109,7 @@ describe('Config', function () {
       },
       generatedValueDelimiter: 'foo',
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw('regex');
@@ -130,7 +130,7 @@ describe('Config', function () {
       },
       generatedValueDelimiter: '|',
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw(
@@ -153,7 +153,7 @@ describe('Config', function () {
       },
       shardKeyDelimiter: 'foo',
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw('regex');
@@ -174,7 +174,7 @@ describe('Config', function () {
       },
       shardKeyDelimiter: '|',
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw(
@@ -197,7 +197,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw('too_small');
@@ -218,7 +218,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw(
@@ -243,7 +243,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw('too_small');
@@ -266,7 +266,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw(
@@ -289,7 +289,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw(
@@ -312,7 +312,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw(
@@ -338,7 +338,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw(
@@ -361,7 +361,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     const parsedConfig = configSchema.parse(config);
@@ -391,7 +391,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     const parsedConfig = configSchema.parse(config);
@@ -421,7 +421,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     expect(() => configSchema.parse(config)).to.throw(
@@ -448,7 +448,7 @@ describe('Config', function () {
         },
       },
       hashKey: 'hashKey',
-      uniqueKey: 'uniqueKey',
+      rangeKey: 'rangeKey',
     };
 
     const parsedConfig = configSchema.parse(config);

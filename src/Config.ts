@@ -125,7 +125,7 @@ export interface ShardBump {
  *
  * @typeParam Entity - The Entity type.
  * @typeParam HashKey - The hash key string literal type.
- * @typeParam UniqueKey - The unique key string literal type.
+ * @typeParam RangeKey - The unique key string literal type.
  *
  * @remarks
  * `generated` is optional if `Entity` has no properties of type `never`.
@@ -133,7 +133,7 @@ export interface ShardBump {
 type ConfigEntity<
   E extends Entity,
   HashKey extends string,
-  UniqueKey extends string,
+  RangeKey extends string,
 > = {
   defaultLimit?: number;
   defaultPageSize?: number;
@@ -143,7 +143,7 @@ type ConfigEntity<
       | PropertiesOfType<E, Stringifiable>
       | PropertiesOfType<E, never>
       | HashKey
-      | UniqueKey
+      | RangeKey
     )[]
   >;
   shardBumps?: ShardBump[];
@@ -161,7 +161,7 @@ type ConfigEntity<
  *
  * @typeParam EntityMap - The entity map type.
  * @typeParam HashKey - The hash key string literal type.
- * @typeParam UniqueKey - The unique key string literal type.
+ * @typeParam RangeKey - The unique key string literal type.
  *
  * @remarks
  * All `EntityMap` properties must be represented, and no extra properties are allowed.
@@ -169,23 +169,23 @@ type ConfigEntity<
 export type ConfigEntities<
   M extends EntityMap,
   HashKey extends string,
-  UniqueKey extends string,
+  RangeKey extends string,
 > =
   | ([keyof Exactify<M>] extends [never]
       ? never
       : {
-          [E in keyof Exactify<M>]: ConfigEntity<M[E], HashKey, UniqueKey>;
+          [E in keyof Exactify<M>]: ConfigEntity<M[E], HashKey, RangeKey>;
         })
   | Record<string, never>;
 
 interface ConfigKeys<
   M extends EntityMap,
   HashKey extends string,
-  UniqueKey extends string,
+  RangeKey extends string,
 > {
-  entities?: ConfigEntities<M, HashKey, UniqueKey>;
-  hashKey?: ExclusiveKey<HashKey, M, UniqueKey>;
-  uniqueKey?: ExclusiveKey<UniqueKey, M, HashKey>;
+  entities?: ConfigEntities<M, HashKey, RangeKey>;
+  hashKey?: ExclusiveKey<HashKey, M, RangeKey>;
+  rangeKey?: ExclusiveKey<RangeKey, M, HashKey>;
 }
 
 /**
@@ -193,7 +193,7 @@ interface ConfigKeys<
  *
  * @typeParam EntityMap - The entity map type.
  * @typeParam HashKey - The hash key string literal type.
- * @typeParam UniqueKey - The unique key string literal type.
+ * @typeParam RangeKey - The unique key string literal type.
  *
  * @remarks
  * `entities` is optional if `EntityMap` is empty.
@@ -201,10 +201,10 @@ interface ConfigKeys<
 export type Config<
   M extends EntityMap = Record<string, never>,
   HashKey extends string = 'hashKey',
-  UniqueKey extends string = 'uniqueKey',
+  RangeKey extends string = 'rangeKey',
 > = ([keyof Exactify<M>] extends [never]
-  ? ConfigKeys<M, HashKey, UniqueKey>
-  : Required<ConfigKeys<M, HashKey, UniqueKey>>) & {
+  ? ConfigKeys<M, HashKey, RangeKey>
+  : Required<ConfigKeys<M, HashKey, RangeKey>>) & {
   generatedKeyDelimiter?: string;
   generatedValueDelimiter?: string;
   shardKeyDelimiter?: string;

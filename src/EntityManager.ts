@@ -248,10 +248,10 @@ const emptyQueryResult: QueryResult = {
  * @category Entity Manager
  */
 export class EntityManager<
-  C extends Config<M, HashKey, UniqueKey>,
+  C extends Config<M, HashKey, RangeKey>,
   M extends EntityMap,
   HashKey extends string,
-  UniqueKey extends string,
+  RangeKey extends string,
 > {
   #config: ParsedConfig;
   #logger: Logger;
@@ -307,21 +307,26 @@ export class EntityManager<
     ].join(this.config.generatedKeyDelimiter);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
   decodeGeneratedProperty<Entity extends keyof EntityMap>(
     entity: Entity,
     value: string,
   ): Partial<EntityMap[Entity]> {
-    const { elements, sharded } =
-      this.config.entities[entity as keyof ParsedConfig].generated[property];
+    const parts = value.split(this.config.generatedKeyDelimiter);
 
-    return [
-      ...(sharded ? [item[this.config.hashKey] as string] : []),
-      ...elements.map((element) =>
-        [element, (item[element] as Stringifiable).toString()].join(
-          this.config.generatedValueDelimiter,
-        ),
-      ),
-    ].join(this.config.generatedKeyDelimiter);
+    const result: Partial<EntityMap[Entity]> = {};
+
+    if (parts[0].includes(this.config.shardKeyDelimiter))
+      result[this.config.hashKey] = parts.shift();
+
+    return parts.reduce((result, part) => {
+      const [key, value] = part.split(this.config.generatedValueDelimiter);
+
+      return {
+        ...result,
+        [key]: value,
+      };
+    }, result);
   }
 
   /**

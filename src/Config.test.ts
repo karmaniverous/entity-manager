@@ -96,7 +96,7 @@ const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
     },
   },
   hashKey: 'entityPK',
-  uniqueKey: 'entitySK',
+  rangeKey: 'entitySK',
 };
 
 const configMissingGeneratedProperties: Config<
@@ -113,7 +113,7 @@ const configMissingGeneratedProperties: Config<
     },
   },
   hashKey: 'entityPK',
-  uniqueKey: 'entitySK',
+  rangeKey: 'entitySK',
 };
 
 // Default configuration retuens no errors.
