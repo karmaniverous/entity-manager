@@ -13,14 +13,8 @@ import {
   zipToObject,
 } from 'radash';
 
-import { configSchema } from './ParsedConfig';
-import {
-  Config,
-  ConfigEntities,
-  MakeEntityMap,
-  ParsedConfig,
-  PropertiesOfType,
-} from './Config';
+import { Config, ConfigEntities, PropertiesOfType } from './Config';
+import { configSchema, ParsedConfig } from './ParsedConfig';
 import {
   type EntityIndexItem,
   type EntityItem,
@@ -255,12 +249,16 @@ const emptyQueryResult: QueryResult = {
  * @category Entity Manager
  */
 export class EntityManager<
-  M,
-  HashKey extends string,
-  UniqueKey extends string,
-  EntityMap = MakeEntityMap<M>,
+  EntityMap,
+  HashKey extends string = 'hashKey',
+  UniqueKey extends string = 'uniqueKey',
+  C extends Config<EntityMap, HashKey, UniqueKey> = Config<
+    EntityMap,
+    HashKey,
+    UniqueKey
+  >,
 > {
-  #config: Config<EntityMap, HashKey, UniqueKey>;
+  #config: ParsedConfig;
   #logger: Logger;
   #throttle: number;
 
@@ -270,14 +268,10 @@ export class EntityManager<
    * @param options - EntityManager options.
    */
   constructor(
-    config: Config<EntityMap, HashKey, UniqueKey>,
+    config: C,
     { logger = console, throttle = 10 }: EntityManagerOptions = {},
   ) {
-    this.#config = configSchema.parse(config) as unknown as Config<
-      EntityMap,
-      HashKey,
-      UniqueKey
-    >;
+    this.#config = configSchema.parse(config);
     this.#logger = logger;
     this.#throttle = throttle;
   }
@@ -297,62 +291,60 @@ export class EntityManager<
    * @param value - RawConfig object.
    */
   set config(value) {
-    this.#config = configSchema.parse(value) as unknown as Config<
-      EntityMap,
-      HashKey,
-      UniqueKey
-    >;
+    this.#config = configSchema.parse(value);
   }
 
-  encode<Entity extends keyof EntityMap>(
+  encodeEntityProperty<Entity extends keyof EntityMap>(
     entity: Entity,
     property: PropertiesOfType<EntityMap[Entity], never>,
     item: EntityMap[Entity],
   ) {
     const { elements, sharded } =
-      this.config.entities![entity].generated![property];
+      this.config.entities[entity as keyof ParsedConfig].generated[property];
 
-    return elements.map((element) => `${element}#${item[element as string]}`);
+    const parts = elements.map((element) => [
+      element,
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
+      (item[element] as Stringifiable).toString(),
+    ]);
   }
 
   /**
    * Generates an array of sharded keys from an {@link EntityItem | `EntityItem`} valid across a given timestamp range.
    *
-   * @param entityToken - Entity token.
-   * @param keyToken - Key token.
-   * @param item - Entity item sufficiently populated to generate property keyToken.
+   * @param entity - Entity token.
+   * @param property - Entity property.
+   * @param item - Entity item sufficiently populated to generate property property.
    * @param timestampFrom - Lower timestamp limit of shard key space. Defaults to `0`.
    * @param timestampTo - Upper timestamp limit of shard key space. Defaults to `Date.now()`.
    * @returns Array of keys.
    */
-  getKeySpace(
-    entityToken: keyof ConfigEntities<EntityMap, HashKey, UniqueKey>,
-    keyToken: string,
-    item: EntityItem = {},
+  getKeySpace<Entity extends keyof EntityMap>(
+    entity: Entity,
+    property: PropertiesOfType<EntityMap[Entity], never> | HashKey,
+    item: EntityMap[Entity],
     timestampFrom = 0,
     timestampTo = Date.now(),
   ) {
     const shardKeySpace = getShardKeySpace(
-      this.config.entities![entityToken].shardBumps!,
+      this.config.entities[entity as keyof ParsedConfig].shardBumps,
       timestampFrom,
       timestampTo,
     );
 
-    const { entity, shardKey: shardKeyToken } = this.config.tokens;
-
     const result = unique(
       shardKeySpace.map((shardKey) =>
-        getEntityKeyConfig(this.config, entityToken, keyToken).encode({
+        getEntityKeyConfig(this.config, entity, property).encode({
           ...item,
-          [entity]: entityToken,
+          [entity]: entity,
           [shardKeyToken]: shardKey,
         }),
       ),
     ) as string[];
 
     this.#logger.debug('got shard key space for entity item', {
-      entityToken,
-      keyToken,
+      entity,
+      property,
       item,
       timestampFrom,
       timestampTo,
