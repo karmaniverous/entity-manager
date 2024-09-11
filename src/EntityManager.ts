@@ -13,13 +13,14 @@ import {
   zipToObject,
 } from 'radash';
 
-import { configSchema } from './Config2';
+import { configSchema } from './ParsedConfig';
 import {
   Config,
   ConfigEntities,
+  MakeEntityMap,
   ParsedConfig,
   PropertiesOfType,
-} from './types';
+} from './Config';
 import {
   type EntityIndexItem,
   type EntityItem,
@@ -254,9 +255,10 @@ const emptyQueryResult: QueryResult = {
  * @category Entity Manager
  */
 export class EntityManager<
-  EntityMap,
+  M,
   HashKey extends string,
   UniqueKey extends string,
+  EntityMap = MakeEntityMap<M>,
 > {
   #config: Config<EntityMap, HashKey, UniqueKey>;
   #logger: Logger;
@@ -310,7 +312,7 @@ export class EntityManager<
     const { elements, sharded } =
       this.config.entities![entity].generated![property];
 
-    return elements.map((element) => `${element}#${item[element]}`);
+    return elements.map((element) => `${element}#${item[element as string]}`);
   }
 
   /**

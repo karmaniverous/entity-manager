@@ -2,8 +2,8 @@ import { Stringifiable } from '@karmaniverous/string-utilities';
 import { isInt, isObject, range } from 'radash';
 import stringHash from 'string-hash';
 
-import { type Config } from './Config';
-import { ShardBump } from './types';
+import { type Config } from './ParsedConfig';
+import { ShardBump } from './Config';
 
 /**
  * Tests whether an entityToken is valid.

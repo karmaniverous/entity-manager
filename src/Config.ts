@@ -1,280 +1,157 @@
-import { counting, sort } from 'radash';
-import { z } from 'zod';
-
-const defaultBump = { timestamp: 0, nibbleBits: 1, nibbles: 0 };
-
-// EncodeFunction zod schema
-const encodeFunctionSchema = z
-  .function()
-  .args(z.record(z.unknown()))
-  .returns(z.unknown());
+/**
+ * Generates a union of the keys of an entity type whose values are of a certain type.
+ *
+ * @typeParam Entity - The entity type.
+ * @typeParam Type - The type to filter by.
+ *
+ * @returns A union of the keys of `Entity` whose values are of type `Type`.
+ */
+export type PropertiesOfType<Entity, Type> = keyof {
+  [Property in keyof Entity as Entity[Property] extends Type
+    ? Property
+    : never]: never;
+};
 
 /**
- * EncodeFunction
+ * Generates a union of the keys of an entity type whose values are not of a certain type.
  *
- * @category Options
+ * @typeParam Entity - The entity type.
+ * @typeParam Type - The type to filter by.
+ *
+ * @returns A union of the keys of `Entity` whose values are not of type `Type`.
  */
-export type EncodeFunction = z.infer<typeof encodeFunctionSchema>;
-
-// DecodeFunction zod schema
-const decodeFunctionSchema = z
-  .function()
-  .args(z.any())
-  .returns(z.record(z.unknown()).optional());
+export type PropertiesNotOfType<Entity, Type> = keyof {
+  [Property in keyof Entity as Entity[Property] extends Type
+    ? never
+    : Property]: never;
+};
 
 /**
- * DecodeFunction
+ * Tests a string literal type to determine whether it belongs to any entity in an entity map or is a member of a union of reserved keys.
  *
- * @category Options
+ * @typeParam Key - The string literal type to test.
+ * @typeParam EntityMap - The entity map type.
+ * @typeParam Reserved - The reserved set of string literal types.
+ *
+ * @returns `Key` if `Key` is exclusive or `never` otherwise.
  */
-export type DecodeFunction = z.infer<typeof decodeFunctionSchema>;
-
-// DecodeFunction zod schema
-const entityKeyFunctionSchema = z
-  .function()
-  .args(z.record(z.unknown()))
-  .returns(z.string());
+export type ExclusiveKey<
+  Key extends string,
+  EntityMap,
+  Reserved extends string = never,
+> = keyof {
+  [E in keyof EntityMap as Key extends keyof EntityMap[E] | Reserved
+    ? Key
+    : never]: never;
+} extends never
+  ? Key
+  : never;
 
 /**
- * EntityKeyFunction
+ * Returns the `generated` property type of a Config Entity.
  *
- * @category Options
- */
-export type EntityKeyFunction = z.infer<typeof entityKeyFunctionSchema>;
-
-// TimestampFunction zod schema
-const timestampFunctionSchema = z
-  .function()
-  .args(z.record(z.unknown()))
-  .returns(z.number());
-
-/**
- * TimestampFunction
+ * @typeParam Entity - The entity type.
  *
- * @category Options
+ * @remarks
+ * All `Entity` properties of type `never` must be represented, and no extra properties are allowed.
  */
-export type TimestampFunction = z.infer<typeof timestampFunctionSchema>;
-
-// Config zod schema
-export const configSchema = z
-  .object({
-    entities: z
-      .record(
-        z.object({
-          defaultLimit: z
-            .number()
-            .int()
-            .positive()
-            .safe()
-            .optional()
-            .default(10),
-          defaultPageSize: z
-            .number()
-            .int()
-            .positive()
-            .safe()
-            .optional()
-            .default(10),
-          indexes: z
-            .record(
-              z.array(z.string()).nonempty(), // No dupes, items are keys
-            )
-            .default({}),
-          keys: z
-            .record(
-              z.object({
-                elements: z
-                  .array(z.string().min(1))
-                  .optional()
-                  .refine((data): data is string[] => z.NEVER), // elements must be unique, defaults to [keyToken]
-                encode: encodeFunctionSchema
-                  .optional()
-                  .refine((data): data is EncodeFunction => z.NEVER), // defaults to (item) => item[keyToken]
-                decode: decodeFunctionSchema
-                  .optional()
-                  .refine((data): data is DecodeFunction => z.NEVER), // defauts to (value) => {[keyToken]: value}
-                retain: z.boolean().default(false),
-              }),
-            ) // no token collisions
-            .default({}),
-          sharding: z
-            .object({
-              bumps: z
-                .array(
-                  z.object({
-                    timestamp: z.number().nonnegative().safe(), // must be unique in bumps array
-                    nibbleBits: z.number().int().min(1).max(5),
-                    nibbles: z.number().int().min(0).max(40), // must increase monotonically with timestamp
-                  }),
-                )
-
-                .default([defaultBump]),
-              entityKey: entityKeyFunctionSchema
-                .optional()
-                .refine((data): data is EntityKeyFunction => z.NEVER), // required if positive-nibble bumps defined
-              timestamp: timestampFunctionSchema
-                .optional()
-                .refine((data): data is TimestampFunction => z.NEVER), // required if positive-nibble bumps defined
-            })
-            .default({ bumps: [defaultBump] }),
-        }),
-      )
-      .default({}),
-    tokens: z
-      .object({
-        entity: z.string().min(1).default('entity'),
-        entityKey: z.string().min(1).default('entityKey'),
-        shardKey: z.string().min(1).default('shardKey'),
-      })
-      .default({
-        entity: 'entity',
-        entityKey: 'entityKey',
-        shardKey: 'shardKey',
-      }),
-  })
-  .superRefine((data, ctx) => {
-    // validate entities
-    for (const [entityToken, entity] of Object.entries(data.entities)) {
-      const validKeyTokens = Object.keys(entity.keys);
-
-      // validate indexes
-      for (const [indexToken, index] of Object.entries(entity.indexes)) {
-        // validate index constituents
-        const counts = counting(index, (element) => element);
-
-        for (const [element, count] of Object.entries(counts)) {
-          // index element valid
-          if (!validKeyTokens.includes(element))
-            ctx.addIssue({
-              code: z.ZodIssueCode.invalid_enum_value,
-              message: `index ${indexToken} element ${element} is not a valid entity ${entityToken} key`,
-              options: validKeyTokens,
-              path: ['entities', entityToken, 'indexes', indexToken],
-              received: element,
-            });
-
-          // index element unique
-          if (count > 1)
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `index ${indexToken} has duplicate element ${element}`,
-              path: ['entities', entityToken, 'indexes', indexToken],
-            });
-        }
-      }
-
-      // validate keys
-      // recast to RawConfig type
-      for (const [keyToken, key] of Object.entries(entity.keys))
-        if (key.elements as string[] | undefined) {
-          // validate elements
-          const counts = counting(key.elements, (element) => element);
-
-          for (const [element, count] of Object.entries(counts)) {
-            // key element unique
-            if (count > 1)
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `entity ${entityToken} key ${keyToken} has duplicate element ${element}`,
-                path: ['entities', entityToken, 'keys', keyToken, 'elements'],
-              });
+export type ConfigEntityGenerated<Entity> =
+  | (PropertiesOfType<Entity, never> extends never
+      ? never
+      : Record<
+          PropertiesOfType<Entity, never>,
+          {
+            elements: PropertiesNotOfType<Entity, never>[];
+            sharded?: boolean;
           }
-        }
-
-      // validate sharding
-      if (entity.sharding.bumps.length) {
-        // validate bumnps
-        const counts = counting(
-          entity.sharding.bumps,
-          ({ timestamp }) => timestamp,
-        );
-
-        // bump timestamp unique
-        for (const [timestamp, count] of Object.entries(counts))
-          if (count > 1)
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `entity ${entityToken} sharding has duplicate bump at timestamp ${timestamp}`,
-              path: ['entities', entityToken, 'sharding', 'bumps'],
-            });
-
-        // bump nibbles mootonically increase with timestamp.
-        if (entity.sharding.bumps.length > 1) {
-          const sortedBumps = sort(
-            entity.sharding.bumps,
-            ({ timestamp }) => timestamp,
-          );
-
-          for (let i = 1; i < sortedBumps.length; i++)
-            if (sortedBumps[i].nibbles <= sortedBumps[i - 1].nibbles)
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message: `entity ${entityToken} sharding bump nibbles do not monotonically increase at timestamp ${sortedBumps[i].timestamp.toString()}`,
-              });
-        }
-
-        // if positive-nibble bumps are defined...
-        if (entity.sharding.bumps.some(({ nibbles }) => !!nibbles)) {
-          // entityKey function must be defined, recast to RawConfig type
-          if (!(entity.sharding.entityKey as EntityKeyFunction | undefined))
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `entity ${entityToken} sharding entityToken function required when positive-nibble bumps defined`,
-              path: ['entities', entityToken, 'sharding'],
-            });
-
-          // timestamp function must be defined, recast to RawConfig type
-          if (!(entity.sharding.timestamp as TimestampFunction | undefined))
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: `entity ${entityToken} sharding timestamp function required when positive-nibble bumps defined`,
-              path: ['entities', entityToken, 'sharding'],
-            });
-        }
-      }
-    }
-  })
-  .transform((data) => {
-    // Normalize entities.
-    for (const entity of Object.values(data.entities)) {
-      // Normalize keys.
-      for (const [keyToken, key] of Object.entries(entity.keys)) {
-        // default elements, recast to RawConfig type
-        (key.elements as string[] | undefined) ??= [keyToken];
-
-        // default encode function, recast to RawConfig type
-        (key.encode as EncodeFunction | undefined) ??= (item) => item[keyToken];
-
-        // default decode function, recast to RawConfig type
-        (key.decode as DecodeFunction | undefined) ??= (value: unknown) => ({
-          [keyToken]: value,
-        });
-      }
-
-      // Sort sharding bumps by timestamp.
-      entity.sharding.bumps = sort(
-        entity.sharding.bumps,
-        ({ timestamp }) => timestamp,
-      );
-
-      // Prepend default sharding bump if first bump has non-zero timestamp.
-      if (entity.sharding.bumps[0].timestamp)
-        entity.sharding.bumps = [defaultBump, ...entity.sharding.bumps];
-    }
-
-    return data;
-  });
+        >)
+  | (PropertiesOfType<Entity, never> extends never
+      ? Record<string, never>
+      : never);
 
 /**
- * RawConfig
- *
- * @category Options
+ * ShardBump interface.
  */
-export type RawConfig = z.input<typeof configSchema>;
+export interface ShardBump {
+  timestamp: number;
+  nibbleBits: number;
+  nibbles: number;
+}
 
 /**
- * Config
+ * Returns a Config Entity type.
  *
- * @category Options
+ * @typeParam Entity - The Entity type.
+ * @typeParam HashKey - The hash key string literal type.
+ * @typeParam UniqueKey - The unique key string literal type.
+ *
+ * @remarks
+ * `generated` is optional if `Entity` has no properties of type `never`.
  */
-export type Config = z.infer<typeof configSchema>;
+type ConfigEntity<Entity, HashKey extends string, UniqueKey extends string> = {
+  defaultLimit?: number;
+  defaultPageSize?: number;
+  indexes?: Record<
+    string,
+    (PropertiesOfType<Entity, string | number> | HashKey | UniqueKey)[]
+  >;
+  shardBumps?: ShardBump[];
+  timestampProperty: PropertiesOfType<Entity, number>;
+  uniqueProperty: PropertiesOfType<Entity, number | string>;
+} & (PropertiesOfType<Entity, never> extends never
+  ? { generated?: ConfigEntityGenerated<Entity> }
+  : { generated: ConfigEntityGenerated<Entity> });
+
+/**
+ * Returns the `entities` property type of a Config tyoe.
+ *
+ * @typeParam EntityMap - The entity map type.
+ * @typeParam HashKey - The hash key string literal type.
+ * @typeParam UniqueKey - The unique key string literal type.
+ *
+ * @remarks
+ * All `EntityMap` properties must be represented, and no extra properties are allowed.
+ */
+export type ConfigEntities<
+  EntityMap,
+  HashKey extends string,
+  UniqueKey extends string,
+> =
+  | (keyof EntityMap extends never
+      ? never
+      : {
+          [Entity in keyof EntityMap]: ConfigEntity<
+            EntityMap[Entity],
+            HashKey,
+            UniqueKey
+          >;
+        })
+  | Record<string, never>;
+
+interface ConfigKeys<
+  EntityMap,
+  HashKey extends string,
+  UniqueKey extends string,
+> {
+  entities?: ConfigEntities<EntityMap, HashKey, UniqueKey>;
+  hashKey?: ExclusiveKey<HashKey, EntityMap, UniqueKey>;
+  uniqueKey?: ExclusiveKey<UniqueKey, EntityMap, HashKey>;
+}
+
+/**
+ * EntityManager Config type.
+ *
+ * @typeParam EntityMap - The entity map type.
+ * @typeParam HashKey - The hash key string literal type.
+ * @typeParam UniqueKey - The unique key string literal type.
+ *
+ * @remarks
+ * `entities` is optional if `EntityMap` is empty.
+ */
+export type Config<
+  EntityMap = object,
+  HashKey extends string = 'hashKey',
+  UniqueKey extends string = 'uniqueKey',
+> = keyof EntityMap extends never
+  ? ConfigKeys<EntityMap, HashKey, UniqueKey>
+  : Required<ConfigKeys<EntityMap, HashKey, UniqueKey>>;

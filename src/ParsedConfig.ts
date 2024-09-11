@@ -94,8 +94,17 @@ export const configSchema = z
                 ]);
               })
 
-              // sort shardBumps by timestamp.
-              .transform((val) => sort(val, ({ timestamp }) => timestamp))
+              .transform((val) => {
+                // sort shardBumps by timestamp.
+                let sorted = sort(val, ({ timestamp }) => timestamp);
+
+                // prepend defaultShardBump if missing zero-timestamp bump.
+                if (sorted[0].timestamp !== 0) {
+                  sorted = [defaultShardBump, ...sorted];
+                }
+
+                return sorted;
+              })
 
               // validate shardBump nibbles mootonically increase with timestamp.
               .superRefine((val, ctx) => {
@@ -165,3 +174,5 @@ export const configSchema = z
       ctx,
     );
   });
+
+export type ParsedConfig = z.infer<typeof configSchema>;

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { type Config, configSchema } from './Config.js';
+import { type Config, configSchema } from './ParsedConfig.js';
 import {
   EntityItem,
   findBump,
