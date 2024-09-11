@@ -6,7 +6,7 @@ export {
   type QueryResult,
   type ShardQueryFunction,
   type ShardQueryResult,
-} from './EntityManager';
+} from './EntityManager.old';
 export type {
   Config,
   DecodeFunction,

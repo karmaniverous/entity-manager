@@ -1,4 +1,4 @@
-import type { Config, Entity, EntityMap } from '../src/Config';
+import type { Config, Entity, EntityItem, EntityMap } from '../src/Config';
 import type { User } from './users';
 
 export const now = Date.now();
@@ -60,3 +60,5 @@ export const config: Config<MyEntityMap> = {
   hashKey: 'hashKey',
   rangeKey: 'rangeKey',
 };
+
+export type UserItem = EntityItem<'user', MyEntityMap>;

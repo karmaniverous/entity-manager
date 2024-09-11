@@ -209,3 +209,14 @@ export type Config<
   generatedValueDelimiter?: string;
   shardKeyDelimiter?: string;
 };
+
+export type EntityItem<
+  E extends keyof M,
+  M extends EntityMap,
+  HashKey extends string = 'hashKey',
+  RangeKey extends string = 'rangeKey',
+> = {
+  [P in keyof Exactify<M[E]>]: [M[E][P]] extends [never] ? string : M[E][P];
+} & {
+  [P in HashKey | RangeKey]?: string;
+};

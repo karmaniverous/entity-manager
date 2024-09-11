@@ -14,7 +14,7 @@ import {
   PageKeyMap,
   ShardQueryFunction,
   ShardQueryResult,
-} from './EntityManager';
+} from './EntityManager.old';
 import { type EntityIndexItem } from './util';
 
 const entity = 'user';
