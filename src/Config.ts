@@ -20,12 +20,12 @@ export type Exactify<T extends Record<string, unknown>> = {
  */
 export type PropertiesOfType<E extends Entity, Type> = keyof {
   [Property in keyof Exactify<E> as [Type] extends [never]
-    ? [E[Property]] extends [never]
+    ? [NonNullable<E[Property]>] extends [never]
       ? Property
       : never
-    : [E[Property]] extends [never]
+    : [NonNullable<E[Property]>] extends [never]
       ? never
-      : E[Property] extends Type
+      : NonNullable<E[Property]> extends Type
         ? Property
         : never]: never;
 };
@@ -40,11 +40,11 @@ export type PropertiesOfType<E extends Entity, Type> = keyof {
  */
 export type PropertiesNotOfType<E extends Entity, Type> = keyof {
   [Property in keyof Exactify<E> as [Type] extends [never]
-    ? [E[Property]] extends [never]
+    ? [NonNullable<E[Property]>] extends [never]
       ? never
       : Property
-    : [E[Property]] extends [never]
-      ? E[Property] extends Type
+    : [NonNullable<E[Property]>] extends [never]
+      ? NonNullable<E[Property]> extends Type
         ? Property
         : never
       : never]: never;
