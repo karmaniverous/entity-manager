@@ -1,8 +1,12 @@
+export type Stringifiable = string | number | boolean | bigint;
+
+export type StringifiableTypes = 'string' | 'number' | 'boolean' | 'bigint';
+
 export type Entity = Record<string, unknown>;
 
 export type EntityMap = Record<string, Entity>;
 
-type Exactify<T extends Record<string, unknown>> = {
+export type Exactify<T extends Record<string, unknown>> = {
   [P in keyof T as string extends P ? never : P]: T[P];
 };
 
@@ -15,9 +19,15 @@ type Exactify<T extends Record<string, unknown>> = {
  * @returns A union of the keys of `Entity` whose values are of type `Type`.
  */
 export type PropertiesOfType<E extends Entity, Type> = keyof {
-  [Property in keyof Exactify<E> as E[Property] extends Type
-    ? Property
-    : never]: never;
+  [Property in keyof Exactify<E> as [Type] extends [never]
+    ? [E[Property]] extends [never]
+      ? Property
+      : never
+    : [E[Property]] extends [never]
+      ? never
+      : E[Property] extends Type
+        ? Property
+        : never]: never;
 };
 
 /**
@@ -29,9 +39,15 @@ export type PropertiesOfType<E extends Entity, Type> = keyof {
  * @returns A union of the keys of `Entity` whose values are not of type `Type`.
  */
 export type PropertiesNotOfType<E extends Entity, Type> = keyof {
-  [Property in keyof Exactify<E> as E[Property] extends Type
-    ? never
-    : Property]: never;
+  [Property in keyof Exactify<E> as [Type] extends [never]
+    ? [E[Property]] extends [never]
+      ? never
+      : Property
+    : [E[Property]] extends [never]
+      ? E[Property] extends Type
+        ? Property
+        : never
+      : never]: never;
 };
 
 /**
@@ -56,6 +72,24 @@ export type ExclusiveKey<
   : never;
 
 /**
+ * Returns the `types` property type of a Config Entity.
+ *
+ * @typeParam Entity - The entity type.
+ *
+ * @remarks
+ * This property supports typing of values decoded from generated properties.
+ *
+ * All `Entity` properties of types `string`, `number`, `boolean`, or `bigint` must be represented, and no extra properties are allowed.
+ */
+export type ConfigEntityTypes<E extends Entity> =
+  | (PropertiesOfType<E, Stringifiable> extends never
+      ? never
+      : Record<PropertiesOfType<E, Stringifiable>, StringifiableTypes>)
+  | (PropertiesOfType<E, Stringifiable> extends never
+      ? Record<string, never>
+      : never);
+
+/**
  * Returns the `generated` property type of a Config Entity.
  *
  * @typeParam Entity - The entity type.
@@ -64,16 +98,18 @@ export type ExclusiveKey<
  * All `Entity` properties of type `never` must be represented, and no extra properties are allowed.
  */
 export type ConfigEntityGenerated<E extends Entity> =
-  | (PropertiesOfType<E, never> extends never
+  | ([PropertiesOfType<E, never>] extends [never]
       ? never
       : Record<
           PropertiesOfType<E, never>,
           {
-            elements: PropertiesNotOfType<E, never>[];
+            elements: PropertiesOfType<E, Stringifiable>[];
             sharded?: boolean;
           }
         >)
-  | (PropertiesOfType<E, never> extends never ? Record<string, never> : never);
+  | ([PropertiesOfType<E, never>] extends [never]
+      ? Record<string, never>
+      : never);
 
 /**
  * ShardBump interface.
@@ -103,14 +139,22 @@ type ConfigEntity<
   defaultPageSize?: number;
   indexes?: Record<
     string,
-    (PropertiesOfType<E, string | number> | HashKey | UniqueKey)[]
+    (
+      | PropertiesOfType<E, Stringifiable>
+      | PropertiesOfType<E, never>
+      | HashKey
+      | UniqueKey
+    )[]
   >;
   shardBumps?: ShardBump[];
   timestampProperty: PropertiesOfType<E, number>;
   uniqueProperty: PropertiesOfType<E, number | string>;
-} & (PropertiesOfType<E, never> extends never
+} & ([PropertiesOfType<E, never>] extends [never]
   ? { generated?: ConfigEntityGenerated<E> }
-  : { generated: ConfigEntityGenerated<E> });
+  : { generated: ConfigEntityGenerated<E> }) &
+  ([PropertiesOfType<E, Stringifiable>] extends [never]
+    ? { types?: ConfigEntityTypes<E> }
+    : { types: ConfigEntityTypes<E> });
 
 /**
  * Returns the `entities` property type of a Config tyoe.
@@ -127,7 +171,7 @@ export type ConfigEntities<
   HashKey extends string,
   UniqueKey extends string,
 > =
-  | (keyof Exactify<M> extends never
+  | ([keyof Exactify<M>] extends [never]
       ? never
       : {
           [E in keyof Exactify<M>]: ConfigEntity<M[E], HashKey, UniqueKey>;
@@ -158,6 +202,6 @@ export type Config<
   M extends EntityMap = Record<string, never>,
   HashKey extends string = 'hashKey',
   UniqueKey extends string = 'uniqueKey',
-> = keyof Exactify<M> extends never
+> = [keyof Exactify<M>] extends [never]
   ? ConfigKeys<M, HashKey, UniqueKey>
   : Required<ConfigKeys<M, HashKey, UniqueKey>>;

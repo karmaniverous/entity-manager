@@ -3,14 +3,19 @@ import {
   Config,
   Entity,
   EntityMap,
+  Exactify,
   ExclusiveKey,
   PropertiesOfType,
+  Stringifiable,
 } from './Config';
+
+type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
 
 interface User extends Entity {
   created: number;
   firstNameCanonical: string;
   firstNameRK: never;
+  json: Json;
   lastNameCanonical: string;
   lastNameRK: never;
   phone: string;
@@ -48,6 +53,10 @@ type noGeneratedProperties = PropertiesOfType<Email, never>;
 
 type neverProperties = PropertiesOfType<User, never>;
 
+type stringifiableProperties = PropertiesOfType<User, Stringifiable>;
+
+type exactifiedUser = Exactify<User>;
+
 const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
   entities: {
     user: {
@@ -66,6 +75,14 @@ const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
           elements: ['lastNameCanonical', 'firstNameCanonical'],
         },
       },
+      types: {
+        created: 'number',
+        firstNameCanonical: 'string',
+        lastNameCanonical: 'string',
+        phone: 'string',
+        updated: 'number',
+        userId: 'string',
+      },
       timestampProperty: 'created',
       uniqueProperty: 'userId',
     },
@@ -73,6 +90,7 @@ const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
       indexes: {
         userId: ['entityPK', 'entitySK', 'userId'],
       },
+      types: { created: 'number', email: 'string', userId: 'string' },
       timestampProperty: 'created',
       uniqueProperty: 'email',
     },
