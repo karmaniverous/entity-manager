@@ -76,6 +76,10 @@ export const configSchema = z
               )
               .optional()
               .default({}),
+            types: z
+              .record(z.enum(['string', 'number', 'boolean', 'bigint']))
+              .optional()
+              .default({}),
             shardBumps: z
               .array(
                 z.object({

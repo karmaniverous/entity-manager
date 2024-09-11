@@ -26,6 +26,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
+          types: { bar: 'string', baz: 'number' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -42,6 +43,7 @@ describe('Config', function () {
       generated: {},
       indexes: {},
       shardBumps: [{ timestamp: 0, nibbles: 0, nibbleBits: 1 }],
+      types: { bar: 'string', baz: 'number' },
     });
   });
 
@@ -54,6 +56,7 @@ describe('Config', function () {
       entities: {
         foo: {
           indexes: { id: [] },
+          types: { bar: 'string', baz: 'number' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -74,6 +77,7 @@ describe('Config', function () {
       entities: {
         foo: {
           indexes: { id: ['bar', 'bar'] },
+          types: { bar: 'string', baz: 'number' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -98,6 +102,7 @@ describe('Config', function () {
           generated: {
             boo: { elements: [] },
           },
+          types: { bar: 'string', baz: 'number' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -120,6 +125,7 @@ describe('Config', function () {
           generated: {
             boo: { elements: ['bar', 'bar'] },
           },
+          types: { bar: 'string', baz: 'number' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -142,6 +148,7 @@ describe('Config', function () {
       entities: {
         foo: {
           shardBumps: [{ timestamp: 0, nibbles: -1, nibbleBits: 1 }],
+          types: { bar: 'string', baz: 'number' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -164,6 +171,7 @@ describe('Config', function () {
       entities: {
         foo: {
           shardBumps: [{ timestamp: 0, nibbles: 41, nibbleBits: 1 }],
+          types: { bar: 'string', baz: 'number' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -185,6 +193,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
+          types: { bar: 'string', baz: 'number' },
           shardBumps: [
             { timestamp: 0, nibbles: 0, nibbleBits: 1 },
             { timestamp: 0, nibbles: 1, nibbleBits: 1 },
@@ -210,6 +219,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
+          types: { bar: 'string', baz: 'number' },
           shardBumps: [{ timestamp: 1, nibbles: 1, nibbleBits: 1 }],
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
@@ -236,6 +246,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
+          types: { bar: 'string', baz: 'number' },
           shardBumps: [
             { timestamp: 2, nibbleBits: 1, nibbles: 2 },
             { timestamp: 1, nibbleBits: 1, nibbles: 1 },
@@ -265,6 +276,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
+          types: { bar: 'string', baz: 'number' },
           shardBumps: [
             { timestamp: 1, nibbleBits: 1, nibbles: 1 },
             { timestamp: 2, nibbleBits: 1, nibbles: 1 },
@@ -290,6 +302,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
+          types: { bar: 'string', baz: 'number' },
           shardBumps: [
             { timestamp: 2, nibbleBits: 1, nibbles: 2 },
             { timestamp: 1, nibbleBits: 1, nibbles: 1 },
