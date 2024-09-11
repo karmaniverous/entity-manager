@@ -202,6 +202,10 @@ export type Config<
   M extends EntityMap = Record<string, never>,
   HashKey extends string = 'hashKey',
   UniqueKey extends string = 'uniqueKey',
-> = [keyof Exactify<M>] extends [never]
+> = ([keyof Exactify<M>] extends [never]
   ? ConfigKeys<M, HashKey, UniqueKey>
-  : Required<ConfigKeys<M, HashKey, UniqueKey>>;
+  : Required<ConfigKeys<M, HashKey, UniqueKey>>) & {
+  generatedKeyDelimiter?: string;
+  generatedValueDelimiter?: string;
+  shardKeyDelimiter?: string;
+};

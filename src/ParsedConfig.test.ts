@@ -13,7 +13,10 @@ describe('Config', function () {
 
     expect(parsedConfig).to.deep.equal({
       entities: {},
+      generatedKeyDelimiter: '|',
+      generatedValueDelimiter: '#',
       hashKey: 'hashKey',
+      shardKeyDelimiter: '!',
       uniqueKey: 'uniqueKey',
     });
   });
@@ -45,6 +48,138 @@ describe('Config', function () {
       shardBumps: [{ timestamp: 0, nibbles: 0, nibbleBits: 1 }],
       types: { bar: 'string', baz: 'number' },
     });
+  });
+
+  it('should fail on invalid generated key delimiter', function () {
+    interface MyEntityMap extends EntityMap {
+      foo: { bar: string; baz: number };
+    }
+
+    const config: Config<MyEntityMap> = {
+      entities: {
+        foo: {
+          types: { bar: 'string', baz: 'number' },
+          timestampProperty: 'baz',
+          uniqueProperty: 'bar',
+        },
+      },
+      generatedKeyDelimiter: 'foo',
+      hashKey: 'hashKey',
+      uniqueKey: 'uniqueKey',
+    };
+
+    expect(() => configSchema.parse(config)).to.throw('regex');
+  });
+
+  it('should fail on generated key delimiter collision', function () {
+    interface MyEntityMap extends EntityMap {
+      foo: { bar: string; baz: number };
+    }
+
+    const config: Config<MyEntityMap> = {
+      entities: {
+        foo: {
+          types: { bar: 'string', baz: 'number' },
+          timestampProperty: 'baz',
+          uniqueProperty: 'bar',
+        },
+      },
+      generatedKeyDelimiter: '#',
+      hashKey: 'hashKey',
+      uniqueKey: 'uniqueKey',
+    };
+
+    expect(() => configSchema.parse(config)).to.throw(
+      'generatedKeyDelimiter contains generatedValueDelimiter',
+    );
+  });
+
+  it('should fail on invalid generated value delimiter', function () {
+    interface MyEntityMap extends EntityMap {
+      foo: { bar: string; baz: number };
+    }
+
+    const config: Config<MyEntityMap> = {
+      entities: {
+        foo: {
+          types: { bar: 'string', baz: 'number' },
+          timestampProperty: 'baz',
+          uniqueProperty: 'bar',
+        },
+      },
+      generatedValueDelimiter: 'foo',
+      hashKey: 'hashKey',
+      uniqueKey: 'uniqueKey',
+    };
+
+    expect(() => configSchema.parse(config)).to.throw('regex');
+  });
+
+  it('should fail on generated value delimiter collision', function () {
+    interface MyEntityMap extends EntityMap {
+      foo: { bar: string; baz: number };
+    }
+
+    const config: Config<MyEntityMap> = {
+      entities: {
+        foo: {
+          types: { bar: 'string', baz: 'number' },
+          timestampProperty: 'baz',
+          uniqueProperty: 'bar',
+        },
+      },
+      generatedValueDelimiter: '|',
+      hashKey: 'hashKey',
+      uniqueKey: 'uniqueKey',
+    };
+
+    expect(() => configSchema.parse(config)).to.throw(
+      'generatedValueDelimiter contains generatedKeyDelimiter',
+    );
+  });
+
+  it('should fail on invalid shard key delimiter', function () {
+    interface MyEntityMap extends EntityMap {
+      foo: { bar: string; baz: number };
+    }
+
+    const config: Config<MyEntityMap> = {
+      entities: {
+        foo: {
+          types: { bar: 'string', baz: 'number' },
+          timestampProperty: 'baz',
+          uniqueProperty: 'bar',
+        },
+      },
+      shardKeyDelimiter: 'foo',
+      hashKey: 'hashKey',
+      uniqueKey: 'uniqueKey',
+    };
+
+    expect(() => configSchema.parse(config)).to.throw('regex');
+  });
+
+  it('should fail on shard key delimiter collision', function () {
+    interface MyEntityMap extends EntityMap {
+      foo: { bar: string; baz: number };
+    }
+
+    const config: Config<MyEntityMap> = {
+      entities: {
+        foo: {
+          types: { bar: 'string', baz: 'number' },
+          timestampProperty: 'baz',
+          uniqueProperty: 'bar',
+        },
+      },
+      shardKeyDelimiter: '|',
+      hashKey: 'hashKey',
+      uniqueKey: 'uniqueKey',
+    };
+
+    expect(() => configSchema.parse(config)).to.throw(
+      'shardKeyDelimiter contains generatedKeyDelimiter',
+    );
   });
 
   it('should fail when entity index is empty', function () {

@@ -1,4 +1,3 @@
-import { type Stringifiable } from '@karmaniverous/string-utilities';
 import lzstring from 'lz-string';
 import {
   alphabetical,
@@ -13,7 +12,7 @@ import {
   zipToObject,
 } from 'radash';
 
-import { Config, ConfigEntities, EntityMap, PropertiesOfType } from './Config';
+import { Config, EntityMap, PropertiesOfType, Stringifiable } from './Config';
 import { configSchema, ParsedConfig } from './ParsedConfig';
 import {
   type EntityIndexItem,
@@ -290,21 +289,39 @@ export class EntityManager<
     this.#config = configSchema.parse(value);
   }
 
-  encodeEntityProperty<Entity extends keyof EntityMap>(
+  encodeGeneratedProperty<Entity extends keyof EntityMap>(
     entity: Entity,
     property: PropertiesOfType<EntityMap[Entity], never>,
     item: EntityMap[Entity],
-  ) {
+  ): string {
     const { elements, sharded } =
       this.config.entities[entity as keyof ParsedConfig].generated[property];
 
-    const shardedPart = sharded ? [item[this.config.hashKey] as string] : [];
+    return [
+      ...(sharded ? [item[this.config.hashKey] as string] : []),
+      ...elements.map((element) =>
+        [element, (item[element] as Stringifiable).toString()].join(
+          this.config.generatedValueDelimiter,
+        ),
+      ),
+    ].join(this.config.generatedKeyDelimiter);
+  }
 
-    const parts = elements.map((element) => [
-      element,
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
-      (item[element] as Stringifiable).toString(),
-    ]);
+  decodeGeneratedProperty<Entity extends keyof EntityMap>(
+    entity: Entity,
+    value: string,
+  ): Partial<EntityMap[Entity]> {
+    const { elements, sharded } =
+      this.config.entities[entity as keyof ParsedConfig].generated[property];
+
+    return [
+      ...(sharded ? [item[this.config.hashKey] as string] : []),
+      ...elements.map((element) =>
+        [element, (item[element] as Stringifiable).toString()].join(
+          this.config.generatedValueDelimiter,
+        ),
+      ),
+    ].join(this.config.generatedKeyDelimiter);
   }
 
   /**

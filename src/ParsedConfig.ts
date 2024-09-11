@@ -147,10 +147,58 @@ export const configSchema = z
       )
       .optional()
       .default({}),
+    generatedKeyDelimiter: z.string().regex(/\W+/).optional().default('|'),
+    generatedValueDelimiter: z.string().regex(/\W+/).optional().default('#'),
+    shardKeyDelimiter: z.string().regex(/\W+/).optional().default('!'),
     hashKey: z.string().optional().default('hashKey'),
     uniqueKey: z.string().optional().default('uniqueKey'),
   })
   .superRefine((data, ctx) => {
+    // validate no generated key delimiter collision
+    if (data.generatedKeyDelimiter.includes(data.generatedValueDelimiter))
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'generatedKeyDelimiter contains generatedValueDelimiter',
+        path: ['generatedKeyDelimiter'],
+      });
+
+    if (data.generatedKeyDelimiter.includes(data.shardKeyDelimiter))
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'generatedKeyDelimiter contains shardKeyDelimiter',
+        path: ['generatedKeyDelimiter'],
+      });
+
+    // validate no generated value delimiter collision
+    if (data.generatedValueDelimiter.includes(data.generatedKeyDelimiter))
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'generatedValueDelimiter contains generatedKeyDelimiter',
+        path: ['generatedValueDelimiter'],
+      });
+
+    if (data.generatedValueDelimiter.includes(data.shardKeyDelimiter))
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'generatedValueDelimiter contains shardKeyDelimiter',
+        path: ['generatedValueDelimiter'],
+      });
+
+    // validate no shard key delimiter collision
+    if (data.shardKeyDelimiter.includes(data.generatedKeyDelimiter))
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'shardKeyDelimiter contains generatedKeyDelimiter',
+        path: ['shardKeyDelimiter'],
+      });
+
+    if (data.shardKeyDelimiter.includes(data.generatedValueDelimiter))
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'shardKeyDelimiter contains generatedValueDelimiter',
+        path: ['shardKeyDelimiter'],
+      });
+
     const reservedKeys = Object.values(data.entities).reduce(
       (reserved, { generated, timestampProperty, uniqueProperty }) =>
         new Set([
