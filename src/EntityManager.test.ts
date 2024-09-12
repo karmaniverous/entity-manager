@@ -264,4 +264,31 @@ describe('EntityManager', function () {
       expect(dehydrated).to.match(/\d+\|\|[\w-]+/);
     });
   });
+
+  describe('rehydrateIndexItem', function () {
+    it('should rehydrate item by index', function () {
+      const [item] = getUsers() as UserItem[];
+
+      const rehydrated = entityManager.rehydrateIndexItem(
+        'user',
+        'firstName',
+        entityManager.dehydrateIndexItem('user', 'firstName', item),
+      );
+
+      expect(item).to.deep.include(rehydrated);
+    });
+
+    it('should rehydrate item by index with missing component', function () {
+      const [item] = getUsers() as UserItem[];
+      delete item.phone;
+
+      const rehydrated = entityManager.rehydrateIndexItem(
+        'user',
+        'phone',
+        entityManager.dehydrateIndexItem('user', 'phone', item),
+      );
+
+      expect(item).to.deep.include(rehydrated);
+    });
+  });
 });

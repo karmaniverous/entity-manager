@@ -1,8 +1,38 @@
-import { objectify } from 'radash';
+import { objectify, shake, zipToObject } from 'radash';
 import stringHash from 'string-hash';
 
-import type { Config, EntityItem, EntityMap, ShardBump } from './Config';
+import type {
+  Config,
+  EntityItem,
+  EntityMap,
+  ShardBump,
+  Stringifiable,
+  StringifiableTypes,
+} from './Config';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
+
+const toStringifiable = (
+  type: StringifiableTypes,
+  value?: string,
+): Stringifiable | undefined => {
+  if (!value) return;
+
+  switch (type) {
+    case 'string':
+      return value;
+    case 'number':
+      return Number(value);
+    case 'boolean':
+      return value === 'true';
+    case 'bigint':
+      return BigInt(value);
+    default:
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      throw new Error(
+        `unknown stringifiable type '${(type as string | undefined) ?? ''}'`,
+      );
+  }
+};
 
 /**
  * Null or undefined.
@@ -414,20 +444,27 @@ export class EntityManager<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
   >(entity: Entity, item: Item): Item {
-    // Delete hash & range keys.
-    delete item[this.config.hashKey as keyof Item];
-    delete item[this.config.rangeKey as keyof Item];
+    try {
+      // Delete hash & range keys.
+      delete item[this.config.hashKey as keyof Item];
+      delete item[this.config.rangeKey as keyof Item];
 
-    // Delete generated properties.
-    for (const property in this.config.entities[entity].generated)
-      delete item[property as keyof Item];
+      // Delete generated properties.
+      for (const property in this.config.entities[entity].generated)
+        delete item[property as keyof Item];
 
-    this.#logger.debug('stripped entity item generated properties', {
-      entity,
-      item,
-    });
+      this.#logger.debug('stripped entity item generated properties', {
+        entity,
+        item,
+      });
 
-    return item;
+      return item;
+    } catch (error) {
+      if (error instanceof Error)
+        this.#logger.debug(error.message, { entity, item });
+
+      throw error;
+    }
   }
 
   /**
@@ -438,32 +475,41 @@ export class EntityManager<
    * @returns Deduped, sorted array of ungenerated index component elements.
    */
   unwrapIndex<Entity extends keyof EntityMap>(entity: Entity, index: string) {
-    // Validate index.
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!this.config.entities[entity].indexes[index])
-      throw new Error(`unknown entity index`);
+    try {
+      // Validate index.
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!this.config.entities[entity].indexes[index])
+        throw new Error(`unknown entity index`);
 
-    const generated = this.config.entities[entity].generated;
-    const generatedKeys = Object.keys(generated);
+      const generated = this.config.entities[entity].generated;
+      const generatedKeys = Object.keys(generated);
 
-    return this.config.entities[entity].indexes[index]
-      .map((component) =>
-        component === this.config.hashKey
-          ? this.config.entities[entity].timestampProperty
-          : component === this.config.rangeKey
-            ? this.config.entities[entity].uniqueProperty
-            : generatedKeys.includes(component)
-              ? generated[component].elements
-              : component,
-      )
-      .flat()
-      .sort();
+      return this.config.entities[entity].indexes[index]
+        .map((component) =>
+          component === this.config.hashKey
+            ? this.config.entities[entity].timestampProperty
+            : component === this.config.rangeKey
+              ? this.config.entities[entity].uniqueProperty
+              : generatedKeys.includes(component)
+                ? generated[component].elements
+                : component,
+        )
+        .flat()
+        .sort();
+    } catch (error) {
+      if (error instanceof Error)
+        this.#logger.debug(error.message, { entity, index });
+
+      throw error;
+    }
   }
 
   /**
    * Condense a partial EntityItem into a delimited string representing the ungenerated component elements of a Config entity index.
    *
    * @remarks
+   * Reverses {@link EntityManager.rehydrateIndexItem | `rehydrateIndexItem`}.
+   *
    * To create the output value, this method:
    *
    * * Unwraps `index` components into deduped, sorted, ungenerated elements.
@@ -480,23 +526,91 @@ export class EntityManager<
   dehydrateIndexItem<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(entity: Entity, index: string, item: Item): string {
-    // Unwrap index elements.
-    const elements = this.unwrapIndex(entity, index);
+  >(entity: Entity, index: string, item: Partial<Item>): string {
+    try {
+      // Unwrap index elements.
+      const elements = this.unwrapIndex(entity, index);
 
-    // Join index element values.
-    const dehydrated = elements
-      .map((element) => item[element as keyof Item]?.toString() ?? '')
-      .join(this.config.generatedKeyDelimiter);
+      // Join index element values.
+      const dehydrated = elements
+        .map((element) => item[element as keyof Item]?.toString() ?? '')
+        .join(this.config.generatedKeyDelimiter);
 
-    this.#logger.debug('dehydrated index', {
-      entity,
-      index,
-      item,
-      elements,
-      dehydrated,
-    });
+      this.#logger.debug('dehydrated index', {
+        entity,
+        index,
+        item,
+        elements,
+        dehydrated,
+      });
 
-    return dehydrated;
+      return dehydrated;
+    } catch (error) {
+      if (error instanceof Error)
+        this.#logger.debug(error.message, { entity, index, item });
+
+      throw error;
+    }
+  }
+
+  /**
+   * Convert a delimited string into a partial EntityItem representing the ungenerated component elements of a Config entity index.
+   *
+   * @remarks
+   * Reverses {@link EntityManager.dehydrateIndexItem | `dehydrateIndexItem`}.
+   *
+   * {@link EntityManager.dehydrateIndexItem | `dehydrateIndexItem`} alphebetically sorts unwrapped index elements during
+   * the dehydration process. This method assumes delimited element values are
+   * presented in the same order.
+   *
+   * @param entity - Entity token.
+   * @param index - Entity index token.
+   * @param value - Dehydrated index.
+   *
+   * @returns Rehydrated index.
+   */
+  rehydrateIndexItem<
+    Entity extends keyof EntityMap,
+    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+  >(entity: Entity, index: string, value: string): Partial<Item> {
+    try {
+      // Unwrap index elements.
+      const elements = this.unwrapIndex(entity, index);
+
+      // Split dehydrated value & validate.
+      const values = value.split(this.config.generatedKeyDelimiter);
+
+      if (elements.length !== values.length)
+        throw new Error('index rehydration key-value mismatch');
+
+      // Assign values to elements.
+      const rehydrated = shake(
+        zipToObject(
+          elements,
+          values.map((value, i) =>
+            toStringifiable(
+              this.config.entities[entity].types[elements[i]],
+              value,
+            ),
+          ),
+        ),
+      ) as Partial<Item>;
+
+      this.#logger.debug('rehydrated index', {
+        entity,
+        index,
+        value,
+        elements,
+        values,
+        rehydrated,
+      });
+
+      return rehydrated;
+    } catch (error) {
+      if (error instanceof Error)
+        this.#logger.debug(error.message, { entity, index, value });
+
+      throw error;
+    }
   }
 }
