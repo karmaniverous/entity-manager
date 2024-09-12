@@ -289,46 +289,6 @@ export class EntityManager<
     this.#config = configSchema.parse(value);
   }
 
-  encodeGeneratedProperty<Entity extends keyof EntityMap>(
-    entity: Entity,
-    property: PropertiesOfType<EntityMap[Entity], never>,
-    item: EntityMap[Entity],
-  ): string {
-    const { elements, sharded } =
-      this.config.entities[entity as keyof ParsedConfig].generated[property];
-
-    return [
-      ...(sharded ? [item[this.config.hashKey] as string] : []),
-      ...elements.map((element) =>
-        [element, (item[element] as Stringifiable).toString()].join(
-          this.config.generatedValueDelimiter,
-        ),
-      ),
-    ].join(this.config.generatedKeyDelimiter);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-  decodeGeneratedProperty<Entity extends keyof EntityMap>(
-    entity: Entity,
-    value: string,
-  ): Partial<EntityMap[Entity]> {
-    const parts = value.split(this.config.generatedKeyDelimiter);
-
-    const result: Partial<EntityMap[Entity]> = {};
-
-    if (parts[0].includes(this.config.shardKeyDelimiter))
-      result[this.config.hashKey] = parts.shift();
-
-    return parts.reduce((result, part) => {
-      const [key, value] = part.split(this.config.generatedValueDelimiter);
-
-      return {
-        ...result,
-        [key]: value,
-      };
-    }, result);
-  }
-
   /**
    * Generates an array of sharded keys from an {@link EntityItem | `EntityItem`} valid across a given timestamp range.
    *
@@ -429,35 +389,6 @@ export class EntityManager<
     });
 
     return result as T;
-  }
-
-  /**
-   * Reverses {@link EntityManager.addKeys | `EntityManager.addKeys `}.
-   *
-   * Remove sharded keys from an entity item. Does not mutate original item or
-   * remove keys marked with `retain = true`.
-   *
-   * @param entityToken - Entity token.
-   * @param item - Entity item.
-   *
-   * @returns Stripped entity item.
-   */
-  removeKeys(entityToken: string, item: EntityItem) {
-    // Validate item.
-    validateEntityItem(item);
-
-    // Remove keys.
-    const { keys } = this.config.entities[entityToken];
-    const unretainedKeys = Object.keys(keys).filter((key) => !keys[key].retain);
-    const result = omit(item, [...unretainedKeys, this.config.tokens.shardKey]);
-
-    this.#logger.debug('removed sharded index keys from entity item', {
-      entityToken,
-      item,
-      result,
-    });
-
-    return result as EntityItem;
   }
 
   /**

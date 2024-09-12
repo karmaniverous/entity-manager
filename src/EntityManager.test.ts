@@ -180,4 +180,61 @@ describe('EntityManager', function () {
       expect(item.hashKey.length).to.equal(7);
     });
   });
+
+  describe('updateItemGeneratedProperties', function () {
+    it('should add item generated properties', function () {
+      const [item] = getUsers() as UserItem[];
+
+      entityManager.updateItemGeneratedProperties('user', item);
+
+      expect(item).to.haveOwnProperty('hashKey');
+      expect(item).to.haveOwnProperty('rangeKey');
+      expect(item).to.haveOwnProperty('firstNameRK');
+      expect(item).to.haveOwnProperty('lastNameRK');
+      expect(item).to.haveOwnProperty('phoneRK');
+    });
+
+    it('should not overwrite item generated properties', function () {
+      const [item] = getUsers() as UserItem[];
+
+      const newItem = entityManager.updateItemGeneratedProperties('user', {
+        ...item,
+        firstNameCanonical: 'foo',
+      });
+
+      expect(newItem.firstNameRK).to.equal(newItem.firstNameRK);
+    });
+
+    it('should overwrite item generated properties', function () {
+      const [item] = getUsers() as UserItem[];
+
+      const newItem = entityManager.updateItemGeneratedProperties(
+        'user',
+        {
+          ...item,
+          firstNameCanonical: 'foo',
+        },
+        true,
+      );
+
+      expect(newItem.firstNameRK).not.to.equal(item.firstNameRK);
+    });
+  });
+
+  describe('stripItemGeneratedProperties', function () {
+    it('should strip item generated properties', function () {
+      const [item] = getUsers() as UserItem[];
+
+      entityManager.stripItemGeneratedProperties(
+        'user',
+        entityManager.updateItemGeneratedProperties('user', item),
+      );
+
+      expect(item).not.to.haveOwnProperty('hashKey');
+      expect(item).not.to.haveOwnProperty('rangeKey');
+      expect(item).not.to.haveOwnProperty('firstNameRK');
+      expect(item).not.to.haveOwnProperty('lastNameRK');
+      expect(item).not.to.haveOwnProperty('phoneRK');
+    });
+  });
 });
