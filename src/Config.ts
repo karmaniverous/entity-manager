@@ -1,31 +1,50 @@
+/**
+ * Indicates primitive types that have a `toString` method.
+ */
 export type Stringifiable = string | number | boolean | bigint;
 
+/**
+ * Stringifiable type names to support runtime generated property decoding.
+ */
 export type StringifiableTypes = 'string' | 'number' | 'boolean' | 'bigint';
 
+/**
+ * The base Entity type. All Entities should extend this type.
+ */
 export type Entity = Record<string, unknown>;
 
+/**
+ * The base EntityMap type. All EntityMaps should extend this type.
+ */
 export type EntityMap = Record<string, Entity>;
 
+/**
+ * Strips the generic `[x: string]: unknown` property from an Entity or EntityMap.
+ *
+ * @typeParam T - The Entity or EntityMap type.
+ *
+ * @returns The Entity or EntityMap type without the generic property.
+ */
 export type Exactify<T extends Record<string, unknown>> = {
   [P in keyof T as string extends P ? never : P]: T[P];
 };
 
 /**
- * Generates a union of the keys of an entity type whose values are of a certain type.
+ * Generates a union of the keys of an Entity type whose values are of a certain type.
  *
- * @typeParam Entity - The entity type.
- * @typeParam Type - The type to filter by.
+ * @typeParam E - The Entity type.
+ * @typeParam T - The type to filter by.
  *
- * @returns A union of the keys of `Entity` whose values are of type `Type`.
+ * @returns A union of the keys of `E` whose values are of type `T`.
  */
-export type PropertiesOfType<E extends Entity, Type> = keyof {
-  [Property in keyof Exactify<E> as [Type] extends [never]
+export type PropertiesOfType<E extends Entity, T> = keyof {
+  [Property in keyof Exactify<E> as [T] extends [never]
     ? [NonNullable<E[Property]>] extends [never]
       ? Property
       : never
     : [NonNullable<E[Property]>] extends [never]
       ? never
-      : NonNullable<E[Property]> extends Type
+      : NonNullable<E[Property]> extends T
         ? Property
         : never]: never;
 };
@@ -33,53 +52,53 @@ export type PropertiesOfType<E extends Entity, Type> = keyof {
 /**
  * Generates a union of the keys of an entity type whose values are not of a certain type.
  *
- * @typeParam Entity - The entity type.
- * @typeParam Type - The type to filter by.
+ * @typeParam E - The entity type.
+ * @typeParam T - The type to filter by.
  *
- * @returns A union of the keys of `Entity` whose values are not of type `Type`.
+ * @returns A union of the keys of `E` whose values are not of type `T`.
  */
-export type PropertiesNotOfType<E extends Entity, Type> = keyof {
-  [Property in keyof Exactify<E> as [Type] extends [never]
+export type PropertiesNotOfType<E extends Entity, T> = keyof {
+  [Property in keyof Exactify<E> as [T] extends [never]
     ? [NonNullable<E[Property]>] extends [never]
       ? never
       : Property
     : [NonNullable<E[Property]>] extends [never]
-      ? NonNullable<E[Property]> extends Type
+      ? NonNullable<E[Property]> extends T
         ? Property
         : never
       : never]: never;
 };
 
 /**
- * Tests a string literal type to determine whether it belongs to any entity in an entity map or is a member of a union of reserved keys.
+ * Tests a string literal type to determine whether it is a key of any Entity in an EntityMap or is a member of a union of reserved keys.
  *
- * @typeParam Key - The string literal type to test.
- * @typeParam EntityMap - The entity map type.
- * @typeParam Reserved - The reserved set of string literal types.
+ * @typeParam K - The string literal type to test.
+ * @typeParam M - The entity map type.
+ * @typeParam R - The reserved set of string literal types.
  *
- * @returns `Key` if `Key` is exclusive or `never` otherwise.
+ * @returns `K` if `K` is exclusive or `never` otherwise.
  */
 export type ExclusiveKey<
-  Key extends string,
+  K extends string,
   M extends EntityMap,
-  Reserved extends string = never,
+  R extends string = never,
 > = keyof {
-  [E in keyof Exactify<M> as Key extends keyof Exactify<M[E]> | Reserved
-    ? Key
+  [E in keyof Exactify<M> as K extends keyof Exactify<M[E]> | R
+    ? K
     : never]: never;
 } extends never
-  ? Key
+  ? K
   : never;
 
 /**
- * Returns the `types` property type of a Config Entity.
+ * Returns the `types` property of a Config entity.
  *
- * @typeParam Entity - The entity type.
+ * @typeParam E - The entity type.
  *
  * @remarks
  * This property supports typing of values decoded from generated properties.
  *
- * All `Entity` properties of types `string`, `number`, `boolean`, or `bigint` must be represented, and no extra properties are allowed.
+ * All Entity properties of types `string`, `number`, `boolean`, or `bigint` must be represented, and no extra properties are allowed.
  */
 export type ConfigEntityTypes<E extends Entity> =
   | (PropertiesOfType<E, Stringifiable> extends never
@@ -90,12 +109,12 @@ export type ConfigEntityTypes<E extends Entity> =
       : never);
 
 /**
- * Returns the `generated` property type of a Config Entity.
+ * Returns the `generated` property of a Config entity.
  *
- * @typeParam Entity - The entity type.
+ * @typeParam E - The entity type.
  *
  * @remarks
- * All `Entity` properties of type `never` must be represented, and no extra properties are allowed.
+ * All Entity properties of type `never` must be represented, and no extra properties are allowed.
  */
 export type ConfigEntityGenerated<E extends Entity> =
   | ([PropertiesOfType<E, never>] extends [never]
@@ -121,14 +140,14 @@ export interface ShardBump {
 }
 
 /**
- * Returns a Config Entity type.
+ * Returns a Config entity type.
  *
- * @typeParam Entity - The Entity type.
+ * @typeParam E - The Entity type.
  * @typeParam HashKey - The hash key string literal type.
  * @typeParam RangeKey - The unique key string literal type.
  *
  * @remarks
- * `generated` is optional if `Entity` has no properties of type `never`.
+ * `generated` is optional if `E` has no properties of type `never`.
  */
 type ConfigEntity<
   E extends Entity,
@@ -157,14 +176,14 @@ type ConfigEntity<
     : { types: ConfigEntityTypes<E> });
 
 /**
- * Returns the `entities` property type of a Config tyoe.
+ * Returns the `entities` property of a Config tyoe.
  *
- * @typeParam EntityMap - The entity map type.
+ * @typeParam M - The EntityMap type.
  * @typeParam HashKey - The hash key string literal type.
  * @typeParam RangeKey - The unique key string literal type.
  *
  * @remarks
- * All `EntityMap` properties must be represented, and no extra properties are allowed.
+ * All properties of `M` must be represented, and no extra properties are allowed.
  */
 export type ConfigEntities<
   M extends EntityMap,
@@ -178,6 +197,9 @@ export type ConfigEntities<
         })
   | Record<string, never>;
 
+/**
+ * Returns all properties of the Config type as optional.
+ */
 interface ConfigKeys<
   M extends EntityMap,
   HashKey extends string,
@@ -191,12 +213,12 @@ interface ConfigKeys<
 /**
  * EntityManager Config type.
  *
- * @typeParam EntityMap - The entity map type.
+ * @typeParam M - The EntityMap type.
  * @typeParam HashKey - The hash key string literal type.
  * @typeParam RangeKey - The unique key string literal type.
  *
  * @remarks
- * `entities` is optional if `EntityMap` is empty.
+ * `entities` is optional if `M` is empty.
  */
 export type Config<
   M extends EntityMap = Record<string, never>,
@@ -210,13 +232,23 @@ export type Config<
   shardKeyDelimiter?: string;
 };
 
+/**
+ * Flattens the top layer of logic in a type.
+ */
+export type Unwrap<T> = { [P in keyof T]: T[P] };
+
+/**
+ * Extracts an Entity item type decorated with generted properties.
+ */
 export type EntityItem<
   E extends keyof M,
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
-> = {
-  [P in keyof Exactify<M[E]>]: [M[E][P]] extends [never] ? string : M[E][P];
-} & {
-  [P in HashKey | RangeKey]?: string;
-};
+> = Unwrap<
+  {
+    [P in keyof Exactify<M[E]>]: [M[E][P]] extends [never] ? string : M[E][P];
+  } & {
+    [P in HashKey | RangeKey]?: string;
+  }
+>;
