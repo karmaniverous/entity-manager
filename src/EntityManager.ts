@@ -429,4 +429,74 @@ export class EntityManager<
 
     return item;
   }
+
+  /**
+   * Unwraps an entity index into deduped, sorted, ungenerated elements.
+   *
+   * @param entity - Entity token.
+   * @param index - Index token.
+   * @returns Deduped, sorted array of ungenerated index component elements.
+   */
+  unwrapIndex<Entity extends keyof EntityMap>(entity: Entity, index: string) {
+    // Validate index.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!this.config.entities[entity].indexes[index])
+      throw new Error(`unknown entity index`);
+
+    const generated = this.config.entities[entity].generated;
+    const generatedKeys = Object.keys(generated);
+
+    return this.config.entities[entity].indexes[index]
+      .map((component) =>
+        component === this.config.hashKey
+          ? this.config.entities[entity].timestampProperty
+          : component === this.config.rangeKey
+            ? this.config.entities[entity].uniqueProperty
+            : generatedKeys.includes(component)
+              ? generated[component].elements
+              : component,
+      )
+      .flat()
+      .sort();
+  }
+
+  /**
+   * Condense a partial EntityItem into a delimited string representing the ungenerated component elements of a Config entity index.
+   *
+   * @remarks
+   * To create the output value, this method:
+   *
+   * * Unwraps `index` components into deduped, sorted, ungenerated elements.
+   * * Joins index component values from `item` with generated key delimiter.
+   *
+   * `item` must be populated with all required index component elements!
+   *
+   * @param entity - Entity token.
+   * @param index - Entity index token.
+   * @param item - EntityItem object.
+   *
+   * @returns Dehydrated index.
+   */
+  dehydrateIndexItem<
+    Entity extends keyof EntityMap,
+    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+  >(entity: Entity, index: string, item: Item): string {
+    // Unwrap index elements.
+    const elements = this.unwrapIndex(entity, index);
+
+    // Join index element values.
+    const dehydrated = elements
+      .map((element) => item[element as keyof Item]?.toString() ?? '')
+      .join(this.config.generatedKeyDelimiter);
+
+    this.#logger.debug('dehydrated index', {
+      entity,
+      index,
+      item,
+      elements,
+      dehydrated,
+    });
+
+    return dehydrated;
+  }
 }

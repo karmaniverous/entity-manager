@@ -237,4 +237,31 @@ describe('EntityManager', function () {
       expect(item).not.to.haveOwnProperty('phoneRK');
     });
   });
+
+  describe('dehydrateIndexItem', function () {
+    it('should dehydrate item by index', function () {
+      const [item] = getUsers() as UserItem[];
+
+      const dehydrated = entityManager.dehydrateIndexItem(
+        'user',
+        'firstName',
+        item,
+      );
+
+      expect(dehydrated).to.match(/\d+\|\w+\|\w+\|[\w-]+/);
+    });
+
+    it('should dehydrate item by index with missing component', function () {
+      const [item] = getUsers() as UserItem[];
+      delete item.phone;
+
+      const dehydrated = entityManager.dehydrateIndexItem(
+        'user',
+        'phone',
+        item,
+      );
+
+      expect(dehydrated).to.match(/\d+\|\|[\w-]+/);
+    });
+  });
 });
