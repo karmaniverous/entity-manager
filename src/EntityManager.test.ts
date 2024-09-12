@@ -1,11 +1,12 @@
 /* eslint-env mocha */
 
 import { expect } from 'chai';
+import { pick } from 'radash';
 import { inspect } from 'util';
 
-import { config, day, now, UserItem } from '../test/config';
+import { config, day, now, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
-import { EntityManager } from './EntityManager';
+import { EntityManager, PageKeyMap } from './EntityManager';
 
 const entityManager = new EntityManager(config, {
   logger: {
@@ -241,6 +242,7 @@ describe('EntityManager', function () {
   describe('dehydrateIndexItem', function () {
     it('should dehydrate item by index', function () {
       const [item] = getUsers() as UserItem[];
+      entityManager.updateItemGeneratedProperties('user', item);
 
       const dehydrated = entityManager.dehydrateIndexItem(
         'user',
@@ -248,12 +250,13 @@ describe('EntityManager', function () {
         item,
       );
 
-      expect(dehydrated).to.match(/\d+\|\w+\|\w+\|[\w-]+/);
+      expect(dehydrated).to.match(/\w+\|[\w!]+\|\w+\|[\w-]+/);
     });
 
     it('should dehydrate item by index with missing component', function () {
       const [item] = getUsers() as UserItem[];
       delete item.phone;
+      entityManager.updateItemGeneratedProperties('user', item);
 
       const dehydrated = entityManager.dehydrateIndexItem(
         'user',
@@ -261,7 +264,7 @@ describe('EntityManager', function () {
         item,
       );
 
-      expect(dehydrated).to.match(/\d+\|\|[\w-]+/);
+      expect(dehydrated).to.match(/[\w!]+\|\|[\w-]+/);
     });
   });
 
@@ -289,6 +292,64 @@ describe('EntityManager', function () {
       );
 
       expect(item).to.deep.include(rehydrated);
+    });
+  });
+
+  describe('dehydratePageKeyMep', function () {
+    it('should dehydrate page key map', function () {
+      const [item, item0, item1] = getUsers(3) as UserItem[];
+
+      item.hashKey = 'user!';
+      item0.hashKey = 'user!0';
+      item1.hashKey = 'user!1';
+
+      entityManager.updateItemGeneratedProperties('user', item);
+      entityManager.updateItemGeneratedProperties('user', item0);
+      entityManager.updateItemGeneratedProperties('user', item1);
+
+      const pageKeyMap = {
+        firstName: {
+          'user!': pick(
+            item,
+            entityManager.config.entities.user.indexes
+              .firstName as (keyof UserItem)[],
+          ),
+          'user!0': pick(
+            item0,
+            entityManager.config.entities.user.indexes
+              .firstName as (keyof UserItem)[],
+          ),
+          'user!1': pick(
+            item1,
+            entityManager.config.entities.user.indexes
+              .firstName as (keyof UserItem)[],
+          ),
+        },
+        lastName: {
+          'user!': pick(
+            item,
+            entityManager.config.entities.user.indexes
+              .lastName as (keyof UserItem)[],
+          ),
+          'user!0': pick(
+            item0,
+            entityManager.config.entities.user.indexes
+              .lastName as (keyof UserItem)[],
+          ),
+          'user!1': pick(
+            item1,
+            entityManager.config.entities.user.indexes
+              .lastName as (keyof UserItem)[],
+          ),
+        },
+      };
+
+      const dehydrated = entityManager.dehydratePageKeyMap(
+        'user',
+        pageKeyMap as PageKeyMap,
+      );
+
+      expect(dehydrated).to.deep.equal({});
     });
   });
 });

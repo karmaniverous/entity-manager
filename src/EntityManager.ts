@@ -11,6 +11,29 @@ import type {
 } from './Config';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 
+/**
+ * A compressed, two-layer map of page keys, used to query the next page of
+ * data for a given sort key on each shard of a given hash key.
+ *
+ * The keys of the outer object are the keys of the `queryMap` object passed to
+ * the `query` method. Each should correspond to an index for the given
+ * `entity`. This is the range key of an individual query.
+ *
+ * The keys of the inner object are the `hashKey` value passed to each
+ * {@link ShardQueryFunction | `ShardQueryFunction`}. This is the hash key of an individual query.
+ *
+ * The values are the `pageKey` returned by the previous query on that shard.
+ * An `undefined` value indicates that there are no more pages to query on
+ * that shard.
+ *
+ * An empty object indicates that there were no more pages to query on any
+ * shard, for any index.
+ */
+export type PageKeyMap = Record<
+  string,
+  Record<string, Record<string, Stringifiable> | undefined>
+>;
+
 const toStringifiable = (
   type: StringifiableTypes,
   value?: string,
@@ -243,7 +266,8 @@ export class EntityManager<
         objectify(
           values,
           ([key]) => key,
-          ([, value]) => value,
+          ([key, value]) =>
+            toStringifiable(this.config.entities[entity].types[key], value),
         ),
       );
 
@@ -487,7 +511,7 @@ export class EntityManager<
       return this.config.entities[entity].indexes[index]
         .map((component) =>
           component === this.config.hashKey
-            ? this.config.entities[entity].timestampProperty
+            ? this.config.hashKey
             : component === this.config.rangeKey
               ? this.config.entities[entity].uniqueProperty
               : generatedKeys.includes(component)
@@ -526,8 +550,11 @@ export class EntityManager<
   dehydrateIndexItem<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(entity: Entity, index: string, item: Partial<Item>): string {
+  >(entity: Entity, index: string, item?: Partial<Item>): string {
     try {
+      // Handle degenerate case.
+      if (!item) return '';
+
       // Unwrap index elements.
       const elements = this.unwrapIndex(entity, index);
 
@@ -609,6 +636,81 @@ export class EntityManager<
     } catch (error) {
       if (error instanceof Error)
         this.#logger.debug(error.message, { entity, index, value });
+
+      throw error;
+    }
+  }
+
+  /**
+   * Dehydrate a {@link PageKeyMap | `PageKeyMap`} object into an array of dehydrated pageKeys.
+   *
+   * @param entity - Entity token.
+   * @param pageKeyMap - PageKeyMap object to dehydrate.
+   *
+   * @returns  Dehydrated {@link PageKeyMap | `PageKeyMap`} object or empty array if all
+   * pageKeys are undefined.
+   */
+  dehydratePageKeyMap<Entity extends keyof EntityMap>(
+    entity: Entity,
+    pageKeyMap: PageKeyMap,
+  ): string[] {
+    try {
+      // Extract & sort index.
+      const indexes = Object.keys(pageKeyMap).sort();
+
+      // Extract & sort hash keys.
+      const hashKeys = Object.keys(pageKeyMap[indexes[0]]).sort();
+
+      // Dehydrate page keys.
+      let dehydrated: string[] = [];
+
+      for (const index of indexes) {
+        for (const hashKey of hashKeys) {
+          // Undefineed pageKey.
+          if (!pageKeyMap[index][hashKey]) {
+            dehydrated.push('');
+            continue;
+          }
+
+          // Compose item from page key
+          const item = Object.entries(pageKeyMap[index][hashKey]).reduce<
+            Partial<EntityItem<Entity, M, HashKey, RangeKey>>
+          >((item, [property, value]) => {
+            if (property === this.config.rangeKey)
+              Object.assign(item, {
+                [this.config.entities[entity].uniqueProperty]: value,
+              });
+
+            if (property in this.config.entities[entity].generated)
+              Object.assign(
+                item,
+                this.decodeGeneratedProperty(entity, value as string),
+              );
+            else Object.assign(item, { [property]: value });
+
+            return item;
+          }, {});
+
+          // Dehydrate index from item.
+          dehydrated.push(this.dehydrateIndexItem(entity, index, item));
+        }
+      }
+
+      // Replace with empty array if all pageKeys are empty strings.
+      if (dehydrated.every((pageKey) => pageKey === '')) dehydrated = [];
+
+      this.#logger.debug('dehydrated page key map', {
+        entity,
+        pageKeyMap,
+        indexes,
+        hashKeys,
+        dehydrated,
+      });
+
+      return dehydrated;
+    } catch (error) {
+      if (error instanceof Error)
+        this.#logger.debug(error.message, { entity, pageKeyMap });
 
       throw error;
     }

@@ -335,58 +335,6 @@ export class EntityManager<
   }
 
   /**
-   * Dehydrate a {@link PageKeyMap | `PageKeyMap`} object into an array of dehydrated pageKeys, then
-   * stringify & compress the array.
-   *
-   * @param entityToken - Entity token.
-   * @param pageKeyMap - PageKeyMap object to dehydrate.
-   *
-   * @returns  Dehydrated {@link PageKeyMap | `PageKeyMap`} object or compressed empty array if all
-   * pageKeys are undefined.
-   */
-  compressPageKeyMap(entityToken: string, pageKeyMap: PageKeyMap) {
-    // Extract & sort index tokens.
-    const indexTokens = alphabetical(Object.keys(pageKeyMap), (key) => key);
-
-    // Extract & sort shard key space.
-    const shardKeySpace = alphabetical(
-      Object.keys(pageKeyMap[indexTokens[0]]),
-      (key) => key,
-    );
-
-    // Dehydrate page keys.
-    const dehydrated: string[] = [];
-    for (const indexToken of indexTokens) {
-      for (const shardedKey of shardKeySpace) {
-        const pageKey = pageKeyMap[indexToken][shardedKey];
-
-        dehydrated.push(
-          pageKey ? this.dehydrateIndex(entityToken, indexToken, pageKey) : '',
-        );
-      }
-    }
-
-    // Compress dehydrated page keys.
-    const compressed = lzstring.compressToEncodedURIComponent(
-      JSON.stringify(
-        dehydrated.some((pageKey) => pageKey !== '') ? dehydrated : [],
-      ),
-    );
-
-    this.#logger.debug('compressed page key map', {
-      entityToken,
-      pageKeyMap,
-      indexTokens,
-      shardKeySpace,
-      dehydrated,
-      compressed,
-    });
-
-    // Dehydrate page keys.
-    return compressed;
-  }
-
-  /**
    * Decompress & rehydrate a compressed array of pageKeys into a {@link PageKeyMap | `PageKeyMap`}
    * object.
    *
