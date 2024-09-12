@@ -51,7 +51,7 @@ type testNumberProperties = PropertiesOfType<User, number>;
 
 type noGeneratedProperties = PropertiesOfType<Email, never>;
 
-type neverProperties = PropertiesOfType<User, never>;
+type neverProperties = PropertiesOfType<MyEntityMap['user'], never>;
 
 type stringifiableProperties = PropertiesOfType<User, Stringifiable>;
 

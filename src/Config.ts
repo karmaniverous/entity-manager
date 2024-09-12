@@ -122,6 +122,7 @@ export type ConfigEntityGenerated<E extends Entity> =
       : Record<
           PropertiesOfType<E, never>,
           {
+            atomic?: boolean;
             elements: PropertiesOfType<E, Stringifiable>[];
             sharded?: boolean;
           }
@@ -247,7 +248,9 @@ export type EntityItem<
   RangeKey extends string = 'rangeKey',
 > = Unwrap<
   {
-    [P in keyof Exactify<M[E]>]: [M[E][P]] extends [never] ? string : M[E][P];
+    [P in keyof Exactify<M[E]>]: [NonNullable<M[E][P]>] extends [never]
+      ? string
+      : M[E][P];
   } & {
     [P in HashKey | RangeKey]?: string;
   }

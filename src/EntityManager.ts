@@ -1,15 +1,22 @@
 import { objectify } from 'radash';
 import stringHash from 'string-hash';
 
-import type {
-  Config,
-  EntityItem,
-  EntityMap,
-  PropertiesOfType,
-  ShardBump,
-  Stringifiable,
-} from './Config';
+import type { Config, EntityItem, EntityMap, ShardBump } from './Config';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
+
+/**
+ * Null or undefined.
+ */
+export type Nil = null | undefined;
+
+/**
+ * Tests whether a value is Nil.
+ *
+ * @param value - Value.
+ * @returns true if value is null or undefined.
+ */
+export const isNil = (value: unknown): value is Nil =>
+  value === null || value === undefined;
 
 /**
  * Injectable logger interface.
@@ -106,6 +113,113 @@ export class EntityManager<
   }
 
   /**
+   * Encode a generated property value. Returns a string or undefined if atomicity requirement not met.
+   *
+   * @param entity - Entity token.
+   * @param item - Entity item.
+   * @param property - Generated property name.
+   *
+   * @returns Encoded generated property value.
+   */
+  encodeGeneratedProperty<
+    Entity extends keyof EntityMap,
+    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+  >(
+    entity: Entity,
+    item: Item,
+    property: keyof EntityMap[Entity],
+  ): string | undefined {
+    // Validate entity property.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!this.config.entities[entity].generated[property])
+      throw new Error(
+        `unknown entity '${entity}' generated property '${property}'`,
+      );
+
+    const { atomic, elements, sharded } =
+      this.config.entities[entity].generated[property];
+
+    // Map elements to [element, value] pairs.
+    const elementMap = elements.map((element) => [
+      element,
+      item[element as keyof Item],
+    ]);
+
+    // Validate atomicity requirement.
+    if (atomic && elementMap.some(([, value]) => isNil(value))) return;
+
+    // Encode property value.
+    const encoded = [
+      ...(sharded ? [item[this.config.hashKey as keyof Item]] : []),
+      ...elementMap.map(([element, value]) =>
+        [element, (value ?? '').toString()].join(
+          this.config.generatedValueDelimiter,
+        ),
+      ),
+    ].join(this.config.generatedKeyDelimiter);
+
+    this.#logger.debug('encoded generated property', {
+      entity,
+      item,
+      encoded,
+    });
+
+    return encoded;
+  }
+
+  /**
+   * Decode a generated property value. Returns a partial EntityItem.
+   *
+   * @param entity - Entity token.
+   * @param value - Encoded generated property value.
+   *
+   * @returns Partial EntityItem with decoded properties decoded from `value`.
+   */
+  decodeGeneratedProperty<
+    Entity extends keyof EntityMap,
+    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+  >(entity: Entity, value: string): Partial<Item> {
+    // Handle degenerate case.
+    if (!value) return {};
+
+    // Split value into keys.
+    const keys = value.split(this.config.generatedKeyDelimiter);
+
+    // Initiate result with hashKey if sharded.
+    const decoded = keys[0].includes(this.config.shardKeyDelimiter)
+      ? { [this.config.hashKey]: keys.shift() }
+      : {};
+
+    // Split keys into values & validate.
+    const values = keys.map((key) => {
+      const pair = key.split(this.config.generatedValueDelimiter);
+
+      if (pair.length !== 2)
+        throw new Error(`invalid generated property value '${key}'`);
+
+      return pair;
+    });
+
+    // Assign decoded properties.
+    Object.assign(
+      decoded,
+      objectify(
+        values,
+        ([key]) => key,
+        ([, value]) => value,
+      ),
+    );
+
+    this.#logger.debug('decoded generated property', {
+      entity,
+      value,
+      decoded,
+    });
+
+    return decoded as Partial<Item>;
+  }
+
+  /**
    * Update the hash key on an EntityItem. Mutates `item`.
    *
    * @param entity - Entity token.
@@ -164,64 +278,5 @@ export class EntityManager<
     });
 
     return item;
-  }
-
-  /**
-   * Encode a generated property value. Returns a string.
-   *
-   * @param entity - Entity token.
-   * @param item - Entity item.
-   * @param property - Generated property name.
-   *
-   * @returns Encoded generated property value.
-   */
-  encodeGeneratedProperty<
-    Entity extends keyof EntityMap,
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(
-    entity: Entity,
-    item: Item,
-    property: PropertiesOfType<EntityMap[Entity], never>,
-  ): string {
-    const { elements, sharded } =
-      this.config.entities[entity].generated[property];
-
-    return [
-      ...(sharded ? [item[this.config.hashKey as keyof Item]] : []),
-      ...elements.map((element) =>
-        [
-          element,
-          (item[element as keyof Item] as Stringifiable).toString(),
-        ].join(this.config.generatedValueDelimiter),
-      ),
-    ].join(this.config.generatedKeyDelimiter);
-  }
-
-  /**
-   * Decode a generated property value. Returns a partial EntityItem.
-   *
-   * @param entity - Entity token.
-   * @param value - Encoded generated property value.
-   *
-   * @returns Partial EntityItem with decoded properties decoded from `value`.
-   */
-  decodeGeneratedProperty<
-    Entity extends keyof EntityMap,
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(entity: Entity, value: string): Partial<Item> {
-    const parts = value.split(this.config.generatedKeyDelimiter);
-
-    const result = parts[0].includes(this.config.shardKeyDelimiter)
-      ? { [this.config.hashKey]: parts.shift() }
-      : {};
-
-    return Object.assign(
-      result,
-      objectify(
-        parts.map((part) => part.split(this.config.generatedValueDelimiter)),
-        ([key]) => key,
-        ([, value]) => value,
-      ),
-    ) as Partial<Item>;
   }
 }

@@ -10,6 +10,7 @@ export interface User extends Entity {
   lastNameCanonical: string;
   lastNameRK?: never;
   phone?: string;
+  phoneRK?: never;
   updated: number;
   userId: string;
 }
@@ -34,6 +35,7 @@ export const getUsers = (count = 1, daysFromNow = 0, forDays = 1) => {
       firstNameCanonical: normstr(firstName)!,
       lastName,
       lastNameCanonical: normstr(lastName)!,
+      phone: faker.phone.number({ style: 'international' }),
       updated: timestamp,
       userId: faker.string.nanoid(),
     });

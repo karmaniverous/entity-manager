@@ -58,6 +58,7 @@ export const configSchema = z
             generated: z
               .record(
                 z.object({
+                  atomic: z.boolean().optional().default(false),
                   elements: z
                     .array(z.string().min(1))
                     .nonempty()

@@ -39,6 +39,11 @@ export const config: Config<MyEntityMap> = {
         },
         lastNameRK: {
           elements: ['lastNameCanonical', 'firstNameCanonical'],
+          sharded: true,
+        },
+        phoneRK: {
+          atomic: true,
+          elements: ['phone', 'created'],
         },
       },
       shardBumps: [
