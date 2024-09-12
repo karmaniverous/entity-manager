@@ -1,3 +1,4 @@
+import { objectify } from 'radash';
 import stringHash from 'string-hash';
 
 import type {
@@ -5,10 +6,10 @@ import type {
   EntityItem,
   EntityMap,
   PropertiesOfType,
+  ShardBump,
   Stringifiable,
 } from './Config';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
-import { objectify } from 'radash';
 
 /**
  * Injectable logger interface.
@@ -77,14 +78,14 @@ export class EntityManager<
    *
    * @returns Current config object.
    */
-  get config() {
+  get config(): ParsedConfig {
     return this.#config;
   }
 
   /**
    * Set the current config.
    *
-   * @param value - RawConfig object.
+   * @param value - ParsedConfig object.
    */
   set config(value) {
     this.#config = configSchema.parse(value);
@@ -98,19 +99,20 @@ export class EntityManager<
    *
    * @returns Shard bump object.
    */
-  getShardBump(entity: keyof EntityMap, timestamp: number) {
+  getShardBump(entity: keyof EntityMap, timestamp: number): ShardBump {
     return [...this.config.entities[entity].shardBumps]
       .reverse()
       .find((bump) => bump.timestamp <= timestamp)!;
   }
 
   /**
-   * Update the hash key on an entity item. Mutates item.
+   * Update the hash key on an EntityItem. Mutates `item`.
    *
    * @param entity - Entity token.
-   * @param item - Entity item.
+   * @param item - EntityItem.
    * @param overwrite - Overwrite existing shard key (default `false`).
-   * @returns Mutated item with updated hash key.
+   *
+   * @returns Mutated `item` with updated hash key.
    */
   updateItemHashKey<
     Entity extends keyof EntityMap,
@@ -164,6 +166,15 @@ export class EntityManager<
     return item;
   }
 
+  /**
+   * Encode a generated property value. Returns a string.
+   *
+   * @param entity - Entity token.
+   * @param item - Entity item.
+   * @param property - Generated property name.
+   *
+   * @returns Encoded generated property value.
+   */
   encodeGeneratedProperty<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
@@ -186,6 +197,14 @@ export class EntityManager<
     ].join(this.config.generatedKeyDelimiter);
   }
 
+  /**
+   * Decode a generated property value. Returns a partial EntityItem.
+   *
+   * @param entity - Entity token.
+   * @param value - Encoded generated property value.
+   *
+   * @returns Partial EntityItem with decoded properties decoded from `value`.
+   */
   decodeGeneratedProperty<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
