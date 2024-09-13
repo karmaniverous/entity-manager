@@ -12,22 +12,19 @@ import type {
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 
 /**
- * A compressed, two-layer map of page keys, used to query the next page of
- * data for a given sort key on each shard of a given hash key.
+ * A two-layer map of page keys, used to query the next page of data for a
+ * given index on each shard of a given hash key.
  *
- * The keys of the outer object are the keys of the `queryMap` object passed to
- * the `query` method. Each should correspond to an index for the given
- * `entity`. This is the range key of an individual query.
+ * The keys of the outer object are the keys of the QueryMap object passed to
+ * the `query` method. Each should correspond to an index for the given entity.
+ * This index contains the range key of an individual query.
  *
- * The keys of the inner object are the `hashKey` value passed to each
- * {@link ShardQueryFunction | `ShardQueryFunction`}. This is the hash key of an individual query.
+ * The keys of the inner object are the hashKey value passed to each
+ * ShardQueryFunction. This is the hash key of an individual query.
  *
- * The values are the `pageKey` returned by the previous query on that shard.
- * An `undefined` value indicates that there are no more pages to query on
- * that shard.
- *
- * An empty object indicates that there were no more pages to query on any
- * shard, for any index.
+ * The values are the `pageKey` returned by the previous query on the related
+ * index & shard. An `undefined` value indicates that there are no more pages to
+ * query for that index & shard.
  */
 export type PageKeyMap = Record<
   string,
@@ -642,13 +639,18 @@ export class EntityManager<
   }
 
   /**
-   * Dehydrate a {@link PageKeyMap | `PageKeyMap`} object into an array of dehydrated pageKeys.
+   * Dehydrate a {@link PageKeyMap | `PageKeyMap`} object into an array of dehydrated page keys.
    *
    * @param entity - Entity token.
    * @param pageKeyMap - PageKeyMap object to dehydrate.
    *
-   * @returns  Dehydrated {@link PageKeyMap | `PageKeyMap`} object or empty array if all
-   * pageKeys are undefined.
+   * @returns  Array of dehydrated page keys.
+   *
+   * @remarks
+   * In the returned array, an empty string member indicates the corresponding
+   * page key is `undefined`.
+   *
+   * An empty returned array indicates all page keys are `undefined`.
    */
   dehydratePageKeyMap<Entity extends keyof EntityMap>(
     entity: Entity,
