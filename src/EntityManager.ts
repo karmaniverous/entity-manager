@@ -1,4 +1,11 @@
-import { objectify, shake, zipToObject } from 'radash';
+import {
+  cluster,
+  mapValues,
+  objectify,
+  range,
+  shake,
+  zipToObject,
+} from 'radash';
 import stringHash from 'string-hash';
 
 import type {
@@ -409,13 +416,12 @@ export class EntityManager<
         const radix = 2 ** nibbleBits;
 
         // Get item unique property & validate.
-        const uniqueId = item[
-          this.config.entities[entity].uniqueProperty as keyof Item
-        ] as unknown as string;
+        const uniqueId =
+          item[this.config.entities[entity].uniqueProperty as keyof Item];
 
-        if (isNil(timestamp)) throw new Error(`missing item unique property`);
+        if (isNil(uniqueId)) throw new Error(`missing item unique property`);
 
-        hashKey += (stringHash(uniqueId) % (nibbles * radix))
+        hashKey += (stringHash(uniqueId.toString()) % (nibbles * radix))
           .toString(radix)
           .padStart(nibbles, '0');
       }
@@ -644,6 +650,7 @@ export class EntityManager<
    * @param item - EntityItem object.
    * @param entity - Entity token.
    * @param index - Entity index token.
+   * @param omit - Index components to omit from the output value.
    *
    * @returns Dehydrated index.
    *
@@ -653,7 +660,12 @@ export class EntityManager<
   dehydrateIndexItem<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(item: Partial<Item> | undefined, entity: Entity, index: string): string {
+  >(
+    item: Partial<Item> | undefined,
+    entity: Entity,
+    index: string,
+    omit: string[] = [],
+  ): string {
     try {
       // Validate params.
       this.validateEntityIndex(entity, index);
@@ -662,7 +674,9 @@ export class EntityManager<
       if (!item) return '';
 
       // Unwrap index elements.
-      const elements = this.unwrapIndex(index, entity);
+      const elements = this.unwrapIndex(index, entity).filter(
+        (element) => !omit.includes(element),
+      );
 
       // Join index element values.
       const dehydrated = elements
@@ -699,6 +713,7 @@ export class EntityManager<
    * @param dehydrated - Dehydrated index.
    * @param entity - Entity token.
    * @param index - Entity index token.
+   * @param omit - Index components omitted from `dehydrated`.
    *
    * @returns Rehydrated index.
    *
@@ -708,13 +723,20 @@ export class EntityManager<
   rehydrateIndexItem<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(dehydrated: string, entity: Entity, index: string): Partial<Item> {
+  >(
+    dehydrated: string,
+    entity: Entity,
+    index: string,
+    omit: string[] = [],
+  ): Partial<Item> {
     try {
       // Validate params.
       this.validateEntityIndex(entity, index);
 
       // Unwrap index elements.
-      const elements = this.unwrapIndex(index, entity);
+      const elements = this.unwrapIndex(index, entity).filter(
+        (element) => !omit.includes(element),
+      );
 
       // Split dehydrated value & validate.
       const values = dehydrated.split(this.config.generatedKeyDelimiter);
@@ -796,7 +818,7 @@ export class EntityManager<
       indexes.map((index) => this.validateEntityIndex(entity, index));
 
       // Extract & sort hash keys.
-      const hashKeys = Object.keys(pageKeyMap[indexes[0]]).sort();
+      const hashKeys = Object.keys(pageKeyMap[indexes[0]]);
 
       // Dehydrate page keys.
       let dehydrated: string[] = [];
@@ -813,12 +835,10 @@ export class EntityManager<
           const item = Object.entries(pageKeyMap[index][hashKey]).reduce<
             Partial<EntityItem<Entity, M, HashKey, RangeKey>>
           >((item, [property, value]) => {
-            if (property === this.config.rangeKey)
-              Object.assign(item, {
-                [this.config.entities[entity].uniqueProperty]: value,
-              });
-
-            if (property in this.config.entities[entity].generated)
+            if (
+              property in this.config.entities[entity].generated ||
+              property === this.config.rangeKey
+            )
               Object.assign(
                 item,
                 this.decodeGeneratedProperty(value as string, entity),
@@ -829,7 +849,9 @@ export class EntityManager<
           }, {});
 
           // Dehydrate index from item.
-          dehydrated.push(this.dehydrateIndexItem(item, entity, index));
+          dehydrated.push(
+            this.dehydrateIndexItem(item, entity, index, [this.config.hashKey]),
+          );
         }
       }
 
@@ -854,89 +876,151 @@ export class EntityManager<
   }
 
   /**
+   * Return an array of hashKey values covering the shard space bounded by
+   * `timestampFrom` & `timestampTo`.
+   *
+   * @param entity - Entity token.
+   * @param timestampFrom - Lower timestanp limit. Defaults to `0`.
+   * @param timestampTo - Upper timestamp limit. Defaults to `Date.now()`.
+   *
+   * @returns Array of hashKey values.
+   *
+   * @throws `Error` if `entity` is invalid.
+   */
+  getHashKeySpace<Entity extends keyof EntityMap>(
+    entity: Entity,
+    timestampFrom = 0,
+    timestampTo = Date.now(),
+  ): string[] {
+    try {
+      // Validate params.
+      this.validateEntity(entity);
+
+      const { shardBumps } = this.config.entities[entity];
+
+      const hashKeySpace = shardBumps
+        .filter(
+          (bump, i) =>
+            (i === shardBumps.length - 1 ||
+              shardBumps[i + 1].timestamp > timestampFrom) &&
+            bump.timestamp <= timestampTo,
+        )
+        .flatMap(({ nibbleBits, nibbles }) => {
+          const radix = 2 ** nibbleBits;
+
+          return nibbles
+            ? [...range(0, radix ** nibbles - 1)].map((nibble) =>
+                nibble.toString(radix).padStart(nibbles, '0'),
+              )
+            : '';
+        })
+        .map(
+          (shardKey) => `${entity}${this.config.shardKeyDelimiter}${shardKey}`,
+        );
+
+      this.#logger.debug('generated hash key space', {
+        entity,
+        timestampFrom,
+        timestampTo,
+        hashKeySpace,
+      });
+
+      return hashKeySpace;
+    } catch (error) {
+      if (error instanceof Error)
+        this.#logger.debug(error.message, {
+          entity,
+          timestampFrom,
+          timestampTo,
+        });
+
+      throw error;
+    }
+  }
+
+  /**
    * Rehydrate an array of dehydrated page keys into a {@link PageKeyMap | `PageKeyMap`} object.
    *
    * @param dehydrated - Array of dehydrated page keys.
    * @param entity - Entity token.
-   * @param hashKey - Config hashKey or sharded generated property.
    * @param indexes - Array of `entity` index tokens.
+   * @param timestampFrom - Lower timestanp limit. Defaults to `0`.
+   * @param timestampTo - Upper timestamp limit. Defaults to `Date.now()`.
    *
-   * @returns Decompressed {@link PageKeyMap | `PageKeyMap`} object.
+   * @returns Rehydrated {@link PageKeyMap | `PageKeyMap`} object.
    *
    * @throws `Error` if `entity` is invalid.
-   * @throws `Error` if `hashKey` is neither Config hashkey nor sharded generated property.
    * @throws `Error` if `indexes` is empty.
-   * @throws `Error` if `indexes` contains invalid `entity` indexes.
-   * @throws `Error` if `dehydrated` length is not an integer multiple of
-   * `indexes` length.
+   * @throws `Error` if any `indexes` are invalid.
+   * @throws `Error` if `dehydrated` has invalid length.
    */
   rehydratePageKeyMap<Entity extends keyof EntityMap>(
     dehydrated: string[],
     entity: Entity,
-    hashKey: string,
     indexes: string[],
+    timestampFrom = 0,
+    timestampTo = Date.now(),
   ): PageKeyMap {
     try {
       // Validate params.
-      this.validateEntityGenerated(entity, hashKey, true);
       if (!indexes.length) throw new Error('indexes empty');
       indexes.map((index) => this.validateEntityIndex(entity, index));
-      if (dehydrated.length % indexes.length)
-        throw new Error(
-          'dehydrated length not integer multiple of indexes length',
-        );
 
       // Shortcut empty dehydrated.
       if (!dehydrated.length) return {};
 
-      // const sortedIndexTokens = alphabetical(indexTokens, (key) => key);
+      // Get hash key space & validate dehydrated length.
+      const hashKeySpace = this.getHashKeySpace(
+        entity,
+        timestampFrom,
+        timestampTo,
+      );
 
-      // const sortedShardKeys = alphabetical(
-      //   this.getKeySpace(entityToken, keyToken, item, timestampFrom, timestampTo),
-      //   (key) => key,
-      // );
+      if (dehydrated.length !== hashKeySpace.length * indexes.length)
+        throw new Error('dehydrated length mismatch');
 
-      // const rehydrated = sortedIndexTokens.reduce<PageKeyMap>(
-      //   (rehydrated, indexToken, i) => ({
-      //     ...rehydrated,
-      //     [indexToken]: sortedShardKeys.reduce(
-      //       (indexPageMap, shardKey, j) => ({
-      //         ...indexPageMap,
-      //         [shardKey]: decompressed
-      //           ? this.rehydrateIndex(
-      //               entityToken,
-      //               indexToken,
-      //               decompressed[i * sortedShardKeys.length + j],
-      //             )
-      //           : undefined,
-      //       }),
-      //       {},
-      //     ),
-      //   }),
-      //   {},
-      // );
+      const rehydrated = mapValues(
+        zipToObject(indexes, cluster(dehydrated, hashKeySpace.length)),
+        (dehydratedIndexPageKeyMaps, index) =>
+          zipToObject(hashKeySpace, (hashKey, i) => {
+            if (!dehydratedIndexPageKeyMaps[i]) return;
 
-      // this.#logger.debug('decompressed page key map', {
-      //   entityToken,
-      //   indexTokens,
-      //   item,
-      //   keyToken,
-      //   pageKeyMap,
-      //   timestampFrom,
-      //   timestampTo,
-      //   decompressed,
-      //   sortedIndexTokens,
-      //   sortedShardKeys,
-      //   rehydrated,
-      // });
+            const item = {
+              [this.config.hashKey]: hashKey,
+              ...this.rehydrateIndexItem(
+                dehydratedIndexPageKeyMaps[i],
+                entity,
+                index,
+                [this.config.hashKey],
+              ),
+            };
 
-      return {};
+            this.updateItemRangeKey(item, entity);
+
+            return zipToObject(
+              this.config.entities[entity].indexes[index],
+              (component) =>
+                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                this.config.entities[entity].generated[component]
+                  ? this.encodeGeneratedProperty(item, entity, component)!
+                  : item[component],
+            );
+          }),
+      );
+
+      this.#logger.debug('rehydrated page key map', {
+        dehydrated,
+        entity,
+        indexes,
+        rehydrated,
+      });
+
+      return rehydrated;
     } catch (error) {
       if (error instanceof Error)
         this.#logger.debug(error.message, {
           dehydrated,
           entity,
-          hashKey,
           indexes,
         });
 

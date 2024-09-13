@@ -379,4 +379,149 @@ describe('EntityManager', function () {
       expect(dehydrated).to.deep.equal([]);
     });
   });
+
+  describe('getHashKeySpace', function () {
+    it('should get lowest hash key space', function () {
+      const hashKeySpace = entityManager.getHashKeySpace('user', now, now);
+
+      expect(hashKeySpace).to.deep.equal(['user!']);
+    });
+
+    it('should get full hash key space', function () {
+      const hashKeySpace = entityManager.getHashKeySpace('user', now, Infinity);
+
+      expect(hashKeySpace.length).to.equal(21);
+    });
+
+    it('should get middle hash key space', function () {
+      const hashKeySpace = entityManager.getHashKeySpace(
+        'user',
+        now + day,
+        now + day,
+      );
+
+      expect(hashKeySpace.length).to.equal(4);
+    });
+
+    it('should get empty hash key space', function () {
+      const hashKeySpace = entityManager.getHashKeySpace(
+        'user',
+        now + day,
+        now,
+      );
+
+      expect(hashKeySpace.length).to.equal(0);
+    });
+  });
+
+  describe('rehydratePageKeyMep', function () {
+    let item0, item1, item2, item3: UserItem;
+    let pageKeyMap: PageKeyMap;
+
+    beforeEach(function () {
+      [item0, item1, item2, item3] = getUsers(4) as UserItem[];
+
+      item0.hashKey = 'user!0';
+      item1.hashKey = 'user!1';
+      item2.hashKey = 'user!2';
+      item3.hashKey = 'user!3';
+
+      entityManager.updateItemGeneratedProperties(item0, 'user');
+      entityManager.updateItemGeneratedProperties(item1, 'user');
+      entityManager.updateItemGeneratedProperties(item2, 'user');
+      entityManager.updateItemGeneratedProperties(item3, 'user');
+
+      pageKeyMap = {
+        firstName: {
+          'user!0': pick(
+            item0,
+            entityManager.config.entities.user.indexes
+              .firstName as (keyof UserItem)[],
+          ),
+          'user!1': pick(
+            item1,
+            entityManager.config.entities.user.indexes
+              .firstName as (keyof UserItem)[],
+          ),
+          'user!2': pick(
+            item2,
+            entityManager.config.entities.user.indexes
+              .firstName as (keyof UserItem)[],
+          ),
+          'user!3': pick(
+            item3,
+            entityManager.config.entities.user.indexes
+              .firstName as (keyof UserItem)[],
+          ),
+        },
+        lastName: {
+          'user!0': pick(
+            item0,
+            entityManager.config.entities.user.indexes
+              .lastName as (keyof UserItem)[],
+          ),
+          'user!1': pick(
+            item1,
+            entityManager.config.entities.user.indexes
+              .lastName as (keyof UserItem)[],
+          ),
+          'user!2': pick(
+            item2,
+            entityManager.config.entities.user.indexes
+              .lastName as (keyof UserItem)[],
+          ),
+          'user!3': pick(
+            item3,
+            entityManager.config.entities.user.indexes
+              .lastName as (keyof UserItem)[],
+          ),
+        },
+      };
+    });
+
+    it('should rehydrate page key map', function () {
+      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
+      const rehydrated = entityManager.rehydratePageKeyMap(
+        dehydrated,
+        'user',
+        ['firstName', 'lastName'],
+        now + day,
+        now + day,
+      );
+
+      expect(rehydrated).to.deep.equal(pageKeyMap);
+    });
+
+    it('should dehydrate page key map with undefined page key', function () {
+      pageKeyMap.firstName['user!0'] = undefined;
+
+      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
+      const rehydrated = entityManager.rehydratePageKeyMap(
+        dehydrated,
+        'user',
+        ['firstName', 'lastName'],
+        now + day,
+        now + day,
+      );
+
+      expect(rehydrated).to.deep.equal(pageKeyMap);
+    });
+
+    it('should rehydrate page key map with all undefined page keys', function () {
+      pageKeyMap = mapValues(pageKeyMap, (indexMap) =>
+        mapValues(indexMap, () => undefined),
+      );
+
+      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
+      const rehydrated = entityManager.rehydratePageKeyMap(
+        dehydrated,
+        'user',
+        ['firstName', 'lastName'],
+        now + day,
+        now + day,
+      );
+
+      expect(rehydrated).to.deep.equal({});
+    });
+  });
 });
