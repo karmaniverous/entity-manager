@@ -239,7 +239,7 @@ export type Config<
 export type Unwrap<T> = { [P in keyof T]: T[P] };
 
 /**
- * Extracts an Entity item type decorated with generted properties.
+ * Extracts an Entity item type decorated with generated properties.
  */
 export type EntityItem<
   E extends keyof M,

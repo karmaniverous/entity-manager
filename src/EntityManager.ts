@@ -194,8 +194,8 @@ export class EntityManager<
    *
    */
   encodeGeneratedProperty<
-    Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+    Entity extends keyof EntityMap,
   >(
     item: Item,
     entity: Entity,
@@ -254,8 +254,8 @@ export class EntityManager<
    * @throws `Error` if `entity` is invalid.
    */
   decodeGeneratedProperty<
-    Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+    Entity extends keyof EntityMap,
   >(encoded: string, entity: Entity): Partial<Item> {
     try {
       // Validate params.
@@ -320,8 +320,8 @@ export class EntityManager<
    * @throws `Error` if `entity` is invalid.
    */
   updateItemHashKey<
-    Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+    Entity extends keyof EntityMap,
   >(item: Item, entity: Entity, overwrite = false): Item {
     try {
       // Validate params.
@@ -395,8 +395,8 @@ export class EntityManager<
    * @throws `Error` if `item` unique property is missing.
    */
   updateItemRangeKey<
-    Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+    Entity extends keyof EntityMap,
   >(item: Item, entity: Entity, overwrite = false): Item {
     try {
       // Validate params.
@@ -455,8 +455,8 @@ export class EntityManager<
    * @throws `Error` if `entity` is invalid.
    */
   updateItemGeneratedProperties<
-    Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+    Entity extends keyof EntityMap,
   >(item: Item, entity: Entity, overwrite = false): Item {
     try {
       // Validate params.
@@ -504,8 +504,8 @@ export class EntityManager<
    * @throws `Error` if `entity` is invalid.
    */
   stripItemGeneratedProperties<
-    Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+    Entity extends keyof EntityMap,
   >(item: Item, entity: Entity): Item {
     try {
       // Validate params.
@@ -597,8 +597,8 @@ export class EntityManager<
    * @throws `Error` if `index` is invalid.
    */
   dehydrateIndexItem<
-    Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+    Entity extends keyof EntityMap,
   >(
     item: Partial<Item> | undefined,
     entity: Entity,
@@ -660,8 +660,8 @@ export class EntityManager<
    * @throws `Error` if `index` is invalid.
    */
   rehydrateIndexItem<
-    Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+    Entity extends keyof EntityMap,
   >(
     dehydrated: string,
     entity: Entity,
@@ -731,8 +731,11 @@ export class EntityManager<
    *
    * An empty returned array indicates all page keys are `undefined`.
    */
-  dehydratePageKeyMap<Entity extends keyof EntityMap>(
-    pageKeyMap: PageKeyMap,
+  dehydratePageKeyMap<
+    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+    Entity extends keyof EntityMap,
+  >(
+    pageKeyMap: PageKeyMap<Item, Entity, EntityMap, HashKey, RangeKey>,
     entity: Entity,
   ): string[] {
     try {
@@ -893,20 +896,24 @@ export class EntityManager<
    * @throws `Error` if any `indexes` are invalid.
    * @throws `Error` if `dehydrated` has invalid length.
    */
-  rehydratePageKeyMap<Entity extends keyof EntityMap>(
+  rehydratePageKeyMap<
+    P extends PageKeyMap<Item, Entity, EntityMap, HashKey, RangeKey>,
+    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+    Entity extends keyof EntityMap,
+  >(
     dehydrated: string[],
     entity: Entity,
     indexes: string[],
     timestampFrom = 0,
     timestampTo = Date.now(),
-  ): PageKeyMap {
+  ): P {
     try {
       // Validate params.
       if (!indexes.length) throw new Error('indexes empty');
       indexes.map((index) => this.validateEntityIndex(entity, index));
 
       // Shortcut empty dehydrated.
-      if (!dehydrated.length) return {};
+      if (!dehydrated.length) return {} as P;
 
       // Get hash key space & validate dehydrated length.
       const hashKeySpace = this.getHashKeySpace(
@@ -945,7 +952,7 @@ export class EntityManager<
                   : item[component],
             );
           }),
-      );
+      ) as P;
 
       this.#logger.debug('rehydrated page key map', {
         dehydrated,

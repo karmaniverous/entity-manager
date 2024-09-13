@@ -81,41 +81,6 @@ export interface EntityManagerOptions {
 }
 
 /**
- * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
- *
- * @category Query
- */
-export interface ShardQueryResult<Entity> {
-  /** The number of records returned. */
-  count: number;
-
-  /** The returned records. */
-  items: Entity[];
-
-  /** The page key for the next query on this shard. */
-  pageKey?: EntityIndexItem;
-}
-
-/**
- * A query function that returns a single page of results from an individual
- * shard. This function will typically be composed dynamically to express a
- * specific query index & logic. The arguments to this function will be
- * provided by the {@link EntityManager.query | `EntityManager.query`} method, which assembles many returned
- * pages queried across multiple shards into a single query result.
- *
- * @param shardedKey - The key of the individual shard being queried.
- * @param pageKey - The page key returned by the previous query on this shard.
- * @param pageSize - The maximum number of items to return from this query.
- *
- * @category Query
- */
-export type ShardQueryFunction<Entity> = (
-  shardedKey: string,
-  pageKey?: EntityIndexItem,
-  pageSize?: number,
-) => Promise<ShardQueryResult<Entity>>;
-
-/**
  * A result returned by a query across multiple shards, where each shard may
  * receive multiple page queries via a dynamically-generated {@link ShardQueryFunction | `ShardQueryFunction`}.
  *
@@ -141,95 +106,6 @@ type UncompressedQueryResult<Entity> = Omit<
 > & {
   pageKeyMap: PageKeyMap;
 };
-
-/**
- * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
- *
- * @category Query
- */
-export interface QueryOptions {
-  /** Identifies the entity to be queried. Key of {@link Config | `EntityManager.config.entities`}. */
-  entityToken: string;
-
-  /**
-   * Identifies the entity key across which the query will be sharded. Key of
-   * {@link Config | `EntityManager.config.entities.<entityToken>.keys`}.
-   */
-  keyToken: string;
-
-  /**
-   * A partial {@link EntityItem | `EntityItem`} object containing at least the properties specified in
-   * {@link Config | `EntityManager.config.entities.<entityToken>.keys.<keyToken>.elements`}, except for the properties specified in {@link Config | `EntityManager.config.tokens`}.
-   *
-   * This data will be used to generate query keys across all shards.
-   */
-  item?: EntityItem;
-
-  /**
-   * The target maximum number of records to be returned by the query across
-   * all shards.
-   *
-   * The actual number of records returned will be a product of {@link QueryOptions.pageSize | `pageSize`} and the
-   * number of shards queried, unless limited by available records in a given
-   * shard.
-   */
-  limit?: number;
-
-  /**
-   * {@link QueryResult.pageKeyMap | `pageKeyMap`} returned by the previous iteration of this query.
-   */
-  pageKeyMap?: string;
-
-  /**
-   * The maximum number of records to be returned by each individual query to a
-   * single shard (i.e. {@link ShardQueryFunction | `ShardQueryFunction`} execution).
-   *
-   * Note that, within a given {@link EntityManager.query | `query`} method execution, these queries will be
-   * repeated until either available data is exhausted or the {@link QueryOptions.limit | `limit`} value is
-   * reached.
-   */
-  pageSize?: number;
-
-  /**
-   * Each key in this object is a valid entity index token. Each value is a valid
-   * {@link ShardQueryFunction | 'ShardQueryFunction'} that specifies the query of a single page of data on a
-   * single shard for the mapped index.
-   *
-   * This allows simultaneous queries on multiple sort keys to share a single
-   * page key, e.g. to match the same string against `firstName` and `lastName`
-   * properties without performing a table scan for either.
-   */
-  queryMap: Record<string, ShardQueryFunction>;
-
-  /**
-   * Lower limit to query shard space.
-   *
-   * Only valid if the query is constrained along the dimension used by the
-   * {@link Config | `EntityManager.config.entities.<entityToken>.sharding.timestamptokens.timestamp`}
-   * function to generate `shardKey`.
-   *
-   * @defaultValue `0`
-   */
-  timestampFrom?: number;
-
-  /**
-   * Upper limit to query shard space.
-   *
-   * Only valid if the query is constrained along the dimension used by the
-   * {@link Config | `EntityManager.config.entities.<entityToken>.sharding.timestamptokens.timestamp`}
-   * function to generate `shardKey`.
-   *
-   * @defaultValue `Date.now()`
-   */
-  timestampTo?: number;
-
-  /**
-   * The maximum number of shards to query in parallel. Overrides constructor `throttle`.
-   *
-   * @defaultValue `this.throttle`
-   */
-  throttle?: number;
-}
 
 export const emptyPageKeyMap = lzstring.compressToEncodedURIComponent(
   JSON.stringify([]),
