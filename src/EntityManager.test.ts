@@ -1,7 +1,8 @@
+/* eslint-disable mocha/no-setup-in-describe */
 /* eslint-env mocha */
 
 import { expect } from 'chai';
-import { pick } from 'radash';
+import { mapValues, pick } from 'radash';
 import { inspect } from 'util';
 
 import { config, day, now, type UserItem } from '../test/config';
@@ -296,8 +297,11 @@ describe('EntityManager', function () {
   });
 
   describe('dehydratePageKeyMep', function () {
-    it('should dehydrate page key map', function () {
-      const [item, item0, item1] = getUsers(3) as UserItem[];
+    let item, item0, item1: UserItem;
+    let pageKeyMap: PageKeyMap;
+
+    beforeEach(function () {
+      [item, item0, item1] = getUsers(3) as UserItem[];
 
       item.hashKey = 'user!';
       item0.hashKey = 'user!0';
@@ -307,7 +311,7 @@ describe('EntityManager', function () {
       entityManager.updateItemGeneratedProperties('user', item0);
       entityManager.updateItemGeneratedProperties('user', item1);
 
-      const pageKeyMap = {
+      pageKeyMap = {
         firstName: {
           'user!': pick(
             item,
@@ -343,13 +347,33 @@ describe('EntityManager', function () {
           ),
         },
       };
+    });
 
-      const dehydrated = entityManager.dehydratePageKeyMap(
-        'user',
-        pageKeyMap as PageKeyMap,
+    it('should dehydrate page key map', function () {
+      const dehydrated = entityManager.dehydratePageKeyMap('user', pageKeyMap);
+
+      expect(dehydrated.length).to.equal(6);
+      expect(dehydrated[0]).to.be.a('string');
+    });
+
+    it('should dehydrate page key map with undefined page key', function () {
+      pageKeyMap.firstName['user!0'] = undefined;
+
+      const dehydrated = entityManager.dehydratePageKeyMap('user', pageKeyMap);
+
+      expect(dehydrated.length).to.equal(6);
+      expect(dehydrated[0]).to.be.a('string');
+      expect(dehydrated[1]).to.equal('');
+    });
+
+    it('should dehydrate page key map with all undefined page keys', function () {
+      pageKeyMap = mapValues(pageKeyMap, (indexMap) =>
+        mapValues(indexMap, () => undefined),
       );
 
-      expect(dehydrated).to.deep.equal({});
+      const dehydrated = entityManager.dehydratePageKeyMap('user', pageKeyMap);
+
+      expect(dehydrated).to.deep.equal([]);
     });
   });
 });
