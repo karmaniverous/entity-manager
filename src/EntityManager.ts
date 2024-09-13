@@ -1,12 +1,10 @@
-import {
-  compressToEncodedURIComponent,
-  decompressFromEncodedURIComponent,
-} from 'lz-string';
+import lzString from 'lz-string';
 import {
   cluster,
   isInt,
   mapValues,
   objectify,
+  parallel,
   range,
   shake,
   zipToObject,
@@ -25,11 +23,15 @@ import {
   type EntityManagerOptions,
   isNil,
   type Logger,
-  PageKeyMap,
-  QueryOptions,
-  QueryResult,
+  type PageKeyMap,
+  type QueryOptions,
+  type QueryResult,
+  type RehydratedQueryResult,
 } from './EntityManager.types';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
+
+const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
+  lzString;
 
 const toStringifiable = (
   type: StringifiableTypes,
@@ -741,10 +743,7 @@ export class EntityManager<
   dehydratePageKeyMap<
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
     Entity extends keyof EntityMap,
-  >(
-    pageKeyMap: PageKeyMap<Item, Entity, EntityMap, HashKey, RangeKey>,
-    entity: Entity,
-  ): string[] {
+  >(pageKeyMap: PageKeyMap<Item>, entity: Entity): string[] {
     try {
       // Validate params.
       this.validateEntity(entity);
@@ -904,7 +903,6 @@ export class EntityManager<
    * @throws `Error` if `dehydrated` has invalid length.
    */
   rehydratePageKeyMap<
-    P extends PageKeyMap<Item, Entity, EntityMap, HashKey, RangeKey>,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
     Entity extends keyof EntityMap,
   >(
@@ -913,14 +911,14 @@ export class EntityManager<
     indexes: string[],
     timestampFrom = 0,
     timestampTo = Date.now(),
-  ): P {
+  ): PageKeyMap<Item> {
     try {
       // Validate params.
       if (!indexes.length) throw new Error('indexes empty');
       indexes.map((index) => this.validateEntityIndex(entity, index));
 
       // Shortcut empty dehydrated.
-      if (dehydrated && !dehydrated.length) return {} as P;
+      if (dehydrated && !dehydrated.length) return {};
 
       // Get hash key space.
       const hashKeySpace = this.getHashKeySpace(
@@ -964,7 +962,7 @@ export class EntityManager<
                   : item[component],
             );
           }),
-      ) as P;
+      );
 
       this.#logger.debug('rehydrated page key map', {
         dehydrated,
@@ -973,7 +971,7 @@ export class EntityManager<
         rehydrated,
       });
 
-      return rehydrated;
+      return rehydrated as PageKeyMap<Item>;
     } catch (error) {
       if (error instanceof Error)
         this.#logger.debug(error.message, {
@@ -1013,7 +1011,7 @@ export class EntityManager<
    * @throws Error if `pageKeyMap` keys do not match `queryMap` keys.
    */
   async query<
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+    Item extends EntityItem<Entity, M, HashKey, RangeKey>,
     Entity extends keyof M & string,
     M extends EntityMap,
     HashKey extends string,
@@ -1032,119 +1030,140 @@ export class EntityManager<
   }: QueryOptions<Item, Entity, M, HashKey, RangeKey>): Promise<
     QueryResult<Item, Entity, M, HashKey, RangeKey>
   > {
-    // Get defaults.
-    const { defaultLimit, defaultPageSize } = this.config.entities[entity];
-    limit ??= defaultLimit;
-    pageSize ??= defaultPageSize;
+    try {
+      // Get defaults.
+      const { defaultLimit, defaultPageSize } = this.config.entities[entity];
+      limit ??= defaultLimit;
+      pageSize ??= defaultPageSize;
 
-    // Validate params.
-    this.validateEntityGenerated(entity, hashKey, true);
+      // Validate params.
+      this.validateEntityGenerated(entity, hashKey, true);
 
-    if (!(limit === Infinity || (isInt(limit) && limit >= 1)))
-      throw new Error('limit must be a positive integer or Infinity.');
+      if (!(limit === Infinity || (isInt(limit) && limit >= 1)))
+        throw new Error('limit must be a positive integer or Infinity.');
 
-    if (!(isInt(pageSize) && pageSize >= 1))
-      throw new Error('pageSize must be a positive integer');
+      if (!(isInt(pageSize) && pageSize >= 1))
+        throw new Error('pageSize must be a positive integer');
 
-    // Rehydrate pageKeyMap.
-    const rehydrated = this.rehydratePageKeyMap(
-      pageKeyMap
-        ? (JSON.parse(
-            decompressFromEncodedURIComponent(pageKeyMap),
-          ) as string[])
-        : undefined,
-      entity,
-      Object.keys(queryMap),
-      timestampFrom,
-      timestampTo,
-    );
-
-    // Shortcut if pageKeyMap is empty.
-    if (!Object.keys(rehydrated).length)
-      return {
-        count: 0,
-        items: [],
-        pageKeyMap: compressToEncodedURIComponent(JSON.stringify([])),
-      };
-
-    // Iterate search over pages.
-    let result: UncompressedQueryResult = { count: 0, items: [], pageKeyMap };
-
-    do {
-      // TODO: This loop will blow up as shards scale, since at a minimum it will return shardCount * pageSize
-      // items, which may be >> limit. Probably the way to fix this is to limit the number of shards queried per
-      // iteration in order to keep shardsQueried * pageSize > (limit - items.length) but only just.
-
-      // TODO: Test for invalid characters (path delimiters) in index keys & shard key values.
-
-      // Query every shard on every index in pageKeyMap.
-      const shardQueryResults = await parallel(
-        throttle,
-        Object.entries(pageKeyMap).flatMap(([indexToken, indexPageKeys]) =>
-          Object.entries(indexPageKeys).map(([shardedKey, pageKey]) => [
-            indexToken,
-            shardedKey,
-            pageKey,
-          ]),
-        ) as [string, string, EntityIndexItem | undefined][],
-        async ([indexToken, shardedKey, pageKey]: [
-          string,
-          string,
-          PageKeyMap[string][string],
-        ]) => ({
-          indexToken,
-          queryResult: await queryMap[indexToken](
-            shardedKey,
-            pageKey,
-            pageSize,
-          ),
-          shardedKey,
-        }),
+      // Rehydrate pageKeyMap.
+      const rehydratedPageQuery = this.rehydratePageKeyMap(
+        pageKeyMap
+          ? (JSON.parse(
+              decompressFromEncodedURIComponent(pageKeyMap),
+            ) as string[])
+          : undefined,
+        entity,
+        Object.keys(queryMap),
+        timestampFrom,
+        timestampTo,
       );
 
-      // Reduce shardQueryResults & update result.
-      result = shardQueryResults.reduce<UncompressedQueryResult>(
-        (
-          { count, items, pageKeyMap },
-          { indexToken, queryResult, shardedKey },
-        ) => {
-          pageKeyMap[indexToken][shardedKey] = queryResult.pageKey;
+      // Shortcut if pageKeyMap is empty.
+      if (!Object.keys(rehydratedPageQuery).length)
+        return {
+          count: 0,
+          items: [],
+          pageKeyMap: compressToEncodedURIComponent(JSON.stringify([])),
+        };
+
+      // Iterate search over pages.
+      let result = {
+        count: 0,
+        items: [],
+        pageKeyMap: rehydratedPageQuery,
+      } as RehydratedQueryResult<Item, Entity, M, HashKey, RangeKey>;
+
+      do {
+        // TODO: This loop will blow up as shards scale, since at a minimum it will return shardCount * pageSize
+        // items, which may be >> limit. Probably the way to fix this is to limit the number of shards queried per
+        // iteration in order to keep shardsQueried * pageSize > (limit - items.length) but only just.
+
+        // TODO: Test for invalid characters (path delimiters) in index keys & shard key values.
+
+        // Query every shard on every index in pageKeyMap.
+        const shardQueryResults = await parallel(
+          throttle,
+          Object.entries(rehydratedPageQuery).flatMap(
+            ([index, indexPageKeys]) =>
+              Object.entries(indexPageKeys).map(([hashKey, pageKey]) => [
+                index,
+                hashKey,
+                pageKey,
+              ]),
+          ) as [string, string, Item | undefined][],
+          async ([index, hashKey, pageKey]: [
+            string,
+            string,
+            Item | undefined,
+          ]) => ({
+            index,
+            queryResult: await queryMap[index](hashKey, pageKey, pageSize),
+            hashKey,
+          }),
+        );
+
+        // Reduce shardQueryResults & update result.
+        result = shardQueryResults.reduce<
+          RehydratedQueryResult<Item, Entity, M, HashKey, RangeKey>
+        >(({ count, items, pageKeyMap }, { index, queryResult, hashKey }) => {
+          Object.assign(rehydratedPageQuery[index], {
+            [hashKey]: queryResult.pageKey,
+          });
 
           return {
             count: count + queryResult.count,
             items: [...items, ...queryResult.items],
             pageKeyMap,
           };
-        },
-        result,
+        }, result);
+      } while (
+        // Repeat while pages remain & limit is not reached.
+        Object.values(result.pageKeyMap).some((indexPageKeys) =>
+          Object.values(indexPageKeys).some((pageKey) => pageKey !== undefined),
+        ) &&
+        result.items.length < limit
       );
-    } while (
-      // Repeat while pages remain & limit is not reached.
-      Object.values(result.pageKeyMap).some((indexPageKeys) =>
-        Object.values(indexPageKeys).some((pageKey) => pageKey !== undefined),
-      ) &&
-      result.items.length < limit
-    );
 
-    const compressed = {
-      ...result,
-      pageKeyMap: this.compressPageKeyMap(entityToken, result.pageKeyMap),
-    };
+      const dehydratedResult = {
+        ...result,
+        pageKeyMap: compressToEncodedURIComponent(
+          JSON.stringify(this.dehydratePageKeyMap(result.pageKeyMap, entity)),
+        ),
+      } as QueryResult<Item, Entity, M, HashKey, RangeKey>;
 
-    this.#logger.debug('queried entity across shards', {
-      entityToken,
-      keyToken,
-      item,
-      limit,
-      pageKeyMap,
-      pageSize,
-      timestampFrom,
-      timestampTo,
-      throttle,
-      result,
-      compressed,
-    });
+      this.#logger.debug('queried entity across shards', {
+        entity,
+        hashKey,
+        item,
+        limit,
+        pageKeyMap,
+        pageSize,
+        queryMap,
+        timestampFrom,
+        timestampTo,
+        throttle,
+        rehydratedPageQuery,
+        result,
+        dehydratedResult,
+      });
 
-    return compressed;
+      return dehydratedResult;
+    } catch (error) {
+      if (error instanceof Error)
+        this.#logger.debug(error.message, {
+          entity,
+          hashKey,
+          item,
+          limit,
+          pageKeyMap,
+          pageSize,
+          queryMap,
+          timestampFrom,
+          timestampTo,
+          throttle,
+        });
+
+      throw error;
+    }
   }
 }

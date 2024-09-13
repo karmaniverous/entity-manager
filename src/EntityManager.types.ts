@@ -20,13 +20,7 @@ import type {
  * index & shard. An `undefined` value indicates that there are no more pages to
  * query for that index & shard.
  */
-export type PageKeyMap<
-  Item extends EntityItem<Entity, M, HashKey, RangeKey>,
-  Entity extends keyof M,
-  M extends EntityMap,
-  HashKey extends string = 'hashKey',
-  RangeKey extends string = 'rangeKey',
-> = Record<
+export type PageKeyMap<Item extends Record<string, unknown>> = Record<
   string,
   Record<string, Pick<Item, PropertiesOfType<Item, Stringifiable>> | undefined>
 >;
@@ -81,11 +75,11 @@ export interface EntityManagerOptions {
  * @category Query
  */
 export interface ShardQueryResult<
+  Item extends EntityItem<Entity, M, HashKey, RangeKey>,
   Entity extends keyof M & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
 > {
   /** The number of records returned. */
   count: number;
@@ -111,16 +105,16 @@ export interface ShardQueryResult<
  * @category Query
  */
 export type ShardQueryFunction<
+  Item extends EntityItem<Entity, M, HashKey, RangeKey>,
   Entity extends keyof M & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
 > = (
   hashKey: string,
-  pageKey?: Record<PropertiesOfType<Item, Stringifiable>, Stringifiable>,
+  pageKey?: Pick<Item, PropertiesOfType<Item, Stringifiable>>,
   pageSize?: number,
-) => Promise<ShardQueryResult<Entity, M, HashKey, RangeKey, Item>>;
+) => Promise<ShardQueryResult<Item, Entity, M, HashKey, RangeKey>>;
 
 /**
  * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
@@ -128,7 +122,7 @@ export type ShardQueryFunction<
  * @category Query
  */
 export interface QueryOptions<
-  Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+  Item extends EntityItem<Entity, M, HashKey, RangeKey>,
   Entity extends keyof M & string,
   M extends EntityMap,
   HashKey extends string,
@@ -187,7 +181,7 @@ export interface QueryOptions<
    */
   queryMap: Record<
     string,
-    ShardQueryFunction<Entity, M, HashKey, RangeKey, Item>
+    ShardQueryFunction<Item, Entity, M, HashKey, RangeKey>
   >;
 
   /**
@@ -247,11 +241,11 @@ export interface QueryResult<
 }
 
 /**
- * A QueryResult object with dehydrated pageKeyMap.
+ * A QueryResult object with rehydrated pageKeyMap.
  *
  * @category Query
  */
-export interface DehydratedQueryResult<
+export interface RehydratedQueryResult<
   Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
   Entity extends keyof M & string,
   M extends EntityMap,
@@ -268,5 +262,5 @@ export interface DehydratedQueryResult<
    * A compressed, two-layer map of page keys, used to query the next page of
    * data for a given sort key on each shard of a given hash key.
    */
-  pageKeyMap: PageKeyMap<Item, Entity, M, HashKey, RangeKey>;
+  pageKeyMap: PageKeyMap<Item>;
 }

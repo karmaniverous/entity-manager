@@ -1,5 +1,4 @@
 import type { Config, Entity, EntityItem, EntityMap } from '../src/Config';
-import { PageKeyMap } from '../src/EntityManager.types';
 import type { User } from './users';
 
 export const now = Date.now();
@@ -68,5 +67,3 @@ export const config: Config<MyEntityMap> = {
 };
 
 export type UserItem = EntityItem<'user', MyEntityMap>;
-
-export type UserPageKeyMap = PageKeyMap<UserItem, 'user', MyEntityMap>;

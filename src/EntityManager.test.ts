@@ -5,15 +5,10 @@ import { expect } from 'chai';
 import { mapValues, pick } from 'radash';
 import { inspect } from 'util';
 
-import {
-  config,
-  day,
-  now,
-  type UserItem,
-  type UserPageKeyMap,
-} from '../test/config';
+import { config, day, now, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
 import { EntityManager } from './EntityManager';
+import { PageKeyMap } from './EntityManager.types';
 
 const entityManager = new EntityManager(config, {
   logger: {
@@ -307,7 +302,7 @@ describe('EntityManager', function () {
 
   describe('dehydratePageKeyMep', function () {
     let item, item0, item1: UserItem;
-    let pageKeyMap: UserPageKeyMap;
+    let pageKeyMap: PageKeyMap<UserItem>;
 
     beforeEach(function () {
       [item, item0, item1] = getUsers(3) as UserItem[];
@@ -422,7 +417,7 @@ describe('EntityManager', function () {
 
   describe('rehydratePageKeyMep', function () {
     let item0, item1, item2, item3: UserItem;
-    let pageKeyMap: UserPageKeyMap;
+    let pageKeyMap: PageKeyMap<UserItem>;
 
     beforeEach(function () {
       [item0, item1, item2, item3] = getUsers(4) as UserItem[];
