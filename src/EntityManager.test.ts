@@ -24,8 +24,8 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
 
       const encoded = entityManager.encodeGeneratedProperty(
-        'user',
         item,
+        'user',
         'firstNameRK',
       );
 
@@ -39,8 +39,8 @@ describe('EntityManager', function () {
       item.hashKey = 'user!q';
 
       const encoded = entityManager.encodeGeneratedProperty(
-        'user',
         item,
+        'user',
         'lastNameRK',
       );
 
@@ -53,8 +53,8 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
 
       const encoded = entityManager.encodeGeneratedProperty(
-        'user',
         item,
+        'user',
         'phoneRK',
       );
 
@@ -66,8 +66,8 @@ describe('EntityManager', function () {
       item.phone = undefined;
 
       const encoded = entityManager.encodeGeneratedProperty(
-        'user',
         item,
+        'user',
         'phoneRK',
       );
 
@@ -78,40 +78,40 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
 
       expect(() =>
-        entityManager.encodeGeneratedProperty('user', item, 'foo'),
+        entityManager.encodeGeneratedProperty(item, 'user', 'foo'),
       ).to.throw('unknown');
     });
   });
 
   describe('decodeGeneratedProperty', function () {
     it('should decode empty string to empty object', function () {
-      const decoded = entityManager.decodeGeneratedProperty('user', '');
+      const decoded = entityManager.decodeGeneratedProperty('', 'user');
 
       expect(decoded).to.deep.equal({});
     });
 
     it('should fail on no value delimiters', function () {
       expect(() =>
-        entityManager.decodeGeneratedProperty('user', 'abc'),
+        entityManager.decodeGeneratedProperty('abc', 'user'),
       ).to.throw('invalid generated property value');
     });
 
     it('should fail on too many value delimiters', function () {
       expect(() =>
-        entityManager.decodeGeneratedProperty('user', 'abc#def#ghi'),
+        entityManager.decodeGeneratedProperty('abc#def#ghi', 'user'),
       ).to.throw('invalid generated property value');
     });
 
     it('should decode hash key', function () {
-      const decoded = entityManager.decodeGeneratedProperty('user', 'user!q');
+      const decoded = entityManager.decodeGeneratedProperty('user!q', 'user');
 
       expect(decoded).to.deep.equal({ hashKey: 'user!q' });
     });
 
     it('should decode generated property', function () {
       const decoded = entityManager.decodeGeneratedProperty(
-        'user',
         'firstNameCanonical#lilian|lastNameCanonical#fahey',
+        'user',
       );
 
       expect(decoded).to.deep.equal({
@@ -122,8 +122,8 @@ describe('EntityManager', function () {
 
     it('should decode generated property with hash key', function () {
       const decoded = entityManager.decodeGeneratedProperty(
-        'user',
         'user!q|firstNameCanonical#lilian|lastNameCanonical#fahey',
+        'user',
       );
 
       expect(decoded).to.deep.equal({
@@ -136,8 +136,8 @@ describe('EntityManager', function () {
     it('should fail on misplaced hash key', function () {
       expect(() =>
         entityManager.decodeGeneratedProperty(
-          'user',
           'firstNameCanonical#lilian|user!q|lastNameCanonical#fahey',
+          'user',
         ),
       ).to.throw('invalid generated property value');
     });
@@ -148,7 +148,7 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
       item.created = now;
 
-      entityManager.updateItemHashKey('user', item);
+      entityManager.updateItemHashKey(item, 'user');
 
       expect(item.hashKey).to.equal('user!');
     });
@@ -157,7 +157,7 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
       item.created = now + day;
 
-      entityManager.updateItemHashKey('user', item);
+      entityManager.updateItemHashKey(item, 'user');
 
       expect(item.hashKey?.length).to.equal(6);
     });
@@ -167,7 +167,7 @@ describe('EntityManager', function () {
       item.created = now + day * 2;
       item.hashKey = 'user!q';
 
-      entityManager.updateItemHashKey('user', item);
+      entityManager.updateItemHashKey(item, 'user');
 
       expect(item.hashKey).to.equal('user!q');
     });
@@ -177,7 +177,7 @@ describe('EntityManager', function () {
       item.created = now + day * 2;
       item.hashKey = 'user!q';
 
-      entityManager.updateItemHashKey('user', item, true);
+      entityManager.updateItemHashKey(item, 'user', true);
 
       expect(item.hashKey.length).to.equal(7);
     });
@@ -187,7 +187,7 @@ describe('EntityManager', function () {
     it('should add item generated properties', function () {
       const [item] = getUsers() as UserItem[];
 
-      entityManager.updateItemGeneratedProperties('user', item);
+      entityManager.updateItemGeneratedProperties(item, 'user');
 
       expect(item).to.haveOwnProperty('hashKey');
       expect(item).to.haveOwnProperty('rangeKey');
@@ -199,10 +199,13 @@ describe('EntityManager', function () {
     it('should not overwrite item generated properties', function () {
       const [item] = getUsers() as UserItem[];
 
-      const newItem = entityManager.updateItemGeneratedProperties('user', {
-        ...item,
-        firstNameCanonical: 'foo',
-      });
+      const newItem = entityManager.updateItemGeneratedProperties(
+        {
+          ...item,
+          firstNameCanonical: 'foo',
+        },
+        'user',
+      );
 
       expect(newItem.firstNameRK).to.equal(newItem.firstNameRK);
     });
@@ -211,11 +214,11 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
 
       const newItem = entityManager.updateItemGeneratedProperties(
-        'user',
         {
           ...item,
           firstNameCanonical: 'foo',
         },
+        'user',
         true,
       );
 
@@ -228,8 +231,8 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
 
       entityManager.stripItemGeneratedProperties(
+        entityManager.updateItemGeneratedProperties(item, 'user'),
         'user',
-        entityManager.updateItemGeneratedProperties('user', item),
       );
 
       expect(item).not.to.haveOwnProperty('hashKey');
@@ -243,12 +246,12 @@ describe('EntityManager', function () {
   describe('dehydrateIndexItem', function () {
     it('should dehydrate item by index', function () {
       const [item] = getUsers() as UserItem[];
-      entityManager.updateItemGeneratedProperties('user', item);
+      entityManager.updateItemGeneratedProperties(item, 'user');
 
       const dehydrated = entityManager.dehydrateIndexItem(
+        item,
         'user',
         'firstName',
-        item,
       );
 
       expect(dehydrated).to.match(/\w+\|[\w!]+\|\w+\|[\w-]+/);
@@ -257,12 +260,12 @@ describe('EntityManager', function () {
     it('should dehydrate item by index with missing component', function () {
       const [item] = getUsers() as UserItem[];
       delete item.phone;
-      entityManager.updateItemGeneratedProperties('user', item);
+      entityManager.updateItemGeneratedProperties(item, 'user');
 
       const dehydrated = entityManager.dehydrateIndexItem(
+        item,
         'user',
         'phone',
-        item,
       );
 
       expect(dehydrated).to.match(/[\w!]+\|\|[\w-]+/);
@@ -274,9 +277,9 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
 
       const rehydrated = entityManager.rehydrateIndexItem(
+        entityManager.dehydrateIndexItem(item, 'user', 'firstName'),
         'user',
         'firstName',
-        entityManager.dehydrateIndexItem('user', 'firstName', item),
       );
 
       expect(item).to.deep.include(rehydrated);
@@ -287,9 +290,9 @@ describe('EntityManager', function () {
       delete item.phone;
 
       const rehydrated = entityManager.rehydrateIndexItem(
+        entityManager.dehydrateIndexItem(item, 'user', 'phone'),
         'user',
         'phone',
-        entityManager.dehydrateIndexItem('user', 'phone', item),
       );
 
       expect(item).to.deep.include(rehydrated);
@@ -307,9 +310,9 @@ describe('EntityManager', function () {
       item0.hashKey = 'user!0';
       item1.hashKey = 'user!1';
 
-      entityManager.updateItemGeneratedProperties('user', item);
-      entityManager.updateItemGeneratedProperties('user', item0);
-      entityManager.updateItemGeneratedProperties('user', item1);
+      entityManager.updateItemGeneratedProperties(item, 'user');
+      entityManager.updateItemGeneratedProperties(item0, 'user');
+      entityManager.updateItemGeneratedProperties(item1, 'user');
 
       pageKeyMap = {
         firstName: {
@@ -350,7 +353,7 @@ describe('EntityManager', function () {
     });
 
     it('should dehydrate page key map', function () {
-      const dehydrated = entityManager.dehydratePageKeyMap('user', pageKeyMap);
+      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
 
       expect(dehydrated.length).to.equal(6);
       expect(dehydrated[0]).to.be.a('string');
@@ -359,7 +362,7 @@ describe('EntityManager', function () {
     it('should dehydrate page key map with undefined page key', function () {
       pageKeyMap.firstName['user!0'] = undefined;
 
-      const dehydrated = entityManager.dehydratePageKeyMap('user', pageKeyMap);
+      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
 
       expect(dehydrated.length).to.equal(6);
       expect(dehydrated[0]).to.be.a('string');
@@ -371,7 +374,7 @@ describe('EntityManager', function () {
         mapValues(indexMap, () => undefined),
       );
 
-      const dehydrated = entityManager.dehydratePageKeyMap('user', pageKeyMap);
+      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
 
       expect(dehydrated).to.deep.equal([]);
     });

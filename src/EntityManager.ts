@@ -131,6 +131,73 @@ export class EntityManager<
   }
 
   /**
+   * Validate that an entity is defined in the EntityManager config.
+   *
+   * @param entity - Entity token.
+   *
+   * @throws `Error` if `entity` is invalid.
+   */
+  private validateEntity(entity: string): void {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!this.config.entities[entity]) throw new Error('unknown entity');
+  }
+
+  /**
+   * Validate that an entity index is defined in EntityManager config.
+   *
+   * @param entity - Entity token.
+   * @param index - Index token.
+   *
+   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `index` is invalid.
+   */
+  private validateEntityIndex(entity: string, index: string): void {
+    this.validateEntity(entity);
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    if (!this.config.entities[entity].indexes[index])
+      throw new Error('unknown entity index');
+  }
+
+  /**
+   * Validate that an entity generated property is defined in EntityManager
+   * config.
+   *
+   * @param entity - Entity token.
+   * @param property - Entity generated property.
+   * @param sharded - Whether the generated property is sharded. `undefined`
+   * indicates no constraint.
+   *
+   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `property` is invalid.
+   * @throws `Error` if `sharded` is specified & does not match `property`
+   * sharding.
+   */
+  private validateEntityGenerated(
+    entity: string,
+    generated: string,
+    sharded?: boolean,
+  ): void {
+    this.validateEntity(entity);
+
+    if (
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      !this.config.entities[entity].generated[generated] &&
+      generated !== this.config.hashKey
+    )
+      throw new Error('unknown generated property');
+
+    if (
+      sharded !== undefined &&
+      (sharded !== this.config.entities[entity].generated[generated].sharded ||
+        (!sharded && generated === this.config.hashKey))
+    )
+      throw new Error(
+        `entity generated property ${sharded ? 'not ' : ''}sharded`,
+      );
+  }
+
+  /**
    * Get the current EntityManager Config object.
    *
    * @returns Current config object.
@@ -155,8 +222,13 @@ export class EntityManager<
    * @param timestamp - Timestamp in milliseconds.
    *
    * @returns Shard bump object.
+   *
+   * @throws `Error` if `entity` is invalid.
    */
   getShardBump(entity: keyof EntityMap, timestamp: number): ShardBump {
+    // Validate params.
+    this.validateEntity(entity);
+
     return [...this.config.entities[entity].shardBumps]
       .reverse()
       .find((bump) => bump.timestamp <= timestamp)!;
@@ -165,25 +237,27 @@ export class EntityManager<
   /**
    * Encode a generated property value. Returns a string or undefined if atomicity requirement not met.
    *
-   * @param entity - Entity token.
    * @param item - Entity item.
+   * @param entity - Entity token.
    * @param property - Generated property name.
    *
    * @returns Encoded generated property value.
+   *
+   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `property` is invalid.
+   *
    */
   encodeGeneratedProperty<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
   >(
-    entity: Entity,
     item: Item,
+    entity: Entity,
     property: keyof EntityMap[Entity],
   ): string | undefined {
     try {
-      // Validate entity property.
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (!this.config.entities[entity].generated[property])
-        throw new Error(`unknown generated property`);
+      // Validate params.
+      this.validateEntityGenerated(entity, property);
 
       const { atomic, elements, sharded } =
         this.config.entities[entity].generated[property];
@@ -208,8 +282,8 @@ export class EntityManager<
       ].join(this.config.generatedKeyDelimiter);
 
       this.#logger.debug('encoded generated property', {
-        entity,
         item,
+        entity,
         property,
         encoded,
       });
@@ -217,7 +291,7 @@ export class EntityManager<
       return encoded;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { entity, item, property });
+        this.#logger.debug(error.message, { item, entity, property });
 
       throw error;
     }
@@ -226,21 +300,26 @@ export class EntityManager<
   /**
    * Decode a generated property value. Returns a partial EntityItem.
    *
+   * @param encoded - Encoded generated property value.
    * @param entity - Entity token.
-   * @param value - Encoded generated property value.
    *
    * @returns Partial EntityItem with decoded properties decoded from `value`.
+   *
+   * @throws `Error` if `entity` is invalid.
    */
   decodeGeneratedProperty<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(entity: Entity, value: string): Partial<Item> {
+  >(encoded: string, entity: Entity): Partial<Item> {
     try {
-      // Handle degenerate case.
-      if (!value) return {};
+      // Validate params.
+      this.validateEntity(entity);
 
-      // Split value into keys.
-      const keys = value.split(this.config.generatedKeyDelimiter);
+      // Handle degenerate case.
+      if (!encoded) return {};
+
+      // Split encoded into keys.
+      const keys = encoded.split(this.config.generatedKeyDelimiter);
 
       // Initiate result with hashKey if sharded.
       const decoded = keys[0].includes(this.config.shardKeyDelimiter)
@@ -269,15 +348,15 @@ export class EntityManager<
       );
 
       this.#logger.debug('decoded generated property', {
+        encoded,
         entity,
-        value,
         decoded,
       });
 
       return decoded as Partial<Item>;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { entity, value });
+        this.#logger.debug(error.message, { encoded, entity });
 
       throw error;
     }
@@ -286,22 +365,27 @@ export class EntityManager<
   /**
    * Update the hash key on an EntityItem. Mutates `item`.
    *
-   * @param entity - Entity token.
    * @param item - EntityItem.
+   * @param entity - Entity token.
    * @param overwrite - Overwrite existing shard key (default `false`).
    *
    * @returns Mutated `item` with updated hash key.
+   *
+   * @throws `Error` if `entity` is invalid.
    */
   updateItemHashKey<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(entity: Entity, item: Item, overwrite = false): Item {
+  >(item: Item, entity: Entity, overwrite = false): Item {
     try {
+      // Validate params.
+      this.validateEntity(entity);
+
       // Return current item if hashKey exists and overwrite is false.
       if (item[this.config.hashKey as keyof Item] && !overwrite) {
         this.#logger.debug('did not overwrite existing entity item hash key', {
-          entity,
           item,
+          entity,
           overwrite,
         });
 
@@ -347,7 +431,7 @@ export class EntityManager<
       return item;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { entity, item, overwrite });
+        this.#logger.debug(error.message, { item, entity, overwrite });
 
       throw error;
     }
@@ -356,22 +440,28 @@ export class EntityManager<
   /**
    * Update the range key on an EntityItem. Mutates `item`.
    *
-   * @param entity - Entity token.
    * @param item - EntityItem.
+   * @param entity - Entity token.
    * @param overwrite - Overwrite existing shard key (default `false`).
    *
    * @returns Mutated `item` with updated range key.
+   *
+   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `item` unique property is missing.
    */
   updateItemRangeKey<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(entity: Entity, item: Item, overwrite = false): Item {
+  >(item: Item, entity: Entity, overwrite = false): Item {
     try {
+      // Validate params.
+      this.validateEntity(entity);
+
       // Return current item if rangeKey exists and overwrite is false.
       if (item[this.config.rangeKey as keyof Item] && !overwrite) {
         this.#logger.debug('did not overwrite existing entity item range key', {
-          entity,
           item,
+          entity,
           overwrite,
         });
 
@@ -402,7 +492,7 @@ export class EntityManager<
       return item;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { entity, item, overwrite });
+        this.#logger.debug(error.message, { item, entity, overwrite });
 
       throw error;
     }
@@ -411,27 +501,32 @@ export class EntityManager<
   /**
    * Update generated properties on an EntityItem. Mutates `item`.
    *
-   * @param entity - Entity token.
    * @param item - EntityItem.
+   * @param entity - Entity token.
    * @param overwrite - Overwrite existing generated properties (default `false`).
    *
    * @returns Mutated `item` with updated generated properties.
+   *
+   * @throws `Error` if `entity` is invalid.
    */
   updateItemGeneratedProperties<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(entity: Entity, item: Item, overwrite = false): Item {
+  >(item: Item, entity: Entity, overwrite = false): Item {
     try {
+      // Validate params.
+      this.validateEntity(entity);
+
       // Update hash key.
-      this.updateItemHashKey(entity, item, overwrite);
+      this.updateItemHashKey(item, entity, overwrite);
 
       // Update range key.
-      this.updateItemRangeKey(entity, item, overwrite);
+      this.updateItemRangeKey(item, entity, overwrite);
 
       // Update generated properties.
       for (const property in this.config.entities[entity].generated) {
         if (overwrite || isNil(item[property as keyof Item])) {
-          const encoded = this.encodeGeneratedProperty(entity, item, property);
+          const encoded = this.encodeGeneratedProperty(item, entity, property);
 
           if (encoded) Object.assign(item, { [property]: encoded });
           else delete item[property as keyof Item];
@@ -447,7 +542,7 @@ export class EntityManager<
       return item;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { entity, item, overwrite });
+        this.#logger.debug(error.message, { entity, overwrite, item });
 
       throw error;
     }
@@ -456,16 +551,21 @@ export class EntityManager<
   /**
    * Strips generated properties from an EntityItem. Mutates `item`.
    *
-   * @param entity - Entity token.
    * @param item - EntityItem.
+   * @param entity - Entity token.
    *
    * @returns Mutated `item` without generated properties.
+   *
+   * @throws `Error` if `entity` is invalid.
    */
   stripItemGeneratedProperties<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(entity: Entity, item: Item): Item {
+  >(item: Item, entity: Entity): Item {
     try {
+      // Validate params.
+      this.validateEntity(entity);
+
       // Delete hash & range keys.
       delete item[this.config.hashKey as keyof Item];
       delete item[this.config.rangeKey as keyof Item];
@@ -482,7 +582,7 @@ export class EntityManager<
       return item;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { entity, item });
+        this.#logger.debug(error.message, { item, entity });
 
       throw error;
     }
@@ -491,16 +591,18 @@ export class EntityManager<
   /**
    * Unwraps an entity index into deduped, sorted, ungenerated elements.
    *
-   * @param entity - Entity token.
    * @param index - Index token.
+   * @param entity - Entity token.
+   *
    * @returns Deduped, sorted array of ungenerated index component elements.
+   *
+   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `index` is invalid.
    */
-  unwrapIndex<Entity extends keyof EntityMap>(entity: Entity, index: string) {
+  unwrapIndex<Entity extends keyof EntityMap>(index: string, entity: Entity) {
     try {
-      // Validate index.
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (!this.config.entities[entity].indexes[index])
-        throw new Error(`unknown entity index`);
+      // Validate params.
+      this.validateEntityIndex(entity, index);
 
       const generated = this.config.entities[entity].generated;
       const generatedKeys = Object.keys(generated);
@@ -519,14 +621,15 @@ export class EntityManager<
         .sort();
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { entity, index });
+        this.#logger.debug(error.message, { index, entity });
 
       throw error;
     }
   }
 
   /**
-   * Condense a partial EntityItem into a delimited string representing the ungenerated component elements of a Config entity index.
+   * Condense a partial EntityItem into a delimited string representing the
+   * ungenerated component elements of a Config entity index.
    *
    * @remarks
    * Reverses {@link EntityManager.rehydrateIndexItem | `rehydrateIndexItem`}.
@@ -538,22 +641,28 @@ export class EntityManager<
    *
    * `item` must be populated with all required index component elements!
    *
+   * @param item - EntityItem object.
    * @param entity - Entity token.
    * @param index - Entity index token.
-   * @param item - EntityItem object.
    *
    * @returns Dehydrated index.
+   *
+   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `index` is invalid.
    */
   dehydrateIndexItem<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(entity: Entity, index: string, item?: Partial<Item>): string {
+  >(item: Partial<Item> | undefined, entity: Entity, index: string): string {
     try {
+      // Validate params.
+      this.validateEntityIndex(entity, index);
+
       // Handle degenerate case.
       if (!item) return '';
 
       // Unwrap index elements.
-      const elements = this.unwrapIndex(entity, index);
+      const elements = this.unwrapIndex(index, entity);
 
       // Join index element values.
       const dehydrated = elements
@@ -561,9 +670,9 @@ export class EntityManager<
         .join(this.config.generatedKeyDelimiter);
 
       this.#logger.debug('dehydrated index', {
+        item,
         entity,
         index,
-        item,
         elements,
         dehydrated,
       });
@@ -571,7 +680,7 @@ export class EntityManager<
       return dehydrated;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { entity, index, item });
+        this.#logger.debug(error.message, { item, entity, index });
 
       throw error;
     }
@@ -587,22 +696,28 @@ export class EntityManager<
    * the dehydration process. This method assumes delimited element values are
    * presented in the same order.
    *
+   * @param dehydrated - Dehydrated index.
    * @param entity - Entity token.
    * @param index - Entity index token.
-   * @param value - Dehydrated index.
    *
    * @returns Rehydrated index.
+   *
+   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `index` is invalid.
    */
   rehydrateIndexItem<
     Entity extends keyof EntityMap,
     Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  >(entity: Entity, index: string, value: string): Partial<Item> {
+  >(dehydrated: string, entity: Entity, index: string): Partial<Item> {
     try {
+      // Validate params.
+      this.validateEntityIndex(entity, index);
+
       // Unwrap index elements.
-      const elements = this.unwrapIndex(entity, index);
+      const elements = this.unwrapIndex(index, entity);
 
       // Split dehydrated value & validate.
-      const values = value.split(this.config.generatedKeyDelimiter);
+      const values = dehydrated.split(this.config.generatedKeyDelimiter);
 
       if (elements.length !== values.length)
         throw new Error('index rehydration key-value mismatch');
@@ -621,9 +736,9 @@ export class EntityManager<
       ) as Partial<Item>;
 
       this.#logger.debug('rehydrated index', {
+        dehydrated,
         entity,
         index,
-        value,
         elements,
         values,
         rehydrated,
@@ -632,7 +747,7 @@ export class EntityManager<
       return rehydrated;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { entity, index, value });
+        this.#logger.debug(error.message, { dehydrated, entity, index });
 
       throw error;
     }
@@ -641,10 +756,13 @@ export class EntityManager<
   /**
    * Dehydrate a {@link PageKeyMap | `PageKeyMap`} object into an array of dehydrated page keys.
    *
-   * @param entity - Entity token.
    * @param pageKeyMap - PageKeyMap object to dehydrate.
+   * @param entity - Entity token.
    *
    * @returns  Array of dehydrated page keys.
+   *
+   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if any `pageKeyMap` index is invalid.
    *
    * @remarks
    * In the returned array, an empty string member indicates the corresponding
@@ -653,12 +771,29 @@ export class EntityManager<
    * An empty returned array indicates all page keys are `undefined`.
    */
   dehydratePageKeyMap<Entity extends keyof EntityMap>(
-    entity: Entity,
     pageKeyMap: PageKeyMap,
+    entity: Entity,
   ): string[] {
     try {
-      // Extract & sort index.
+      // Validate params.
+      this.validateEntity(entity);
+
+      // Shortcut empty pageKeyMap.
+      if (!Object.keys(pageKeyMap).length) {
+        const dehydrated: string[] = [];
+
+        this.#logger.debug('dehydrated empty page key map', {
+          pageKeyMap,
+          entity,
+          dehydrated,
+        });
+
+        return dehydrated;
+      }
+
+      // Extract, sort & validate indexs.
       const indexes = Object.keys(pageKeyMap).sort();
+      indexes.map((index) => this.validateEntityIndex(entity, index));
 
       // Extract & sort hash keys.
       const hashKeys = Object.keys(pageKeyMap[indexes[0]]).sort();
@@ -686,7 +821,7 @@ export class EntityManager<
             if (property in this.config.entities[entity].generated)
               Object.assign(
                 item,
-                this.decodeGeneratedProperty(entity, value as string),
+                this.decodeGeneratedProperty(value as string, entity),
               );
             else Object.assign(item, { [property]: value });
 
@@ -694,7 +829,7 @@ export class EntityManager<
           }, {});
 
           // Dehydrate index from item.
-          dehydrated.push(this.dehydrateIndexItem(entity, index, item));
+          dehydrated.push(this.dehydrateIndexItem(item, entity, index));
         }
       }
 
@@ -702,8 +837,8 @@ export class EntityManager<
       if (dehydrated.every((pageKey) => pageKey === '')) dehydrated = [];
 
       this.#logger.debug('dehydrated page key map', {
-        entity,
         pageKeyMap,
+        entity,
         indexes,
         hashKeys,
         dehydrated,
@@ -713,6 +848,97 @@ export class EntityManager<
     } catch (error) {
       if (error instanceof Error)
         this.#logger.debug(error.message, { entity, pageKeyMap });
+
+      throw error;
+    }
+  }
+
+  /**
+   * Rehydrate an array of dehydrated page keys into a {@link PageKeyMap | `PageKeyMap`} object.
+   *
+   * @param dehydrated - Array of dehydrated page keys.
+   * @param entity - Entity token.
+   * @param hashKey - Config hashKey or sharded generated property.
+   * @param indexes - Array of `entity` index tokens.
+   *
+   * @returns Decompressed {@link PageKeyMap | `PageKeyMap`} object.
+   *
+   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `hashKey` is neither Config hashkey nor sharded generated property.
+   * @throws `Error` if `indexes` is empty.
+   * @throws `Error` if `indexes` contains invalid `entity` indexes.
+   * @throws `Error` if `dehydrated` length is not an integer multiple of
+   * `indexes` length.
+   */
+  rehydratePageKeyMap<Entity extends keyof EntityMap>(
+    dehydrated: string[],
+    entity: Entity,
+    hashKey: string,
+    indexes: string[],
+  ): PageKeyMap {
+    try {
+      // Validate params.
+      this.validateEntityGenerated(entity, hashKey, true);
+      if (!indexes.length) throw new Error('indexes empty');
+      indexes.map((index) => this.validateEntityIndex(entity, index));
+      if (dehydrated.length % indexes.length)
+        throw new Error(
+          'dehydrated length not integer multiple of indexes length',
+        );
+
+      // Shortcut empty dehydrated.
+      if (!dehydrated.length) return {};
+
+      // const sortedIndexTokens = alphabetical(indexTokens, (key) => key);
+
+      // const sortedShardKeys = alphabetical(
+      //   this.getKeySpace(entityToken, keyToken, item, timestampFrom, timestampTo),
+      //   (key) => key,
+      // );
+
+      // const rehydrated = sortedIndexTokens.reduce<PageKeyMap>(
+      //   (rehydrated, indexToken, i) => ({
+      //     ...rehydrated,
+      //     [indexToken]: sortedShardKeys.reduce(
+      //       (indexPageMap, shardKey, j) => ({
+      //         ...indexPageMap,
+      //         [shardKey]: decompressed
+      //           ? this.rehydrateIndex(
+      //               entityToken,
+      //               indexToken,
+      //               decompressed[i * sortedShardKeys.length + j],
+      //             )
+      //           : undefined,
+      //       }),
+      //       {},
+      //     ),
+      //   }),
+      //   {},
+      // );
+
+      // this.#logger.debug('decompressed page key map', {
+      //   entityToken,
+      //   indexTokens,
+      //   item,
+      //   keyToken,
+      //   pageKeyMap,
+      //   timestampFrom,
+      //   timestampTo,
+      //   decompressed,
+      //   sortedIndexTokens,
+      //   sortedShardKeys,
+      //   rehydrated,
+      // });
+
+      return {};
+    } catch (error) {
+      if (error instanceof Error)
+        this.#logger.debug(error.message, {
+          dehydrated,
+          entity,
+          hashKey,
+          indexes,
+        });
 
       throw error;
     }
