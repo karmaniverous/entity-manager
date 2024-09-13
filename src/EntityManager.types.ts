@@ -22,7 +22,7 @@ import type {
  */
 export type PageKeyMap<
   Item extends EntityItem<Entity, M, HashKey, RangeKey>,
-  Entity extends keyof M & string,
+  Entity extends keyof M,
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
@@ -128,11 +128,11 @@ export type ShardQueryFunction<
  * @category Query
  */
 export interface QueryOptions<
+  Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
   Entity extends keyof M & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
 > {
   /** Identifies the entity to be queried. Key of {@link Config | `EntityManager.config.entities`}. */
   entity: Entity;
@@ -218,4 +218,55 @@ export interface QueryOptions<
    * @defaultValue `this.throttle`
    */
   throttle?: number;
+}
+
+/**
+ * A result returned by a query across multiple shards, where each shard may
+ * receive multiple page queries via a dynamically-generated {@link ShardQueryFunction | `ShardQueryFunction`}.
+ *
+ * @category Query
+ */
+export interface QueryResult<
+  Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+  Entity extends keyof M & string,
+  M extends EntityMap,
+  HashKey extends string,
+  RangeKey extends string,
+> {
+  /** Total number of records returned across all shards. */
+  count: number;
+
+  /** The returned records. */
+  items: Item[];
+
+  /**
+   * A compressed, two-layer map of page keys, used to query the next page of
+   * data for a given sort key on each shard of a given hash key.
+   */
+  pageKeyMap: string;
+}
+
+/**
+ * A QueryResult object with dehydrated pageKeyMap.
+ *
+ * @category Query
+ */
+export interface DehydratedQueryResult<
+  Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
+  Entity extends keyof M & string,
+  M extends EntityMap,
+  HashKey extends string,
+  RangeKey extends string,
+> {
+  /** Total number of records returned across all shards. */
+  count: number;
+
+  /** The returned records. */
+  items: Item[];
+
+  /**
+   * A compressed, two-layer map of page keys, used to query the next page of
+   * data for a given sort key on each shard of a given hash key.
+   */
+  pageKeyMap: PageKeyMap<Item, Entity, M, HashKey, RangeKey>;
 }
