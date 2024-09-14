@@ -1,14 +1,18 @@
-/* eslint-disable mocha/no-setup-in-describe */
 /* eslint-env mocha */
 
+import { MockDb } from '@karmaniverous/mock-db';
 import { expect } from 'chai';
 import { mapValues, pick } from 'radash';
 import { inspect } from 'util';
 
-import { config, day, now, type UserItem } from '../test/config';
+import { config, day, MyEntityMap, now, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
-import { EntityManager } from './EntityManager';
-import { PageKeyMap } from './EntityManager.types';
+import {
+  EntityManager,
+  type PageKeyMap,
+  type ShardQueryFunction,
+  type ShardQueryResult,
+} from './EntityManager';
 
 const entityManager = new EntityManager(config, {
   logger: {
@@ -523,6 +527,145 @@ describe('EntityManager', function () {
       );
 
       expect(rehydrated).to.deep.equal({});
+    });
+  });
+
+  describe('query', function () {
+    let users: UserItem[];
+    let mockDb: MockDb<UserItem>;
+    let lastNameQuery: ShardQueryFunction<UserItem, 'user', MyEntityMap>;
+    let firstNameQuery: ShardQueryFunction<UserItem, 'user', MyEntityMap>;
+
+    before(function () {
+      users = getUsers(1000, 0, 2).map((user) =>
+        entityManager.updateItemGeneratedProperties(user as UserItem, 'user'),
+      );
+
+      mockDb = new MockDb(users);
+
+      lastNameQuery = async (shardedKey, pageKey, pageSize) =>
+        (await mockDb.query({
+          hashKey: 'hashKey',
+          hashValue: shardedKey,
+          indexComponents: entityManager.config.entities.user.indexes.lastName,
+          limit: pageSize,
+          pageKey,
+          sortKey: 'lastName',
+        })) as ShardQueryResult<UserItem, 'user', MyEntityMap>;
+
+      firstNameQuery = async (shardedKey, pageKey, pageSize) =>
+        (await mockDb.query({
+          hashKey: 'hashKey',
+          hashValue: shardedKey,
+          indexComponents: entityManager.config.entities.user.indexes.firstName,
+          limit: pageSize,
+          pageKey,
+          sortKey: 'firstName',
+        })) as ShardQueryResult<UserItem, 'user', MyEntityMap>;
+    });
+
+    it('simple query', async function () {
+      let result = await entityManager.query({
+        entity: 'user',
+        hashKey: 'hashKey',
+        queryMap: { lastName: lastNameQuery },
+      });
+
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit,
+      );
+
+      result = await entityManager.query({
+        entity: 'user',
+        hashKey: 'hashKey',
+        pageKeyMap: result.pageKeyMap,
+        queryMap: { lastName: lastNameQuery },
+      });
+
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit,
+      );
+    });
+
+    it('simple sharded query', async function () {
+      let result = await entityManager.query({
+        entity: 'user',
+        hashKey: 'hashKey',
+        queryMap: { lastName: lastNameQuery },
+        timestampFrom: now,
+        timestampTo: now + day,
+      });
+
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit * 5,
+      );
+
+      result = await entityManager.query({
+        entity: 'user',
+        hashKey: 'hashKey',
+        pageKeyMap: result.pageKeyMap,
+        queryMap: { lastName: lastNameQuery },
+        timestampFrom: now,
+        timestampTo: now + day,
+      });
+
+      expect(result.count).to.equal(
+        entityManager.config.entities.user.defaultLimit * 5,
+      );
+    });
+
+    it('complex query', async function () {
+      let result = await entityManager.query({
+        entity: 'user',
+        hashKey: 'hashKey',
+        queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      });
+
+      expect(result.count).to.be.greaterThan(
+        entityManager.config.entities.user.defaultLimit,
+      );
+
+      result = await entityManager.query({
+        entity: 'user',
+        hashKey: 'hashKey',
+        pageKeyMap: result.pageKeyMap,
+        queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      });
+
+      expect(result.count).to.be.greaterThan(
+        entityManager.config.entities.user.defaultLimit,
+      );
+    });
+
+    it('complex sharded query', async function () {
+      let result = await entityManager.query({
+        entity: 'user',
+        hashKey: 'hashKey',
+        queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+        timestampFrom: now,
+        timestampTo: now + day,
+      });
+
+      expect(result.count).to.be.greaterThan(
+        entityManager.config.entities.user.defaultLimit * 5,
+      );
+
+      result = await entityManager.query({
+        entity: 'user',
+        hashKey: 'hashKey',
+        pageKeyMap: result.pageKeyMap,
+        queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+        sortOrder: [
+          { property: 'lastNameCanonical', desc: true },
+          { property: 'firstNameCanonical' },
+        ],
+        timestampFrom: now,
+        timestampTo: now + day,
+      });
+
+      expect(result.count).to.be.greaterThan(
+        entityManager.config.entities.user.defaultLimit * 5,
+      );
     });
   });
 });

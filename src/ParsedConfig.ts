@@ -57,14 +57,16 @@ export const configSchema = z
               .default(10),
             generated: z
               .record(
-                z.object({
-                  atomic: z.boolean().optional().default(false),
-                  elements: z
-                    .array(z.string().min(1))
-                    .nonempty()
-                    .superRefine(validateArrayUnique),
-                  sharded: z.boolean().optional().default(false),
-                }),
+                z
+                  .object({
+                    atomic: z.boolean().optional().default(false),
+                    elements: z
+                      .array(z.string().min(1))
+                      .nonempty()
+                      .superRefine(validateArrayUnique),
+                    sharded: z.boolean().optional().default(false),
+                  })
+                  .optional(),
               )
               .optional()
               .default({}),
