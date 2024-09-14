@@ -76,28 +76,11 @@ export type PageKeyMap<
 >;
 
 /**
- * Injectable logger interface.
- *
- * @category Options
- */
-export interface Logger {
-  debug: (...args: unknown[]) => void;
-  error: (...args: unknown[]) => void;
-}
-
-/**
  * EntityManager constructor options.
  *
  * @category Options
  */
 export interface EntityManagerOptions {
-  /**
-   * Logger object.
-   *
-   * @defaultValue `console`
-   */
-  logger?: Logger;
-
   /**
    * Default maximum number of shards to query in parallel.
    *
@@ -328,7 +311,6 @@ export class EntityManager<
   IndexableTypes extends TypeMap,
 > {
   #config: ParsedConfig;
-  #logger: Logger;
   #throttle: number;
 
   /**
@@ -338,10 +320,9 @@ export class EntityManager<
    */
   constructor(
     config: Config<M, HashKey, RangeKey, IndexableTypes>,
-    { logger = console, throttle = 10 }: EntityManagerOptions = {},
+    { throttle = 10 }: EntityManagerOptions = {},
   ) {
     this.#config = configSchema.parse(config);
-    this.#logger = logger;
     this.#throttle = throttle;
   }
 
@@ -494,7 +475,7 @@ export class EntityManager<
         ),
       ].join(this.config.generatedKeyDelimiter);
 
-      this.#logger.debug('encoded generated property', {
+      console.debug('encoded generated property', {
         item,
         entity,
         property,
@@ -504,7 +485,7 @@ export class EntityManager<
       return encoded;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { item, entity, property });
+        console.error(error.message, { item, entity, property });
 
       throw error;
     }
@@ -563,7 +544,7 @@ export class EntityManager<
         ),
       );
 
-      this.#logger.debug('decoded generated property', {
+      console.debug('decoded generated property', {
         encoded,
         entity,
         decoded,
@@ -572,7 +553,7 @@ export class EntityManager<
       return decoded as Partial<Item>;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { encoded, entity });
+        console.error(error.message, { encoded, entity });
 
       throw error;
     }
@@ -599,7 +580,7 @@ export class EntityManager<
 
       // Return current item if hashKey exists and overwrite is false.
       if (item[this.config.hashKey as keyof Item] && !overwrite) {
-        this.#logger.debug('did not overwrite existing entity item hash key', {
+        console.debug('did not overwrite existing entity item hash key', {
           item,
           entity,
           overwrite,
@@ -637,7 +618,7 @@ export class EntityManager<
 
       Object.assign(item, { [this.config.hashKey]: hashKey });
 
-      this.#logger.debug('updated entity item hash key', {
+      console.debug('updated entity item hash key', {
         entity,
         overwrite,
         item,
@@ -646,7 +627,7 @@ export class EntityManager<
       return item;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { item, entity, overwrite });
+        console.error(error.message, { item, entity, overwrite });
 
       throw error;
     }
@@ -674,7 +655,7 @@ export class EntityManager<
 
       // Return current item if rangeKey exists and overwrite is false.
       if (item[this.config.rangeKey as keyof Item] && !overwrite) {
-        this.#logger.debug('did not overwrite existing entity item range key', {
+        console.debug('did not overwrite existing entity item range key', {
           item,
           entity,
           overwrite,
@@ -698,7 +679,7 @@ export class EntityManager<
         ].join(this.config.generatedValueDelimiter),
       });
 
-      this.#logger.debug('updated entity item range key', {
+      console.debug('updated entity item range key', {
         entity,
         overwrite,
         item,
@@ -707,7 +688,7 @@ export class EntityManager<
       return item;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { item, entity, overwrite });
+        console.error(error.message, { item, entity, overwrite });
 
       throw error;
     }
@@ -748,7 +729,7 @@ export class EntityManager<
         }
       }
 
-      this.#logger.debug('updated entity item generated properties', {
+      console.debug('updated entity item generated properties', {
         entity,
         overwrite,
         item,
@@ -757,7 +738,7 @@ export class EntityManager<
       return item;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { entity, overwrite, item });
+        console.error(error.message, { entity, overwrite, item });
 
       throw error;
     }
@@ -789,7 +770,7 @@ export class EntityManager<
       for (const property in this.config.entities[entity].generated)
         delete item[property as keyof Item];
 
-      this.#logger.debug('stripped entity item generated properties', {
+      console.debug('stripped entity item generated properties', {
         entity,
         item,
       });
@@ -797,7 +778,7 @@ export class EntityManager<
       return item;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { item, entity });
+        console.error(error.message, { item, entity });
 
       throw error;
     }
@@ -836,7 +817,7 @@ export class EntityManager<
         .sort();
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { index, entity });
+        console.error(error.message, { index, entity });
 
       throw error;
     }
@@ -892,7 +873,7 @@ export class EntityManager<
         .map((element) => item[element as keyof Item]?.toString() ?? '')
         .join(this.config.generatedKeyDelimiter);
 
-      this.#logger.debug('dehydrated index', {
+      console.debug('dehydrated index', {
         item,
         entity,
         index,
@@ -903,7 +884,7 @@ export class EntityManager<
       return dehydrated;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { item, entity, index });
+        console.error(error.message, { item, entity, index });
 
       throw error;
     }
@@ -966,7 +947,7 @@ export class EntityManager<
         ),
       ) as Partial<Item>;
 
-      this.#logger.debug('rehydrated index', {
+      console.debug('rehydrated index', {
         dehydrated,
         entity,
         index,
@@ -978,7 +959,7 @@ export class EntityManager<
       return rehydrated;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { dehydrated, entity, index });
+        console.error(error.message, { dehydrated, entity, index });
 
       throw error;
     }
@@ -1013,7 +994,7 @@ export class EntityManager<
       if (!Object.keys(pageKeyMap).length) {
         const dehydrated: string[] = [];
 
-        this.#logger.debug('dehydrated empty page key map', {
+        console.debug('dehydrated empty page key map', {
           pageKeyMap,
           entity,
           dehydrated,
@@ -1067,7 +1048,7 @@ export class EntityManager<
       // Replace with empty array if all pageKeys are empty strings.
       if (dehydrated.every((pageKey) => pageKey === '')) dehydrated = [];
 
-      this.#logger.debug('dehydrated page key map', {
+      console.debug('dehydrated page key map', {
         pageKeyMap,
         entity,
         indexes,
@@ -1078,7 +1059,7 @@ export class EntityManager<
       return dehydrated;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, { entity, pageKeyMap });
+        console.error(error.message, { entity, pageKeyMap });
 
       throw error;
     }
@@ -1127,7 +1108,7 @@ export class EntityManager<
           (shardKey) => `${entity}${this.config.shardKeyDelimiter}${shardKey}`,
         );
 
-      this.#logger.debug('generated hash key space', {
+      console.debug('generated hash key space', {
         entity,
         timestampFrom,
         timestampTo,
@@ -1137,7 +1118,7 @@ export class EntityManager<
       return hashKeySpace;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, {
+        console.error(error.message, {
           entity,
           timestampFrom,
           timestampTo,
@@ -1224,7 +1205,7 @@ export class EntityManager<
           }),
       );
 
-      this.#logger.debug('rehydrated page key map', {
+      console.debug('rehydrated page key map', {
         dehydrated,
         entity,
         indexes,
@@ -1234,7 +1215,7 @@ export class EntityManager<
       return rehydrated as PageKeyMap<Item>;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, {
+        console.error(error.message, {
           dehydrated,
           entity,
           indexes,
@@ -1405,7 +1386,7 @@ export class EntityManager<
         ),
       } as QueryResult<Item, Entity, M, HashKey, RangeKey>;
 
-      this.#logger.debug('queried entity across shards', {
+      console.debug('queried entity across shards', {
         entity,
         hashKey,
         item,
@@ -1424,7 +1405,7 @@ export class EntityManager<
       return result;
     } catch (error) {
       if (error instanceof Error)
-        this.#logger.debug(error.message, {
+        console.error(error.message, {
           entity,
           hashKey,
           item,

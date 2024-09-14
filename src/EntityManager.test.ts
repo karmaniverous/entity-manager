@@ -3,7 +3,6 @@
 import { MockDb } from '@karmaniverous/mock-db';
 import { expect } from 'chai';
 import { mapValues, pick } from 'radash';
-import { inspect } from 'util';
 
 import { config, day, MyEntityMap, now, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
@@ -14,14 +13,7 @@ import {
   type ShardQueryResult,
 } from './EntityManager';
 
-const entityManager = new EntityManager(config, {
-  logger: {
-    ...console,
-    debug: (...args: unknown[]) => {
-      console.debug(...args.map((arg) => inspect(arg, false, null)));
-    },
-  },
-});
+const entityManager = new EntityManager(config);
 
 describe('EntityManager', function () {
   describe('encodeGeneratedProperty', function () {
