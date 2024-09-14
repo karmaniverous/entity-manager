@@ -6,10 +6,18 @@ import {
   Exactify,
   ExclusiveKey,
   PropertiesOfType,
-  Stringifiable,
+  StringifiableTypes,
 } from './Config';
 
-type Json = string | number | boolean | null | Json[] | { [key: string]: Json };
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
+type Json = JsonValue[] | Record<string, JsonValue>;
 
 interface User extends Entity {
   created: number;
@@ -22,6 +30,11 @@ interface User extends Entity {
   updated: number;
   userId: string;
 }
+
+type test = PropertiesOfType<
+  User,
+  StringifiableTypes[keyof StringifiableTypes]
+>;
 
 interface Email extends Entity {
   created: number;
@@ -53,7 +66,10 @@ type noGeneratedProperties = PropertiesOfType<Email, never>;
 
 type neverProperties = PropertiesOfType<MyEntityMap['user'], never>;
 
-type stringifiableProperties = PropertiesOfType<User, Stringifiable>;
+type stringifiableProperties = PropertiesOfType<
+  User,
+  StringifiableTypes[keyof StringifiableTypes]
+>;
 
 type exactifiedUser = Exactify<User>;
 

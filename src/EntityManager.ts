@@ -18,8 +18,8 @@ import type {
   EntityMap,
   PropertiesOfType,
   ShardBump,
-  Stringifiable,
   StringifiableTypes,
+  TypeMap,
 } from './Config';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 import { sort, type SortOrder } from './sort';
@@ -28,24 +28,24 @@ import { isNil } from './util';
 const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
   lzString;
 
-const toStringifiable = (
-  type: StringifiableTypes,
+const str2indexable = <IndexableTypes extends TypeMap>(
+  type: keyof IndexableTypes,
   value?: string,
-): Stringifiable | undefined => {
+): IndexableTypes[keyof IndexableTypes] | undefined => {
   if (!value) return;
 
   switch (type) {
     case 'string':
-      return value;
+      return value as IndexableTypes[keyof IndexableTypes];
     case 'number':
-      return Number(value);
+      return Number(value) as IndexableTypes[keyof IndexableTypes];
     case 'boolean':
-      return value === 'true';
+      return (value === 'true') as IndexableTypes[keyof IndexableTypes];
     case 'bigint':
-      return BigInt(value);
+      return BigInt(value) as IndexableTypes[keyof IndexableTypes];
     default:
       throw new Error(
-        `unknown stringifiable type '${(type as string | undefined) ?? ''}'`,
+        `unsupported indexable type '${(type as string | undefined) ?? ''}'`,
       );
   }
 };
@@ -65,9 +65,16 @@ const toStringifiable = (
  * index & shard. An `undefined` value indicates that there are no more pages to
  * query for that index & shard.
  */
-export type PageKeyMap<Item extends Record<string, unknown>> = Record<
+export type PageKeyMap<
+  Item extends Record<string, unknown>,
+  IndexableTypes extends TypeMap = StringifiableTypes,
+> = Record<
   string,
-  Record<string, Pick<Item, PropertiesOfType<Item, Stringifiable>> | undefined>
+  Record<
+    string,
+    | Pick<Item, PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>>
+    | undefined
+  >
 >;
 
 /**
@@ -111,6 +118,7 @@ export interface ShardQueryResult<
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
+  IndexableTypes extends TypeMap = StringifiableTypes,
 > {
   /** The number of records returned. */
   count: number;
@@ -119,7 +127,10 @@ export interface ShardQueryResult<
   items: Item[];
 
   /** The page key for the next query on this shard. */
-  pageKey?: Record<PropertiesOfType<Item, Stringifiable>, Stringifiable>;
+  pageKey?: Pick<
+    Item,
+    PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>
+  >;
 }
 
 /**
@@ -141,11 +152,17 @@ export type ShardQueryFunction<
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
+  IndexableTypes extends TypeMap = StringifiableTypes,
 > = (
   hashKey: string,
-  pageKey?: Pick<Item, PropertiesOfType<Item, Stringifiable>>,
+  pageKey?: Pick<
+    Item,
+    PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>
+  >,
   pageSize?: number,
-) => Promise<ShardQueryResult<Item, Entity, M, HashKey, RangeKey>>;
+) => Promise<
+  ShardQueryResult<Item, Entity, M, HashKey, RangeKey, IndexableTypes>
+>;
 
 /**
  * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
@@ -158,6 +175,7 @@ export interface QueryOptions<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  IndexableTypes extends TypeMap,
 > {
   /** Identifies the entity to be queried. Key of {@link Config | `EntityManager.config.entities`}. */
   entity: Entity;
@@ -212,7 +230,7 @@ export interface QueryOptions<
    */
   queryMap: Record<
     string,
-    ShardQueryFunction<Item, Entity, M, HashKey, RangeKey>
+    ShardQueryFunction<Item, Entity, M, HashKey, RangeKey, IndexableTypes>
   >;
 
   /**
@@ -287,6 +305,7 @@ export interface WorkingQueryResult<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  IndexableTypes extends TypeMap = StringifiableTypes,
 > {
   /** The returned records. */
   items: Item[];
@@ -295,7 +314,7 @@ export interface WorkingQueryResult<
    * A compressed, two-layer map of page keys, used to query the next page of
    * data for a given sort key on each shard of a given hash key.
    */
-  pageKeyMap: PageKeyMap<Item>;
+  pageKeyMap: PageKeyMap<Item, IndexableTypes>;
 }
 
 /**
@@ -308,6 +327,7 @@ export class EntityManager<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  IndexableTypes extends TypeMap,
 > {
   #config: ParsedConfig;
   #logger: Logger;
@@ -319,7 +339,7 @@ export class EntityManager<
    * @param options - EntityManager options.
    */
   constructor(
-    config: Config<M, HashKey, RangeKey>,
+    config: Config<M, HashKey, RangeKey, IndexableTypes>,
     { logger = console, throttle = 10 }: EntityManagerOptions = {},
   ) {
     this.#config = configSchema.parse(config);
@@ -538,7 +558,10 @@ export class EntityManager<
           values,
           ([key]) => key,
           ([key, value]) =>
-            toStringifiable(this.config.entities[entity].types[key], value),
+            str2indexable<IndexableTypes>(
+              this.config.entities[entity].types[key],
+              value,
+            ),
         ),
       );
 
@@ -937,7 +960,7 @@ export class EntityManager<
         zipToObject(
           elements,
           values.map((value, i) =>
-            toStringifiable(
+            str2indexable<IndexableTypes>(
               this.config.entities[entity].types[elements[i]],
               value,
             ),
@@ -1267,7 +1290,7 @@ export class EntityManager<
     timestampFrom = 0,
     timestampTo = Date.now(),
     throttle = this.#throttle,
-  }: QueryOptions<Item, Entity, M, HashKey, RangeKey>): Promise<
+  }: QueryOptions<Item, Entity, M, HashKey, RangeKey, IndexableTypes>): Promise<
     QueryResult<Item, Entity, M, HashKey, RangeKey>
   > {
     try {
@@ -1366,9 +1389,9 @@ export class EntityManager<
       workingResult.items = sort(
         unique(workingResult.items, (item) =>
           (
-            item[
-              this.config.entities[entity].uniqueProperty as keyof Item
-            ] as Stringifiable
+            item[this.config.entities[entity].uniqueProperty as keyof Item] as
+              | string
+              | number
           ).toString(),
         ),
         sortOrder,

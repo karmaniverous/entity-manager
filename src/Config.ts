@@ -1,12 +1,27 @@
 /**
- * Indicates primitive types that have a `toString` method.
+ * The base TypeMap type. Relates types to the string token identifying the type in runtime code. All TypeMaps should extend this type.
+ *
+ * @example
+ * ```
+ * interface StringifiableTypes extends TypeMap {
+ *   string: string;
+ *   number: number;
+ *   boolean: boolean;
+ *   bigint: bigint;
+ * }
+ * ```
  */
-export type Stringifiable = string | number | boolean | bigint;
+export type TypeMap = Record<string, unknown>;
 
 /**
- * Stringifiable type names to support runtime generated property decoding.
+ * The default TypeMap representing indexabe types.
  */
-export type StringifiableTypes = 'string' | 'number' | 'boolean' | 'bigint';
+export interface StringifiableTypes extends TypeMap {
+  string: string;
+  number: number;
+  boolean: boolean;
+  bigint: bigint;
+}
 
 /**
  * The base Entity type. All Entities should extend this type.
@@ -90,6 +105,37 @@ export type ExclusiveKey<
   ? K
   : never;
 
+type IndexableProperties<
+  E extends Entity,
+  IndexableTypes extends TypeMap,
+> = PropertiesOfType<E, IndexableTypes[keyof Exactify<IndexableTypes>]>;
+
+/**
+ * Returns the `generated` property of a Config entity.
+ *
+ * @typeParam E - The entity type.
+ *
+ * @remarks
+ * All Entity properties of type `never` must be represented, and no extra properties are allowed.
+ */
+export type ConfigEntityGenerated<
+  E extends Entity,
+  IndexableTypes extends TypeMap,
+> =
+  | ([PropertiesOfType<E, never>] extends [never]
+      ? never
+      : Record<
+          PropertiesOfType<E, never>,
+          {
+            atomic?: boolean;
+            elements: IndexableProperties<E, IndexableTypes>[];
+            sharded?: boolean;
+          }
+        >)
+  | ([PropertiesOfType<E, never>] extends [never]
+      ? Record<string, never>
+      : never);
+
 /**
  * Returns the `types` property of a Config entity.
  *
@@ -100,34 +146,14 @@ export type ExclusiveKey<
  *
  * All Entity properties of types `string`, `number`, `boolean`, or `bigint` must be represented, and no extra properties are allowed.
  */
-export type ConfigEntityTypes<E extends Entity> =
-  | (PropertiesOfType<E, Stringifiable> extends never
+export type ConfigEntityTypes<
+  E extends Entity,
+  IndexableTypes extends TypeMap,
+> =
+  | ([IndexableProperties<E, IndexableTypes>] extends [never]
       ? never
-      : Record<PropertiesOfType<E, Stringifiable>, StringifiableTypes>)
-  | (PropertiesOfType<E, Stringifiable> extends never
-      ? Record<string, never>
-      : never);
-
-/**
- * Returns the `generated` property of a Config entity.
- *
- * @typeParam E - The entity type.
- *
- * @remarks
- * All Entity properties of type `never` must be represented, and no extra properties are allowed.
- */
-export type ConfigEntityGenerated<E extends Entity> =
-  | ([PropertiesOfType<E, never>] extends [never]
-      ? never
-      : Record<
-          PropertiesOfType<E, never>,
-          {
-            atomic?: boolean;
-            elements: PropertiesOfType<E, Stringifiable>[];
-            sharded?: boolean;
-          }
-        >)
-  | ([PropertiesOfType<E, never>] extends [never]
+      : Record<IndexableProperties<E, IndexableTypes>, keyof IndexableTypes>)
+  | ([IndexableProperties<E, IndexableTypes>] extends [never]
       ? Record<string, never>
       : never);
 
@@ -154,13 +180,14 @@ type ConfigEntity<
   E extends Entity,
   HashKey extends string,
   RangeKey extends string,
+  IndexableTypes extends TypeMap,
 > = {
   defaultLimit?: number;
   defaultPageSize?: number;
   indexes?: Record<
     string,
     (
-      | PropertiesOfType<E, Stringifiable>
+      | IndexableProperties<E, IndexableTypes>
       | PropertiesOfType<E, never>
       | HashKey
       | RangeKey
@@ -170,11 +197,11 @@ type ConfigEntity<
   timestampProperty: PropertiesOfType<E, number>;
   uniqueProperty: PropertiesOfType<E, number | string>;
 } & ([PropertiesOfType<E, never>] extends [never]
-  ? { generated?: ConfigEntityGenerated<E> }
-  : { generated: ConfigEntityGenerated<E> }) &
-  ([PropertiesOfType<E, Stringifiable>] extends [never]
-    ? { types?: ConfigEntityTypes<E> }
-    : { types: ConfigEntityTypes<E> });
+  ? { generated?: ConfigEntityGenerated<E, IndexableTypes> }
+  : { generated: ConfigEntityGenerated<E, IndexableTypes> }) &
+  ([IndexableProperties<E, IndexableTypes>] extends [never]
+    ? { types?: ConfigEntityTypes<E, IndexableTypes> }
+    : { types: ConfigEntityTypes<E, IndexableTypes> });
 
 /**
  * Returns the `entities` property of a Config tyoe.
@@ -190,11 +217,17 @@ export type ConfigEntities<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  IndexableTypes extends TypeMap,
 > =
   | ([keyof Exactify<M>] extends [never]
       ? never
       : {
-          [E in keyof Exactify<M>]: ConfigEntity<M[E], HashKey, RangeKey>;
+          [E in keyof Exactify<M>]: ConfigEntity<
+            M[E],
+            HashKey,
+            RangeKey,
+            IndexableTypes
+          >;
         })
   | Record<string, never>;
 
@@ -205,8 +238,9 @@ interface ConfigKeys<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  IndexableTypes extends TypeMap,
 > {
-  entities?: ConfigEntities<M, HashKey, RangeKey>;
+  entities?: ConfigEntities<M, HashKey, RangeKey, IndexableTypes>;
   hashKey?: ExclusiveKey<HashKey, M, RangeKey>;
   rangeKey?: ExclusiveKey<RangeKey, M, HashKey>;
 }
@@ -225,9 +259,10 @@ export type Config<
   M extends EntityMap = Record<string, never>,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
+  IndexableTypes extends TypeMap = StringifiableTypes,
 > = ([keyof Exactify<M>] extends [never]
-  ? ConfigKeys<M, HashKey, RangeKey>
-  : Required<ConfigKeys<M, HashKey, RangeKey>>) & {
+  ? ConfigKeys<M, HashKey, RangeKey, IndexableTypes>
+  : Required<ConfigKeys<M, HashKey, RangeKey, IndexableTypes>>) & {
   generatedKeyDelimiter?: string;
   generatedValueDelimiter?: string;
   shardKeyDelimiter?: string;
