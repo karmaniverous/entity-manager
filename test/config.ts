@@ -1,4 +1,6 @@
-import type { Config, Entity, EntityItem, EntityMap } from '../src/Config';
+import type { Entity } from '@karmaniverous/entity-tools';
+
+import type { Config, EntityItem, EntityMap } from '../src/Config';
 import type { User } from './users';
 
 export const now = Date.now();

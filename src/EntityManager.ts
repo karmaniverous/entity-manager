@@ -1,3 +1,11 @@
+import {
+  isNil,
+  type PropertiesOfType,
+  sort,
+  type SortOrder,
+  type StringifiableTypes,
+  type TypeMap,
+} from '@karmaniverous/entity-tools';
 import lzString from 'lz-string';
 import {
   cluster,
@@ -12,18 +20,8 @@ import {
 } from 'radash';
 import stringHash from 'string-hash';
 
-import type {
-  Config,
-  EntityItem,
-  EntityMap,
-  PropertiesOfType,
-  ShardBump,
-  StringifiableTypes,
-  TypeMap,
-} from './Config';
+import type { Config, EntityItem, EntityMap, ShardBump } from './Config';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
-import { sort, type SortOrder } from './sort';
-import { isNil } from './util';
 
 const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
   lzString;
@@ -234,7 +232,7 @@ export interface QueryOptions<
   >;
 
   /**
-   * A {@link Sort | `Sort`} object specifying the sort order of the returned records. Defaults to `[]`.
+   * A {@link SortOrder | `SortOrder`} object specifying the sort order of the result set. Defaults to `[]`.
    */
   sortOrder?: SortOrder<Item>;
 

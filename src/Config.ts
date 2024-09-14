@@ -1,88 +1,15 @@
-/**
- * The base TypeMap type. Relates types to the string token identifying the type in runtime code. All TypeMaps should extend this type.
- *
- * @example
- * ```
- * interface StringifiableTypes extends TypeMap {
- *   string: string;
- *   number: number;
- *   boolean: boolean;
- *   bigint: bigint;
- * }
- * ```
- */
-export type TypeMap = Record<string, unknown>;
-
-/**
- * The default TypeMap representing indexabe types.
- */
-export interface StringifiableTypes extends TypeMap {
-  string: string;
-  number: number;
-  boolean: boolean;
-  bigint: bigint;
-}
-
-/**
- * The base Entity type. All Entities should extend this type.
- */
-export type Entity = Record<string, unknown>;
+import type {
+  Entity,
+  Exactify,
+  PropertiesOfType,
+  StringifiableTypes,
+  TypeMap,
+} from '@karmaniverous/entity-tools';
 
 /**
  * The base EntityMap type. All EntityMaps should extend this type.
  */
 export type EntityMap = Record<string, Entity>;
-
-/**
- * Strips the generic `[x: string]: unknown` property from an Entity or EntityMap.
- *
- * @typeParam T - The Entity or EntityMap type.
- *
- * @returns The Entity or EntityMap type without the generic property.
- */
-export type Exactify<T extends Record<string, unknown>> = {
-  [P in keyof T as string extends P ? never : P]: T[P];
-};
-
-/**
- * Generates a union of the keys of an Entity type whose values are of a certain type.
- *
- * @typeParam E - The Entity type.
- * @typeParam T - The type to filter by.
- *
- * @returns A union of the keys of `E` whose values are of type `T`.
- */
-export type PropertiesOfType<E extends Entity, T> = keyof {
-  [Property in keyof Exactify<E> as [T] extends [never]
-    ? [NonNullable<E[Property]>] extends [never]
-      ? Property
-      : never
-    : [NonNullable<E[Property]>] extends [never]
-      ? never
-      : NonNullable<E[Property]> extends T
-        ? Property
-        : never]: never;
-};
-
-/**
- * Generates a union of the keys of an entity type whose values are not of a certain type.
- *
- * @typeParam E - The entity type.
- * @typeParam T - The type to filter by.
- *
- * @returns A union of the keys of `E` whose values are not of type `T`.
- */
-export type PropertiesNotOfType<E extends Entity, T> = keyof {
-  [Property in keyof Exactify<E> as [T] extends [never]
-    ? [NonNullable<E[Property]>] extends [never]
-      ? never
-      : Property
-    : [NonNullable<E[Property]>] extends [never]
-      ? NonNullable<E[Property]> extends T
-        ? Property
-        : never
-      : never]: never;
-};
 
 /**
  * Tests a string literal type to determine whether it is a key of any Entity in an EntityMap or is a member of a union of reserved keys.
@@ -105,7 +32,7 @@ export type ExclusiveKey<
   ? K
   : never;
 
-type IndexableProperties<
+export type IndexableProperties<
   E extends Entity,
   IndexableTypes extends TypeMap,
 > = PropertiesOfType<E, IndexableTypes[keyof Exactify<IndexableTypes>]>;

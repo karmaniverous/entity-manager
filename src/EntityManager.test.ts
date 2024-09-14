@@ -547,20 +547,22 @@ describe('EntityManager', function () {
         (await mockDb.query({
           hashKey: 'hashKey',
           hashValue: shardedKey,
-          indexComponents: entityManager.config.entities.user.indexes.lastName,
+          indexComponents: entityManager.config.entities.user.indexes
+            .lastName as (keyof UserItem)[],
           limit: pageSize,
           pageKey,
-          sortKey: 'lastName',
+          sortOrder: [{ property: 'lastNameCanonical' }],
         })) as ShardQueryResult<UserItem, 'user', MyEntityMap>;
 
       firstNameQuery = async (shardedKey, pageKey, pageSize) =>
         (await mockDb.query({
           hashKey: 'hashKey',
           hashValue: shardedKey,
-          indexComponents: entityManager.config.entities.user.indexes.firstName,
+          indexComponents: entityManager.config.entities.user.indexes
+            .firstName as (keyof UserItem)[],
           limit: pageSize,
           pageKey,
-          sortKey: 'firstName',
+          sortOrder: [{ property: 'firstNameCanonical' }],
         })) as ShardQueryResult<UserItem, 'user', MyEntityMap>;
     });
 

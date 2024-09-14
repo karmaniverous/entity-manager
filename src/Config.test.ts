@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-  Config,
+import type {
   Entity,
-  EntityMap,
   Exactify,
-  ExclusiveKey,
   PropertiesOfType,
   StringifiableTypes,
-} from './Config';
+} from '@karmaniverous/entity-tools';
+
+import type { Config, EntityMap, ExclusiveKey } from './Config';
 
 type JsonValue =
   | string

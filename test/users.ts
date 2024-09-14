@@ -1,7 +1,6 @@
 import { faker } from '@faker-js/faker';
+import type { Entity } from '@karmaniverous/entity-tools';
 import { normstr } from '@karmaniverous/string-utilities';
-
-import { type Entity } from '../src/Config';
 
 export interface User extends Entity {
   created: number;
