@@ -2,6 +2,7 @@ import { Exactify, isNil, TypeMap } from '@karmaniverous/entity-tools';
 
 import type { EntityItem, EntityMap } from './Config';
 import { EntityManager } from './EntityManager';
+import { validateEntityGeneratedProperty } from './validateEntityGeneratedProperty';
 
 /**
  * Encode a generated property value. Returns a string or undefined if atomicity requirement not met.
@@ -31,7 +32,7 @@ export function encodeGeneratedProperty<
 ): string | undefined {
   try {
     // Validate params.
-    entityManager.validateEntityGeneratedProperty(entityToken, property);
+    validateEntityGeneratedProperty(entityManager, entityToken, property);
 
     const { atomic, elements, sharded } =
       entityManager.config.entities[entityToken].generated[property]!;

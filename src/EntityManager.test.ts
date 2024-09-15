@@ -1,17 +1,25 @@
 /* eslint-env mocha */
 
-import { MockDb, type StringifiableTypes } from '@karmaniverous/mock-db';
+import type { StringifiableTypes } from '@karmaniverous/entity-tools';
+import { MockDb } from '@karmaniverous/mock-db';
 import { expect } from 'chai';
 import { mapValues, pick } from 'radash';
 
 import { config, day, MyEntityMap, now, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
+import { addKeys } from './addKeys';
 import { decodeGeneratedProperty } from './decodeGeneratedProperty';
+import { dehydrateIndexItem } from './dehydrateIndexItem';
+import { dehydratePageKeyMap } from './dehydratePageKeyMap';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import { EntityManager } from './EntityManager';
+import { getHashKeySpace } from './getHashKeySpace';
 import type { PageKeyMap } from './PageKeyMap';
+import { rehydrateIndexItem } from './rehydrateIndexItem';
+import { rehydratePageKeyMap } from './rehydratePageKeyMap';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 import type { ShardQueryResult } from './ShardQueryResult';
+import { updateItemHashKey } from './updateItemHashKey';
 
 const entityManager = new EntityManager(config);
 
@@ -34,7 +42,7 @@ describe('EntityManager', function () {
 
     it('should encode sharded generated property', function () {
       const [item] = getUsers() as UserItem[];
-      item.hashKey = 'user!q';
+      item.hashKey2 = 'user!q';
 
       const encoded = encodeGeneratedProperty(
         entityManager,
@@ -106,7 +114,7 @@ describe('EntityManager', function () {
     it('should decode hash key', function () {
       const decoded = decodeGeneratedProperty(entityManager, 'user!q', 'user');
 
-      expect(decoded).to.deep.equal({ hashKey: 'user!q' });
+      expect(decoded).to.deep.equal({ hashKey2: 'user!q' });
     });
 
     it('should decode generated property', function () {
@@ -130,7 +138,7 @@ describe('EntityManager', function () {
       );
 
       expect(decoded).to.deep.equal({
-        hashKey: 'user!q',
+        hashKey2: 'user!q',
         firstNameCanonical: 'lilian',
         lastNameCanonical: 'fahey',
       });
@@ -152,48 +160,48 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
       item.created = now;
 
-      entityManager.updateItemHashKey(item, 'user');
+      updateItemHashKey(entityManager, item, 'user');
 
-      expect(item.hashKey).to.equal('user!');
+      expect(item.hashKey2).to.equal('user!');
     });
 
     it('should add sharded entity item hash key', function () {
       const [item] = getUsers() as UserItem[];
       item.created = now + day;
 
-      entityManager.updateItemHashKey(item, 'user');
+      updateItemHashKey(entityManager, item, 'user');
 
-      expect(item.hashKey?.length).to.equal(6);
+      expect(item.hashKey2?.length).to.equal(6);
     });
 
     it('should not overwrite sharded entity item hash key', function () {
       const [item] = getUsers() as UserItem[];
       item.created = now + day * 2;
-      item.hashKey = 'user!q';
+      item.hashKey2 = 'user!q';
 
-      entityManager.updateItemHashKey(item, 'user');
+      updateItemHashKey(entityManager, item, 'user');
 
-      expect(item.hashKey).to.equal('user!q');
+      expect(item.hashKey2).to.equal('user!q');
     });
 
     it('should overwrite sharded entity item hash key', function () {
       const [item] = getUsers() as UserItem[];
       item.created = now + day * 2;
-      item.hashKey = 'user!q';
+      item.hashKey2 = 'user!q';
 
-      entityManager.updateItemHashKey(item, 'user', true);
+      updateItemHashKey(entityManager, item, 'user', true);
 
-      expect(item.hashKey.length).to.equal(7);
+      expect(item.hashKey2.length).to.equal(7);
     });
   });
 
-  describe('updateItemGeneratedProperties', function () {
+  describe('addKeys', function () {
     it('should add item generated properties', function () {
       const [item] = getUsers() as UserItem[];
 
-      entityManager.updateItemGeneratedProperties(item, 'user');
+      addKeys(entityManager, item, 'user');
 
-      expect(item).to.haveOwnProperty('hashKey');
+      expect(item).to.haveOwnProperty('hashKey2');
       expect(item).to.haveOwnProperty('rangeKey');
       expect(item).to.haveOwnProperty('firstNameRK');
       expect(item).to.haveOwnProperty('lastNameRK');
@@ -203,7 +211,8 @@ describe('EntityManager', function () {
     it('should not overwrite item generated properties', function () {
       const [item] = getUsers() as UserItem[];
 
-      const newItem = entityManager.updateItemGeneratedProperties(
+      const newItem = addKeys(
+        entityManager,
         {
           ...item,
           firstNameCanonical: 'foo',
@@ -217,7 +226,8 @@ describe('EntityManager', function () {
     it('should overwrite item generated properties', function () {
       const [item] = getUsers() as UserItem[];
 
-      const newItem = entityManager.updateItemGeneratedProperties(
+      const newItem = addKeys(
+        entityManager,
         {
           ...item,
           firstNameCanonical: 'foo',
@@ -230,14 +240,11 @@ describe('EntityManager', function () {
     });
   });
 
-  describe('stripItemGeneratedProperties', function () {
+  describe('removeKeys', function () {
     it('should strip item generated properties', function () {
       const [item] = getUsers() as UserItem[];
 
-      entityManager.stripItemGeneratedProperties(
-        entityManager.updateItemGeneratedProperties(item, 'user'),
-        'user',
-      );
+      entityManager.removeKeys(addKeys(entityManager, item, 'user'), 'user');
 
       expect(item).not.to.haveOwnProperty('hashKey');
       expect(item).not.to.haveOwnProperty('rangeKey');
@@ -250,9 +257,10 @@ describe('EntityManager', function () {
   describe('dehydrateIndexItem', function () {
     it('should dehydrate item by index', function () {
       const [item] = getUsers() as UserItem[];
-      entityManager.updateItemGeneratedProperties(item, 'user');
+      addKeys(entityManager, item, 'user');
 
-      const dehydrated = entityManager.dehydrateIndexItem(
+      const dehydrated = dehydrateIndexItem(
+        entityManager,
         item,
         'user',
         'firstName',
@@ -264,9 +272,10 @@ describe('EntityManager', function () {
     it('should dehydrate item by index with missing component', function () {
       const [item] = getUsers() as UserItem[];
       delete item.phone;
-      entityManager.updateItemGeneratedProperties(item, 'user');
+      addKeys(entityManager, item, 'user');
 
-      const dehydrated = entityManager.dehydrateIndexItem(
+      const dehydrated = dehydrateIndexItem(
+        entityManager,
         item,
         'user',
         'phone',
@@ -280,8 +289,9 @@ describe('EntityManager', function () {
     it('should rehydrate item by index', function () {
       const [item] = getUsers() as UserItem[];
 
-      const rehydrated = entityManager.rehydrateIndexItem(
-        entityManager.dehydrateIndexItem(item, 'user', 'firstName'),
+      const rehydrated = rehydrateIndexItem(
+        entityManager,
+        dehydrateIndexItem(entityManager, item, 'user', 'firstName'),
         'user',
         'firstName',
       );
@@ -293,8 +303,9 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
       delete item.phone;
 
-      const rehydrated = entityManager.rehydrateIndexItem(
-        entityManager.dehydrateIndexItem(item, 'user', 'phone'),
+      const rehydrated = rehydrateIndexItem(
+        entityManager,
+        dehydrateIndexItem(entityManager, item, 'user', 'phone'),
         'user',
         'phone',
       );
@@ -310,13 +321,13 @@ describe('EntityManager', function () {
     beforeEach(function () {
       [item, item0, item1] = getUsers(3) as UserItem[];
 
-      item.hashKey = 'user!';
-      item0.hashKey = 'user!0';
-      item1.hashKey = 'user!1';
+      item.hashKey2 = 'user!';
+      item0.hashKey2 = 'user!0';
+      item1.hashKey2 = 'user!1';
 
-      entityManager.updateItemGeneratedProperties(item, 'user');
-      entityManager.updateItemGeneratedProperties(item0, 'user');
-      entityManager.updateItemGeneratedProperties(item1, 'user');
+      addKeys(entityManager, item, 'user');
+      addKeys(entityManager, item0, 'user');
+      addKeys(entityManager, item1, 'user');
 
       pageKeyMap = {
         firstName: {
@@ -357,7 +368,7 @@ describe('EntityManager', function () {
     });
 
     it('should dehydrate page key map', function () {
-      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
+      const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
 
       expect(dehydrated.length).to.equal(6);
       expect(dehydrated[0]).to.be.a('string');
@@ -366,7 +377,7 @@ describe('EntityManager', function () {
     it('should dehydrate page key map with undefined page key', function () {
       pageKeyMap.firstName['user!0'] = undefined;
 
-      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
+      const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
 
       expect(dehydrated.length).to.equal(6);
       expect(dehydrated[0]).to.be.a('string');
@@ -378,7 +389,7 @@ describe('EntityManager', function () {
         mapValues(indexMap, () => undefined),
       );
 
-      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
+      const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
 
       expect(dehydrated).to.deep.equal([]);
     });
@@ -386,19 +397,25 @@ describe('EntityManager', function () {
 
   describe('getHashKeySpace', function () {
     it('should get lowest hash key space', function () {
-      const hashKeySpace = entityManager.getHashKeySpace('user', now, now);
+      const hashKeySpace = getHashKeySpace(entityManager, 'user', now, now);
 
       expect(hashKeySpace).to.deep.equal(['user!']);
     });
 
     it('should get full hash key space', function () {
-      const hashKeySpace = entityManager.getHashKeySpace('user', now, Infinity);
+      const hashKeySpace = getHashKeySpace(
+        entityManager,
+        'user',
+        now,
+        Infinity,
+      );
 
       expect(hashKeySpace.length).to.equal(21);
     });
 
     it('should get middle hash key space', function () {
-      const hashKeySpace = entityManager.getHashKeySpace(
+      const hashKeySpace = getHashKeySpace(
+        entityManager,
         'user',
         now + day,
         now + day,
@@ -408,7 +425,8 @@ describe('EntityManager', function () {
     });
 
     it('should get empty hash key space', function () {
-      const hashKeySpace = entityManager.getHashKeySpace(
+      const hashKeySpace = getHashKeySpace(
+        entityManager,
         'user',
         now + day,
         now,
@@ -425,15 +443,15 @@ describe('EntityManager', function () {
     beforeEach(function () {
       [item0, item1, item2, item3] = getUsers(4) as UserItem[];
 
-      item0.hashKey = 'user!0';
-      item1.hashKey = 'user!1';
-      item2.hashKey = 'user!2';
-      item3.hashKey = 'user!3';
+      item0.hashKey2 = 'user!0';
+      item1.hashKey2 = 'user!1';
+      item2.hashKey2 = 'user!2';
+      item3.hashKey2 = 'user!3';
 
-      entityManager.updateItemGeneratedProperties(item0, 'user');
-      entityManager.updateItemGeneratedProperties(item1, 'user');
-      entityManager.updateItemGeneratedProperties(item2, 'user');
-      entityManager.updateItemGeneratedProperties(item3, 'user');
+      addKeys(entityManager, item0, 'user');
+      addKeys(entityManager, item1, 'user');
+      addKeys(entityManager, item2, 'user');
+      addKeys(entityManager, item3, 'user');
 
       pageKeyMap = {
         firstName: {
@@ -484,8 +502,9 @@ describe('EntityManager', function () {
     });
 
     it('should rehydrate page key map', function () {
-      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
-      const rehydrated = entityManager.rehydratePageKeyMap(
+      const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
+      const rehydrated = rehydratePageKeyMap(
+        entityManager,
         dehydrated,
         'user',
         ['firstName', 'lastName'],
@@ -499,8 +518,9 @@ describe('EntityManager', function () {
     it('should dehydrate page key map with undefined page key', function () {
       pageKeyMap.firstName['user!0'] = undefined;
 
-      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
-      const rehydrated = entityManager.rehydratePageKeyMap(
+      const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
+      const rehydrated = rehydratePageKeyMap(
+        entityManager,
         dehydrated,
         'user',
         ['firstName', 'lastName'],
@@ -516,8 +536,9 @@ describe('EntityManager', function () {
         mapValues(indexMap, () => undefined),
       );
 
-      const dehydrated = entityManager.dehydratePageKeyMap(pageKeyMap, 'user');
-      const rehydrated = entityManager.rehydratePageKeyMap(
+      const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
+      const rehydrated = rehydratePageKeyMap(
+        entityManager,
         dehydrated,
         'user',
         ['firstName', 'lastName'],
@@ -537,14 +558,14 @@ describe('EntityManager', function () {
 
     before(function () {
       users = getUsers(1000, 0, 2).map((user) =>
-        entityManager.updateItemGeneratedProperties(user as UserItem, 'user'),
+        addKeys(entityManager, user as UserItem, 'user'),
       );
 
       mockDb = new MockDb(users);
 
       lastNameQuery = async (shardedKey, pageKey, pageSize) =>
         (await mockDb.query({
-          hashKey: 'hashKey',
+          hashKey: 'hashKey2',
           hashValue: shardedKey,
           indexComponents: entityManager.config.entities.user.indexes
             .lastName as (keyof UserItem)[],
@@ -555,7 +576,7 @@ describe('EntityManager', function () {
 
       firstNameQuery = async (shardedKey, pageKey, pageSize) =>
         (await mockDb.query({
-          hashKey: 'hashKey',
+          hashKey: 'hashKey2',
           hashValue: shardedKey,
           indexComponents: entityManager.config.entities.user.indexes
             .firstName as (keyof UserItem)[],
@@ -568,7 +589,7 @@ describe('EntityManager', function () {
     it('simple query', async function () {
       let result = await entityManager.query({
         entityToken: 'user',
-        hashKey: 'hashKey',
+        hashKey: 'hashKey2',
         queryMap: { lastName: lastNameQuery },
       });
 
@@ -578,7 +599,7 @@ describe('EntityManager', function () {
 
       result = await entityManager.query({
         entityToken: 'user',
-        hashKey: 'hashKey',
+        hashKey: 'hashKey2',
         pageKeyMap: result.pageKeyMap,
         queryMap: { lastName: lastNameQuery },
       });
@@ -591,7 +612,7 @@ describe('EntityManager', function () {
     it('simple sharded query', async function () {
       let result = await entityManager.query({
         entityToken: 'user',
-        hashKey: 'hashKey',
+        hashKey: 'hashKey2',
         queryMap: { lastName: lastNameQuery },
         timestampFrom: now,
         timestampTo: now + day,
@@ -603,7 +624,7 @@ describe('EntityManager', function () {
 
       result = await entityManager.query({
         entityToken: 'user',
-        hashKey: 'hashKey',
+        hashKey: 'hashKey2',
         pageKeyMap: result.pageKeyMap,
         queryMap: { lastName: lastNameQuery },
         timestampFrom: now,
@@ -618,7 +639,7 @@ describe('EntityManager', function () {
     it('complex query', async function () {
       let result = await entityManager.query({
         entityToken: 'user',
-        hashKey: 'hashKey',
+        hashKey: 'hashKey2',
         queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
       });
 
@@ -628,7 +649,7 @@ describe('EntityManager', function () {
 
       result = await entityManager.query({
         entityToken: 'user',
-        hashKey: 'hashKey',
+        hashKey: 'hashKey2',
         pageKeyMap: result.pageKeyMap,
         queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
       });
@@ -641,7 +662,7 @@ describe('EntityManager', function () {
     it('complex sharded query', async function () {
       let result = await entityManager.query({
         entityToken: 'user',
-        hashKey: 'hashKey',
+        hashKey: 'hashKey2',
         queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
         timestampFrom: now,
         timestampTo: now + day,
@@ -653,7 +674,7 @@ describe('EntityManager', function () {
 
       result = await entityManager.query({
         entityToken: 'user',
-        hashKey: 'hashKey',
+        hashKey: 'hashKey2',
         pageKeyMap: result.pageKeyMap,
         queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
         sortOrder: [

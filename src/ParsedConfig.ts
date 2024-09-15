@@ -231,4 +231,9 @@ export const configSchema = z
     );
   });
 
+/**
+ * Foo
+ *
+ * @category Config
+ */
 export type ParsedConfig = z.infer<typeof configSchema>;

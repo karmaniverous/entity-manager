@@ -17,11 +17,11 @@ export interface MyEntityMap extends EntityMap {
   email: Email;
 }
 
-export const config: Config<MyEntityMap> = {
+export const config: Config<MyEntityMap, 'hashKey2'> = {
   entities: {
     email: {
       indexes: {
-        userId: ['hashKey', 'rangeKey', 'userId'],
+        userId: ['hashKey2', 'rangeKey', 'userId'],
       },
       timestampProperty: 'created',
       types: { created: 'number', email: 'string', userId: 'string' },
@@ -29,11 +29,11 @@ export const config: Config<MyEntityMap> = {
     },
     user: {
       indexes: {
-        created: ['hashKey', 'rangeKey', 'created'],
-        firstName: ['hashKey', 'rangeKey', 'firstNameRK'],
-        lastName: ['hashKey', 'rangeKey', 'lastNameRK'],
-        phone: ['hashKey', 'rangeKey', 'phone'],
-        updated: ['hashKey', 'rangeKey', 'updated'],
+        created: ['hashKey2', 'rangeKey', 'created'],
+        firstName: ['hashKey2', 'rangeKey', 'firstNameRK'],
+        lastName: ['hashKey2', 'rangeKey', 'lastNameRK'],
+        phone: ['hashKey2', 'rangeKey', 'phone'],
+        updated: ['hashKey2', 'rangeKey', 'updated'],
       },
       generated: {
         firstNameRK: {
@@ -64,8 +64,8 @@ export const config: Config<MyEntityMap> = {
       uniqueProperty: 'userId',
     },
   },
-  hashKey: 'hashKey',
+  hashKey: 'hashKey2',
   rangeKey: 'rangeKey',
 };
 
-export type UserItem = EntityItem<'user', MyEntityMap>;
+export type UserItem = EntityItem<'user', MyEntityMap, 'hashKey2'>;

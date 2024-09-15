@@ -8,6 +8,8 @@ import type {
 
 /**
  * The base EntityMap type. All EntityMaps should extend this type.
+ *
+ * @category Entities
  */
 export type EntityMap = Record<string, Entity>;
 
@@ -19,6 +21,9 @@ export type EntityMap = Record<string, Entity>;
  * @typeParam R - The reserved set of string literal types.
  *
  * @returns `K` if `K` is exclusive or `never` otherwise.
+ *
+ * @category Config
+ * @protected
  */
 export type ExclusiveKey<
   K extends string,
@@ -38,6 +43,9 @@ export type ExclusiveKey<
  * @typeParam EntityToken - The {@link Entity | `Entity`} token.
  * @typeParam M - The {@link EntityMap | `EntityMap`}.
  * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed.
+ *
+ * @category Entities
+ * @protected
  */
 export type IndexableProperties<
   EntityToken extends keyof Exactify<M>,
@@ -57,6 +65,9 @@ export type IndexableProperties<
  *
  * @remarks
  * All Entity properties of type `never` must be represented, and no extra properties are allowed.
+ *
+ * @category Config
+ * @protected
  */
 export type ConfigEntityGenerated<
   EntityToken extends keyof Exactify<M>,
@@ -88,6 +99,9 @@ export type ConfigEntityGenerated<
  * This property supports typing of values decoded from generated properties.
  *
  * All Entity properties of types `string`, `number`, `boolean`, or `bigint` must be represented, and no extra properties are allowed.
+ *
+ * @category Config
+ * @protected
  */
 export type ConfigEntityTypes<
   EntityToken extends keyof Exactify<M>,
@@ -106,6 +120,9 @@ export type ConfigEntityTypes<
 
 /**
  * Defines a single time period in an {@link Entity | `Entity`} sharding strategy.
+ *
+ * @category Config
+ * @protected
  */
 export interface ShardBump {
   /**
@@ -142,6 +159,9 @@ export interface ShardBump {
 
  * @remarks
  * `generated` is optional if `E` has no properties of type `never`.
+ * 
+ * @category Config
+ * @protected
  */
 export type ConfigEntity<
   EntityToken extends keyof Exactify<M>,
@@ -298,6 +318,9 @@ export type ConfigEntity<
  *
  * @remarks
  * All properties of `M` must be represented, and no extra properties are allowed.
+ *
+ * @category Config
+ * @protected
  */
 export type ConfigEntities<
   M extends EntityMap,
@@ -325,6 +348,9 @@ export type ConfigEntities<
  * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property.
  * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property.
  * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntityGenerated | generated property}. 
+ * 
+ * @category Config
+ * @protected
  */
 export interface ConfigKeys<
   M extends EntityMap,
@@ -345,6 +371,9 @@ export interface ConfigKeys<
    * This value must exactly match the {@link Config | `Config`} `HashKey` type parameter, and must not conflict with any {@link Entity | `Entity`} property.
    *
    * @defaultValue `'hashKey'`
+   *
+   * @category Config
+   * @protected
    */
   hashKey?: ExclusiveKey<HashKey, M, RangeKey>;
 
@@ -368,6 +397,8 @@ export interface ConfigKeys<
  *
  * @remarks
  * `entities` is optional if `M` is empty.
+ *
+ * @category Config
  */
 export type Config<
   M extends EntityMap = Record<string, never>,
@@ -414,6 +445,9 @@ export type Config<
 
 /**
  * Flattens the top layer of logic in a type.
+ *
+ * @category Utility
+ * @protected
  */
 export type Unwrap<T> = { [P in keyof T]: T[P] };
 
@@ -424,6 +458,8 @@ export type Unwrap<T> = { [P in keyof T]: T[P] };
  * @typeParam M - The {@link EntityMap | `EntityMap`} type that identitfies the {@link Entity | `Entity`} & related property types to be managed by EntityManager.
  * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property. Defaults to `'hashKey'`.
  * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property. Defaults to `'rangeKey'`.
+ *
+ * @category Entities
  */
 export type EntityItem<
   EntityToken extends keyof Exactify<M>,
