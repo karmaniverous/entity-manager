@@ -1,10 +1,7 @@
 import {
   Exactify,
   isNil,
-  type PropertiesOfType,
   sort,
-  type SortOrder,
-  type StringifiableTypes,
   type TypeMap,
 } from '@karmaniverous/entity-tools';
 import lzString from 'lz-string';
@@ -12,7 +9,6 @@ import {
   cluster,
   isInt,
   mapValues,
-  objectify,
   parallel,
   range,
   shake,
@@ -22,270 +18,18 @@ import {
 import stringHash from 'string-hash';
 
 import type { Config, EntityItem, EntityMap, ShardBump } from './Config';
+import { decodeGeneratedProperty } from './decodeGeneratedProperty';
+import { encodeGeneratedProperty } from './encodeGeneratedProperty';
+import type { PageKeyMap } from './PageKeyMap';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
+import type { QueryOptions } from './QueryOptions';
+import type { QueryResult } from './QueryResult';
+import { string2Stringifiable } from './string2Stringifiable';
+import { validateEntityToken } from './validateEntityToken';
+import type { WorkingQueryResult } from './WorkingQueryResult';
 
 const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
   lzString;
-
-const str2indexable = <IndexableTypes extends TypeMap>(
-  type: keyof IndexableTypes,
-  value?: string,
-): IndexableTypes[keyof IndexableTypes] | undefined => {
-  if (!value) return;
-
-  switch (type) {
-    case 'string':
-      return value as IndexableTypes[keyof IndexableTypes];
-    case 'number':
-      return Number(value) as IndexableTypes[keyof IndexableTypes];
-    case 'boolean':
-      return (value === 'true') as IndexableTypes[keyof IndexableTypes];
-    case 'bigint':
-      return BigInt(value) as IndexableTypes[keyof IndexableTypes];
-    default:
-      throw new Error(
-        `unsupported indexable type '${(type as string | undefined) ?? ''}'`,
-      );
-  }
-};
-
-/**
- * A two-layer map of page keys, used to query the next page of data across a set of indexes and on each shard of a given hash key.
- *
- * The keys of the outer object are the keys of the {@link QueryOptions.queryMap | `QueryMap`} object passed with the {@link EntityManager.query | `query`} method {@link QueryOptions.queryMap | options}. Each should correspond to a {@link ConfigEntity.indexes | `Config` entity index} for the given {@link Entity | `Entity`}.
- *
- * The keys of the inner object are the shard space for `hashKey` as constrained by the {@link QueryOptions | query options} timestamps.
- *
- * The values of the inner object are the page key objects returned by the previous database query on the related index & shard. An `undefined` value indicates that there are no more pages to query for that index & shard.
- *
- * @typeParam Item - The item type being queried. This will geerally be an {@link EntityItem | `EntityItem`} object.
- * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed.
- */
-export type PageKeyMap<
-  Item extends Record<string, unknown>,
-  IndexableTypes extends TypeMap,
-> = Record<
-  string,
-  Record<
-    string,
-    | Partial<
-        Pick<Item, PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>>
-      >
-    | undefined
-  >
->;
-
-/**
- * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
- *
- * @typeParam Item - The {@link EntityItem | `EntityItem`} type being queried. 
- * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed.
-
-* @category Query
- */
-export interface ShardQueryResult<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-  EntityToken extends keyof Exactify<M> & string,
-  M extends EntityMap,
-  HashKey extends string = 'hashKey',
-  RangeKey extends string = 'rangeKey',
-  IndexableTypes extends TypeMap = StringifiableTypes,
-> {
-  /** The number of records returned. */
-  count: number;
-
-  /** The returned records. */
-  items: Item[];
-
-  /** The page key for the next query on this shard. */
-  pageKey?: Partial<
-    Pick<Item, PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>>
-  >;
-}
-
-/**
- * A query function that returns a single page of results from an individual
- * shard. This function will typically be composed dynamically to express a
- * specific query index & logic. The arguments to this function will be
- * provided by the {@link EntityManager.query | `EntityManager.query`} method, which assembles many returned
- * pages queried across multiple shards into a single query result.
- *
- * @typeParam Item - The {@link EntityItem | `EntityItem`} type being queried. 
- * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Defaults to {@link StringifiableTypes | `StringifiableTypes`}.
-
- * @param hashKey - The {@link ConfigKeys.hashKey | `this.config.hashKey`} property value of the shard being queried.
- * @param pageKey - The page key returned by the previous query on this shard.
- * @param pageSize - The maximum number of items to return from this query.
- *
- * @category Query
- */
-export type ShardQueryFunction<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-  EntityToken extends keyof Exactify<M> & string,
-  M extends EntityMap,
-  HashKey extends string = 'hashKey',
-  RangeKey extends string = 'rangeKey',
-  IndexableTypes extends TypeMap = StringifiableTypes,
-> = (
-  hashKey: string,
-  pageKey?: Partial<
-    Pick<Item, PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>>
-  >,
-  pageSize?: number,
-) => Promise<
-  ShardQueryResult<Item, EntityToken, M, HashKey, RangeKey, IndexableTypes>
->;
-
-/**
- * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
- *
- * @category Query
- */
-export interface QueryOptions<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-  EntityToken extends keyof Exactify<M> & string,
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  IndexableTypes extends TypeMap,
-> {
-  /** Identifies the entity to be queried. Key of {@link Config | `EntityManager.config.entities`}. */
-  entityToken: EntityToken;
-
-  /**
-   * Identifies the entity key across which the query will be sharded. Key of
-   * {@link Config | `EntityManager.config.entities.<entityToken>.keys`}.
-   */
-  hashKey: string;
-
-  /**
-   * A partial {@link EntityItem | `EntityItem`} object containing at least the properties specified in
-   * {@link Config | `EntityManager.config.entities.<entityToken>.keys.<keyToken>.elements`}, except for the properties specified in {@link Config | `EntityManager.config.tokens`}.
-   *
-   * This data will be used to generate query keys across all shards.
-   */
-  item?: Item;
-
-  /**
-   * The target maximum number of records to be returned by the query across
-   * all shards.
-   *
-   * The actual number of records returned will be a product of {@link QueryOptions.pageSize | `pageSize`} and the
-   * number of shards queried, unless limited by available records in a given
-   * shard.
-   */
-  limit?: number;
-
-  /**
-   * {@link QueryResult.pageKeyMap | `pageKeyMap`} returned by the previous iteration of this query.
-   */
-  pageKeyMap?: string;
-
-  /**
-   * The maximum number of records to be returned by each individual query to a
-   * single shard (i.e. {@link ShardQueryFunction | `ShardQueryFunction`} execution).
-   *
-   * Note that, within a given {@link EntityManager.query | `query`} method execution, these queries will be
-   * repeated until either available data is exhausted or the {@link QueryOptions.limit | `limit`} value is
-   * reached.
-   */
-  pageSize?: number;
-
-  /**
-   * Each key in this object is a valid entity index token. Each value is a valid
-   * {@link ShardQueryFunction | 'ShardQueryFunction'} that specifies the query of a single page of data on a
-   * single shard for the mapped index.
-   *
-   * This allows simultaneous queries on multiple sort keys to share a single
-   * page key, e.g. to match the same string against `firstName` and `lastName`
-   * properties without performing a table scan for either.
-   */
-  queryMap: Record<
-    string,
-    ShardQueryFunction<Item, EntityToken, M, HashKey, RangeKey, IndexableTypes>
-  >;
-
-  /**
-   * A {@link SortOrder | `SortOrder`} object specifying the sort order of the result set. Defaults to `[]`.
-   */
-  sortOrder?: SortOrder<Item>;
-
-  /**
-   * Lower limit to query shard space.
-   *
-   * Only valid if the query is constrained along the dimension used by the
-   * {@link Config | `EntityManager.config.entities.<entityToken>.sharding.timestamptokens.timestamp`}
-   * function to generate `shardKey`.
-   *
-   * @defaultValue `0`
-   */
-  timestampFrom?: number;
-
-  /**
-   * Upper limit to query shard space.
-   *
-   * Only valid if the query is constrained along the dimension used by the
-   * {@link Config | `EntityManager.config.entities.<entityToken>.sharding.timestamptokens.timestamp`}
-   * function to generate `shardKey`.
-   *
-   * @defaultValue `Date.now()`
-   */
-  timestampTo?: number;
-
-  /**
-   * The maximum number of shards to query in parallel. Overrides options `throttle`.
-   *
-   * @defaultValue `options.throttle`
-   */
-  throttle?: number;
-}
-
-/**
- * A result returned by a query across multiple shards, where each shard may
- * receive multiple page queries via a dynamically-generated {@link ShardQueryFunction | `ShardQueryFunction`}.
- *
- * @category Query
- */
-export interface QueryResult<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-  EntityToken extends keyof Exactify<M> & string,
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-> {
-  /** Total number of records returned across all shards. */
-  count: number;
-
-  /** The returned records. */
-  items: Item[];
-
-  /**
-   * A compressed, two-layer map of page keys, used to query the next page of
-   * data for a given sort key on each shard of a given hash key.
-   */
-  pageKeyMap: string;
-}
-
-/**
- * A QueryResult object with rehydrated pageKeyMap.
- */
-export interface WorkingQueryResult<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-  EntityToken extends keyof Exactify<M> & string,
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  IndexableTypes extends TypeMap = StringifiableTypes,
-> {
-  /** The returned records. */
-  items: Item[];
-
-  /**
-   * A compressed, two-layer map of page keys, used to query the next page of
-   * data for a given sort key on each shard of a given hash key.
-   */
-  pageKeyMap: PageKeyMap<Item, IndexableTypes>;
-}
 
 /**
  * The EntityManager class applies a configuration-driven sharded data model &
@@ -311,19 +55,6 @@ export class EntityManager<
   }
 
   /**
-   * Validate that an entity is defined in the EntityManager config.
-   *
-   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
-   *
-   * @throws `Error` if `entityToken` is invalid.
-   */
-  private validateEntityToken(entityToken: string): void {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!this.config.entities[entityToken])
-      throw new Error('invalid entity token');
-  }
-
-  /**
    * Validate that an entity index is defined in EntityManager config.
    *
    * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
@@ -332,11 +63,8 @@ export class EntityManager<
    * @throws `Error` if `entityToken` is invalid.
    * @throws `Error` if `indexToken` is invalid.
    */
-  private validateEntityIndexToken(
-    entityToken: string,
-    indexToken: string,
-  ): void {
-    this.validateEntityToken(entityToken);
+  validateEntityIndexToken(entityToken: string, indexToken: string): void {
+    validateEntityToken(this, entityToken);
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!this.config.entities[entityToken].indexes[indexToken])
@@ -355,12 +83,12 @@ export class EntityManager<
    * @throws `Error` if `property` is invalid.
    * @throws `Error` if `sharded` is specified & does not match `this.config.entities.<entityToken>.generated.<property>.sharded`.
    */
-  private validateEntityGeneratedProperty(
+  validateEntityGeneratedProperty(
     entityToken: string,
     property: string,
     sharded?: boolean,
   ): void {
-    this.validateEntityToken(entityToken);
+    validateEntityToken(this, entityToken);
 
     const generated = this.config.entities[entityToken].generated[property];
 
@@ -410,141 +138,11 @@ export class EntityManager<
     timestamp: number,
   ): ShardBump {
     // Validate params.
-    this.validateEntityToken(entityToken);
+    validateEntityToken(this, entityToken);
 
     return [...this.config.entities[entityToken].shardBumps]
       .reverse()
       .find((bump) => bump.timestamp <= timestamp)!;
-  }
-
-  /**
-   * Encode a generated property value. Returns a string or undefined if atomicity requirement not met.
-   *
-   * @param item - Partial {@link EntityItem | `EntityItem`} object.
-   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
-   * @param property - {@link ConfigEntityGenerated | `this.config.entities.<entityToken>.generated`} key.
-   *
-   * @returns Encoded generated property value.
-   *
-   * @throws `Error` if `entityToken` is invalid.
-   * @throws `Error` if `property` is invalid.
-   */
-  encodeGeneratedProperty<
-    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof Exactify<M> & string,
-  >(
-    item: Partial<Item>,
-    entityToken: EntityToken,
-    property: keyof M[EntityToken] & string,
-  ): string | undefined {
-    try {
-      // Validate params.
-      this.validateEntityGeneratedProperty(entityToken, property);
-
-      const { atomic, elements, sharded } =
-        this.config.entities[entityToken].generated[property]!;
-
-      // Map elements to [element, value] pairs.
-      const elementMap = elements.map((element) => [
-        element,
-        item[element as keyof Item],
-      ]);
-
-      // Validate atomicity requirement.
-      if (atomic && elementMap.some(([, value]) => isNil(value))) return;
-
-      // Encode property value.
-      const encoded = [
-        ...(sharded ? [item[this.config.hashKey as keyof Item]] : []),
-        ...elementMap.map(([element, value]) =>
-          [element, (value ?? '').toString()].join(
-            this.config.generatedValueDelimiter,
-          ),
-        ),
-      ].join(this.config.generatedKeyDelimiter);
-
-      console.debug('encoded generated property', {
-        item,
-        entityToken,
-        property,
-        encoded,
-      });
-
-      return encoded;
-    } catch (error) {
-      if (error instanceof Error)
-        console.error(error.message, { item, entityToken, property });
-
-      throw error;
-    }
-  }
-
-  /**
-   * Decode a generated property value. Returns a partial EntityItem.
-   *
-   * @param encoded - Encoded generated property value.
-   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
-   *
-   * @returns Partial {@link EntityItem | `EntityItem`} object with updated properties decoded from `encoded`.
-   *
-   * @throws `Error` if `entityToken` is invalid.
-   */
-  decodeGeneratedProperty<
-    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof Exactify<M> & string,
-  >(encoded: string, entityToken: EntityToken): Partial<Item> {
-    try {
-      // Validate params.
-      this.validateEntityToken(entityToken);
-
-      // Handle degenerate case.
-      if (!encoded) return {};
-
-      // Split encoded into keys.
-      const keys = encoded.split(this.config.generatedKeyDelimiter);
-
-      // Initiate result with hashKey if sharded.
-      const decoded = keys[0].includes(this.config.shardKeyDelimiter)
-        ? { [this.config.hashKey]: keys.shift() }
-        : {};
-
-      // Split keys into values & validate.
-      const values = keys.map((key) => {
-        const pair = key.split(this.config.generatedValueDelimiter);
-
-        if (pair.length !== 2)
-          throw new Error(`invalid generated property value '${key}'`);
-
-        return pair;
-      });
-
-      // Assign decoded properties.
-      Object.assign(
-        decoded,
-        objectify(
-          values,
-          ([key]) => key,
-          ([key, value]) =>
-            str2indexable<IndexableTypes>(
-              this.config.entities[entityToken].types[key],
-              value,
-            ),
-        ),
-      );
-
-      console.debug('decoded generated property', {
-        encoded,
-        entityToken,
-        decoded,
-      });
-
-      return decoded as Partial<Item>;
-    } catch (error) {
-      if (error instanceof Error)
-        console.error(error.message, { encoded, entityToken });
-
-      throw error;
-    }
   }
 
   /**
@@ -564,7 +162,7 @@ export class EntityManager<
   >(item: Item, entityToken: EntityToken, overwrite = false): Item {
     try {
       // Validate params.
-      this.validateEntityToken(entityToken);
+      validateEntityToken(this, entityToken);
 
       // Return current item if hashKey exists and overwrite is false.
       if (item[this.config.hashKey as keyof Item] && !overwrite) {
@@ -643,7 +241,7 @@ export class EntityManager<
   ): Partial<Item> {
     try {
       // Validate params.
-      this.validateEntityToken(entityToken);
+      validateEntityToken(this, entityToken);
 
       // Return current item if rangeKey exists and overwrite is false.
       if (item[this.config.rangeKey as keyof Item] && !overwrite) {
@@ -703,7 +301,7 @@ export class EntityManager<
   >(item: Item, entityToken: EntityToken, overwrite = false): Item {
     try {
       // Validate params.
-      this.validateEntityToken(entityToken);
+      validateEntityToken(this, entityToken);
 
       // Update hash key.
       this.updateItemHashKey(item, entityToken, overwrite);
@@ -714,7 +312,8 @@ export class EntityManager<
       // Update generated properties.
       for (const property in this.config.entities[entityToken].generated) {
         if (overwrite || isNil(item[property as keyof Item])) {
-          const encoded = this.encodeGeneratedProperty(
+          const encoded = encodeGeneratedProperty(
+            this,
             item,
             entityToken,
             property,
@@ -756,7 +355,7 @@ export class EntityManager<
   >(item: Item, entityToken: EntityToken): Item {
     try {
       // Validate params.
-      this.validateEntityToken(entityToken);
+      validateEntityToken(this, entityToken);
 
       // Delete hash & range keys.
       delete item[this.config.hashKey as keyof Item];
@@ -932,7 +531,7 @@ export class EntityManager<
         zipToObject(
           elements,
           values.map((value, i) =>
-            str2indexable<IndexableTypes>(
+            string2Stringifiable<IndexableTypes>(
               this.config.entities[entityToken].types[elements[i]],
               value,
             ),
@@ -985,7 +584,7 @@ export class EntityManager<
   ): string[] {
     try {
       // Validate params.
-      this.validateEntityToken(entityToken);
+      validateEntityToken(this, entityToken);
 
       // Shortcut empty pageKeyMap.
       if (!Object.keys(pageKeyMap).length) {
@@ -1028,7 +627,7 @@ export class EntityManager<
             )
               Object.assign(
                 item,
-                this.decodeGeneratedProperty(value as string, entityToken),
+                decodeGeneratedProperty(this, value as string, entityToken),
               );
             else Object.assign(item, { [property]: value });
 
@@ -1082,7 +681,7 @@ export class EntityManager<
   ): string[] {
     try {
       // Validate params.
-      this.validateEntityToken(entityToken);
+      validateEntityToken(this, entityToken);
 
       const { shardBumps } = this.config.entities[entityToken];
 
@@ -1204,7 +803,7 @@ export class EntityManager<
               this.config.entities[entityToken].indexes[index],
               (component) =>
                 this.config.entities[entityToken].generated[component]
-                  ? this.encodeGeneratedProperty(item, entityToken, component)!
+                  ? encodeGeneratedProperty(this, item, entityToken, component)!
                   : item[component],
             );
           }),

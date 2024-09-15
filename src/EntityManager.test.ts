@@ -1,17 +1,17 @@
 /* eslint-env mocha */
 
-import { MockDb, StringifiableTypes } from '@karmaniverous/mock-db';
+import { MockDb, type StringifiableTypes } from '@karmaniverous/mock-db';
 import { expect } from 'chai';
 import { mapValues, pick } from 'radash';
 
 import { config, day, MyEntityMap, now, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
-import {
-  EntityManager,
-  type PageKeyMap,
-  type ShardQueryFunction,
-  type ShardQueryResult,
-} from './EntityManager';
+import { decodeGeneratedProperty } from './decodeGeneratedProperty';
+import { encodeGeneratedProperty } from './encodeGeneratedProperty';
+import { EntityManager } from './EntityManager';
+import type { PageKeyMap } from './PageKeyMap';
+import type { ShardQueryFunction } from './ShardQueryFunction';
+import type { ShardQueryResult } from './ShardQueryResult';
 
 const entityManager = new EntityManager(config);
 
@@ -20,7 +20,8 @@ describe('EntityManager', function () {
     it('should encode generated property', function () {
       const [item] = getUsers() as UserItem[];
 
-      const encoded = entityManager.encodeGeneratedProperty(
+      const encoded = encodeGeneratedProperty(
+        entityManager,
         item,
         'user',
         'firstNameRK',
@@ -35,7 +36,8 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
       item.hashKey = 'user!q';
 
-      const encoded = entityManager.encodeGeneratedProperty(
+      const encoded = encodeGeneratedProperty(
+        entityManager,
         item,
         'user',
         'lastNameRK',
@@ -49,7 +51,8 @@ describe('EntityManager', function () {
     it('should encode atomic generated property', function () {
       const [item] = getUsers() as UserItem[];
 
-      const encoded = entityManager.encodeGeneratedProperty(
+      const encoded = encodeGeneratedProperty(
+        entityManager,
         item,
         'user',
         'phoneRK',
@@ -62,7 +65,8 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
       item.phone = undefined;
 
-      const encoded = entityManager.encodeGeneratedProperty(
+      const encoded = encodeGeneratedProperty(
+        entityManager,
         item,
         'user',
         'phoneRK',
@@ -75,38 +79,39 @@ describe('EntityManager', function () {
       const [item] = getUsers() as UserItem[];
 
       expect(() =>
-        entityManager.encodeGeneratedProperty(item, 'user', 'foo'),
+        encodeGeneratedProperty(entityManager, item, 'user', 'foo'),
       ).to.throw('invalid');
     });
   });
 
   describe('decodeGeneratedProperty', function () {
     it('should decode empty string to empty object', function () {
-      const decoded = entityManager.decodeGeneratedProperty('', 'user');
+      const decoded = decodeGeneratedProperty(entityManager, '', 'user');
 
       expect(decoded).to.deep.equal({});
     });
 
     it('should fail on no value delimiters', function () {
       expect(() =>
-        entityManager.decodeGeneratedProperty('abc', 'user'),
+        decodeGeneratedProperty(entityManager, 'abc', 'user'),
       ).to.throw('invalid generated property value');
     });
 
     it('should fail on too many value delimiters', function () {
       expect(() =>
-        entityManager.decodeGeneratedProperty('abc#def#ghi', 'user'),
+        decodeGeneratedProperty(entityManager, 'abc#def#ghi', 'user'),
       ).to.throw('invalid generated property value');
     });
 
     it('should decode hash key', function () {
-      const decoded = entityManager.decodeGeneratedProperty('user!q', 'user');
+      const decoded = decodeGeneratedProperty(entityManager, 'user!q', 'user');
 
       expect(decoded).to.deep.equal({ hashKey: 'user!q' });
     });
 
     it('should decode generated property', function () {
-      const decoded = entityManager.decodeGeneratedProperty(
+      const decoded = decodeGeneratedProperty(
+        entityManager,
         'firstNameCanonical#lilian|lastNameCanonical#fahey',
         'user',
       );
@@ -118,7 +123,8 @@ describe('EntityManager', function () {
     });
 
     it('should decode generated property with hash key', function () {
-      const decoded = entityManager.decodeGeneratedProperty(
+      const decoded = decodeGeneratedProperty(
+        entityManager,
         'user!q|firstNameCanonical#lilian|lastNameCanonical#fahey',
         'user',
       );
@@ -132,7 +138,8 @@ describe('EntityManager', function () {
 
     it('should fail on misplaced hash key', function () {
       expect(() =>
-        entityManager.decodeGeneratedProperty(
+        decodeGeneratedProperty(
+          entityManager,
           'firstNameCanonical#lilian|user!q|lastNameCanonical#fahey',
           'user',
         ),
