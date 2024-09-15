@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 
-import { MockDb } from '@karmaniverous/mock-db';
+import { MockDb, StringifiableTypes } from '@karmaniverous/mock-db';
 import { expect } from 'chai';
 import { mapValues, pick } from 'radash';
 
@@ -298,7 +298,7 @@ describe('EntityManager', function () {
 
   describe('dehydratePageKeyMep', function () {
     let item, item0, item1: UserItem;
-    let pageKeyMap: PageKeyMap<UserItem>;
+    let pageKeyMap: PageKeyMap<UserItem, StringifiableTypes>;
 
     beforeEach(function () {
       [item, item0, item1] = getUsers(3) as UserItem[];
@@ -413,7 +413,7 @@ describe('EntityManager', function () {
 
   describe('rehydratePageKeyMep', function () {
     let item0, item1, item2, item3: UserItem;
-    let pageKeyMap: PageKeyMap<UserItem>;
+    let pageKeyMap: PageKeyMap<UserItem, StringifiableTypes>;
 
     beforeEach(function () {
       [item0, item1, item2, item3] = getUsers(4) as UserItem[];

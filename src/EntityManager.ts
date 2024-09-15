@@ -1,4 +1,5 @@
 import {
+  Exactify,
   isNil,
   type PropertiesOfType,
   sort,
@@ -51,7 +52,7 @@ const str2indexable = <IndexableTypes extends TypeMap>(
 /**
  * A two-layer map of page keys, used to query the next page of data across a set of indexes and on each shard of a given hash key.
  *
- * The keys of the outer object are the keys of the {@link QueryMap | `QueryMap`} object passed with the {@link EntityManager.query | `query`} method {@link QueryOptions.queryMap | options}. Each should correspond to a {@link ConfigEntity.indexes | `Config` entity index} for the given {@link Entity | `Entity`}.
+ * The keys of the outer object are the keys of the {@link QueryOptions.queryMap | `QueryMap`} object passed with the {@link EntityManager.query | `query`} method {@link QueryOptions.queryMap | options}. Each should correspond to a {@link ConfigEntity.indexes | `Config` entity index} for the given {@link Entity | `Entity`}.
  *
  * The keys of the inner object are the shard space for `hashKey` as constrained by the {@link QueryOptions | query options} timestamps.
  *
@@ -62,7 +63,7 @@ const str2indexable = <IndexableTypes extends TypeMap>(
  */
 export type PageKeyMap<
   Item extends Record<string, unknown>,
-  IndexableTypes extends TypeMap = StringifiableTypes,
+  IndexableTypes extends TypeMap,
 > = Record<
   string,
   Record<
@@ -84,7 +85,7 @@ export type PageKeyMap<
  */
 export interface ShardQueryResult<
   Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-  EntityToken extends keyof M & string,
+  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
@@ -109,7 +110,10 @@ export interface ShardQueryResult<
  * provided by the {@link EntityManager.query | `EntityManager.query`} method, which assembles many returned
  * pages queried across multiple shards into a single query result.
  *
- * @param haskKey - The key of the individual shard being queried.
+ * @typeParam Item - The {@link EntityItem | `EntityItem`} type being queried. 
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Defaults to {@link StringifiableTypes | `StringifiableTypes`}.
+
+ * @param hashKey - The {@link ConfigKeys.hashKey | `this.config.hashKey`} property value of the shard being queried.
  * @param pageKey - The page key returned by the previous query on this shard.
  * @param pageSize - The maximum number of items to return from this query.
  *
@@ -117,7 +121,7 @@ export interface ShardQueryResult<
  */
 export type ShardQueryFunction<
   Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-  EntityToken extends keyof M & string,
+  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
@@ -139,7 +143,7 @@ export type ShardQueryFunction<
  */
 export interface QueryOptions<
   Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-  EntityToken extends keyof M & string,
+  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
@@ -244,7 +248,7 @@ export interface QueryOptions<
  */
 export interface QueryResult<
   Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-  EntityToken extends keyof M & string,
+  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
@@ -264,12 +268,10 @@ export interface QueryResult<
 
 /**
  * A QueryResult object with rehydrated pageKeyMap.
- *
- * @category Query
  */
 export interface WorkingQueryResult<
   Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-  EntityToken extends keyof M & string,
+  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
@@ -302,7 +304,7 @@ export class EntityManager<
   /**
    * Create an EntityManager instance.
    *
-   * @param options - EntityManager options.
+   * @param config - EntityManager {@link Config | `Config`} object.
    */
   constructor(config: Config<M, HashKey, RangeKey, IndexableTypes>) {
     this.#config = configSchema.parse(config);
@@ -311,9 +313,9 @@ export class EntityManager<
   /**
    * Validate that an entity is defined in the EntityManager config.
    *
-   * @param entity - Entity token.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
    *
-   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
    */
   private validateEntityToken(entityToken: string): void {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -324,20 +326,20 @@ export class EntityManager<
   /**
    * Validate that an entity index is defined in EntityManager config.
    *
-   * @param entity - Entity token.
-   * @param index - Index token.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param indexToken - {@link ConfigEntity.indexes | `this.config.entities.<entityToken>.indexes`} key.
    *
-   * @throws `Error` if `entity` is invalid.
-   * @throws `Error` if `index` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
+   * @throws `Error` if `indexToken` is invalid.
    */
   private validateEntityIndexToken(
     entityToken: string,
-    indexToke: string,
+    indexToken: string,
   ): void {
     this.validateEntityToken(entityToken);
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!this.config.entities[entityToken].indexes[indexToke])
+    if (!this.config.entities[entityToken].indexes[indexToken])
       throw new Error('invalid entity index token');
   }
 
@@ -345,15 +347,13 @@ export class EntityManager<
    * Validate that an entity generated property is defined in EntityManager
    * config.
    *
-   * @param entity - Entity token.
-   * @param property - Entity generated property.
-   * @param sharded - Whether the generated property is sharded. `undefined`
-   * indicates no constraint.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param property - {@link ConfigEntityGenerated | `this.config.entities.<entityToken>.generated`} key.
+   * @param sharded - Whether the generated property is sharded. `undefined` indicates no constraint.
    *
-   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
    * @throws `Error` if `property` is invalid.
-   * @throws `Error` if `sharded` is specified & does not match `property`
-   * sharding.
+   * @throws `Error` if `sharded` is specified & does not match `this.config.entities.<entityToken>.generated.<property>.sharded`.
    */
   private validateEntityGeneratedProperty(
     entityToken: string,
@@ -378,18 +378,18 @@ export class EntityManager<
   }
 
   /**
-   * Get the current EntityManager Config object.
+   * Get the current EntityManager {@link Config | `Config`} object.
    *
-   * @returns Current config object.
+   * @returns Current {@link Config | `Config`} object.
    */
   get config(): ParsedConfig {
     return this.#config;
   }
 
   /**
-   * Set the current config.
+   * Set the current EntityManager {@link Config | `Config`} object.
    *
-   * @param value - ParsedConfig object.
+   * @param value - {@link Config | `Config`} object.
    */
   set config(value) {
     this.#config = configSchema.parse(value);
@@ -398,14 +398,17 @@ export class EntityManager<
   /**
    * Get first entity shard bump before timestamp.
    *
-   * @param entity - Entity token.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
    * @param timestamp - Timestamp in milliseconds.
    *
-   * @returns Shard bump object.
+   * @returns {@link ShardBump | `ShardBump`} object.
    *
-   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
    */
-  getShardBump(entityToken: keyof M & string, timestamp: number): ShardBump {
+  private getShardBump(
+    entityToken: keyof Exactify<M> & string,
+    timestamp: number,
+  ): ShardBump {
     // Validate params.
     this.validateEntityToken(entityToken);
 
@@ -417,19 +420,18 @@ export class EntityManager<
   /**
    * Encode a generated property value. Returns a string or undefined if atomicity requirement not met.
    *
-   * @param item - Entity item.
-   * @param entity - Entity token.
-   * @param property - Generated property name.
+   * @param item - Partial {@link EntityItem | `EntityItem`} object.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param property - {@link ConfigEntityGenerated | `this.config.entities.<entityToken>.generated`} key.
    *
    * @returns Encoded generated property value.
    *
-   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
    * @throws `Error` if `property` is invalid.
-   *
    */
   encodeGeneratedProperty<
     Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof M & string,
+    EntityToken extends keyof Exactify<M> & string,
   >(
     item: Partial<Item>,
     entityToken: EntityToken,
@@ -481,15 +483,15 @@ export class EntityManager<
    * Decode a generated property value. Returns a partial EntityItem.
    *
    * @param encoded - Encoded generated property value.
-   * @param entity - Entity token.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
    *
-   * @returns Partial EntityItem with decoded properties decoded from `value`.
+   * @returns Partial {@link EntityItem | `EntityItem`} object with updated properties decoded from `encoded`.
    *
-   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
    */
   decodeGeneratedProperty<
     Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof M & string,
+    EntityToken extends keyof Exactify<M> & string,
   >(encoded: string, entityToken: EntityToken): Partial<Item> {
     try {
       // Validate params.
@@ -546,19 +548,19 @@ export class EntityManager<
   }
 
   /**
-   * Update the hash key on an EntityItem. Mutates `item`.
+   * Update the hash key on a partial {@link EntityItem | `EntityItem`} object. Mutates `item`.
    *
-   * @param item - EntityItem.
-   * @param entity - Entity token.
-   * @param overwrite - Overwrite existing shard key (default `false`).
+   * @param item - Partial {@link EntityItem | `EntityItem`} object.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param overwrite - Overwrite existing {@link ConfigKeys.hashKey | `this.config.hashKey`} property value (default `false`).
    *
    * @returns Mutated `item` with updated hash key.
    *
-   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
    */
   updateItemHashKey<
     Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof M & string,
+    EntityToken extends keyof Exactify<M> & string,
   >(item: Item, entityToken: EntityToken, overwrite = false): Item {
     try {
       // Validate params.
@@ -620,20 +622,20 @@ export class EntityManager<
   }
 
   /**
-   * Update the range key on an EntityItem. Mutates `item`.
+   * Update the range key on a partial {@link EntityItem | `EntityItem`} object. Mutates `item`.
    *
-   * @param item - EntityItem.
-   * @param entity - Entity token.
-   * @param overwrite - Overwrite existing shard key (default `false`).
+   * @param item - Partial {@link EntityItem | `EntityItem`} object.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param overwrite - Overwrite existing {@link ConfigKeys.rangeKey | `this.config.rangeKey`} property value (default `false`).
    *
    * @returns Mutated `item` with updated range key.
    *
-   * @throws `Error` if `entity` is invalid.
-   * @throws `Error` if `item` unique property is missing.
+   * @throws `Error` if `entityToken` is invalid.
+   * @throws `Error` if `item` {@link ConfigEntity.uniqueProperty | `this.config.entities<entityToken>.uniqueProperty`} property value is missing.
    */
   updateItemRangeKey<
     Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof M & string,
+    EntityToken extends keyof Exactify<M> & string,
   >(
     item: Partial<Item>,
     entityToken: EntityToken,
@@ -685,19 +687,19 @@ export class EntityManager<
   }
 
   /**
-   * Update generated properties on an EntityItem. Mutates `item`.
+   * Update generated properties, hash key, and range key on an {@link EntityItem | `EntityItem`} object. Mutates `item`.
    *
-   * @param item - EntityItem.
-   * @param entity - Entity token.
-   * @param overwrite - Overwrite existing generated properties (default `false`).
+   * @param item - {@link EntityItem | `EntityItem`} object.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param overwrite - Overwrite existing properties (default `false`).
    *
-   * @returns Mutated `item` with updated generated properties.
+   * @returns Mutated `item` with updated properties.
    *
-   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
    */
   updateItemGeneratedProperties<
     Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof M & string,
+    EntityToken extends keyof Exactify<M> & string,
   >(item: Item, entityToken: EntityToken, overwrite = false): Item {
     try {
       // Validate params.
@@ -739,18 +741,18 @@ export class EntityManager<
   }
 
   /**
-   * Strips generated properties from an EntityItem. Mutates `item`.
+   * Strips generated properties, hash key, and range key from an {@link EntityItem | `EntityItem`} object. Mutates `item`.
    *
-   * @param item - EntityItem.
-   * @param entity - Entity token.
+   * @param item - {@link EntityItem | `EntityItem`} object.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
    *
-   * @returns Mutated `item` without generated properties.
+   * @returns Mutated `item` without generated properties, hash key or range key.
    *
-   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
    */
   stripItemGeneratedProperties<
     Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof M & string,
+    EntityToken extends keyof Exactify<M> & string,
   >(item: Item, entityToken: EntityToken): Item {
     try {
       // Validate params.
@@ -779,28 +781,25 @@ export class EntityManager<
   }
 
   /**
-   * Unwraps an entity index into deduped, sorted, ungenerated elements.
+   * Unwraps an {@link ConfigEntity.indexes | Entity index} into deduped, sorted, ungenerated index component elements.
    *
-   * @param index - Index token.
-   * @param entity - Entity token.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param indexToken - {@link ConfigEntity.indexes | `this.config.entities.<entityToken>.indexes`} key.
    *
    * @returns Deduped, sorted array of ungenerated index component elements.
    *
-   * @throws `Error` if `entity` is invalid.
-   * @throws `Error` if `index` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
+   * @throws `Error` if `indexToken` is invalid.
    */
-  unwrapIndex<EntityToken extends keyof M & string>(
-    index: string,
-    entityToken: EntityToken,
-  ) {
+  unwrapIndex(entityToken: keyof Exactify<M> & string, indexToken: string) {
     try {
       // Validate params.
-      this.validateEntityIndexToken(entityToken, index);
+      this.validateEntityIndexToken(entityToken, indexToken);
 
       const generated = this.config.entities[entityToken].generated;
       const generatedKeys = Object.keys(shake(generated));
 
-      return this.config.entities[entityToken].indexes[index]
+      return this.config.entities[entityToken].indexes[indexToken]
         .map((component) =>
           component === this.config.hashKey
             ? this.config.hashKey
@@ -814,15 +813,14 @@ export class EntityManager<
         .sort();
     } catch (error) {
       if (error instanceof Error)
-        console.error(error.message, { index, entityToken });
+        console.error(error.message, { indexToken, entityToken });
 
       throw error;
     }
   }
 
   /**
-   * Condense a partial EntityItem into a delimited string representing the
-   * ungenerated component elements of a Config entity index.
+   * Condense a partial {@link EntityItem | `EntityItem`} object into a delimited string representing the deduped, sorted, ungenerated component elements of an {@link ConfigEntity.indexes | Entity index}.
    *
    * @remarks
    * Reverses {@link EntityManager.rehydrateIndexItem | `rehydrateIndexItem`}.
@@ -830,23 +828,23 @@ export class EntityManager<
    * To create the output value, this method:
    *
    * * Unwraps `index` components into deduped, sorted, ungenerated elements.
-   * * Joins index component values from `item` with generated key delimiter.
+   * * Joins `item` element values with {@link Config.generatedKeyDelimiter | `this.config.generatedKeyDelimiter`}.
    *
    * `item` must be populated with all required index component elements!
    *
-   * @param item - EntityItem object.
-   * @param entity - Entity token.
-   * @param index - Entity index token.
-   * @param omit - Index components to omit from the output value.
+   * @param item - Partial {@link EntityItem | `EntityItem`} object.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param indexToken - {@link ConfigEntity.indexes | `this.config.entities.<entityToken>.indexes`} key.
+   * @param omit - Array of index components to omit from the output value.
    *
-   * @returns Dehydrated index.
+   * @returns Dehydrated index value.
    *
-   * @throws `Error` if `entity` is invalid.
-   * @throws `Error` if `index` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
+   * @throws `Error` if `indexToken` is invalid.
    */
   dehydrateIndexItem<
     Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof M & string,
+    EntityToken extends keyof Exactify<M> & string,
   >(
     item: Partial<Item> | undefined,
     entityToken: EntityToken,
@@ -861,7 +859,7 @@ export class EntityManager<
       if (!item) return '';
 
       // Unwrap index elements.
-      const elements = this.unwrapIndex(indexToken, entityToken).filter(
+      const elements = this.unwrapIndex(entityToken, indexToken).filter(
         (element) => !omit.includes(element),
       );
 
@@ -888,28 +886,26 @@ export class EntityManager<
   }
 
   /**
-   * Convert a delimited string into a partial EntityItem representing the ungenerated component elements of a Config entity index.
+   * Convert a delimited string into a partial {@link EntityItem | `EntityItem`} object representing the ungenerated component elements of a Config entity index.
    *
    * @remarks
    * Reverses {@link EntityManager.dehydrateIndexItem | `dehydrateIndexItem`}.
    *
-   * {@link EntityManager.dehydrateIndexItem | `dehydrateIndexItem`} alphebetically sorts unwrapped index elements during
-   * the dehydration process. This method assumes delimited element values are
-   * presented in the same order.
+   * {@link EntityManager.dehydrateIndexItem | `dehydrateIndexItem`} alphebetically sorts unwrapped index elements during the dehydration process. This method assumes delimited element values are presented in the same order.
    *
-   * @param dehydrated - Dehydrated index.
-   * @param entity - Entity token.
-   * @param index - Entity index token.
-   * @param omit - Index components omitted from `dehydrated`.
+   * @param dehydrated - Dehydrated index value.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param indexToken - {@link ConfigEntity.indexes | `this.config.entities.<entityToken>.indexes`} key.
+   * @param omit - Array of index components omitted from `dehydrated`.
    *
-   * @returns Rehydrated index.
+   * @returns Partial {@link EntityItem | `EntityItem`} object containing rehydrated index component elements.
    *
-   * @throws `Error` if `entity` is invalid.
-   * @throws `Error` if `index` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
+   * @throws `Error` if `indexToken` is invalid.
    */
   rehydrateIndexItem<
     Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof M & string,
+    EntityToken extends keyof Exactify<M> & string,
   >(
     dehydrated: string,
     entityToken: EntityToken,
@@ -921,7 +917,7 @@ export class EntityManager<
       this.validateEntityIndexToken(entityToken, indexToken);
 
       // Unwrap index elements.
-      const elements = this.unwrapIndex(indexToken, entityToken).filter(
+      const elements = this.unwrapIndex(entityToken, indexToken).filter(
         (element) => !omit.includes(element),
       );
 
@@ -965,23 +961,24 @@ export class EntityManager<
   /**
    * Dehydrate a {@link PageKeyMap | `PageKeyMap`} object into an array of dehydrated page keys.
    *
-   * @param pageKeyMap - PageKeyMap object to dehydrate.
-   * @param entity - Entity token.
+   * Reverses {@link EntityManager.rehydratePageKeyMap | `rehydratePageKeyMap`}.
+   *
+   * @param pageKeyMap - {@link PageKeyMap | `PageKeyMap`} object to dehydrate.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
    *
    * @returns  Array of dehydrated page keys.
    *
-   * @throws `Error` if `entity` is invalid.
-   * @throws `Error` if any `pageKeyMap` index is invalid.
+   * @throws `Error` if `entityToken` is invalid.
+   * @throws `Error` if any `pageKeyMap` key is an invalid indexToken is invalid {@link ConfigEntity.indexes | `this.config.entities.<entityToken>.indexes`} key.
    *
    * @remarks
-   * In the returned array, an empty string member indicates the corresponding
-   * page key is `undefined`.
+   * In the returned array, an empty string member indicates the corresponding page key is `undefined`.
    *
    * An empty returned array indicates all page keys are `undefined`.
    */
   dehydratePageKeyMap<
     Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof M & string,
+    EntityToken extends keyof Exactify<M> & string,
   >(
     pageKeyMap: PageKeyMap<Item, IndexableTypes>,
     entityToken: EntityToken,
@@ -1068,16 +1065,15 @@ export class EntityManager<
   }
 
   /**
-   * Return an array of hashKey values covering the shard space bounded by
-   * `timestampFrom` & `timestampTo`.
+   * Return an array of {@link ConfigKeys.hashKey | `this.config.hashKey`} property values covering the shard space bounded by `timestampFrom` & `timestampTo`.
    *
-   * @param entity - Entity token.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
    * @param timestampFrom - Lower timestanp limit. Defaults to `0`.
    * @param timestampTo - Upper timestamp limit. Defaults to `Date.now()`.
    *
-   * @returns Array of hashKey values.
+   * @returns Array of {@link ConfigKeys.hashKey | `this.config.hashKey`} property values covering the indicated shard space.
    *
-   * @throws `Error` if `entity` is invalid.
+   * @throws `Error` if `entityToken` is invalid.
    */
   getHashKeySpace(
     entityToken: keyof M & string,
@@ -1134,22 +1130,24 @@ export class EntityManager<
   /**
    * Rehydrate an array of dehydrated page keys into a {@link PageKeyMap | `PageKeyMap`} object.
    *
+   * Reverses the {@link EntityManager.dehydratePageKeyMap | `dehydratePageKeyMap`} method.
+   *
    * @param dehydrated - Array of dehydrated page keys or undefined if new query.
-   * @param entity - Entity token.
-   * @param indexes - Array of `entity` index tokens.
-   * @param timestampFrom - Lower timestanp limit. Defaults to `0`.
-   * @param timestampTo - Upper timestamp limit. Defaults to `Date.now()`.
+   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param indexTokens - Array of {@link ConfigEntity.indexes | `this.config.entities.<entityToken>.indexes`} keys used as keys of the original {@link PageKeyMap | `PageKeyMap`}.
+   * @param timestampFrom - Lower timestanp limit used to generate the original {@link PageKeyMap | `PageKeyMap`}. Defaults to `0`.
+   * @param timestampTo - Upper timestamp limit used to generate the original {@link PageKeyMap | `PageKeyMap`}. Defaults to `Date.now()`.
    *
    * @returns Rehydrated {@link PageKeyMap | `PageKeyMap`} object.
    *
-   * @throws `Error` if `entity` is invalid.
-   * @throws `Error` if `indexes` is empty.
-   * @throws `Error` if any `indexes` are invalid.
+   * @throws `Error` if `entityToken` is invalid.
+   * @throws `Error` if `indexTokens` is empty.
+   * @throws `Error` if any `indexTokens` are invalid.
    * @throws `Error` if `dehydrated` has invalid length.
    */
   rehydratePageKeyMap<
     Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof M & string,
+    EntityToken extends keyof Exactify<M> & string,
   >(
     dehydrated: string[] | undefined,
     entityToken: EntityToken,
@@ -1233,34 +1231,26 @@ export class EntityManager<
   }
 
   /**
-   * Query an entity across shards in a provider-generic fashion.
+   * Query a database entity across shards in a provider-generic fashion.
    *
    * @remarks
-   * The provided {@link ShardQueryFunction | `ShardQueryFunction`} performs the actual query of individual
-   * data pages on individual shards. This function is presumed to express
-   * provider-specific query logic, including any necessary indexing or search
-   * constraints.
+   * The provided {@link ShardQueryFunction | `ShardQueryFunction`} performs the actual query of individual data pages on individual shards. This function is presumed to express provider-specific query logic, including any necessary indexing or search constraints.
    *
-   * Shards will generally not be in alignment with provided sort
-   * indexes. The resulting data set will therefore NOT be sorted despite any
-   * sort imposed by `shardQuery`, and will require an additional sort to
-   * present a sorted result to the end user.
+   * Individual shard query results will be combined, deduped by {@link ConfigEntity.uniqueProperty} property value, and sorted by {@link QueryOptions.sortOrder | `sortOrder`}.
    *
-   * As a result, returned data pages will also be somewhat unordered. Expect
-   * the leading and trailing edges of returned data pages to interleave
-   * somewhat with preceding & following pages.
+   * In queries on sharded data, expect the leading and trailing edges of returned data pages to interleave somewhat with preceding & following pages.
    *
    * Unsharded query results should sort & page as expected.
    *
-   * @param options - Query options.
+   * @param options - {@link QueryOptions | `QueryOptions`} object.
    *
-   * @returns Query results combined across shards.
+   * @returns {@link QueryResult} object.
    *
-   * @throws Error if `pageKeyMap` keys do not match `queryMap` keys.
+   * @throws Error if {@link QueryOptions.pageKeyMap | `pageKeyMap`} keys do not match {@link QueryOptions.queryMap | `queryMap`} keys.
    */
   async query<
     Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
-    EntityToken extends keyof M & string,
+    EntityToken extends keyof Exactify<M> & string,
   >({
     entityToken,
     hashKey,

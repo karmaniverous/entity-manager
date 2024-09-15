@@ -32,42 +32,56 @@ export type ExclusiveKey<
   ? K
   : never;
 
+/**
+ * Extracts a union of indexable property names from an Entity in an EntityMap.
+ *
+ * @typeParam EntityToken - The {@link Entity | `Entity`} token.
+ * @typeParam M - The {@link EntityMap | `EntityMap`}.
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed.
+ */
 export type IndexableProperties<
-  E extends Entity,
+  EntityToken extends keyof Exactify<M>,
+  M extends EntityMap,
   IndexableTypes extends TypeMap,
-> = PropertiesOfType<E, IndexableTypes[keyof Exactify<IndexableTypes>]>;
+> = PropertiesOfType<
+  M[EntityToken],
+  IndexableTypes[keyof Exactify<IndexableTypes>]
+>;
 
 /**
  * Returns the `generated` property of a Config entity.
  *
- * @typeParam E - The {@link Entity | `Entity`} type.
+ * @typeParam EntityToken - The {@link Entity | `Entity`} token.
+ * @typeParam M - The {@link EntityMap | `EntityMap`}.
  * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed.
  *
  * @remarks
  * All Entity properties of type `never` must be represented, and no extra properties are allowed.
  */
 export type ConfigEntityGenerated<
-  E extends Entity,
+  EntityToken extends keyof Exactify<M>,
+  M extends EntityMap,
   IndexableTypes extends TypeMap,
 > =
-  | ([PropertiesOfType<E, never>] extends [never]
+  | ([PropertiesOfType<M[EntityToken], never>] extends [never]
       ? never
       : Record<
-          PropertiesOfType<E, never>,
+          PropertiesOfType<M[EntityToken], never>,
           {
             atomic?: boolean;
-            elements: IndexableProperties<E, IndexableTypes>[];
+            elements: IndexableProperties<EntityToken, M, IndexableTypes>[];
             sharded?: boolean;
           }
         >)
-  | ([PropertiesOfType<E, never>] extends [never]
+  | ([PropertiesOfType<M[EntityToken], never>] extends [never]
       ? Record<string, never>
       : never);
 
 /**
  * Returns the `types` property of a Config entity.
  *
- * @typeParam E - The {@link Entity | `Entity`} type.
+ * @typeParam EntityToken - The {@link Entity | `Entity`} token.
+ * @typeParam M - The {@link EntityMap | `EntityMap`}.
  * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed..
  *
  * @remarks
@@ -76,13 +90,17 @@ export type ConfigEntityGenerated<
  * All Entity properties of types `string`, `number`, `boolean`, or `bigint` must be represented, and no extra properties are allowed.
  */
 export type ConfigEntityTypes<
-  E extends Entity,
+  EntityToken extends keyof Exactify<M>,
+  M extends EntityMap,
   IndexableTypes extends TypeMap,
 > =
-  | ([IndexableProperties<E, IndexableTypes>] extends [never]
+  | ([IndexableProperties<EntityToken, M, IndexableTypes>] extends [never]
       ? never
-      : Record<IndexableProperties<E, IndexableTypes>, keyof IndexableTypes>)
-  | ([IndexableProperties<E, IndexableTypes>] extends [never]
+      : Record<
+          IndexableProperties<EntityToken, M, IndexableTypes>,
+          keyof IndexableTypes
+        >)
+  | ([IndexableProperties<EntityToken, M, IndexableTypes>] extends [never]
       ? Record<string, never>
       : never);
 
@@ -116,16 +134,18 @@ export interface ShardBump {
 /**
  * Returns a Config entity type.
  *
- * @typeParam E - The {@link Entity | `Entity`} type.
+ * @typeParam EntityToken - The {@link Entity | `Entity`} token.
+ * @typeParam M - The {@link EntityMap | `EntityMap`}.
  * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property.
  * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property.
- * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntity.generated | generated property}. 
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntityGenerated | generated property}. 
 
  * @remarks
  * `generated` is optional if `E` has no properties of type `never`.
  */
-type ConfigEntity<
-  E extends Entity,
+export type ConfigEntity<
+  EntityToken extends keyof Exactify<M>,
+  M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
   IndexableTypes extends TypeMap,
@@ -159,13 +179,13 @@ type ConfigEntity<
    *
    * Each key is the name of an index, and each value is a non-empty array of {@link Entity | `Entity`} property names that define the index.
    *
-   * Related property types must be align with the {@link Config | `Config`} `IndexableTypes` type parameter. Note tha all {@link ConfigEntity.generated | generated property} types are indexable by definition.
+   * Related property types must be align with the {@link Config | `Config`} `IndexableTypes` type parameter. Note tha all {@link ConfigEntityGenerated | generated property} types are indexable by definition.
    */
   indexes?: Record<
     string,
     (
-      | IndexableProperties<E, IndexableTypes>
-      | PropertiesOfType<E, never>
+      | IndexableProperties<EntityToken, M, IndexableTypes>
+      | PropertiesOfType<M[EntityToken], never>
       | HashKey
       | RangeKey
     )[]
@@ -197,7 +217,7 @@ type ConfigEntity<
    *
    * Once in production, this configuration property should not be changed or data integrity will be compromised!
    */
-  timestampProperty: PropertiesOfType<E, number>;
+  timestampProperty: PropertiesOfType<M[EntityToken], number>;
 
   /**
    * Identifies the {@link Entity | `Entity`} used as the basis for both shard key calculations and the table's {@link ConfigKeys.rangeKey | range key}.
@@ -206,10 +226,10 @@ type ConfigEntity<
    *
    * Once in production, this configuration property should not be changed or data integrity will be compromised!
    */
-  uniqueProperty: PropertiesOfType<E, number | string>;
-} & ([PropertiesOfType<E, never>] extends [never]
+  uniqueProperty: PropertiesOfType<M[EntityToken], number | string>;
+} & ([PropertiesOfType<M[EntityToken], never>] extends [never]
   ? {
-      generated?: ConfigEntityGenerated<E, IndexableTypes>;
+      generated?: ConfigEntityGenerated<EntityToken, M, IndexableTypes>;
     }
   : {
       /**
@@ -219,15 +239,15 @@ type ConfigEntity<
        *
        * All such properties must be accounted for in the `generated` object, and no additional properties are permitted..
        */
-      generated: ConfigEntityGenerated<E, IndexableTypes>;
+      generated: ConfigEntityGenerated<EntityToken, M, IndexableTypes>;
     }) &
-  ([IndexableProperties<E, IndexableTypes>] extends [never]
-    ? { types?: ConfigEntityTypes<E, IndexableTypes> }
+  ([IndexableProperties<EntityToken, M, IndexableTypes>] extends [never]
+    ? { types?: ConfigEntityTypes<EntityToken, M, IndexableTypes> }
     : {
         /**
          * This object defines that types of {@link Entity | `Entity`} indexable properties in a way that is accessible at runtime. It is used to rehydrate PageKeyMap objects from highly compressed, URL-safe string values.
          *
-         * The keys of this object must exactly match the indexable properties of the {@link Entity | `Entity`}. Note that all {@link ConfigEntity.generated | generated properties} are indexable by definition and need not be included.
+         * The keys of this object must exactly match the indexable properties of the {@link Entity | `Entity`}. Note that all {@link ConfigEntityGenerated | generated properties} are indexable by definition and need not be included.
          *
          * The values of this object must be one of the keys of the {@link Config | `Config`} `IndexableTypes` type parameter, and should match the associted property type.
          *
@@ -265,7 +285,7 @@ type ConfigEntity<
          * };
          * ```
          */
-        types: ConfigEntityTypes<E, IndexableTypes>;
+        types: ConfigEntityTypes<EntityToken, M, IndexableTypes>;
       });
 
 /**
@@ -274,7 +294,7 @@ type ConfigEntity<
  * @typeParam M - The {@link EntityMap | `EntityMap`} type that identitfies the {@link Entity | `Entity`} & related property types to be managed by EntityManager.
  * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property.
  * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property.
- * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntity.generated | generated property}.
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntityGenerated | generated property}.
  *
  * @remarks
  * All properties of `M` must be represented, and no extra properties are allowed.
@@ -289,7 +309,8 @@ export type ConfigEntities<
       ? never
       : {
           [E in keyof Exactify<M>]: ConfigEntity<
-            M[E],
+            E,
+            M,
             HashKey,
             RangeKey,
             IndexableTypes
@@ -303,9 +324,9 @@ export type ConfigEntities<
  * @typeParam M - The {@link EntityMap | `EntityMap`} type that identitfies the {@link Entity | `Entity`} & related property types to be managed by EntityManager.
  * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property.
  * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property.
- * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntity.generated | generated property}. 
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntityGenerated | generated property}. 
  */
-interface ConfigKeys<
+export interface ConfigKeys<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
@@ -343,7 +364,7 @@ interface ConfigKeys<
  * @typeParam M - The {@link EntityMap | `EntityMap`} type that identitfies the {@link Entity | `Entity`} & related property types to be managed by EntityManager.
  * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property. Defaults to `'hashKey'`.
  * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property. Defaults to `'rangeKey'`.
- * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntity.generated | generated property}. Defaults to {@link StringifiableTypes | `StringifiableTypes`}.
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntityGenerated | generated property}. Defaults to {@link StringifiableTypes | `StringifiableTypes`}.
  *
  * @remarks
  * `entities` is optional if `M` is empty.
@@ -397,18 +418,25 @@ export type Config<
 export type Unwrap<T> = { [P in keyof T]: T[P] };
 
 /**
- * Extracts an {@link Entity | `Entity`} item type decorated with {@link ConfigKeys.hashKey | hashKey}, {@link ConfigKeys.shardKey | shardKey}, and {@link ConfigEntity.generated | generated properties}.
+ * Extracts an {@link Entity | `Entity`} item type decorated with {@link ConfigKeys.hashKey | hashKey}, {@link ConfigKeys.rangeKey | rangeKey}, and {@link ConfigEntityGenerated | generated properties}.
+ *
+ * @typeParam EntityToken - The key of the {@link Entity | `Entity`} in `M`.
+ * @typeParam M - The {@link EntityMap | `EntityMap`} type that identitfies the {@link Entity | `Entity`} & related property types to be managed by EntityManager.
+ * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property. Defaults to `'hashKey'`.
+ * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property. Defaults to `'rangeKey'`.
  */
 export type EntityItem<
-  E extends keyof M & string,
+  EntityToken extends keyof Exactify<M>,
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
 > = Unwrap<
   {
-    [P in keyof Exactify<M[E]>]: [NonNullable<M[E][P]>] extends [never]
+    [P in keyof Exactify<M[EntityToken]>]: [
+      NonNullable<M[EntityToken][P]>,
+    ] extends [never]
       ? string
-      : M[E][P];
+      : M[EntityToken][P];
   } & {
     [P in HashKey | RangeKey]?: string;
   }
