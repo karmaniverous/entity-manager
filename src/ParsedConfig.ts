@@ -155,6 +155,7 @@ export const configSchema = z
     shardKeyDelimiter: z.string().regex(/\W+/).optional().default('!'),
     hashKey: z.string().optional().default('hashKey'),
     rangeKey: z.string().optional().default('rangeKey'),
+    throttle: z.number().int().positive().safe().optional().default(10),
   })
   .superRefine((data, ctx) => {
     // validate no generated key delimiter collision

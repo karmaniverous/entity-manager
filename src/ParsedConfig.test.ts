@@ -18,6 +18,7 @@ describe('Config', function () {
       hashKey: 'hashKey',
       shardKeyDelimiter: '!',
       rangeKey: 'rangeKey',
+      throttle: 10,
     });
   });
 

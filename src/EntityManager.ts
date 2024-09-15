@@ -76,19 +76,6 @@ export type PageKeyMap<
 >;
 
 /**
- * EntityManager constructor options.
- *
- * @category Options
- */
-export interface EntityManagerOptions {
-  /**
-   * Default maximum number of shards to query in parallel.
-   *
-   * @defaultValue `10`
-   */
-  throttle?: number;
-}
-/**
  * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
  *
  * @category Query
@@ -311,19 +298,14 @@ export class EntityManager<
   IndexableTypes extends TypeMap,
 > {
   #config: ParsedConfig;
-  #throttle: number;
 
   /**
    * Create an EntityManager instance.
    *
    * @param options - EntityManager options.
    */
-  constructor(
-    config: Config<M, HashKey, RangeKey, IndexableTypes>,
-    { throttle = 10 }: EntityManagerOptions = {},
-  ) {
+  constructor(config: Config<M, HashKey, RangeKey, IndexableTypes>) {
     this.#config = configSchema.parse(config);
-    this.#throttle = throttle;
   }
 
   /**
@@ -1268,7 +1250,7 @@ export class EntityManager<
     sortOrder = [],
     timestampFrom = 0,
     timestampTo = Date.now(),
-    throttle = this.#throttle,
+    throttle = this.config.throttle,
   }: QueryOptions<Item, Entity, M, HashKey, RangeKey, IndexableTypes>): Promise<
     QueryResult<Item, Entity, M, HashKey, RangeKey>
   > {

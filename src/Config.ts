@@ -193,6 +193,7 @@ export type Config<
   generatedKeyDelimiter?: string;
   generatedValueDelimiter?: string;
   shardKeyDelimiter?: string;
+  throttle?: number;
 };
 
 /**
