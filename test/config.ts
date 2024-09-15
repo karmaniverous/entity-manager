@@ -49,8 +49,8 @@ export const config: Config<MyEntityMap> = {
         },
       },
       shardBumps: [
-        { timestamp: now + day, nibbleBits: 2, nibbles: 1 },
-        { timestamp: now + day * 2, nibbleBits: 2, nibbles: 2 },
+        { timestamp: now + day, charBits: 2, chars: 1 },
+        { timestamp: now + day * 2, charBits: 2, chars: 2 },
       ],
       timestampProperty: 'created',
       types: {

@@ -49,19 +49,16 @@ const str2indexable = <IndexableTypes extends TypeMap>(
 };
 
 /**
- * A two-layer map of page keys, used to query the next page of data for a
- * given index on each shard of a given hash key.
+ * A two-layer map of page keys, used to query the next page of data across a set of indexes and on each shard of a given hash key.
  *
- * The keys of the outer object are the keys of the QueryMap object passed to
- * the `query` method. Each should correspond to an index for the given entity.
- * This index contains the range key of an individual query.
+ * The keys of the outer object are the keys of the {@link QueryMap | `QueryMap`} object passed with the {@link EntityManager.query | `query`} method {@link QueryOptions.queryMap | options}. Each should correspond to a {@link ConfigEntity.indexes | `Config` entity index} for the given {@link Entity | `Entity`}.
  *
- * The keys of the inner object are the hashKey value passed to each
- * ShardQueryFunction. This is the hash key of an individual query.
+ * The keys of the inner object are the shard space for `hashKey` as constrained by the {@link QueryOptions | query options} timestamps.
  *
- * The values are the `pageKey` returned by the previous query on the related
- * index & shard. An `undefined` value indicates that there are no more pages to
- * query for that index & shard.
+ * The values of the inner object are the page key objects returned by the previous database query on the related index & shard. An `undefined` value indicates that there are no more pages to query for that index & shard.
+ *
+ * @typeParam Item - The item type being queried. This will geerally be an {@link EntityItem | `EntityItem`} object.
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed.
  */
 export type PageKeyMap<
   Item extends Record<string, unknown>,
@@ -70,7 +67,9 @@ export type PageKeyMap<
   string,
   Record<
     string,
-    | Pick<Item, PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>>
+    | Partial<
+        Pick<Item, PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>>
+      >
     | undefined
   >
 >;
@@ -78,11 +77,14 @@ export type PageKeyMap<
 /**
  * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
  *
- * @category Query
+ * @typeParam Item - The {@link EntityItem | `EntityItem`} type being queried. 
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed.
+
+* @category Query
  */
 export interface ShardQueryResult<
-  Item extends EntityItem<Entity, M, HashKey, RangeKey>,
-  Entity extends keyof M & string,
+  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  EntityToken extends keyof M & string,
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
@@ -95,9 +97,8 @@ export interface ShardQueryResult<
   items: Item[];
 
   /** The page key for the next query on this shard. */
-  pageKey?: Pick<
-    Item,
-    PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>
+  pageKey?: Partial<
+    Pick<Item, PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>>
   >;
 }
 
@@ -115,21 +116,20 @@ export interface ShardQueryResult<
  * @category Query
  */
 export type ShardQueryFunction<
-  Item extends EntityItem<Entity, M, HashKey, RangeKey>,
-  Entity extends keyof M & string,
+  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  EntityToken extends keyof M & string,
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
   IndexableTypes extends TypeMap = StringifiableTypes,
 > = (
   hashKey: string,
-  pageKey?: Pick<
-    Item,
-    PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>
+  pageKey?: Partial<
+    Pick<Item, PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>>
   >,
   pageSize?: number,
 ) => Promise<
-  ShardQueryResult<Item, Entity, M, HashKey, RangeKey, IndexableTypes>
+  ShardQueryResult<Item, EntityToken, M, HashKey, RangeKey, IndexableTypes>
 >;
 
 /**
@@ -138,15 +138,15 @@ export type ShardQueryFunction<
  * @category Query
  */
 export interface QueryOptions<
-  Item extends EntityItem<Entity, M, HashKey, RangeKey>,
-  Entity extends keyof M & string,
+  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  EntityToken extends keyof M & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
   IndexableTypes extends TypeMap,
 > {
   /** Identifies the entity to be queried. Key of {@link Config | `EntityManager.config.entities`}. */
-  entity: Entity;
+  entityToken: EntityToken;
 
   /**
    * Identifies the entity key across which the query will be sharded. Key of
@@ -198,7 +198,7 @@ export interface QueryOptions<
    */
   queryMap: Record<
     string,
-    ShardQueryFunction<Item, Entity, M, HashKey, RangeKey, IndexableTypes>
+    ShardQueryFunction<Item, EntityToken, M, HashKey, RangeKey, IndexableTypes>
   >;
 
   /**
@@ -229,9 +229,9 @@ export interface QueryOptions<
   timestampTo?: number;
 
   /**
-   * The maximum number of shards to query in parallel. Overrides constructor `throttle`.
+   * The maximum number of shards to query in parallel. Overrides options `throttle`.
    *
-   * @defaultValue `this.throttle`
+   * @defaultValue `options.throttle`
    */
   throttle?: number;
 }
@@ -243,8 +243,8 @@ export interface QueryOptions<
  * @category Query
  */
 export interface QueryResult<
-  Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  Entity extends keyof M & string,
+  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  EntityToken extends keyof M & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
@@ -268,8 +268,8 @@ export interface QueryResult<
  * @category Query
  */
 export interface WorkingQueryResult<
-  Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-  Entity extends keyof M & string,
+  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  EntityToken extends keyof M & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
@@ -315,9 +315,10 @@ export class EntityManager<
    *
    * @throws `Error` if `entity` is invalid.
    */
-  private validateEntity(entity: string): void {
+  private validateEntityToken(entityToken: string): void {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!this.config.entities[entity]) throw new Error('unknown entity');
+    if (!this.config.entities[entityToken])
+      throw new Error('invalid entity token');
   }
 
   /**
@@ -329,12 +330,15 @@ export class EntityManager<
    * @throws `Error` if `entity` is invalid.
    * @throws `Error` if `index` is invalid.
    */
-  private validateEntityIndex(entity: string, index: string): void {
-    this.validateEntity(entity);
+  private validateEntityIndexToken(
+    entityToken: string,
+    indexToke: string,
+  ): void {
+    this.validateEntityToken(entityToken);
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!this.config.entities[entity].indexes[index])
-      throw new Error('unknown entity index');
+    if (!this.config.entities[entityToken].indexes[indexToke])
+      throw new Error('invalid entity index token');
   }
 
   /**
@@ -351,17 +355,17 @@ export class EntityManager<
    * @throws `Error` if `sharded` is specified & does not match `property`
    * sharding.
    */
-  private validateEntityGenerated(
-    entity: string,
+  private validateEntityGeneratedProperty(
+    entityToken: string,
     property: string,
     sharded?: boolean,
   ): void {
-    this.validateEntity(entity);
+    this.validateEntityToken(entityToken);
 
-    const generated = this.config.entities[entity].generated[property];
+    const generated = this.config.entities[entityToken].generated[property];
 
     if (!generated && property !== this.config.hashKey)
-      throw new Error('unknown generated property');
+      throw new Error('invalid entity generated property');
 
     if (
       sharded !== undefined &&
@@ -401,11 +405,11 @@ export class EntityManager<
    *
    * @throws `Error` if `entity` is invalid.
    */
-  getShardBump(entity: keyof EntityMap, timestamp: number): ShardBump {
+  getShardBump(entityToken: keyof M & string, timestamp: number): ShardBump {
     // Validate params.
-    this.validateEntity(entity);
+    this.validateEntityToken(entityToken);
 
-    return [...this.config.entities[entity].shardBumps]
+    return [...this.config.entities[entityToken].shardBumps]
       .reverse()
       .find((bump) => bump.timestamp <= timestamp)!;
   }
@@ -424,19 +428,19 @@ export class EntityManager<
    *
    */
   encodeGeneratedProperty<
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-    Entity extends keyof EntityMap,
+    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    EntityToken extends keyof M & string,
   >(
-    item: Item,
-    entity: Entity,
-    property: keyof EntityMap[Entity],
+    item: Partial<Item>,
+    entityToken: EntityToken,
+    property: keyof M[EntityToken] & string,
   ): string | undefined {
     try {
       // Validate params.
-      this.validateEntityGenerated(entity, property);
+      this.validateEntityGeneratedProperty(entityToken, property);
 
       const { atomic, elements, sharded } =
-        this.config.entities[entity].generated[property]!;
+        this.config.entities[entityToken].generated[property]!;
 
       // Map elements to [element, value] pairs.
       const elementMap = elements.map((element) => [
@@ -459,7 +463,7 @@ export class EntityManager<
 
       console.debug('encoded generated property', {
         item,
-        entity,
+        entityToken,
         property,
         encoded,
       });
@@ -467,7 +471,7 @@ export class EntityManager<
       return encoded;
     } catch (error) {
       if (error instanceof Error)
-        console.error(error.message, { item, entity, property });
+        console.error(error.message, { item, entityToken, property });
 
       throw error;
     }
@@ -484,12 +488,12 @@ export class EntityManager<
    * @throws `Error` if `entity` is invalid.
    */
   decodeGeneratedProperty<
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-    Entity extends keyof EntityMap,
-  >(encoded: string, entity: Entity): Partial<Item> {
+    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    EntityToken extends keyof M & string,
+  >(encoded: string, entityToken: EntityToken): Partial<Item> {
     try {
       // Validate params.
-      this.validateEntity(entity);
+      this.validateEntityToken(entityToken);
 
       // Handle degenerate case.
       if (!encoded) return {};
@@ -520,7 +524,7 @@ export class EntityManager<
           ([key]) => key,
           ([key, value]) =>
             str2indexable<IndexableTypes>(
-              this.config.entities[entity].types[key],
+              this.config.entities[entityToken].types[key],
               value,
             ),
         ),
@@ -528,14 +532,14 @@ export class EntityManager<
 
       console.debug('decoded generated property', {
         encoded,
-        entity,
+        entityToken,
         decoded,
       });
 
       return decoded as Partial<Item>;
     } catch (error) {
       if (error instanceof Error)
-        console.error(error.message, { encoded, entity });
+        console.error(error.message, { encoded, entityToken });
 
       throw error;
     }
@@ -553,18 +557,18 @@ export class EntityManager<
    * @throws `Error` if `entity` is invalid.
    */
   updateItemHashKey<
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-    Entity extends keyof EntityMap,
-  >(item: Item, entity: Entity, overwrite = false): Item {
+    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    EntityToken extends keyof M & string,
+  >(item: Item, entityToken: EntityToken, overwrite = false): Item {
     try {
       // Validate params.
-      this.validateEntity(entity);
+      this.validateEntityToken(entityToken);
 
       // Return current item if hashKey exists and overwrite is false.
       if (item[this.config.hashKey as keyof Item] && !overwrite) {
         console.debug('did not overwrite existing entity item hash key', {
           item,
-          entity,
+          entityToken,
           overwrite,
         });
 
@@ -573,35 +577,35 @@ export class EntityManager<
 
       // Get item timestamp property & validate.
       const timestamp: number = item[
-        this.config.entities[entity].timestampProperty as keyof Item
+        this.config.entities[entityToken].timestampProperty as keyof Item
       ] as unknown as number;
 
       if (isNil(timestamp)) throw new Error(`missing item timestamp property`);
 
       // Find first entity sharding bump before timestamp.
-      const { nibbleBits, nibbles } = this.getShardBump(entity, timestamp);
+      const { charBits, chars } = this.getShardBump(entityToken, timestamp);
 
-      let hashKey = `${entity}${this.config.shardKeyDelimiter}`;
+      let hashKey = `${entityToken}${this.config.shardKeyDelimiter}`;
 
-      if (nibbles) {
+      if (chars) {
         // Radix is the numerical base of the shardKey.
-        const radix = 2 ** nibbleBits;
+        const radix = 2 ** charBits;
 
         // Get item unique property & validate.
         const uniqueId =
-          item[this.config.entities[entity].uniqueProperty as keyof Item];
+          item[this.config.entities[entityToken].uniqueProperty as keyof Item];
 
         if (isNil(uniqueId)) throw new Error(`missing item unique property`);
 
-        hashKey += (stringHash(uniqueId.toString()) % (nibbles * radix))
+        hashKey += (stringHash(uniqueId.toString()) % (chars * radix))
           .toString(radix)
-          .padStart(nibbles, '0');
+          .padStart(chars, '0');
       }
 
       Object.assign(item, { [this.config.hashKey]: hashKey });
 
       console.debug('updated entity item hash key', {
-        entity,
+        entityToken,
         overwrite,
         item,
       });
@@ -609,7 +613,7 @@ export class EntityManager<
       return item;
     } catch (error) {
       if (error instanceof Error)
-        console.error(error.message, { item, entity, overwrite });
+        console.error(error.message, { item, entityToken, overwrite });
 
       throw error;
     }
@@ -628,18 +632,22 @@ export class EntityManager<
    * @throws `Error` if `item` unique property is missing.
    */
   updateItemRangeKey<
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-    Entity extends keyof EntityMap,
-  >(item: Item, entity: Entity, overwrite = false): Item {
+    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    EntityToken extends keyof M & string,
+  >(
+    item: Partial<Item>,
+    entityToken: EntityToken,
+    overwrite = false,
+  ): Partial<Item> {
     try {
       // Validate params.
-      this.validateEntity(entity);
+      this.validateEntityToken(entityToken);
 
       // Return current item if rangeKey exists and overwrite is false.
       if (item[this.config.rangeKey as keyof Item] && !overwrite) {
         console.debug('did not overwrite existing entity item range key', {
           item,
-          entity,
+          entityToken,
           overwrite,
         });
 
@@ -648,7 +656,7 @@ export class EntityManager<
 
       // Get item unique property & validate.
       const uniqueProperty =
-        item[this.config.entities[entity].uniqueProperty as keyof Item];
+        item[this.config.entities[entityToken].uniqueProperty as keyof Item];
 
       if (isNil(uniqueProperty))
         throw new Error(`missing item unique property`);
@@ -656,13 +664,13 @@ export class EntityManager<
       // Update range key.
       Object.assign(item, {
         [this.config.rangeKey]: [
-          this.config.entities[entity].uniqueProperty,
+          this.config.entities[entityToken].uniqueProperty,
           uniqueProperty,
         ].join(this.config.generatedValueDelimiter),
       });
 
       console.debug('updated entity item range key', {
-        entity,
+        entityToken,
         overwrite,
         item,
       });
@@ -670,7 +678,7 @@ export class EntityManager<
       return item;
     } catch (error) {
       if (error instanceof Error)
-        console.error(error.message, { item, entity, overwrite });
+        console.error(error.message, { item, entityToken, overwrite });
 
       throw error;
     }
@@ -688,23 +696,27 @@ export class EntityManager<
    * @throws `Error` if `entity` is invalid.
    */
   updateItemGeneratedProperties<
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-    Entity extends keyof EntityMap,
-  >(item: Item, entity: Entity, overwrite = false): Item {
+    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    EntityToken extends keyof M & string,
+  >(item: Item, entityToken: EntityToken, overwrite = false): Item {
     try {
       // Validate params.
-      this.validateEntity(entity);
+      this.validateEntityToken(entityToken);
 
       // Update hash key.
-      this.updateItemHashKey(item, entity, overwrite);
+      this.updateItemHashKey(item, entityToken, overwrite);
 
       // Update range key.
-      this.updateItemRangeKey(item, entity, overwrite);
+      this.updateItemRangeKey(item, entityToken, overwrite);
 
       // Update generated properties.
-      for (const property in this.config.entities[entity].generated) {
+      for (const property in this.config.entities[entityToken].generated) {
         if (overwrite || isNil(item[property as keyof Item])) {
-          const encoded = this.encodeGeneratedProperty(item, entity, property);
+          const encoded = this.encodeGeneratedProperty(
+            item,
+            entityToken,
+            property,
+          );
 
           if (encoded) Object.assign(item, { [property]: encoded });
           else delete item[property as keyof Item];
@@ -712,7 +724,7 @@ export class EntityManager<
       }
 
       console.debug('updated entity item generated properties', {
-        entity,
+        entityToken,
         overwrite,
         item,
       });
@@ -720,7 +732,7 @@ export class EntityManager<
       return item;
     } catch (error) {
       if (error instanceof Error)
-        console.error(error.message, { entity, overwrite, item });
+        console.error(error.message, { entityToken, overwrite, item });
 
       throw error;
     }
@@ -737,30 +749,30 @@ export class EntityManager<
    * @throws `Error` if `entity` is invalid.
    */
   stripItemGeneratedProperties<
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-    Entity extends keyof EntityMap,
-  >(item: Item, entity: Entity): Item {
+    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    EntityToken extends keyof M & string,
+  >(item: Item, entityToken: EntityToken): Item {
     try {
       // Validate params.
-      this.validateEntity(entity);
+      this.validateEntityToken(entityToken);
 
       // Delete hash & range keys.
       delete item[this.config.hashKey as keyof Item];
       delete item[this.config.rangeKey as keyof Item];
 
       // Delete generated properties.
-      for (const property in this.config.entities[entity].generated)
+      for (const property in this.config.entities[entityToken].generated)
         delete item[property as keyof Item];
 
       console.debug('stripped entity item generated properties', {
-        entity,
+        entityToken,
         item,
       });
 
       return item;
     } catch (error) {
       if (error instanceof Error)
-        console.error(error.message, { item, entity });
+        console.error(error.message, { item, entityToken });
 
       throw error;
     }
@@ -777,20 +789,23 @@ export class EntityManager<
    * @throws `Error` if `entity` is invalid.
    * @throws `Error` if `index` is invalid.
    */
-  unwrapIndex<Entity extends keyof EntityMap>(index: string, entity: Entity) {
+  unwrapIndex<EntityToken extends keyof M & string>(
+    index: string,
+    entityToken: EntityToken,
+  ) {
     try {
       // Validate params.
-      this.validateEntityIndex(entity, index);
+      this.validateEntityIndexToken(entityToken, index);
 
-      const generated = this.config.entities[entity].generated;
+      const generated = this.config.entities[entityToken].generated;
       const generatedKeys = Object.keys(shake(generated));
 
-      return this.config.entities[entity].indexes[index]
+      return this.config.entities[entityToken].indexes[index]
         .map((component) =>
           component === this.config.hashKey
             ? this.config.hashKey
             : component === this.config.rangeKey
-              ? this.config.entities[entity].uniqueProperty
+              ? this.config.entities[entityToken].uniqueProperty
               : generatedKeys.includes(component)
                 ? generated[component]!.elements
                 : component,
@@ -799,7 +814,7 @@ export class EntityManager<
         .sort();
     } catch (error) {
       if (error instanceof Error)
-        console.error(error.message, { index, entity });
+        console.error(error.message, { index, entityToken });
 
       throw error;
     }
@@ -830,23 +845,23 @@ export class EntityManager<
    * @throws `Error` if `index` is invalid.
    */
   dehydrateIndexItem<
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-    Entity extends keyof EntityMap,
+    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    EntityToken extends keyof M & string,
   >(
     item: Partial<Item> | undefined,
-    entity: Entity,
-    index: string,
+    entityToken: EntityToken,
+    indexToken: string,
     omit: string[] = [],
   ): string {
     try {
       // Validate params.
-      this.validateEntityIndex(entity, index);
+      this.validateEntityIndexToken(entityToken, indexToken);
 
       // Handle degenerate case.
       if (!item) return '';
 
       // Unwrap index elements.
-      const elements = this.unwrapIndex(index, entity).filter(
+      const elements = this.unwrapIndex(indexToken, entityToken).filter(
         (element) => !omit.includes(element),
       );
 
@@ -857,8 +872,8 @@ export class EntityManager<
 
       console.debug('dehydrated index', {
         item,
-        entity,
-        index,
+        entityToken,
+        indexToken,
         elements,
         dehydrated,
       });
@@ -866,7 +881,7 @@ export class EntityManager<
       return dehydrated;
     } catch (error) {
       if (error instanceof Error)
-        console.error(error.message, { item, entity, index });
+        console.error(error.message, { item, entityToken, indexToken });
 
       throw error;
     }
@@ -893,20 +908,20 @@ export class EntityManager<
    * @throws `Error` if `index` is invalid.
    */
   rehydrateIndexItem<
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-    Entity extends keyof EntityMap,
+    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    EntityToken extends keyof M & string,
   >(
     dehydrated: string,
-    entity: Entity,
-    index: string,
+    entityToken: EntityToken,
+    indexToken: string,
     omit: string[] = [],
   ): Partial<Item> {
     try {
       // Validate params.
-      this.validateEntityIndex(entity, index);
+      this.validateEntityIndexToken(entityToken, indexToken);
 
       // Unwrap index elements.
-      const elements = this.unwrapIndex(index, entity).filter(
+      const elements = this.unwrapIndex(indexToken, entityToken).filter(
         (element) => !omit.includes(element),
       );
 
@@ -922,7 +937,7 @@ export class EntityManager<
           elements,
           values.map((value, i) =>
             str2indexable<IndexableTypes>(
-              this.config.entities[entity].types[elements[i]],
+              this.config.entities[entityToken].types[elements[i]],
               value,
             ),
           ),
@@ -931,8 +946,8 @@ export class EntityManager<
 
       console.debug('rehydrated index', {
         dehydrated,
-        entity,
-        index,
+        entityToken,
+        indexToken,
         elements,
         values,
         rehydrated,
@@ -941,7 +956,7 @@ export class EntityManager<
       return rehydrated;
     } catch (error) {
       if (error instanceof Error)
-        console.error(error.message, { dehydrated, entity, index });
+        console.error(error.message, { dehydrated, entityToken, indexToken });
 
       throw error;
     }
@@ -965,12 +980,15 @@ export class EntityManager<
    * An empty returned array indicates all page keys are `undefined`.
    */
   dehydratePageKeyMap<
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-    Entity extends keyof EntityMap,
-  >(pageKeyMap: PageKeyMap<Item>, entity: Entity): string[] {
+    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    EntityToken extends keyof M & string,
+  >(
+    pageKeyMap: PageKeyMap<Item, IndexableTypes>,
+    entityToken: EntityToken,
+  ): string[] {
     try {
       // Validate params.
-      this.validateEntity(entity);
+      this.validateEntityToken(entityToken);
 
       // Shortcut empty pageKeyMap.
       if (!Object.keys(pageKeyMap).length) {
@@ -978,7 +996,7 @@ export class EntityManager<
 
         console.debug('dehydrated empty page key map', {
           pageKeyMap,
-          entity,
+          entityToken,
           dehydrated,
         });
 
@@ -987,7 +1005,7 @@ export class EntityManager<
 
       // Extract, sort & validate indexs.
       const indexes = Object.keys(pageKeyMap).sort();
-      indexes.map((index) => this.validateEntityIndex(entity, index));
+      indexes.map((index) => this.validateEntityIndexToken(entityToken, index));
 
       // Extract & sort hash keys.
       const hashKeys = Object.keys(pageKeyMap[indexes[0]]);
@@ -1005,15 +1023,15 @@ export class EntityManager<
 
           // Compose item from page key
           const item = Object.entries(pageKeyMap[index][hashKey]).reduce<
-            Partial<EntityItem<Entity, M, HashKey, RangeKey>>
+            Partial<EntityItem<EntityToken, M, HashKey, RangeKey>>
           >((item, [property, value]) => {
             if (
-              property in this.config.entities[entity].generated ||
+              property in this.config.entities[entityToken].generated ||
               property === this.config.rangeKey
             )
               Object.assign(
                 item,
-                this.decodeGeneratedProperty(value as string, entity),
+                this.decodeGeneratedProperty(value as string, entityToken),
               );
             else Object.assign(item, { [property]: value });
 
@@ -1022,7 +1040,9 @@ export class EntityManager<
 
           // Dehydrate index from item.
           dehydrated.push(
-            this.dehydrateIndexItem(item, entity, index, [this.config.hashKey]),
+            this.dehydrateIndexItem(item, entityToken, index, [
+              this.config.hashKey,
+            ]),
           );
         }
       }
@@ -1032,7 +1052,7 @@ export class EntityManager<
 
       console.debug('dehydrated page key map', {
         pageKeyMap,
-        entity,
+        entityToken,
         indexes,
         hashKeys,
         dehydrated,
@@ -1041,7 +1061,7 @@ export class EntityManager<
       return dehydrated;
     } catch (error) {
       if (error instanceof Error)
-        console.error(error.message, { entity, pageKeyMap });
+        console.error(error.message, { entityToken, pageKeyMap });
 
       throw error;
     }
@@ -1059,16 +1079,16 @@ export class EntityManager<
    *
    * @throws `Error` if `entity` is invalid.
    */
-  getHashKeySpace<Entity extends keyof EntityMap>(
-    entity: Entity,
+  getHashKeySpace(
+    entityToken: keyof M & string,
     timestampFrom = 0,
     timestampTo = Date.now(),
   ): string[] {
     try {
       // Validate params.
-      this.validateEntity(entity);
+      this.validateEntityToken(entityToken);
 
-      const { shardBumps } = this.config.entities[entity];
+      const { shardBumps } = this.config.entities[entityToken];
 
       const hashKeySpace = shardBumps
         .filter(
@@ -1077,21 +1097,22 @@ export class EntityManager<
               shardBumps[i + 1].timestamp > timestampFrom) &&
             bump.timestamp <= timestampTo,
         )
-        .flatMap(({ nibbleBits, nibbles }) => {
-          const radix = 2 ** nibbleBits;
+        .flatMap(({ charBits, chars }) => {
+          const radix = 2 ** charBits;
 
-          return nibbles
-            ? [...range(0, radix ** nibbles - 1)].map((nibble) =>
-                nibble.toString(radix).padStart(nibbles, '0'),
+          return chars
+            ? [...range(0, radix ** chars - 1)].map((char) =>
+                char.toString(radix).padStart(chars, '0'),
               )
             : '';
         })
         .map(
-          (shardKey) => `${entity}${this.config.shardKeyDelimiter}${shardKey}`,
+          (shardKey) =>
+            `${entityToken}${this.config.shardKeyDelimiter}${shardKey}`,
         );
 
       console.debug('generated hash key space', {
-        entity,
+        entityToken,
         timestampFrom,
         timestampTo,
         hashKeySpace,
@@ -1101,7 +1122,7 @@ export class EntityManager<
     } catch (error) {
       if (error instanceof Error)
         console.error(error.message, {
-          entity,
+          entityToken,
           timestampFrom,
           timestampTo,
         });
@@ -1127,40 +1148,44 @@ export class EntityManager<
    * @throws `Error` if `dehydrated` has invalid length.
    */
   rehydratePageKeyMap<
-    Item extends EntityItem<Entity, EntityMap, HashKey, RangeKey>,
-    Entity extends keyof EntityMap,
+    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    EntityToken extends keyof M & string,
   >(
     dehydrated: string[] | undefined,
-    entity: Entity,
-    indexes: string[],
+    entityToken: EntityToken,
+    indexTokens: string[],
     timestampFrom = 0,
     timestampTo = Date.now(),
-  ): PageKeyMap<Item> {
+  ): PageKeyMap<Item, IndexableTypes> {
     try {
       // Validate params.
-      if (!indexes.length) throw new Error('indexes empty');
-      indexes.map((index) => this.validateEntityIndex(entity, index));
+      if (!indexTokens.length) throw new Error('indexTokens empty');
+      indexTokens.map((index) =>
+        this.validateEntityIndexToken(entityToken, index),
+      );
 
       // Shortcut empty dehydrated.
       if (dehydrated && !dehydrated.length) return {};
 
       // Get hash key space.
       const hashKeySpace = this.getHashKeySpace(
-        entity,
+        entityToken,
         timestampFrom,
         timestampTo,
       );
 
       // Default dehydrated.
-      dehydrated ??= [...range(1, hashKeySpace.length * indexes.length, '')];
+      dehydrated ??= [
+        ...range(1, hashKeySpace.length * indexTokens.length, ''),
+      ];
 
       // Validate dehydrated length
-      if (dehydrated.length !== hashKeySpace.length * indexes.length)
+      if (dehydrated.length !== hashKeySpace.length * indexTokens.length)
         throw new Error('dehydrated length mismatch');
 
       // Rehydrate pageKeys.
       const rehydrated = mapValues(
-        zipToObject(indexes, cluster(dehydrated, hashKeySpace.length)),
+        zipToObject(indexTokens, cluster(dehydrated, hashKeySpace.length)),
         (dehydratedIndexPageKeyMaps, index) =>
           zipToObject(hashKeySpace, (hashKey, i) => {
             if (!dehydratedIndexPageKeyMaps[i]) return;
@@ -1169,19 +1194,19 @@ export class EntityManager<
               [this.config.hashKey]: hashKey,
               ...this.rehydrateIndexItem(
                 dehydratedIndexPageKeyMaps[i],
-                entity,
+                entityToken,
                 index,
                 [this.config.hashKey],
               ),
             };
 
-            this.updateItemRangeKey(item, entity);
+            this.updateItemRangeKey(item, entityToken);
 
             return zipToObject(
-              this.config.entities[entity].indexes[index],
+              this.config.entities[entityToken].indexes[index],
               (component) =>
-                this.config.entities[entity].generated[component]
-                  ? this.encodeGeneratedProperty(item, entity, component)!
+                this.config.entities[entityToken].generated[component]
+                  ? this.encodeGeneratedProperty(item, entityToken, component)!
                   : item[component],
             );
           }),
@@ -1189,18 +1214,18 @@ export class EntityManager<
 
       console.debug('rehydrated page key map', {
         dehydrated,
-        entity,
-        indexes,
+        entityToken,
+        indexTokens,
         rehydrated,
       });
 
-      return rehydrated as PageKeyMap<Item>;
+      return rehydrated as PageKeyMap<Item, IndexableTypes>;
     } catch (error) {
       if (error instanceof Error)
         console.error(error.message, {
           dehydrated,
-          entity,
-          indexes,
+          entityToken,
+          indexTokens,
         });
 
       throw error;
@@ -1234,13 +1259,10 @@ export class EntityManager<
    * @throws Error if `pageKeyMap` keys do not match `queryMap` keys.
    */
   async query<
-    Item extends EntityItem<Entity, M, HashKey, RangeKey>,
-    Entity extends keyof M & string,
-    M extends EntityMap,
-    HashKey extends string,
-    RangeKey extends string,
+    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    EntityToken extends keyof M & string,
   >({
-    entity,
+    entityToken,
     hashKey,
     item,
     limit,
@@ -1251,17 +1273,23 @@ export class EntityManager<
     timestampFrom = 0,
     timestampTo = Date.now(),
     throttle = this.config.throttle,
-  }: QueryOptions<Item, Entity, M, HashKey, RangeKey, IndexableTypes>): Promise<
-    QueryResult<Item, Entity, M, HashKey, RangeKey>
-  > {
+  }: QueryOptions<
+    Item,
+    EntityToken,
+    M,
+    HashKey,
+    RangeKey,
+    IndexableTypes
+  >): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
     try {
       // Get defaults.
-      const { defaultLimit, defaultPageSize } = this.config.entities[entity];
+      const { defaultLimit, defaultPageSize } =
+        this.config.entities[entityToken];
       limit ??= defaultLimit;
       pageSize ??= defaultPageSize;
 
       // Validate params.
-      this.validateEntityGenerated(entity, hashKey, true);
+      this.validateEntityGeneratedProperty(entityToken, hashKey, true);
 
       if (!(limit === Infinity || (isInt(limit) && limit >= 1)))
         throw new Error('limit must be a positive integer or Infinity.');
@@ -1276,7 +1304,7 @@ export class EntityManager<
               decompressFromEncodedURIComponent(pageKeyMap),
             ) as string[])
           : undefined,
-        entity,
+        entityToken,
         Object.keys(queryMap),
         timestampFrom,
         timestampTo,
@@ -1294,7 +1322,7 @@ export class EntityManager<
       let workingResult = {
         items: [],
         pageKeyMap: rehydratedPageKeyMap,
-      } as WorkingQueryResult<Item, Entity, M, HashKey, RangeKey>;
+      } as WorkingQueryResult<Item, EntityToken, M, HashKey, RangeKey>;
 
       do {
         // TODO: This loop will blow up as shards scale, since at a minimum it will return shardCount * pageSize
@@ -1327,7 +1355,7 @@ export class EntityManager<
 
         // Reduce shardQueryResults & updateworkingRresult.
         workingResult = shardQueryResults.reduce<
-          WorkingQueryResult<Item, Entity, M, HashKey, RangeKey>
+          WorkingQueryResult<Item, EntityToken, M, HashKey, RangeKey>
         >(({ items, pageKeyMap }, { index, queryResult, hashKey }) => {
           Object.assign(rehydratedPageKeyMap[index], {
             [hashKey]: queryResult.pageKey,
@@ -1350,9 +1378,9 @@ export class EntityManager<
       workingResult.items = sort(
         unique(workingResult.items, (item) =>
           (
-            item[this.config.entities[entity].uniqueProperty as keyof Item] as
-              | string
-              | number
+            item[
+              this.config.entities[entityToken].uniqueProperty as keyof Item
+            ] as string | number
           ).toString(),
         ),
         sortOrder,
@@ -1363,13 +1391,13 @@ export class EntityManager<
         items: workingResult.items,
         pageKeyMap: compressToEncodedURIComponent(
           JSON.stringify(
-            this.dehydratePageKeyMap(workingResult.pageKeyMap, entity),
+            this.dehydratePageKeyMap(workingResult.pageKeyMap, entityToken),
           ),
         ),
-      } as QueryResult<Item, Entity, M, HashKey, RangeKey>;
+      } as QueryResult<Item, EntityToken, M, HashKey, RangeKey>;
 
-      console.debug('queried entity across shards', {
-        entity,
+      console.debug('queried entityToken across shards', {
+        entityToken,
         hashKey,
         item,
         limit,
@@ -1388,7 +1416,7 @@ export class EntityManager<
     } catch (error) {
       if (error instanceof Error)
         console.error(error.message, {
-          entity,
+          entityToken,
           hashKey,
           item,
           limit,

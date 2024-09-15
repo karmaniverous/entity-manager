@@ -16,8 +16,8 @@
   "devDependencies": {
     "@dotenvx/dotenvx": "^1.14.1",
     "@eslint/js": "^9.10.0",
-    "@faker-js/faker": "^9.0.0",
-    "@karmaniverous/mock-db": "^0.2.0",
+    "@faker-js/faker": "^9.0.1",
+    "@karmaniverous/mock-db": "^0.2.1",
     "@rollup/plugin-alias": "^5.1.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",

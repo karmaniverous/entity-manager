@@ -71,12 +71,12 @@ describe('EntityManager', function () {
       expect(encoded).to.be.undefined;
     });
 
-    it('should fail on unknown generated property', function () {
+    it('should fail on invalid generated property', function () {
       const [item] = getUsers() as UserItem[];
 
       expect(() =>
         entityManager.encodeGeneratedProperty(item, 'user', 'foo'),
-      ).to.throw('unknown');
+      ).to.throw('invalid');
     });
   });
 
@@ -560,7 +560,7 @@ describe('EntityManager', function () {
 
     it('simple query', async function () {
       let result = await entityManager.query({
-        entity: 'user',
+        entityToken: 'user',
         hashKey: 'hashKey',
         queryMap: { lastName: lastNameQuery },
       });
@@ -570,7 +570,7 @@ describe('EntityManager', function () {
       );
 
       result = await entityManager.query({
-        entity: 'user',
+        entityToken: 'user',
         hashKey: 'hashKey',
         pageKeyMap: result.pageKeyMap,
         queryMap: { lastName: lastNameQuery },
@@ -583,7 +583,7 @@ describe('EntityManager', function () {
 
     it('simple sharded query', async function () {
       let result = await entityManager.query({
-        entity: 'user',
+        entityToken: 'user',
         hashKey: 'hashKey',
         queryMap: { lastName: lastNameQuery },
         timestampFrom: now,
@@ -595,7 +595,7 @@ describe('EntityManager', function () {
       );
 
       result = await entityManager.query({
-        entity: 'user',
+        entityToken: 'user',
         hashKey: 'hashKey',
         pageKeyMap: result.pageKeyMap,
         queryMap: { lastName: lastNameQuery },
@@ -610,7 +610,7 @@ describe('EntityManager', function () {
 
     it('complex query', async function () {
       let result = await entityManager.query({
-        entity: 'user',
+        entityToken: 'user',
         hashKey: 'hashKey',
         queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
       });
@@ -620,7 +620,7 @@ describe('EntityManager', function () {
       );
 
       result = await entityManager.query({
-        entity: 'user',
+        entityToken: 'user',
         hashKey: 'hashKey',
         pageKeyMap: result.pageKeyMap,
         queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
@@ -633,7 +633,7 @@ describe('EntityManager', function () {
 
     it('complex sharded query', async function () {
       let result = await entityManager.query({
-        entity: 'user',
+        entityToken: 'user',
         hashKey: 'hashKey',
         queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
         timestampFrom: now,
@@ -645,7 +645,7 @@ describe('EntityManager', function () {
       );
 
       result = await entityManager.query({
-        entity: 'user',
+        entityToken: 'user',
         hashKey: 'hashKey',
         pageKeyMap: result.pageKeyMap,
         queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },

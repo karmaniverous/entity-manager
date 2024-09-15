@@ -12,10 +12,10 @@ import type {
 export type EntityMap = Record<string, Entity>;
 
 /**
- * Tests a string literal type to determine whether it is a key of any Entity in an EntityMap or is a member of a union of reserved keys.
+ * Tests a string literal type to determine whether it is a key of any {@link Entity | `Entity`} in an {@link EntityMap | `EntityMap`} or is a member of a union of reserved keys.
  *
  * @typeParam K - The string literal type to test.
- * @typeParam M - The entity map type.
+ * @typeParam M - The {@link EntityMap | `EntityMap`}.
  * @typeParam R - The reserved set of string literal types.
  *
  * @returns `K` if `K` is exclusive or `never` otherwise.
@@ -40,7 +40,8 @@ export type IndexableProperties<
 /**
  * Returns the `generated` property of a Config entity.
  *
- * @typeParam E - The entity type.
+ * @typeParam E - The {@link Entity | `Entity`} type.
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed.
  *
  * @remarks
  * All Entity properties of type `never` must be represented, and no extra properties are allowed.
@@ -66,7 +67,8 @@ export type ConfigEntityGenerated<
 /**
  * Returns the `types` property of a Config entity.
  *
- * @typeParam E - The entity type.
+ * @typeParam E - The {@link Entity | `Entity`} type.
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed..
  *
  * @remarks
  * This property supports typing of values decoded from generated properties.
@@ -85,21 +87,40 @@ export type ConfigEntityTypes<
       : never);
 
 /**
- * ShardBump interface.
+ * Defines a single time period in an {@link Entity | `Entity`} sharding strategy.
  */
 export interface ShardBump {
+  /**
+   * The timestamp marking the beginning of the time period. Must be a non-negative integer.
+   *
+   * This value must be unique across all {@link ShardBump | `ShardBumps`} for the {@link Entity | `Entity`}.
+   */
   timestamp: number;
-  nibbleBits: number;
-  nibbles: number;
+
+  /**
+   * The number of bits per character in the bump's shard space. For example, `0` yields a single shard per character, and a value of `2` would yield 4 shards per character.
+   *
+   * This value must be an integer between `1` and `5` inclusive.
+   */
+  charBits: number;
+
+  /**
+   * The number of characters used to represent the bump's shard key.
+   *
+   * This value must be an integer between `0` and `40` inclusive. Note that more than a few characters will result in an impossibly large shard space!   *
+   * A ShardBump with `chars` of `2` and `charBits` of `3` would yield a two-character shard key with a space of 16 shards.
+   */
+  chars: number;
 }
 
 /**
  * Returns a Config entity type.
  *
- * @typeParam E - The Entity type.
- * @typeParam HashKey - The hash key string literal type.
- * @typeParam RangeKey - The unique key string literal type.
- *
+ * @typeParam E - The {@link Entity | `Entity`} type.
+ * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property.
+ * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property.
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntity.generated | generated property}. 
+
  * @remarks
  * `generated` is optional if `E` has no properties of type `never`.
  */
@@ -109,8 +130,37 @@ type ConfigEntity<
   RangeKey extends string,
   IndexableTypes extends TypeMap,
 > = {
+  /**
+   * The default maximum number of records to return from a query.
+   *
+   * @defaultValue `10`
+   *
+   * @remarks
+   * Can be overridden at {@link QueryOptions.limit | `QueryOptions.limit`}.
+   *
+   * In cross-shard queries, the actual number of records returned is heavily influenced by {@link QueryOptions.pageSize | query pageSize} and the number of shards queried. Actual results may significantly exceed this limit.
+   */
   defaultLimit?: number;
+
+  /**
+   * The default maximum number of records to return per data page on an individual shard query.
+   *
+   * @defaultValue `10`
+   *
+   * @remarks
+   * Shard queries will be repeated internally until either the shard is exhausted or the number of records returned exceeds the {@link QueryOptions.limit | query limit}.
+   *
+   * Can be overridden at {@link QueryOptions.pageSize | `QueryOptions.pageSize`}.
+   */
   defaultPageSize?: number;
+
+  /**
+   * Indexes defined for the {@link Entity | `Entity`}. Should reflect the underlying database table indexes.
+   *
+   * Each key is the name of an index, and each value is a non-empty array of {@link Entity | `Entity`} property names that define the index.
+   *
+   * Related property types must be align with the {@link Config | `Config`} `IndexableTypes` type parameter. Note tha all {@link ConfigEntity.generated | generated property} types are indexable by definition.
+   */
   indexes?: Record<
     string,
     (
@@ -120,22 +170,111 @@ type ConfigEntity<
       | RangeKey
     )[]
   >;
+
+  /**
+   * An array of {@link ShardBump | `ShardBump`} objects representing the {@link Entity | `Entity`}'s sharding strategy.
+   *
+   * If omitted, or if configured without a zero-{@link ShardBump.timestamp | `timestamp`} {@link ShardBump | `ShardBump`}, this array will be initialized with the following {@link ShardBump | `ShardBump`} as its first member:
+   *
+   * ```
+   * { timestamp: 0, charBits: 0, chars: 1 }
+   * ```
+   *
+   * Members must be unique by {@link ShardBump.timestamp | `timestamp`}.
+   *
+   * {@link ShardBump.chars | `chars`} must increase monotonically with {@link ShardBump.timestamp | `timestamp`}
+   *
+   * Array will be sorted in ascending order by {@link ShardBump.timestamp | `timestamp`} on initialization.
+   *
+   * Future {@link ShardBump | `ShardBumps`} can be changed as required, but past {@link ShardBump | `ShardBumps`} should not be modified or data integrity will be compromised!
+   */
   shardBumps?: ShardBump[];
+
+  /**
+   * Identifies the {@link Entity | `Entity`} property used as the timestamp for shard key calculations.
+   *
+   * This property must be of type `number`. Its value should not change over the life of the record. A `created` timestamp is ideal.
+   *
+   * Once in production, this configuration property should not be changed or data integrity will be compromised!
+   */
   timestampProperty: PropertiesOfType<E, number>;
+
+  /**
+   * Identifies the {@link Entity | `Entity`} used as the basis for both shard key calculations and the table's {@link ConfigKeys.rangeKey | range key}.
+   *
+   * This property must be of type `string` or `number`. Its value should be a unique record identifier and should not change over the life of the record.
+   *
+   * Once in production, this configuration property should not be changed or data integrity will be compromised!
+   */
   uniqueProperty: PropertiesOfType<E, number | string>;
 } & ([PropertiesOfType<E, never>] extends [never]
-  ? { generated?: ConfigEntityGenerated<E, IndexableTypes> }
-  : { generated: ConfigEntityGenerated<E, IndexableTypes> }) &
+  ? {
+      generated?: ConfigEntityGenerated<E, IndexableTypes>;
+    }
+  : {
+      /**
+       * {@link Entity | `Entity`} properties whose values will be generated by EntityManager.
+       *
+       * These properties should be indicated by a `never` type in the {@link Config | `Config`} `EntityMap` type parameter.
+       *
+       * All such properties must be accounted for in the `generated` object, and no additional properties are permitted..
+       */
+      generated: ConfigEntityGenerated<E, IndexableTypes>;
+    }) &
   ([IndexableProperties<E, IndexableTypes>] extends [never]
     ? { types?: ConfigEntityTypes<E, IndexableTypes> }
-    : { types: ConfigEntityTypes<E, IndexableTypes> });
+    : {
+        /**
+         * This object defines that types of {@link Entity | `Entity`} indexable properties in a way that is accessible at runtime. It is used to rehydrate PageKeyMap objects from highly compressed, URL-safe string values.
+         *
+         * The keys of this object must exactly match the indexable properties of the {@link Entity | `Entity`}. Note that all {@link ConfigEntity.generated | generated properties} are indexable by definition and need not be included.
+         *
+         * The values of this object must be one of the keys of the {@link Config | `Config`} `IndexableTypes` type parameter, and should match the associted property type.
+         *
+         * @example
+         * ```
+         * // Default indexable types.
+         * interface StringifiableTypes extends TypeMap {
+         *   string: string;
+         *   number: number;
+         *   boolean: boolean;
+         *   bigint: bigint;
+         * }
+         *
+         * interface MyEntityMap extends EntityMap {
+         *   user: {
+         *    created: number;
+         *    data?: Json; // Not a Stringifiable type
+         *    userId: string;
+         *   };
+         * }
+         *
+         * // IndexableTypes type param defaults to StringifiableTypes.
+         * const config: Config<MyEntityMap> = {
+         *   entities: {
+         *     user: {
+         *       ...,
+         *       types: { // All Stringafiable properties required!
+         *         created: 'number',
+         *         userId: 'string',
+         *         // 'data' not allowed: not a Stringifiable type
+         *       }
+         *     }
+         *   },
+         *   ...
+         * };
+         * ```
+         */
+        types: ConfigEntityTypes<E, IndexableTypes>;
+      });
 
 /**
- * Returns the `entities` property of a Config tyoe.
+ * Returns the `entities` property of the {@link Config | `Config`} tyoe.
  *
- * @typeParam M - The EntityMap type.
- * @typeParam HashKey - The hash key string literal type.
- * @typeParam RangeKey - The unique key string literal type.
+ * @typeParam M - The {@link EntityMap | `EntityMap`} type that identitfies the {@link Entity | `Entity`} & related property types to be managed by EntityManager.
+ * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property.
+ * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property.
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntity.generated | generated property}.
  *
  * @remarks
  * All properties of `M` must be represented, and no extra properties are allowed.
@@ -159,7 +298,12 @@ export type ConfigEntities<
   | Record<string, never>;
 
 /**
- * Returns all properties of the Config type as optional.
+ * Returns variably-optional properties of the {@link Config | `Config`} type as optional.
+
+ * @typeParam M - The {@link EntityMap | `EntityMap`} type that identitfies the {@link Entity | `Entity`} & related property types to be managed by EntityManager.
+ * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property.
+ * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property.
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntity.generated | generated property}. 
  */
 interface ConfigKeys<
   M extends EntityMap,
@@ -167,17 +311,39 @@ interface ConfigKeys<
   RangeKey extends string,
   IndexableTypes extends TypeMap,
 > {
+  /**
+   * Defines options for each {@link Entity | `Entity`} in the {@link Config | `Config`} `EntityMap` type parameter.
+   *
+   * The properties of this object must exactly match the keys of the {@link Config | `Config`} `EntityMap` type parameter.
+   */
   entities?: ConfigEntities<M, HashKey, RangeKey, IndexableTypes>;
+
+  /**
+   * The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key.
+   *
+   * This value must exactly match the {@link Config | `Config`} `HashKey` type parameter, and must not conflict with any {@link Entity | `Entity`} property.
+   *
+   * @defaultValue `'hashKey'`
+   */
   hashKey?: ExclusiveKey<HashKey, M, RangeKey>;
+
+  /**
+   * The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key.
+   *
+   * This value must exactly match the {@link Config | `Config`} `RangeKey` type parameter, and must not conflict with any {@link Entity | `Entity`} property.
+   *
+   * @defaultValue `'rangeKey'`
+   */
   rangeKey?: ExclusiveKey<RangeKey, M, HashKey>;
 }
 
 /**
  * EntityManager Config type.
  *
- * @typeParam M - The EntityMap type.
- * @typeParam HashKey - The hash key string literal type.
- * @typeParam RangeKey - The unique key string literal type.
+ * @typeParam M - The {@link EntityMap | `EntityMap`} type that identitfies the {@link Entity | `Entity`} & related property types to be managed by EntityManager.
+ * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property. Defaults to `'hashKey'`.
+ * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property. Defaults to `'rangeKey'`.
+ * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntity.generated | generated property}. Defaults to {@link StringifiableTypes | `StringifiableTypes`}.
  *
  * @remarks
  * `entities` is optional if `M` is empty.
@@ -190,9 +356,38 @@ export type Config<
 > = ([keyof Exactify<M>] extends [never]
   ? ConfigKeys<M, HashKey, RangeKey, IndexableTypes>
   : Required<ConfigKeys<M, HashKey, RangeKey, IndexableTypes>>) & {
+  /**
+   * Defines the delimiter used to separate key-value pairs in a generated property value.
+   *
+   * Must consist of one or more non-word characters, and must not intersect with {@link Config.generatedValueDelimiter | `generatedValueDelimiter`} or {@link Config.shardKeyDelimiter | `shardKeyDelimiter`}.
+   *
+   * @defaultValue `'|'`
+   */
   generatedKeyDelimiter?: string;
+
+  /**
+   * Defines the delimiter used to separate keys & values in a generated property value.
+   *
+   * Must consist of one or more non-word characters, and must not intersect with {@link Config.generatedKeyDelimiter | `generatedKeyDelimiter`} or {@link Config.shardKeyDelimiter | `shardKeyDelimiter`}.
+   *
+   * @defaultValue `'#'`
+   */
   generatedValueDelimiter?: string;
+
+  /**
+   * Defines the delimiter used to construct an Entity's hashKey value from its Entity key and shard key.
+   *
+   * Must consist of one or more non-word characters, and must not intersect with {@link Config.generatedKeyDelimiter | `generatedKeyDelimiter`} or {@link Config.generatedValueDelimiter | `generatedValueDelimiter`}.
+   *
+   * @defaultValue `'!'`
+   */
   shardKeyDelimiter?: string;
+
+  /**
+   * The default maximum number of shards to query in parallel. Can be overridden at {@link QueryOptions.throttle | `QueryOptions.throttle`}.
+   *
+   * @defaultValue `10`
+   */
   throttle?: number;
 };
 
@@ -202,10 +397,10 @@ export type Config<
 export type Unwrap<T> = { [P in keyof T]: T[P] };
 
 /**
- * Extracts an Entity item type decorated with generated properties.
+ * Extracts an {@link Entity | `Entity`} item type decorated with {@link ConfigKeys.hashKey | hashKey}, {@link ConfigKeys.shardKey | shardKey}, and {@link ConfigEntity.generated | generated properties}.
  */
 export type EntityItem<
-  E extends keyof M,
+  E extends keyof M & string,
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',

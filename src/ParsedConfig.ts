@@ -1,7 +1,7 @@
 import { counting, sort } from 'radash';
 import { z } from 'zod';
 
-const defaultShardBump = { timestamp: 0, nibbleBits: 1, nibbles: 0 };
+const defaultShardBump = { timestamp: 0, charBits: 1, chars: 0 };
 
 const validateArrayUnique = <T>(
   arr: T[],
@@ -87,8 +87,8 @@ export const configSchema = z
               .array(
                 z.object({
                   timestamp: z.number().nonnegative().safe(),
-                  nibbleBits: z.number().int().min(1).max(5),
-                  nibbles: z.number().int().min(0).max(40),
+                  charBits: z.number().int().min(1).max(5),
+                  chars: z.number().int().min(0).max(40),
                 }),
               )
               .optional()
@@ -113,14 +113,14 @@ export const configSchema = z
                 return sorted;
               })
 
-              // validate shardBump nibbles mootonically increase with timestamp.
+              // validate shardBump chars mootonically increase with timestamp.
               .superRefine((val, ctx) => {
                 if (val.length > 1) {
                   for (let i = 1; i < val.length; i++)
-                    if (val[i].nibbles <= val[i - 1].nibbles)
+                    if (val[i].chars <= val[i - 1].chars)
                       ctx.addIssue({
                         code: z.ZodIssueCode.custom,
-                        message: `shardBump nibbles do not monotonically increase at timestamp ${val[i].timestamp.toString()}`,
+                        message: `shardBump chars do not monotonically increase at timestamp ${val[i].timestamp.toString()}`,
                         path: [i],
                       });
                 }

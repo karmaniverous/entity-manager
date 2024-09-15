@@ -46,7 +46,7 @@ describe('Config', function () {
       defaultPageSize: 10,
       generated: {},
       indexes: {},
-      shardBumps: [{ timestamp: 0, nibbles: 0, nibbleBits: 1 }],
+      shardBumps: [{ timestamp: 0, chars: 0, charBits: 1 }],
       types: { bar: 'string', baz: 'number' },
     });
   });
@@ -275,7 +275,7 @@ describe('Config', function () {
     );
   });
 
-  it('should fail on negative entity sharding bump nibbles value', function () {
+  it('should fail on negative entity sharding bump chars value', function () {
     interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
@@ -283,7 +283,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          shardBumps: [{ timestamp: 0, nibbles: -1, nibbleBits: 1 }],
+          shardBumps: [{ timestamp: 0, chars: -1, charBits: 1 }],
           types: { bar: 'string', baz: 'number' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
@@ -298,7 +298,7 @@ describe('Config', function () {
     );
   });
 
-  it('should fail on entity sharding bump nibbles value over 40', function () {
+  it('should fail on entity sharding bump chars value over 40', function () {
     interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
@@ -306,7 +306,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          shardBumps: [{ timestamp: 0, nibbles: 41, nibbleBits: 1 }],
+          shardBumps: [{ timestamp: 0, chars: 41, charBits: 1 }],
           types: { bar: 'string', baz: 'number' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
@@ -331,8 +331,8 @@ describe('Config', function () {
         foo: {
           types: { bar: 'string', baz: 'number' },
           shardBumps: [
-            { timestamp: 0, nibbles: 0, nibbleBits: 1 },
-            { timestamp: 0, nibbles: 1, nibbleBits: 1 },
+            { timestamp: 0, chars: 0, charBits: 1 },
+            { timestamp: 0, chars: 1, charBits: 1 },
           ],
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
@@ -356,7 +356,7 @@ describe('Config', function () {
       entities: {
         foo: {
           types: { bar: 'string', baz: 'number' },
-          shardBumps: [{ timestamp: 1, nibbles: 1, nibbleBits: 1 }],
+          shardBumps: [{ timestamp: 1, chars: 1, charBits: 1 }],
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -369,8 +369,8 @@ describe('Config', function () {
 
     expect(parsedConfig.entities.foo.shardBumps[0]).to.deep.equal({
       timestamp: 0,
-      nibbles: 0,
-      nibbleBits: 1,
+      chars: 0,
+      charBits: 1,
     });
   });
 
@@ -384,8 +384,8 @@ describe('Config', function () {
         foo: {
           types: { bar: 'string', baz: 'number' },
           shardBumps: [
-            { timestamp: 2, nibbleBits: 1, nibbles: 2 },
-            { timestamp: 1, nibbleBits: 1, nibbles: 1 },
+            { timestamp: 2, charBits: 1, chars: 2 },
+            { timestamp: 1, charBits: 1, chars: 1 },
           ],
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
@@ -398,13 +398,13 @@ describe('Config', function () {
     const parsedConfig = configSchema.parse(config);
 
     expect(parsedConfig.entities.foo.shardBumps).to.deep.equal([
-      { timestamp: 0, nibbleBits: 1, nibbles: 0 },
-      { timestamp: 1, nibbleBits: 1, nibbles: 1 },
-      { timestamp: 2, nibbleBits: 1, nibbles: 2 },
+      { timestamp: 0, charBits: 1, chars: 0 },
+      { timestamp: 1, charBits: 1, chars: 1 },
+      { timestamp: 2, charBits: 1, chars: 2 },
     ]);
   });
 
-  it('should fail when entity sharding bumps nibbles do not increase monotonically with timestamp', function () {
+  it('should fail when entity sharding bumps chars do not increase monotonically with timestamp', function () {
     interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
     }
@@ -414,8 +414,8 @@ describe('Config', function () {
         foo: {
           types: { bar: 'string', baz: 'number' },
           shardBumps: [
-            { timestamp: 1, nibbleBits: 1, nibbles: 1 },
-            { timestamp: 2, nibbleBits: 1, nibbles: 1 },
+            { timestamp: 1, charBits: 1, chars: 1 },
+            { timestamp: 2, charBits: 1, chars: 1 },
           ],
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
@@ -426,7 +426,7 @@ describe('Config', function () {
     };
 
     expect(() => configSchema.parse(config)).to.throw(
-      'shardBump nibbles do not monotonically increase at timestamp',
+      'shardBump chars do not monotonically increase at timestamp',
     );
   });
 
@@ -440,9 +440,9 @@ describe('Config', function () {
         foo: {
           types: { bar: 'string', baz: 'number' },
           shardBumps: [
-            { timestamp: 2, nibbleBits: 1, nibbles: 2 },
-            { timestamp: 1, nibbleBits: 1, nibbles: 1 },
-            { timestamp: 0, nibbleBits: 1, nibbles: 0 },
+            { timestamp: 2, charBits: 1, chars: 2 },
+            { timestamp: 1, charBits: 1, chars: 1 },
+            { timestamp: 0, charBits: 1, chars: 0 },
           ],
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
@@ -455,9 +455,9 @@ describe('Config', function () {
     const parsedConfig = configSchema.parse(config);
 
     expect(parsedConfig.entities.foo.shardBumps).to.deep.equal([
-      { timestamp: 0, nibbleBits: 1, nibbles: 0 },
-      { timestamp: 1, nibbleBits: 1, nibbles: 1 },
-      { timestamp: 2, nibbleBits: 1, nibbles: 2 },
+      { timestamp: 0, charBits: 1, chars: 0 },
+      { timestamp: 1, charBits: 1, chars: 1 },
+      { timestamp: 2, charBits: 1, chars: 2 },
     ]);
   });
 });
