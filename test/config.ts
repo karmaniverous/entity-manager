@@ -1,6 +1,7 @@
 import type { Entity } from '@karmaniverous/entity-tools';
 
 import type { Config, EntityItem, EntityMap } from '../src/Config';
+import { EntityManager } from '../src/EntityManager';
 import type { User } from './users';
 
 export const now = Date.now();
@@ -69,3 +70,5 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
 };
 
 export type UserItem = EntityItem<'user', MyEntityMap, 'hashKey2'>;
+
+export const entityManager = new EntityManager(config);
