@@ -1,6 +1,6 @@
 import { Exactify, isNil, TypeMap } from '@karmaniverous/entity-tools';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
 import { validateEntityGeneratedProperty } from './validateEntityGeneratedProperty';
 
@@ -8,7 +8,7 @@ import { validateEntityGeneratedProperty } from './validateEntityGeneratedProper
  * Encode a generated property value. Returns a string or undefined if atomicity requirement not met.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param item - Partial {@link EntityItem | `EntityItem`} object.
+ * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param entityToken - `entityManager.config.entities` key.
  * @param property - {@link ConfigEntityGenerated | `entityManager.config.entities.<entityToken>.generated`} key.
  *
@@ -18,7 +18,7 @@ import { validateEntityGeneratedProperty } from './validateEntityGeneratedProper
  * @throws `Error` if `property` is invalid.
  */
 export function encodeGeneratedProperty<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,

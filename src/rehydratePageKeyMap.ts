@@ -1,7 +1,7 @@
 import type { Exactify, TypeMap } from '@karmaniverous/entity-tools';
 import { cluster, mapValues, range, zipToObject } from 'radash';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import { EntityManager } from './EntityManager';
 import { getHashKeySpace } from './getHashKeySpace';
@@ -30,7 +30,7 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * @throws `Error` if `dehydrated` has invalid length.
  */
 export function rehydratePageKeyMap<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,

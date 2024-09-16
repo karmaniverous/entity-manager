@@ -5,10 +5,10 @@ export type {
   ConfigEntityGenerated,
   ConfigEntityTypes,
   ConfigKeys,
-  EntityItem,
   EntityMap,
   ExclusiveKey,
   IndexableProperties,
+  ItemMap,
   ShardBump,
   Unwrap,
 } from './Config';

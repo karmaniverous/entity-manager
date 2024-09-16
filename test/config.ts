@@ -1,6 +1,6 @@
 import type { Entity } from '@karmaniverous/entity-tools';
 
-import type { Config, EntityItem, EntityMap } from '../src/Config';
+import type { Config, EntityMap, ItemMap } from '../src/Config';
 import { EntityManager } from '../src/EntityManager';
 import type { User } from './users';
 
@@ -69,6 +69,6 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
   rangeKey: 'rangeKey',
 };
 
-export type UserItem = EntityItem<'user', MyEntityMap, 'hashKey2'>;
+export type UserItem = ItemMap<MyEntityMap, 'hashKey2'>['user'];
 
 export const entityManager = new EntityManager(config);

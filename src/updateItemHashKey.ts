@@ -5,16 +5,16 @@ import {
 } from '@karmaniverous/entity-tools';
 import stringHash from 'string-hash';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
 import { getShardBump } from './getShardBump';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Update the hash key on a partial {@link EntityItem | `EntityItem`} object. Mutates `item`.
+ * Update the hash key on a partial {@link ItemMap | `ItemMap`} object. Mutates `item`.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param item - Partial {@link EntityItem | `EntityItem`} object.
+ * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
  * @param overwrite - Overwrite existing {@link ConfigKeys.hashKey | `this.config.hashKey`} property value (default `false`).
  *
@@ -23,7 +23,7 @@ import { validateEntityToken } from './validateEntityToken';
  * @throws `Error` if `entityToken` is invalid.
  */
 export function updateItemHashKey<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,

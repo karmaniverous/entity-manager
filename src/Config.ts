@@ -452,28 +452,28 @@ export type Config<
 export type Unwrap<T> = { [P in keyof T]: T[P] };
 
 /**
- * Extracts an {@link Entity | `Entity`} item type decorated with {@link ConfigKeys.hashKey | hashKey}, {@link ConfigKeys.rangeKey | rangeKey}, and {@link ConfigEntityGenerated | generated properties}.
+ * Extracts a map of {@link Entity | `Entity`} item types decorated with {@link ConfigKeys.hashKey | hashKey}, {@link ConfigKeys.rangeKey | rangeKey}, and {@link ConfigEntityGenerated | generated properties}.
  *
- * @typeParam EntityToken - The key of the {@link Entity | `Entity`} in `M`.
  * @typeParam M - The {@link EntityMap | `EntityMap`} type that identitfies the {@link Entity | `Entity`} & related property types to be managed by EntityManager.
  * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property. Defaults to `'hashKey'`.
  * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property. Defaults to `'rangeKey'`.
  *
  * @category Entities
  */
-export type EntityItem<
-  EntityToken extends keyof Exactify<M>,
+export type ItemMap<
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
-> = Unwrap<
-  {
-    [P in keyof Exactify<M[EntityToken]>]: [
-      NonNullable<M[EntityToken][P]>,
-    ] extends [never]
-      ? string
-      : M[EntityToken][P];
-  } & {
-    [P in HashKey | RangeKey]?: string;
-  }
->;
+> = {
+  [EntityToken in keyof Exactify<M>]: Unwrap<
+    {
+      [P in keyof Exactify<M[EntityToken]>]: [
+        NonNullable<M[EntityToken][P]>,
+      ] extends [never]
+        ? string
+        : M[EntityToken][P];
+    } & {
+      [P in HashKey | RangeKey]?: string;
+    }
+  >;
+};

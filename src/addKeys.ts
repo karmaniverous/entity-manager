@@ -4,7 +4,7 @@ import {
   type TypeMap,
 } from '@karmaniverous/entity-tools';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import { EntityManager } from './EntityManager';
 import { updateItemHashKey } from './updateItemHashKey';
@@ -12,10 +12,10 @@ import { updateItemRangeKey } from './updateItemRangeKey';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Update generated properties, hash key, and range key on an {@link EntityItem | `EntityItem`} object. Mutates `item`.
+ * Update generated properties, hash key, and range key on an {@link ItemMap | `ItemMap`} object. Mutates `item`.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param item - {@link EntityItem | `EntityItem`} object.
+ * @param item - {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
  * @param overwrite - Overwrite existing properties (default `false`).
  *
@@ -24,7 +24,7 @@ import { validateEntityToken } from './validateEntityToken';
  * @throws `Error` if `entityToken` is invalid.
  */
 export function addKeys<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,

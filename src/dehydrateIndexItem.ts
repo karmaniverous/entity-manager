@@ -1,12 +1,12 @@
 import type { Exactify, TypeMap } from '@karmaniverous/entity-tools';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
 import { unwrapIndex } from './unwrapIndex';
 import { validateEntityIndexToken } from './validateEntityIndexToken';
 
 /**
- * Condense a partial {@link EntityItem | `EntityItem`} object into a delimited string representing the deduped, sorted, ungenerated component elements of an {@link ConfigEntity.indexes | Entity index}.
+ * Condense a partial {@link ItemMap | `ItemMap`} object into a delimited string representing the deduped, sorted, ungenerated component elements of an {@link ConfigEntity.indexes | Entity index}.
  *
  * @remarks
  * Reverses {@link EntityManager.rehydrateIndexItem | `rehydrateIndexItem`}.
@@ -19,7 +19,7 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * `item` must be populated with all required index component elements!
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param item - Partial {@link EntityItem | `EntityItem`} object.
+ * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
  * @param indexToken - {@link ConfigEntity.indexes | `entityManager.config.entities.<entityToken>.indexes`} key.
  * @param omit - Array of index components to omit from the output value.
@@ -30,7 +30,7 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * @throws `Error` if `indexToken` is invalid.
  */
 export function dehydrateIndexItem<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,

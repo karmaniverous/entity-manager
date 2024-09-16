@@ -1,6 +1,6 @@
 import type { Exactify, SortOrder, TypeMap } from '@karmaniverous/entity-tools';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 
 /**
@@ -9,7 +9,7 @@ import type { ShardQueryFunction } from './ShardQueryFunction';
  * @category Query
  */
 export interface QueryOptions<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
@@ -26,7 +26,7 @@ export interface QueryOptions<
   hashKey: string;
 
   /**
-   * A partial {@link EntityItem | `EntityItem`} object containing at least the properties specified in
+   * A partial {@link ItemMap | `ItemMap`} object containing at least the properties specified in
    * {@link Config | `EntityManager.config.entities.<entityToken>.keys.<keyToken>.elements`}, except for the properties specified in {@link Config | `EntityManager.config.tokens`}.
    *
    * This data will be used to generate query keys across all shards.

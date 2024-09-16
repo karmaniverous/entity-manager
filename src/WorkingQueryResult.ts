@@ -4,14 +4,14 @@ import type {
   TypeMap,
 } from '@karmaniverous/entity-tools';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import type { PageKeyMap } from './PageKeyMap';
 
 /**
  * A QueryResult object with rehydrated pageKeyMap.
  */
 export interface WorkingQueryResult<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,

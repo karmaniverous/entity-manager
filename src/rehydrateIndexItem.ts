@@ -1,14 +1,14 @@
 import type { Exactify, TypeMap } from '@karmaniverous/entity-tools';
 import { shake, zipToObject } from 'radash';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
 import { string2Stringifiable } from './string2Stringifiable';
 import { unwrapIndex } from './unwrapIndex';
 import { validateEntityIndexToken } from './validateEntityIndexToken';
 
 /**
- * Convert a delimited string into a partial {@link EntityItem | `EntityItem`} object representing the ungenerated component elements of a Config entity index.
+ * Convert a delimited string into a partial {@link ItemMap | `ItemMap`} object representing the ungenerated component elements of a Config entity index.
  *
  * @remarks
  * Reverses {@link EntityManager.dehydrateIndexItem | `dehydrateIndexItem`}.
@@ -21,13 +21,13 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * @param indexToken - {@link ConfigEntity.indexes | `entityManager.config.entities.<entityToken>.indexes`} key.
  * @param omit - Array of index components omitted from `dehydrated`.
  *
- * @returns Partial {@link EntityItem | `EntityItem`} object containing rehydrated index component elements.
+ * @returns Partial {@link ItemMap | `ItemMap`} object containing rehydrated index component elements.
  *
  * @throws `Error` if `entityToken` is invalid.
  * @throws `Error` if `indexToken` is invalid.
  */
 export function rehydrateIndexItem<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,

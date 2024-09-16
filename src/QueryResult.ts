@@ -1,6 +1,6 @@
 import type { Exactify } from '@karmaniverous/entity-tools';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 
 /**
  * A result returned by a query across multiple shards, where each shard may
@@ -9,7 +9,7 @@ import type { EntityItem, EntityMap } from './Config';
  * @category Query
  */
 export interface QueryResult<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,

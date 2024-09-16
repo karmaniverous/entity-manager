@@ -5,7 +5,7 @@ import type {
   TypeMap,
 } from '@karmaniverous/entity-tools';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import type { ShardQueryResult } from './ShardQueryResult';
 
 /**
@@ -15,7 +15,7 @@ import type { ShardQueryResult } from './ShardQueryResult';
  * provided by the {@link EntityManager.query | `EntityManager.query`} method, which assembles many returned
  * pages queried across multiple shards into a single query result.
  *
- * @typeParam Item - The {@link EntityItem | `EntityItem`} type being queried. 
+ * @typeParam Item - The {@link ItemMap | `ItemMap`} type being queried. 
  * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Defaults to {@link StringifiableTypes | `StringifiableTypes`}.
 
  * @param hashKey - The {@link ConfigKeys.hashKey | `this.config.hashKey`} property value of the shard being queried.
@@ -25,7 +25,7 @@ import type { ShardQueryResult } from './ShardQueryResult';
  * @category Query
  */
 export type ShardQueryFunction<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string = 'hashKey',

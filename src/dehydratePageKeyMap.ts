@@ -1,6 +1,6 @@
 import type { Exactify, TypeMap } from '@karmaniverous/entity-tools';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import { decodeGeneratedProperty } from './decodeGeneratedProperty';
 import { dehydrateIndexItem } from './dehydrateIndexItem';
 import { EntityManager } from './EntityManager';
@@ -28,7 +28,7 @@ import { validateEntityToken } from './validateEntityToken';
  * An empty returned array indicates all page keys are `undefined`.
  */
 export function dehydratePageKeyMap<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
@@ -78,7 +78,7 @@ export function dehydratePageKeyMap<
 
         // Compose item from page key
         const item = Object.entries(pageKeyMap[index][hashKey]).reduce<
-          Partial<EntityItem<EntityToken, M, HashKey, RangeKey>>
+          Partial<ItemMap<M, HashKey, RangeKey>[EntityToken]>
         >((item, [property, value]) => {
           if (
             property in entityManager.config.entities[entityToken].generated ||

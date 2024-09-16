@@ -9,7 +9,7 @@ import type { PropertiesOfType, TypeMap } from '@karmaniverous/entity-tools';
  *
  * The values of the inner object are the page key objects returned by the previous database query on the related index & shard. An `undefined` value indicates that there are no more pages to query for that index & shard.
  *
- * @typeParam Item - The item type being queried. This will geerally be an {@link EntityItem | `EntityItem`} object.
+ * @typeParam Item - The item type being queried. This will geerally be an {@link ItemMap | `ItemMap`} object.
  * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed.
  */
 export type PageKeyMap<

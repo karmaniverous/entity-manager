@@ -1,24 +1,24 @@
 import { Exactify, TypeMap } from '@karmaniverous/entity-tools';
 import { objectify } from 'radash';
 
-import { EntityItem, EntityMap } from './Config';
+import { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
 import { string2Stringifiable } from './string2Stringifiable';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Decode a generated property value. Returns a partial EntityItem.
+ * Decode a generated property value. Returns a partial ItemMap.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param encoded - Encoded generated property value.
  * @param entityToken - `entityManager.config.entities` key.
  *
- * @returns Partial {@link EntityItem | `EntityItem`} object with updated properties decoded from `encoded`.
+ * @returns Partial {@link ItemMap | `ItemMap`} object with updated properties decoded from `encoded`.
  *
  * @throws `Error` if `entityToken` is invalid.
  */
 export function decodeGeneratedProperty<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,

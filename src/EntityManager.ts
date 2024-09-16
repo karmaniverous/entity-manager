@@ -2,7 +2,7 @@ import type { Exactify, TypeMap } from '@karmaniverous/entity-tools';
 
 import { addKeys } from './addKeys';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Config, ConfigEntity, EntityItem, EntityMap } from './Config';
+import type { Config, ConfigEntity, EntityMap, ItemMap } from './Config';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
@@ -51,9 +51,9 @@ export class EntityManager<
   }
 
   /**
-   * Update generated properties, hash key, and range key on an {@link EntityItem | `EntityItem`} object. Mutates `item`.
+   * Update generated properties, hash key, and range key on an {@link ItemMap | `ItemMap`} object. Mutates `item`.
    *
-   * @param item - {@link EntityItem | `EntityItem`} object.
+   * @param item - {@link ItemMap | `ItemMap`} object.
    * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
    * @param overwrite - Overwrite existing properties (default `false`).
    *
@@ -62,16 +62,16 @@ export class EntityManager<
    * @throws `Error` if `entityToken` is invalid.
    */
   addKeys<
-    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
     EntityToken extends keyof Exactify<M> & string,
   >(item: Item, entityToken: EntityToken, overwrite = false): Item {
     return addKeys(this, item, entityToken, overwrite);
   }
 
   /**
-   * Strips generated properties, hash key, and range key from an {@link EntityItem | `EntityItem`} object. Mutates `item`.
+   * Strips generated properties, hash key, and range key from an {@link ItemMap | `ItemMap`} object. Mutates `item`.
    *
-   * @param item - {@link EntityItem | `EntityItem`} object.
+   * @param item - {@link ItemMap | `ItemMap`} object.
    * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
    *
    * @returns Mutated `item` without generated properties, hash key or range key.
@@ -79,7 +79,7 @@ export class EntityManager<
    * @throws `Error` if `entityToken` is invalid.
    */
   removeKeys<
-    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
     EntityToken extends keyof Exactify<M> & string,
   >(item: Item, entityToken: EntityToken): Item {
     return removeKeys(this, item, entityToken);
@@ -104,7 +104,7 @@ export class EntityManager<
    * @throws Error if {@link QueryOptions.pageKeyMap | `pageKeyMap`} keys do not match {@link QueryOptions.queryMap | `queryMap`} keys.
    */
   async query<
-    Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+    Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
     EntityToken extends keyof Exactify<M> & string,
   >(
     options: QueryOptions<

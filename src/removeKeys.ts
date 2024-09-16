@@ -1,14 +1,14 @@
 import type { Exactify, TypeMap } from '@karmaniverous/entity-tools';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Strips generated properties, hash key, and range key from an {@link EntityItem | `EntityItem`} object. Mutates `item`.
+ * Strips generated properties, hash key, and range key from an {@link ItemMap | `ItemMap`} object. Mutates `item`.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param item - {@link EntityItem | `EntityItem`} object.
+ * @param item - {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
  *
  * @returns Mutated `item` without generated properties, hash key or range key.
@@ -16,7 +16,7 @@ import { validateEntityToken } from './validateEntityToken';
  * @throws `Error` if `entityToken` is invalid.
  */
 export function removeKeys<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,

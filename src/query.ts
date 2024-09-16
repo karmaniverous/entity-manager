@@ -2,7 +2,7 @@ import { type Exactify, sort, type TypeMap } from '@karmaniverous/entity-tools';
 import lzString from 'lz-string';
 import { isInt, parallel, unique } from 'radash';
 
-import type { EntityItem, EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
 import { EntityManager } from './EntityManager';
 import type { QueryOptions } from './QueryOptions';
@@ -34,7 +34,7 @@ const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
  * @throws Error if {@link QueryOptions.pageKeyMap | `pageKeyMap`} keys do not match {@link QueryOptions.queryMap | `queryMap`} keys.
  */
 export async function query<
-  Item extends EntityItem<EntityToken, M, HashKey, RangeKey>,
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
