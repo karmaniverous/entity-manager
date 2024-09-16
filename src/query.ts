@@ -1,4 +1,8 @@
-import { type Exactify, sort, type TypeMap } from '@karmaniverous/entity-tools';
+import {
+  type Exactify,
+  sort,
+  type TranscodeMap,
+} from '@karmaniverous/entity-tools';
 import lzString from 'lz-string';
 import { isInt, parallel, unique } from 'radash';
 
@@ -39,7 +43,7 @@ export async function query<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TypeMap,
+  IndexableTypes extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
   {

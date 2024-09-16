@@ -1,7 +1,7 @@
 import type {
   Exactify,
-  StringifiableTypes,
-  TypeMap,
+  DefaultTranscodeMap,
+  TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
@@ -16,7 +16,7 @@ export interface WorkingQueryResult<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TypeMap = StringifiableTypes,
+  IndexableTypes extends TranscodeMap = DefaultTranscodeMap,
 > {
   /** The returned records. */
   items: Item[];

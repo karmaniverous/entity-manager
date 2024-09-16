@@ -1,4 +1,4 @@
-import type { Exactify, TypeMap } from '@karmaniverous/entity-tools';
+import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import { addKeys } from './addKeys';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -19,7 +19,7 @@ export class EntityManager<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TypeMap,
+  IndexableTypes extends TranscodeMap,
 > {
   #config: ParsedConfig;
 

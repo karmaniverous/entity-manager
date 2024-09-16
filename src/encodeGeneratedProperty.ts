@@ -1,4 +1,4 @@
-import { Exactify, isNil, TypeMap } from '@karmaniverous/entity-tools';
+import { Exactify, isNil, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
@@ -23,7 +23,7 @@ export function encodeGeneratedProperty<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TypeMap,
+  IndexableTypes extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
   item: Partial<Item>,

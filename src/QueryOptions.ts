@@ -1,4 +1,8 @@
-import type { Exactify, SortOrder, TypeMap } from '@karmaniverous/entity-tools';
+import type {
+  Exactify,
+  SortOrder,
+  TranscodeMap,
+} from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
 import type { ShardQueryFunction } from './ShardQueryFunction';
@@ -14,7 +18,7 @@ export interface QueryOptions<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TypeMap,
+  IndexableTypes extends TranscodeMap,
 > {
   /** Identifies the entity to be queried. Key of {@link Config | `EntityManager.config.entities`}. */
   entityToken: EntityToken;

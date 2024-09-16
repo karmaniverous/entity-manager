@@ -7,7 +7,6 @@ export type {
   ConfigKeys,
   EntityMap,
   ExclusiveKey,
-  IndexableProperties,
   ItemMap,
   ShardBump,
   Unwrap,
@@ -19,9 +18,10 @@ export type { QueryResult } from './QueryResult';
 export type { ShardQueryFunction } from './ShardQueryFunction';
 export type { ShardQueryResult } from './ShardQueryResult';
 export type {
+  DefaultTranscodeMap,
   Entity,
   PropertiesOfType,
   SortOrder,
-  StringifiableTypes,
-  TypeMap,
+  TranscodableProperties,
+  TranscodeMap,
 } from '@karmaniverous/entity-tools';

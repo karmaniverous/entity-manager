@@ -1,4 +1,7 @@
-import type { PropertiesOfType, TypeMap } from '@karmaniverous/entity-tools';
+import type {
+  PropertiesOfType,
+  TranscodeMap,
+} from '@karmaniverous/entity-tools';
 
 /**
  * A two-layer map of page keys, used to query the next page of data across a set of indexes and on each shard of a given hash key.
@@ -10,11 +13,11 @@ import type { PropertiesOfType, TypeMap } from '@karmaniverous/entity-tools';
  * The values of the inner object are the page key objects returned by the previous database query on the related index & shard. An `undefined` value indicates that there are no more pages to query for that index & shard.
  *
  * @typeParam Item - The item type being queried. This will geerally be an {@link ItemMap | `ItemMap`} object.
- * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed.
+ * @typeParam IndexableTypes - The {@link TranscodeMap | `TranscodeMap`} identifying property types that can be indexed.
  */
 export type PageKeyMap<
   Item extends Record<string, unknown>,
-  IndexableTypes extends TypeMap,
+  IndexableTypes extends TranscodeMap,
 > = Record<
   string,
   Record<

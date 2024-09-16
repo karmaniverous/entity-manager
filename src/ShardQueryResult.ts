@@ -1,8 +1,8 @@
 import type {
   Exactify,
   PropertiesOfType,
-  StringifiableTypes,
-  TypeMap,
+  DefaultTranscodeMap,
+  TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
@@ -11,7 +11,7 @@ import type { EntityMap, ItemMap } from './Config';
  * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
  *
  * @typeParam Item - The {@link ItemMap | `ItemMap`} type being queried. 
- * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed.
+ * @typeParam IndexableTypes - The {@link TranscodeMap | `TranscodeMap`} identifying property types that can be indexed.
 
 * @category Query
  */
@@ -21,7 +21,7 @@ export interface ShardQueryResult<
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
-  IndexableTypes extends TypeMap = StringifiableTypes,
+  IndexableTypes extends TranscodeMap = DefaultTranscodeMap,
 > {
   /** The number of records returned. */
   count: number;

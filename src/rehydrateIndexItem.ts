@@ -1,4 +1,4 @@
-import type { Exactify, TypeMap } from '@karmaniverous/entity-tools';
+import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 import { shake, zipToObject } from 'radash';
 
 import type { EntityMap, ItemMap } from './Config';
@@ -32,7 +32,7 @@ export function rehydrateIndexItem<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TypeMap,
+  IndexableTypes extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
   dehydrated: string,

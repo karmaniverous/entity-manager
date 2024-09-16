@@ -1,4 +1,4 @@
-import { type StringifiableTypes } from '@karmaniverous/entity-tools';
+import { type DefaultTranscodeMap } from '@karmaniverous/entity-tools';
 import { expect } from 'chai';
 import { mapValues, pick } from 'radash';
 
@@ -10,7 +10,7 @@ import { type PageKeyMap } from './PageKeyMap';
 
 describe('dehydratePageKeyMep', function () {
   let item, item0, item1: UserItem;
-  let pageKeyMap: PageKeyMap<UserItem, StringifiableTypes>;
+  let pageKeyMap: PageKeyMap<UserItem, DefaultTranscodeMap>;
 
   beforeEach(function () {
     [item, item0, item1] = getUsers(3) as UserItem[];

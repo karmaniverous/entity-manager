@@ -3,7 +3,7 @@ import type {
   Entity,
   Exactify,
   PropertiesOfType,
-  StringifiableTypes,
+  DefaultTranscodeMap,
 } from '@karmaniverous/entity-tools';
 
 import type { Config, EntityMap, ExclusiveKey } from './Config';
@@ -32,7 +32,7 @@ interface User extends Entity {
 
 type test = PropertiesOfType<
   User,
-  StringifiableTypes[keyof StringifiableTypes]
+  DefaultTranscodeMap[keyof DefaultTranscodeMap]
 >;
 
 interface Email extends Entity {
@@ -67,7 +67,7 @@ type neverProperties = PropertiesOfType<MyEntityMap['user'], never>;
 
 type stringifiableProperties = PropertiesOfType<
   User,
-  StringifiableTypes[keyof StringifiableTypes]
+  DefaultTranscodeMap[keyof DefaultTranscodeMap]
 >;
 
 type exactifiedUser = Exactify<User>;

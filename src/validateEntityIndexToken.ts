@@ -1,4 +1,4 @@
-import type { TypeMap } from '@karmaniverous/entity-tools';
+import type { TranscodeMap } from '@karmaniverous/entity-tools';
 
 import type { EntityMap } from './Config';
 import { EntityManager } from './EntityManager';
@@ -18,7 +18,7 @@ export function validateEntityIndexToken<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TypeMap,
+  IndexableTypes extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
   entityToken: string,

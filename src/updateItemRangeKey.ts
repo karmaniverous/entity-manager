@@ -1,7 +1,7 @@
 import {
   type Exactify,
   isNil,
-  type TypeMap,
+  type TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
@@ -27,7 +27,7 @@ export function updateItemRangeKey<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TypeMap,
+  IndexableTypes extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
   item: Partial<Item>,

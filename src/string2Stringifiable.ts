@@ -1,6 +1,6 @@
-import { TypeMap } from '@karmaniverous/entity-tools';
+import { TranscodeMap } from '@karmaniverous/entity-tools';
 
-export const string2Stringifiable = <IndexableTypes extends TypeMap>(
+export const string2Stringifiable = <IndexableTypes extends TranscodeMap>(
   type: keyof IndexableTypes,
   value?: string,
 ): IndexableTypes[keyof IndexableTypes] | undefined => {

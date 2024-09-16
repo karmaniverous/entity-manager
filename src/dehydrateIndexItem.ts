@@ -1,4 +1,4 @@
-import type { Exactify, TypeMap } from '@karmaniverous/entity-tools';
+import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
@@ -35,7 +35,7 @@ export function dehydrateIndexItem<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TypeMap,
+  IndexableTypes extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
   item: Partial<Item> | undefined,

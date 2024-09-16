@@ -1,7 +1,7 @@
 import {
   type Exactify,
   isNil,
-  type TypeMap,
+  type TranscodeMap,
 } from '@karmaniverous/entity-tools';
 import stringHash from 'string-hash';
 
@@ -28,7 +28,7 @@ export function updateItemHashKey<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TypeMap,
+  IndexableTypes extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
   item: Item,

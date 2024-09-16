@@ -1,18 +1,6 @@
-# TODO
-
-- Rationalize query parameter names. `keyToken` should probably be `hashKeyToken`. Normalize `sortKey` to `rangeKey`.
-
-- Add a `sortKey` parameter that sorts the combined result.
-
-- Where we can either refer to an index name or provide an array of key tokens, should we use an `...Index` suffix?
-
-- Add a `rangeKey` parameter that ensures uniqueness of the combined result. Should this be an entity property?
-
 # entity-manager
 
 > EntityManager implements rational indexing & cross-shard querying at scale in your NoSQL database so you can focus on your application logic.
-
-This package is currently undergoing a complete Typescript refactor. The underlying code base is HIGHLY stable, but it will be a few weeks before the package is ready for you to use.
 
 If you have any questions, please [start a discussion](https://github.com/karmaniverous/entity-manager/discussions). Otherwise stay tuned!
 

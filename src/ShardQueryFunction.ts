@@ -1,8 +1,8 @@
 import type {
   Exactify,
   PropertiesOfType,
-  StringifiableTypes,
-  TypeMap,
+  DefaultTranscodeMap,
+  TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
@@ -16,7 +16,7 @@ import type { ShardQueryResult } from './ShardQueryResult';
  * pages queried across multiple shards into a single query result.
  *
  * @typeParam Item - The {@link ItemMap | `ItemMap`} type being queried. 
- * @typeParam IndexableTypes - The {@link TypeMap | `TypeMap`} identifying property types that can be indexed. Defaults to {@link StringifiableTypes | `StringifiableTypes`}.
+ * @typeParam IndexableTypes - The {@link TranscodeMap | `TranscodeMap`} identifying property types that can be indexed. Defaults to {@link DefaultTranscodeMap | `DefaultTranscodeMap`}.
 
  * @param hashKey - The {@link ConfigKeys.hashKey | `this.config.hashKey`} property value of the shard being queried.
  * @param pageKey - The page key returned by the previous query on this shard.
@@ -30,7 +30,7 @@ export type ShardQueryFunction<
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
-  IndexableTypes extends TypeMap = StringifiableTypes,
+  IndexableTypes extends TranscodeMap = DefaultTranscodeMap,
 > = (
   hashKey: string,
   pageKey?: Partial<

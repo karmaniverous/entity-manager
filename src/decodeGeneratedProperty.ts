@@ -1,4 +1,4 @@
-import { Exactify, TypeMap } from '@karmaniverous/entity-tools';
+import { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 import { objectify } from 'radash';
 
 import { EntityMap, ItemMap } from './Config';
@@ -23,7 +23,7 @@ export function decodeGeneratedProperty<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TypeMap,
+  IndexableTypes extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
   encoded: string,
