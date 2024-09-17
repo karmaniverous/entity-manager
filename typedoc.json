@@ -1,7 +1,7 @@
 {
   "categoryOrder": ["Entity Manager", "Options", "Items", "Query"],
   "defaultCategory": "Entity Manager",
-  "entryPoints": ["./src"],
+  "entryPoints": ["./src/index.ts"],
   "highlightLanguages": [
     "bash",
     "console",
@@ -36,9 +36,7 @@
   },
   "searchInComments": true,
   "searchInDocuments": true,
-  "sidebarLinks": {
-    "GitHub Repo": "https://github.com/karmaniverous/entity-manager"
-  },
+  "titleLink": "https://github.com/karmaniverous/entity-manager",
   "visibilityFilters": {
     "external": false,
     "protected": false
