@@ -2,9 +2,9 @@ import { expect } from 'chai';
 
 import { entityManager, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
+import { addKeys } from './addKeys';
 import { dehydrateIndexItem } from './dehydrateIndexItem';
 import { rehydrateIndexItem } from './rehydrateIndexItem';
-import { addKeys } from './addKeys';
 
 describe('rehydrateIndexItem', function () {
   it('should rehydrate item by index', function () {

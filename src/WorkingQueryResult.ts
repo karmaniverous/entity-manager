@@ -1,6 +1,6 @@
 import type {
-  Exactify,
   DefaultTranscodeMap,
+  Exactify,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 

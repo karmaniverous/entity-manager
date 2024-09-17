@@ -1,7 +1,7 @@
 import type {
+  DefaultTranscodeMap,
   Exactify,
   PropertiesOfType,
-  DefaultTranscodeMap,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
