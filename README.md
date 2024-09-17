@@ -1,6 +1,10 @@
-# entity-manager
+<!-- TYPEDOC_EXCLUDE -->
 
 > [API Documentation](https://karmanivero.us/entity-manager/) • [CHANGELOG](https://github.com/karmaniverous/entity-manager/tree/main/CHANGELOG.md)
+
+<!-- /TYPEDOC_EXCLUDE -->
+
+# entity-manager
 
 **EntityManager implements rational indexing & cross-shard querying at scale in your NoSQL database so you can focus on your application logic.**
 
@@ -29,4 +33,3 @@ With EntityManager, you can:
 ---
 
 Built for you with ❤️ on Bali! Find more great tools & templates on [my GitHub Profile](https://github.com/karmaniverous).
-

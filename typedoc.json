@@ -1,5 +1,5 @@
 {
-  "categoryOrder": ["Entity Manager", "Options", "Items", "Query"],
+  "categoryOrder": ["Entity Manager"],
   "defaultCategory": "Entity Manager",
   "entryPoints": ["./src/index.ts"],
   "highlightLanguages": [
