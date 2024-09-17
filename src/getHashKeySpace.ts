@@ -21,9 +21,9 @@ export function getHashKeySpace<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
+  entityManager: EntityManager<M, HashKey, RangeKey, T>,
   entityToken: keyof M & string,
   timestampFrom = 0,
   timestampTo = Date.now(),

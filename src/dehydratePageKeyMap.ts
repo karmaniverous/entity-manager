@@ -33,10 +33,10 @@ export function dehydratePageKeyMap<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
-  pageKeyMap: PageKeyMap<Item, IndexableTypes>,
+  entityManager: EntityManager<M, HashKey, RangeKey, T>,
+  pageKeyMap: PageKeyMap<Item, T>,
   entityToken: EntityToken,
 ): string[] {
   try {

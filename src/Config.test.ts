@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type {
-  Entity,
-  Exactify,
-  PropertiesOfType,
-  DefaultTranscodeMap,
+import {
+  type DefaultTranscodeMap,
+  defaultTranscodes,
+  type Entity,
+  type Exactify,
+  type PropertiesOfType,
 } from '@karmaniverous/entity-tools';
 
 import type { Config, EntityMap, ExclusiveKey } from './Config';
@@ -90,12 +91,12 @@ const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
           elements: ['lastNameCanonical', 'firstNameCanonical'],
         },
       },
-      types: {
-        created: 'number',
+      elementTypes: {
+        created: 'timestamp',
         firstNameCanonical: 'string',
         lastNameCanonical: 'string',
         phone: 'string',
-        updated: 'number',
+        updated: 'timestamp',
         userId: 'string',
       },
       timestampProperty: 'created',
@@ -105,11 +106,16 @@ const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
       indexes: {
         userId: ['entityPK', 'entitySK', 'userId'],
       },
-      types: { created: 'number', email: 'string', userId: 'string' },
+      elementTypes: {
+        created: 'timestamp',
+        email: 'string',
+        userId: 'string',
+      },
       timestampProperty: 'created',
       uniqueProperty: 'email',
     },
   },
+  transcodes: defaultTranscodes,
   hashKey: 'entityPK',
   rangeKey: 'entitySK',
 };

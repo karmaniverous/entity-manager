@@ -35,15 +35,15 @@ export function rehydratePageKeyMap<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
+  entityManager: EntityManager<M, HashKey, RangeKey, T>,
   dehydrated: string[] | undefined,
   entityToken: EntityToken,
   indexTokens: string[],
   timestampFrom = 0,
   timestampTo = Date.now(),
-): PageKeyMap<Item, IndexableTypes> {
+): PageKeyMap<Item, T> {
   try {
     // Validate params.
     if (!indexTokens.length) throw new Error('indexTokens empty');
@@ -111,7 +111,7 @@ export function rehydratePageKeyMap<
       rehydrated,
     });
 
-    return rehydrated as PageKeyMap<Item, IndexableTypes>;
+    return rehydrated as PageKeyMap<Item, T>;
   } catch (error) {
     if (error instanceof Error)
       console.error(error.message, {

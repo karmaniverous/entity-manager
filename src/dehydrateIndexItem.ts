@@ -1,6 +1,7 @@
 import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
+import { encodeEntityElement } from './encodeEntityElement';
 import { EntityManager } from './EntityManager';
 import { unwrapIndex } from './unwrapIndex';
 import { validateEntityIndexToken } from './validateEntityIndexToken';
@@ -35,15 +36,17 @@ export function dehydrateIndexItem<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
+  entityManager: EntityManager<M, HashKey, RangeKey, T>,
   item: Partial<Item> | undefined,
   entityToken: EntityToken,
   indexToken: string,
   omit: string[] = [],
 ): string {
   try {
+    const { generatedKeyDelimiter } = entityManager.config;
+
     // Validate params.
     validateEntityIndexToken(entityManager, entityToken, indexToken);
 
@@ -57,8 +60,10 @@ export function dehydrateIndexItem<
 
     // Join index element values.
     const dehydrated = elements
-      .map((element) => item[element as keyof Item]?.toString() ?? '')
-      .join(entityManager.config.generatedKeyDelimiter);
+      .map((element) =>
+        encodeEntityElement(entityManager, item, entityToken, element),
+      )
+      .join(generatedKeyDelimiter);
 
     console.debug('dehydrated index', {
       item,

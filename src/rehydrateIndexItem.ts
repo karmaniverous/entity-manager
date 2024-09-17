@@ -2,8 +2,8 @@ import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 import { shake, zipToObject } from 'radash';
 
 import type { EntityMap, ItemMap } from './Config';
+import { decodeEntityElement } from './decodeEntityElement';
 import { EntityManager } from './EntityManager';
-import { string2Stringifiable } from './string2Stringifiable';
 import { unwrapIndex } from './unwrapIndex';
 import { validateEntityIndexToken } from './validateEntityIndexToken';
 
@@ -32,15 +32,17 @@ export function rehydrateIndexItem<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
+  entityManager: EntityManager<M, HashKey, RangeKey, T>,
   dehydrated: string,
   entityToken: EntityToken,
   indexToken: string,
   omit: string[] = [],
 ): Partial<Item> {
   try {
+    const { generatedKeyDelimiter } = entityManager.config;
+
     // Validate params.
     validateEntityIndexToken(entityManager, entityToken, indexToken);
 
@@ -50,7 +52,7 @@ export function rehydrateIndexItem<
     );
 
     // Split dehydrated value & validate.
-    const values = dehydrated.split(entityManager.config.generatedKeyDelimiter);
+    const values = dehydrated.split(generatedKeyDelimiter);
 
     if (elements.length !== values.length)
       throw new Error('index rehydration key-value mismatch');
@@ -60,10 +62,7 @@ export function rehydrateIndexItem<
       zipToObject(
         elements,
         values.map((value, i) =>
-          string2Stringifiable<IndexableTypes>(
-            entityManager.config.entities[entityToken].types[elements[i]],
-            value,
-          ),
+          decodeEntityElement(entityManager, value, entityToken, elements[i]),
         ),
       ),
     ) as Partial<Item>;

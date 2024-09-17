@@ -40,7 +40,7 @@
     "GitHub Repo": "https://github.com/karmaniverous/entity-manager"
   },
   "visibilityFilters": {
-    "external": true,
+    "external": false,
     "protected": false
   }
 }

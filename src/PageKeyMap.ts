@@ -13,18 +13,15 @@ import type {
  * The values of the inner object are the page key objects returned by the previous database query on the related index & shard. An `undefined` value indicates that there are no more pages to query for that index & shard.
  *
  * @typeParam Item - The item type being queried. This will geerally be an {@link ItemMap | `ItemMap`} object.
- * @typeParam IndexableTypes - The {@link TranscodeMap | `TranscodeMap`} identifying property types that can be indexed.
+ * @typeParam T - The {@link TranscodeMap | `TranscodeMap`} identifying property types that can be indexed.
  */
 export type PageKeyMap<
   Item extends Record<string, unknown>,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 > = Record<
   string,
   Record<
     string,
-    | Partial<
-        Pick<Item, PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>>
-      >
-    | undefined
+    Partial<Pick<Item, PropertiesOfType<Item, T[keyof T]>>> | undefined
   >
 >;

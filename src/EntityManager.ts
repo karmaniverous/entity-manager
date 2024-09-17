@@ -19,7 +19,7 @@ export class EntityManager<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 > {
   #config: ParsedConfig;
 
@@ -28,7 +28,7 @@ export class EntityManager<
    *
    * @param config - EntityManager {@link Config | `Config`} object.
    */
-  constructor(config: Config<M, HashKey, RangeKey, IndexableTypes>) {
+  constructor(config: Config<M, HashKey, RangeKey, T>) {
     this.#config = configSchema.parse(config);
   }
 
@@ -107,14 +107,7 @@ export class EntityManager<
     Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
     EntityToken extends keyof Exactify<M> & string,
   >(
-    options: QueryOptions<
-      Item,
-      EntityToken,
-      M,
-      HashKey,
-      RangeKey,
-      IndexableTypes
-    >,
+    options: QueryOptions<Item, EntityToken, M, HashKey, RangeKey, T>,
   ): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
     return await query(this, options);
   }

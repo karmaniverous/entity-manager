@@ -18,9 +18,9 @@ export function validateEntityIndexToken<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
+  entityManager: EntityManager<M, HashKey, RangeKey, T>,
   entityToken: string,
   indexToken: string,
 ): void {

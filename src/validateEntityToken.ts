@@ -15,9 +15,9 @@ export function validateEntityToken<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
+  entityManager: EntityManager<M, HashKey, RangeKey, T>,
   entityToken: string,
 ): void {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

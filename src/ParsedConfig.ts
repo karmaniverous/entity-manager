@@ -1,3 +1,4 @@
+import { defaultTranscodes } from '@karmaniverous/entity-tools';
 import { counting, sort } from 'radash';
 import { z } from 'zod';
 
@@ -70,6 +71,7 @@ export const configSchema = z
               )
               .optional()
               .default({}),
+            elementTypes: z.record(z.string()).optional().default({}),
             indexes: z
               .record(
                 z
@@ -79,14 +81,15 @@ export const configSchema = z
               )
               .optional()
               .default({}),
-            types: z.record(z.string()).optional().default({}),
             shardBumps: z
               .array(
-                z.object({
-                  timestamp: z.number().nonnegative().safe(),
-                  charBits: z.number().int().min(1).max(5),
-                  chars: z.number().int().min(0).max(40),
-                }),
+                z
+                  .object({
+                    timestamp: z.number().nonnegative().safe(),
+                    charBits: z.number().int().min(1).max(5),
+                    chars: z.number().int().min(0).max(40),
+                  })
+                  .strict(),
               )
               .optional()
               .default([defaultShardBump])
@@ -125,6 +128,7 @@ export const configSchema = z
             timestampProperty: z.string().min(1),
             uniqueProperty: z.string().min(1),
           })
+          .strict()
           .superRefine((data, ctx) => {
             const generatedKeys = Object.keys(data.generated);
 
@@ -153,7 +157,19 @@ export const configSchema = z
     hashKey: z.string().optional().default('hashKey'),
     rangeKey: z.string().optional().default('rangeKey'),
     throttle: z.number().int().positive().safe().optional().default(10),
+    transcodes: z
+      .record(
+        z
+          .object({
+            encode: z.function().args(z.any()).returns(z.string()),
+            decode: z.function().args(z.string()).returns(z.any()),
+          })
+          .strict(),
+      )
+      .optional()
+      .default(defaultTranscodes),
   })
+  .strict()
   .superRefine((data, ctx) => {
     // validate no generated key delimiter collision
     if (data.generatedKeyDelimiter.includes(data.generatedValueDelimiter))
@@ -226,6 +242,60 @@ export const configSchema = z
       [...reservedKeys, data.hashKey],
       ctx,
     );
+
+    // validate entities
+    const transcodes = Object.keys(data.transcodes);
+
+    for (const [entityToken, entity] of Object.entries(data.entities)) {
+      // validate all entity generated element type values are transcode keys.
+      for (const [element, generatedElementType] of Object.entries(
+        entity.elementTypes,
+      ))
+        if (!transcodes.includes(generatedElementType))
+          ctx.addIssue({
+            code: z.ZodIssueCode.invalid_enum_value,
+            options: transcodes,
+            path: ['entities', entityToken, 'elementTypes', element],
+            received: generatedElementType,
+          });
+
+      // validate all entity generated property elements have a corresponding entity element type.
+      const typedElements = Object.keys(entity.elementTypes);
+
+      for (const [generatedKey, generated] of Object.entries(entity.generated))
+        for (const element of generated?.elements ?? [])
+          if (!typedElements.includes(element))
+            ctx.addIssue({
+              code: z.ZodIssueCode.invalid_enum_value,
+              options: typedElements,
+              path: [
+                'entities',
+                entityToken,
+                'generated',
+                generatedKey,
+                'elements',
+              ],
+              received: element,
+            });
+
+      // validate all ungenerated entity index components have a corresponding entity element type.
+      const generatedProperties = Object.keys(entity.generated);
+
+      for (const [indexKey, index] of Object.entries(entity.indexes))
+        for (const component of index)
+          if (
+            ![data.hashKey, data.rangeKey, ...generatedProperties].includes(
+              component,
+            ) &&
+            !typedElements.includes(component)
+          )
+            ctx.addIssue({
+              code: z.ZodIssueCode.invalid_enum_value,
+              options: typedElements,
+              path: ['entities', entityToken, 'indexes', indexKey],
+              received: component,
+            });
+    }
   });
 
 /**

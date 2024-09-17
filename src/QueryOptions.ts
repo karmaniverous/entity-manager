@@ -18,7 +18,7 @@ export interface QueryOptions<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 > {
   /** Identifies the entity to be queried. Key of {@link Config | `EntityManager.config.entities`}. */
   entityToken: EntityToken;
@@ -73,7 +73,7 @@ export interface QueryOptions<
    */
   queryMap: Record<
     string,
-    ShardQueryFunction<Item, EntityToken, M, HashKey, RangeKey, IndexableTypes>
+    ShardQueryFunction<Item, EntityToken, M, HashKey, RangeKey, T>
   >;
 
   /**

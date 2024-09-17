@@ -23,9 +23,9 @@ export function encodeGeneratedProperty<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
+  entityManager: EntityManager<M, HashKey, RangeKey, T>,
   item: Partial<Item>,
   entityToken: EntityToken,
   property: keyof M[EntityToken] & string,

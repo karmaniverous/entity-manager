@@ -5,6 +5,7 @@ import type {
   PropertiesOfType,
   TranscodableProperties,
   TranscodeMap,
+  Transcodes,
 } from '@karmaniverous/entity-tools';
 
 /**
@@ -67,33 +68,6 @@ export type ConfigEntityGenerated<
           }
         >)
   | ([PropertiesOfType<M[EntityToken], never>] extends [never]
-      ? Record<string, never>
-      : never);
-
-/**
- * Returns the `types` property of a Config entity.
- *
- * @typeParam EntityToken - The {@link Entity | `Entity`} token.
- * @typeParam M - The {@link EntityMap | `EntityMap`}.
- * @typeParam T - The {@link TranscodeMap | `TranscodeMap`} identifying transcodable property types..
- *
- * @remarks
- * This property supports typing of values decoded from generated properties.
- *
- * All Entity properties of types `string`, `number`, `boolean`, or `bigint` must be represented, and no extra properties are allowed.
- *
- * @category Config
- * @protected
- */
-export type ConfigEntityTypes<
-  EntityToken extends keyof Exactify<M>,
-  M extends EntityMap,
-  T extends TranscodeMap,
-> =
-  | ([TranscodableProperties<M[EntityToken], T>] extends [never]
-      ? never
-      : Record<TranscodableProperties<M[EntityToken], T>, keyof T>)
-  | ([TranscodableProperties<M[EntityToken], T>] extends [never]
       ? Record<string, never>
       : never);
 
@@ -174,6 +148,66 @@ export type ConfigEntity<
   defaultPageSize?: number;
 
   /**
+   * This object assigns transcodes to {@link Entity | `Entity`} generated property & ungenerated index elements.
+   *
+   * These transcodes are used to encode and decode generated property values & pageKeys.
+   *
+   * The keys of this object must be transcodable properties of the {@link Entity | `Entity`}.
+   *
+   * The values of this object must be one of the keys of the {@link Config | `Config`} `T` type parameter (the config's {@link TranscodeMap | `TranscodeMap`}).
+   *
+   * The types of the related {@link Entity | `Entity`} and {@link TranscodeMap | `TranscodeMap`} properties should match.
+   *
+   * If any entity generated property element or ungenerated index element is not included here, the {@link Config | `Config`} object will fail to parse.
+   *
+   * @example
+   * ```
+   * // Default transcodable types.
+   * interface DefaultTranscodeMap extends TranscodeMap {
+   *   string: string;
+   *   number: number;
+   *   boolean: boolean;
+   *   bigint: bigint;
+   * }
+   *
+   * interface MyEntityMap extends EntityMap {
+   *   user: {
+   *    created: number;
+   *    data?: Json; // Not a Stringifiable type
+   *    userId: string;
+   *   };
+   * }
+   *
+   * // T type param defaults to DefaultTranscodeMap.
+   * const config: Config<MyEntityMap> = {
+   *   entities: {
+   *     user: {
+   *       ...,
+   *       types: { // All Stringafiable properties required!
+   *         created: 'number',
+   *         userId: 'string',
+   *         // 'data' not allowed: not a Stringifiable type
+   *       }
+   *     }
+   *   },
+   *   ...
+   * };
+   * ```
+   */
+  elementTypes?:
+    | ([TranscodableProperties<M[EntityToken], T>] extends [never]
+        ? never
+        : {
+            [P in TranscodableProperties<M[EntityToken], T>]?: PropertiesOfType<
+              T,
+              M[EntityToken][P]
+            >;
+          })
+    | ([TranscodableProperties<M[EntityToken], T>] extends [never]
+        ? Record<string, never>
+        : never);
+
+  /**
    * Indexes defined for the {@link Entity | `Entity`}. Should reflect the underlying database table indexes.
    *
    * Each key is the name of an index, and each value is a non-empty array of {@link Entity | `Entity`} property names that define the index.
@@ -239,53 +273,7 @@ export type ConfigEntity<
        * All such properties must be accounted for in the `generated` object, and no additional properties are permitted..
        */
       generated: ConfigEntityGenerated<EntityToken, M, T>;
-    }) &
-  ([TranscodableProperties<M[EntityToken], T>] extends [never]
-    ? { types?: ConfigEntityTypes<EntityToken, M, T> }
-    : {
-        /**
-         * This object defines the types of {@link Entity | `Entity`} transcodable properties in a way that is accessible at runtime. It is used to rehydrate PageKeyMap objects from highly compressed, URL-safe string values.
-         *
-         * The keys of this object must exactly match the transcodable properties of the {@link Entity | `Entity`}. Note that all {@link ConfigEntityGenerated | generated properties} are transcodable by definition and need not be included.
-         *
-         * The values of this object must be one of the keys of the {@link Config | `Config`} `T` type parameter, and should match the associted property type.
-         *
-         * @example
-         * ```
-         * // Default transcodable types.
-         * interface DefaultTranscodeMap extends TranscodeMap {
-         *   string: string;
-         *   number: number;
-         *   boolean: boolean;
-         *   bigint: bigint;
-         * }
-         *
-         * interface MyEntityMap extends EntityMap {
-         *   user: {
-         *    created: number;
-         *    data?: Json; // Not a Stringifiable type
-         *    userId: string;
-         *   };
-         * }
-         *
-         * // T type param defaults to DefaultTranscodeMap.
-         * const config: Config<MyEntityMap> = {
-         *   entities: {
-         *     user: {
-         *       ...,
-         *       types: { // All Stringafiable properties required!
-         *         created: 'number',
-         *         userId: 'string',
-         *         // 'data' not allowed: not a Stringifiable type
-         *       }
-         *     }
-         *   },
-         *   ...
-         * };
-         * ```
-         */
-        types: ConfigEntityTypes<EntityToken, M, T>;
-      });
+    });
 
 /**
  * Returns the `entities` property of the {@link Config | `Config`} tyoe.
@@ -361,6 +349,14 @@ export interface ConfigKeys<
 }
 
 /**
+ * @category Config
+ * @protected
+ */
+export type ConfigTranscodes<T extends TranscodeMap> =
+  | ([keyof Exactify<T>] extends [never] ? never : Transcodes<T>)
+  | ([keyof Exactify<T>] extends [never] ? Record<string, never> : never);
+
+/**
  * EntityManager Config type.
  *
  * @typeParam M - The {@link EntityMap | `EntityMap`} type that identitfies the {@link Entity | `Entity`} & related property types to be managed by EntityManager.
@@ -414,7 +410,11 @@ export type Config<
    * @defaultValue `10`
    */
   throttle?: number;
-};
+} & ([keyof Exactify<T>] extends [never]
+    ? { transcodes?: ConfigTranscodes<T> }
+    : DefaultTranscodeMap extends T
+      ? { transcodes?: ConfigTranscodes<T> }
+      : { transcodes: ConfigTranscodes<T> });
 
 /**
  * Flattens the top layer of logic in a type.

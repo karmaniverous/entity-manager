@@ -11,7 +11,7 @@ import type { EntityMap, ItemMap } from './Config';
  * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
  *
  * @typeParam Item - The {@link ItemMap | `ItemMap`} type being queried. 
- * @typeParam IndexableTypes - The {@link TranscodeMap | `TranscodeMap`} identifying property types that can be indexed.
+ * @typeParam T - The {@link TranscodeMap | `TranscodeMap`} identifying property types that can be indexed.
 
 * @category Query
  */
@@ -21,7 +21,7 @@ export interface ShardQueryResult<
   M extends EntityMap,
   HashKey extends string = 'hashKey',
   RangeKey extends string = 'rangeKey',
-  IndexableTypes extends TranscodeMap = DefaultTranscodeMap,
+  T extends TranscodeMap = DefaultTranscodeMap,
 > {
   /** The number of records returned. */
   count: number;
@@ -30,7 +30,5 @@ export interface ShardQueryResult<
   items: Item[];
 
   /** The page key for the next query on this shard. */
-  pageKey?: Partial<
-    Pick<Item, PropertiesOfType<Item, IndexableTypes[keyof IndexableTypes]>>
-  >;
+  pageKey?: Partial<Pick<Item, PropertiesOfType<Item, T[keyof T]>>>;
 }

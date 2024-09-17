@@ -43,9 +43,9 @@ export async function query<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
+  entityManager: EntityManager<M, HashKey, RangeKey, T>,
   {
     entityToken,
     hashKey,
@@ -58,7 +58,7 @@ export async function query<
     timestampFrom = 0,
     timestampTo = Date.now(),
     throttle = entityManager.config.throttle,
-  }: QueryOptions<Item, EntityToken, M, HashKey, RangeKey, IndexableTypes>,
+  }: QueryOptions<Item, EntityToken, M, HashKey, RangeKey, T>,
 ): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
   try {
     // Get defaults.

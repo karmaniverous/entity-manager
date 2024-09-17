@@ -21,11 +21,15 @@ export interface MyEntityMap extends EntityMap {
 export const config: Config<MyEntityMap, 'hashKey2'> = {
   entities: {
     email: {
+      elementTypes: {
+        created: 'int',
+        email: 'string',
+        userId: 'string',
+      },
       indexes: {
         userId: ['hashKey2', 'rangeKey', 'userId'],
       },
       timestampProperty: 'created',
-      types: { created: 'number', email: 'string', userId: 'string' },
       uniqueProperty: 'email',
     },
     user: {
@@ -49,19 +53,19 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
           elements: ['phone', 'created'],
         },
       },
+      elementTypes: {
+        created: 'int',
+        firstNameCanonical: 'string',
+        lastNameCanonical: 'string',
+        phone: 'string',
+        updated: 'int',
+        userId: 'string',
+      },
       shardBumps: [
         { timestamp: now + day, charBits: 2, chars: 1 },
         { timestamp: now + day * 2, charBits: 2, chars: 2 },
       ],
       timestampProperty: 'created',
-      types: {
-        created: 'number',
-        firstNameCanonical: 'string',
-        lastNameCanonical: 'string',
-        phone: 'string',
-        updated: 'number',
-        userId: 'string',
-      },
       uniqueProperty: 'userId',
     },
   },

@@ -3,8 +3,8 @@ export type {
   ConfigEntities,
   ConfigEntity,
   ConfigEntityGenerated,
-  ConfigEntityTypes,
   ConfigKeys,
+  ConfigTranscodes,
   EntityMap,
   ExclusiveKey,
   ItemMap,
@@ -19,9 +19,11 @@ export type { ShardQueryFunction } from './ShardQueryFunction';
 export type { ShardQueryResult } from './ShardQueryResult';
 export type {
   DefaultTranscodeMap,
+  defaultTranscodes,
   Entity,
   PropertiesOfType,
   SortOrder,
   TranscodableProperties,
   TranscodeMap,
+  Transcodes,
 } from '@karmaniverous/entity-tools';

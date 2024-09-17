@@ -1,7 +1,7 @@
 import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 import { shake } from 'radash';
 
-import type { EntityMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
 import { validateEntityIndexToken } from './validateEntityIndexToken';
 
@@ -18,15 +18,17 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * @throws `Error` if `indexToken` is invalid.
  */
 export function unwrapIndex<
+  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
+  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
-  entityToken: keyof Exactify<M> & string,
+  entityManager: EntityManager<M, HashKey, RangeKey, T>,
+  entityToken: EntityToken,
   indexToken: string,
-) {
+): (keyof Item & string)[] {
   try {
     // Validate params.
     validateEntityIndexToken(entityManager, entityToken, indexToken);
@@ -45,7 +47,7 @@ export function unwrapIndex<
               : component,
       )
       .flat()
-      .sort();
+      .sort() as (keyof Item & string)[];
   } catch (error) {
     if (error instanceof Error)
       console.error(error.message, { indexToken, entityToken });

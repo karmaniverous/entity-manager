@@ -1,9 +1,9 @@
-import { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
+import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 import { objectify } from 'radash';
 
-import { EntityMap, ItemMap } from './Config';
+import type { EntityMap, ItemMap } from './Config';
+import { decodeEntityElement } from './decodeEntityElement';
 import { EntityManager } from './EntityManager';
-import { string2Stringifiable } from './string2Stringifiable';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
@@ -23,13 +23,20 @@ export function decodeGeneratedProperty<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap,
+  T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, IndexableTypes>,
+  entityManager: EntityManager<M, HashKey, RangeKey, T>,
   encoded: string,
   entityToken: EntityToken,
 ): Partial<Item> {
   try {
+    const {
+      generatedKeyDelimiter,
+      generatedValueDelimiter,
+      hashKey,
+      shardKeyDelimiter,
+    } = entityManager.config;
+
     // Validate params.
     validateEntityToken(entityManager, entityToken);
 
@@ -37,16 +44,16 @@ export function decodeGeneratedProperty<
     if (!encoded) return {};
 
     // Split encoded into keys.
-    const keys = encoded.split(entityManager.config.generatedKeyDelimiter);
+    const keys = encoded.split(generatedKeyDelimiter);
 
     // Initiate result with hashKey if sharded.
-    const decoded = keys[0].includes(entityManager.config.shardKeyDelimiter)
-      ? { [entityManager.config.hashKey]: keys.shift() }
+    const decoded = keys[0].includes(shardKeyDelimiter)
+      ? { [hashKey]: keys.shift() }
       : {};
 
     // Split keys into values & validate.
     const values = keys.map((key) => {
-      const pair = key.split(entityManager.config.generatedValueDelimiter);
+      const pair = key.split(generatedValueDelimiter);
 
       if (pair.length !== 2)
         throw new Error(`invalid generated property value '${key}'`);
@@ -61,9 +68,11 @@ export function decodeGeneratedProperty<
         values,
         ([key]) => key,
         ([key, value]) =>
-          string2Stringifiable<IndexableTypes>(
-            entityManager.config.entities[entityToken].types[key],
+          decodeEntityElement(
+            entityManager,
             value,
+            entityToken,
+            key as keyof Item & string,
           ),
       ),
     );

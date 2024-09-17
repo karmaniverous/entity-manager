@@ -16,7 +16,7 @@ export interface WorkingQueryResult<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  IndexableTypes extends TranscodeMap = DefaultTranscodeMap,
+  T extends TranscodeMap = DefaultTranscodeMap,
 > {
   /** The returned records. */
   items: Item[];
@@ -25,5 +25,5 @@ export interface WorkingQueryResult<
    * A compressed, two-layer map of page keys, used to query the next page of
    * data for a given sort key on each shard of a given hash key.
    */
-  pageKeyMap: PageKeyMap<Item, IndexableTypes>;
+  pageKeyMap: PageKeyMap<Item, T>;
 }
