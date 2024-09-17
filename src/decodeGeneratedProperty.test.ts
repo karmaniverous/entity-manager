@@ -1,0 +1,67 @@
+import { expect } from 'chai';
+
+import { entityManager } from '../test/config';
+import { decodeGeneratedProperty } from './decodeGeneratedProperty';
+
+describe('decodeGeneratedProperty', function () {
+  it('should decode empty string to empty object', function () {
+    const decoded = decodeGeneratedProperty(entityManager, '', 'user');
+
+    expect(decoded).to.deep.equal({});
+  });
+
+  it('should fail on no value delimiters', function () {
+    expect(() =>
+      decodeGeneratedProperty(entityManager, 'abc', 'user'),
+    ).to.throw('invalid generated property value');
+  });
+
+  it('should fail on too many value delimiters', function () {
+    expect(() =>
+      decodeGeneratedProperty(entityManager, 'abc#def#ghi', 'user'),
+    ).to.throw('invalid generated property value');
+  });
+
+  it('should decode hash key', function () {
+    const decoded = decodeGeneratedProperty(entityManager, 'user!q', 'user');
+
+    expect(decoded).to.deep.equal({ hashKey2: 'user!q' });
+  });
+
+  it('should decode generated property', function () {
+    const decoded = decodeGeneratedProperty(
+      entityManager,
+      'firstNameCanonical#lilian|lastNameCanonical#fahey',
+      'user',
+    );
+
+    expect(decoded).to.deep.equal({
+      firstNameCanonical: 'lilian',
+      lastNameCanonical: 'fahey',
+    });
+  });
+
+  it('should decode generated property with hash key', function () {
+    const decoded = decodeGeneratedProperty(
+      entityManager,
+      'user!q|firstNameCanonical#lilian|lastNameCanonical#fahey',
+      'user',
+    );
+
+    expect(decoded).to.deep.equal({
+      hashKey2: 'user!q',
+      firstNameCanonical: 'lilian',
+      lastNameCanonical: 'fahey',
+    });
+  });
+
+  it('should fail on misplaced hash key', function () {
+    expect(() =>
+      decodeGeneratedProperty(
+        entityManager,
+        'firstNameCanonical#lilian|user!q|lastNameCanonical#fahey',
+        'user',
+      ),
+    ).to.throw('invalid generated property value');
+  });
+});
