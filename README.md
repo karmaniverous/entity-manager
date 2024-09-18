@@ -1,6 +1,6 @@
 <!-- TYPEDOC_EXCLUDE -->
 
-> [API Documentation](https://karmanivero.us/entity-manager/) • [CHANGELOG](https://github.com/karmaniverous/entity-manager/tree/main/CHANGELOG.md)
+> [API Documentation](https://docs.karmanivero.us/entity-manager/) • [CHANGELOG](https://github.com/karmaniverous/entity-manager/tree/main/CHANGELOG.md)
 
 <!-- /TYPEDOC_EXCLUDE -->
 
