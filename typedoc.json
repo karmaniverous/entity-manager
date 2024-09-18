@@ -18,7 +18,7 @@
   "navigation": {
     "includeCategories": true
   },
-  "out": "./docs/entity-manager",
+  "out": "./docs",
   "plugin": [
     "typedoc-plugin-mdn-links",
     "typedoc-plugin-replace-text",
