@@ -1,3 +1,6 @@
+/**
+ * @module entity-manager
+ */
 export type {
   Config,
   ConfigEntities,
