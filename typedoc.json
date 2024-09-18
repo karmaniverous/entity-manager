@@ -1,7 +1,7 @@
 {
   "categoryOrder": ["Entity Manager"],
   "defaultCategory": "Entity Manager",
-  "entryPoints": ["./src"],
+  "entryPoints": ["./src/index.ts"],
   "highlightLanguages": [
     "bash",
     "console",
