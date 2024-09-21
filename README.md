@@ -8,7 +8,7 @@
 
 **EntityManager implements rational indexing & cross-shard querying at scale in your NoSQL database so you can focus on your application logic.**
 
-I've just released a full Typescript refactor. Everything works beatuifully, but I'm still fleshing out the documentation.
+I've just released a full Typescript refactor. Everything works beatuifully, but I'm still fleshing out [the documentation](https://karmanivero.us/projects/entity-manager/intro/).
 
 If you have any questions, please [start a discussion](https://github.com/karmaniverous/entity-manager/discussions). Otherwise stay tuned!
 
