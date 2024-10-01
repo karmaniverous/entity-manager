@@ -31,7 +31,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -49,7 +49,7 @@ describe('Config', function () {
       generated: {},
       indexes: {},
       shardBumps: [{ timestamp: 0, chars: 0, charBits: 1 }],
-      elementTypes: { bar: 'string', baz: 'int' },
+      elementTranscodes: { bar: 'string', baz: 'int' },
     });
   });
 
@@ -61,7 +61,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -82,7 +82,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -105,7 +105,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -126,7 +126,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -149,7 +149,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -170,7 +170,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -194,7 +194,7 @@ describe('Config', function () {
       entities: {
         foo: {
           indexes: { id: [] },
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -215,7 +215,7 @@ describe('Config', function () {
       entities: {
         foo: {
           indexes: { id: ['bar', 'bar'] },
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -240,7 +240,7 @@ describe('Config', function () {
           generated: {
             boo: { elements: [] },
           },
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -263,7 +263,7 @@ describe('Config', function () {
           generated: {
             boo: { elements: ['bar', 'bar'] },
           },
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -286,7 +286,7 @@ describe('Config', function () {
       entities: {
         foo: {
           shardBumps: [{ timestamp: 0, chars: -1, charBits: 1 }],
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -309,7 +309,7 @@ describe('Config', function () {
       entities: {
         foo: {
           shardBumps: [{ timestamp: 0, chars: 41, charBits: 1 }],
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
         },
@@ -331,7 +331,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           shardBumps: [
             { timestamp: 0, chars: 0, charBits: 1 },
             { timestamp: 0, chars: 1, charBits: 1 },
@@ -357,7 +357,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           shardBumps: [{ timestamp: 1, chars: 1, charBits: 1 }],
           timestampProperty: 'baz',
           uniqueProperty: 'bar',
@@ -384,7 +384,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           shardBumps: [
             { timestamp: 2, charBits: 1, chars: 2 },
             { timestamp: 1, charBits: 1, chars: 1 },
@@ -414,7 +414,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           shardBumps: [
             { timestamp: 1, charBits: 1, chars: 1 },
             { timestamp: 2, charBits: 1, chars: 1 },
@@ -440,7 +440,7 @@ describe('Config', function () {
     const config: Config<MyEntityMap> = {
       entities: {
         foo: {
-          elementTypes: { bar: 'string', baz: 'int' },
+          elementTranscodes: { bar: 'string', baz: 'int' },
           shardBumps: [
             { timestamp: 2, charBits: 1, chars: 2 },
             { timestamp: 1, charBits: 1, chars: 1 },

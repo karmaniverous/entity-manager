@@ -91,7 +91,7 @@ const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
           elements: ['lastNameCanonical', 'firstNameCanonical'],
         },
       },
-      elementTypes: {
+      elementTranscodes: {
         created: 'timestamp',
         firstNameCanonical: 'string',
         lastNameCanonical: 'string',
@@ -106,7 +106,7 @@ const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
       indexes: {
         userId: ['entityPK', 'entitySK', 'userId'],
       },
-      elementTypes: {
+      elementTranscodes: {
         created: 'timestamp',
         email: 'string',
         userId: 'string',

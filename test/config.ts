@@ -21,7 +21,7 @@ export interface MyEntityMap extends EntityMap {
 export const config: Config<MyEntityMap, 'hashKey2'> = {
   entities: {
     email: {
-      elementTypes: {
+      elementTranscodes: {
         created: 'int',
         email: 'string',
         userId: 'string',
@@ -53,7 +53,7 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
           elements: ['phone', 'created'],
         },
       },
-      elementTypes: {
+      elementTranscodes: {
         created: 'int',
         firstNameCanonical: 'string',
         lastNameCanonical: 'string',

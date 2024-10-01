@@ -194,7 +194,7 @@ export type ConfigEntity<
    * };
    * ```
    */
-  elementTypes?:
+  elementTranscodes?:
     | ([TranscodableProperties<M[EntityToken], T>] extends [never]
         ? never
         : {

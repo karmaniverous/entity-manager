@@ -71,7 +71,7 @@ export const configSchema = z
               )
               .optional()
               .default({}),
-            elementTypes: z.record(z.string()).optional().default({}),
+            elementTranscodes: z.record(z.string()).optional().default({}),
             indexes: z
               .record(
                 z
@@ -249,18 +249,18 @@ export const configSchema = z
     for (const [entityToken, entity] of Object.entries(data.entities)) {
       // validate all entity generated element type values are transcode keys.
       for (const [element, generatedElementType] of Object.entries(
-        entity.elementTypes,
+        entity.elementTranscodes,
       ))
         if (!transcodes.includes(generatedElementType))
           ctx.addIssue({
             code: z.ZodIssueCode.invalid_enum_value,
             options: transcodes,
-            path: ['entities', entityToken, 'elementTypes', element],
+            path: ['entities', entityToken, 'elementTranscodes', element],
             received: generatedElementType,
           });
 
       // validate all entity generated property elements have a corresponding entity element type.
-      const typedElements = Object.keys(entity.elementTypes);
+      const typedElements = Object.keys(entity.elementTranscodes);
 
       for (const [generatedKey, generated] of Object.entries(entity.generated))
         for (const element of generated?.elements ?? [])
