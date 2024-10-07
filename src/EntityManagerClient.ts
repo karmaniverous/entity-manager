@@ -1,4 +1,5 @@
-import { isFunction } from 'radash';
+import { cluster, isFunction, parallel } from 'radash';
+import { setTimeout } from 'timers/promises';
 
 import { conditionalize } from './conditionalize';
 import type { EntityManagerClientBatchOptions } from './EntityManagerClientBatchOptions';
@@ -55,5 +56,64 @@ export abstract class EntityManagerClient<
    */
   get options() {
     return this.#options;
+  }
+
+  /**
+   * Executes a batch operation.
+   *
+   * @param items - Items to batch execute.
+   * @param executeBatch - Function to execute the batch.
+   * @param getUnprocessedItems - Function to get unprocessed items from the output.
+   * @param options - Batch options.
+   *
+   * @typeParam Item - Input item type.
+   * @typeParam Output - Output type.
+   *
+   * @returns Output array.
+   */
+  protected async batchExecute<Item, Output>(
+    items: Item[],
+    executeBatch: (items: Item[]) => Promise<Output>,
+    getUnprocessedItems?: (output: Output) => Item[],
+    {
+      batchSize = this.options.batchSize,
+      delayIncrement = this.options.delayIncrement,
+      maxRetries = this.options.maxRetries,
+      throttle = this.options.throttle,
+    }: EntityManagerClientBatchOptions = {},
+  ): Promise<Output[]> {
+    const batches = cluster(items, batchSize);
+    const outputs: Output[] = [];
+
+    await parallel(throttle!, batches, async (batch) => {
+      let delay = 0;
+      let retry = 0;
+
+      while (batch.length) {
+        if (delay) await setTimeout(delay);
+
+        const output = await executeBatch(batch);
+
+        this.options.logger!.debug('executed batch', {
+          batch,
+          delay,
+          retry,
+          output,
+        });
+
+        outputs.push(output);
+
+        batch = getUnprocessedItems?.(output) ?? [];
+
+        if (batch.length) {
+          if (retry === maxRetries) throw new Error('max retries exceeded');
+
+          delay = delay ? delay * 2 : delayIncrement!;
+          retry++;
+        }
+      }
+    });
+
+    return outputs;
   }
 }
