@@ -74,7 +74,7 @@ export abstract class EntityManagerClient<
   protected async batchExecute<Item, Output>(
     items: Item[],
     executeBatch: (items: Item[]) => Promise<Output>,
-    getUnprocessedItems?: (output: Output) => Item[],
+    getUnprocessedItems?: (output: Output) => Item[] | undefined,
     {
       batchSize = this.options.batchSize,
       delayIncrement = this.options.delayIncrement,
