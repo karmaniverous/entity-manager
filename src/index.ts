@@ -1,6 +1,7 @@
 /**
  * @module entity-manager
  */
+export { conditionalize } from './conditionalize';
 export type {
   Config,
   ConfigEntities,
@@ -15,6 +16,12 @@ export type {
   Unwrap,
 } from './Config';
 export { EntityManager } from './EntityManager';
+export {
+  EntityManagerClient,
+  type EntityManagerClientOptions,
+} from './EntityManagerClient';
+export type { EntityManagerClientBatchOptions } from './EntityManagerClientBatchOptions';
+export type { Logger, LoggerEndpoint, LoggerOptions } from './Logger';
 export type { ParsedConfig } from './ParsedConfig';
 export type { QueryOptions } from './QueryOptions';
 export type { QueryResult } from './QueryResult';
