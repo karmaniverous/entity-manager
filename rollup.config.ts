@@ -21,7 +21,7 @@ const commonAliases: Alias[] = [];
 
 const commonInputOptions: InputOptions = {
   input: 'src/index.ts',
-  plugins: [aliasPlugin({ entries: commonAliases }), commonPlugins],
+  plugins: [aliasPlugin({ entries: commonAliases }), ...commonPlugins],
 };
 
 const config: RollupOptions[] = [
@@ -60,16 +60,6 @@ const config: RollupOptions[] = [
         extend: true,
         file: `${outputPath}/index.d.ts`,
         format: 'esm',
-      },
-      {
-        extend: true,
-        file: `${outputPath}/index.d.mts`,
-        format: 'esm',
-      },
-      {
-        extend: true,
-        file: `${outputPath}/index.d.cts`,
-        format: 'cjs',
       },
     ],
   },
