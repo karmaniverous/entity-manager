@@ -16,6 +16,8 @@ export type EntityManagerClientOptions = EntityManagerClientBatchOptions &
 /**
  * EntityManagerClient base class.
  *
+ * @typeParam O - Options type extended from {@link EntityManagerClientOptions | `EntityManagerClientOptions`}.
+ *
  * @category Client
  */
 export abstract class EntityManagerClient<
@@ -23,6 +25,10 @@ export abstract class EntityManagerClient<
 > {
   #options: Required<O>;
 
+  /**
+   * EntityManagerClient base constructor.
+   * @param options - Options object extended from {@link EntityManagerClientOptions | `EntityManagerClientOptions`}.
+   */
   constructor({
     batchSize = 25,
     delayIncrement = 100,
