@@ -27,6 +27,7 @@ export type { QueryOptions } from './QueryOptions';
 export type { QueryResult } from './QueryResult';
 export type { ShardQueryFunction } from './ShardQueryFunction';
 export type { ShardQueryResult } from './ShardQueryResult';
+export type { WithRequiredAndNonNullable } from './WithRequiredAndNonNullable';
 export type {
   DefaultTranscodeMap,
   defaultTranscodes,
