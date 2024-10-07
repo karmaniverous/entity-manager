@@ -1,6 +1,8 @@
+import { isFunction } from 'radash';
+
 import { conditionalize } from './conditionalize';
-import { EntityManagerClientBatchOptions } from './EntityManagerClientBatchOptions';
-import { LoggerOptions } from './Logger';
+import type { EntityManagerClientBatchOptions } from './EntityManagerClientBatchOptions';
+import type { LoggerOptions } from './Logger';
 
 /**
  * EntityManagerClient base class options.
@@ -18,7 +20,7 @@ export type EntityManagerClientOptions = EntityManagerClientBatchOptions &
 export abstract class EntityManagerClient<
   O extends EntityManagerClientOptions,
 > {
-  #options: Required<O>;
+  #options: O;
 
   constructor({
     batchSize = 25,
@@ -27,10 +29,14 @@ export abstract class EntityManagerClient<
     throttle = 10,
     logger = console,
     logInternals = false,
-    ...options
+    ...childOptions
   }: O) {
+    if (!isFunction(logger.debug))
+      throw new Error('logger must support debug method');
+    if (!isFunction(logger.error))
+      throw new Error('logger must support error method');
+
     this.#options = {
-      ...options,
       batchSize,
       delayIncrement,
       maxRetries,
@@ -40,7 +46,8 @@ export abstract class EntityManagerClient<
         ...logger,
         debug: conditionalize(logger.debug, logInternals),
       },
-    } as Required<O>;
+      ...childOptions,
+    } as O;
   }
 
   /**
