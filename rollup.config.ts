@@ -20,6 +20,14 @@ const commonPlugins = [
 const commonAliases: Alias[] = [];
 
 const commonInputOptions: InputOptions = {
+  external: [
+    '@karmaniverous/entity-tools',
+    'lz-string',
+    'radash',
+    'string-hash',
+    'tslib',
+    'zod',
+  ],
   input: 'src/index.ts',
   plugins: [aliasPlugin({ entries: commonAliases }), ...commonPlugins],
 };
