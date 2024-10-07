@@ -20,7 +20,7 @@ export type EntityManagerClientOptions = EntityManagerClientBatchOptions &
 export abstract class EntityManagerClient<
   O extends EntityManagerClientOptions,
 > {
-  #options: O;
+  #options: Required<O>;
 
   constructor({
     batchSize = 25,
@@ -47,7 +47,7 @@ export abstract class EntityManagerClient<
         debug: conditionalize(logger.debug, logInternals),
       },
       ...childOptions,
-    } as O;
+    } as Required<O>;
   }
 
   /**

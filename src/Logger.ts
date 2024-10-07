@@ -22,8 +22,8 @@ export interface Logger {
  */
 export interface LoggerOptions {
   /** Logger to use for internal logging. Must support the `debug` & `error` methods. Defaults to `console`. */
-  logger: Logger;
+  logger?: Logger;
 
   /** Enables internal logging when `true`. */
-  logInternals: boolean;
+  logInternals?: boolean;
 }

@@ -3,14 +3,14 @@
  */
 export interface EntityManagerClientBatchOptions {
   /** Batch size. */
-  batchSize: number;
+  batchSize?: number;
 
   /** Delay increment in ms for retry operations. Doubles on each retry. */
-  delayIncrement: number;
+  delayIncrement?: number;
 
   /** Max retries for retry operations. */
-  maxRetries: number;
+  maxRetries?: number;
 
   /** Throttle for parallel operations. */
-  throttle: number;
+  throttle?: number;
 }
