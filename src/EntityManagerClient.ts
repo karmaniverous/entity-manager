@@ -16,14 +16,14 @@ export type EntityManagerClientOptions = EntityManagerClientBatchOptions &
 /**
  * EntityManagerClient base class.
  *
- * @typeParam O - Options type extended from {@link EntityManagerClientOptions | `EntityManagerClientOptions`}.
+ * @typeParam Options - Options type extended from {@link EntityManagerClientOptions | `EntityManagerClientOptions`}.
  *
  * @category Client
  */
 export abstract class EntityManagerClient<
-  O extends EntityManagerClientOptions,
+  Options extends EntityManagerClientOptions,
 > {
-  #options: Required<O>;
+  #options: Required<Options>;
 
   /**
    * EntityManagerClient base constructor.
@@ -37,7 +37,7 @@ export abstract class EntityManagerClient<
     logger = console,
     logInternals = false,
     ...childOptions
-  }: O) {
+  }: Options) {
     if (!isFunction(logger.debug))
       throw new Error('logger must support debug method');
     if (!isFunction(logger.error))
@@ -54,7 +54,7 @@ export abstract class EntityManagerClient<
         debug: conditionalize(logger.debug, logInternals),
       },
       ...childOptions,
-    } as Required<O>;
+    } as Required<Options>;
   }
 
   /**

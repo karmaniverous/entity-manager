@@ -26,6 +26,8 @@ export type { ParsedConfig } from './ParsedConfig';
 export type { QueryOptions } from './QueryOptions';
 export type { QueryResult } from './QueryResult';
 export type { ShardQueryFunction } from './ShardQueryFunction';
+export { ShardQueryFunctionBuilder } from './ShardQueryFunctionBuilder';
+export type { ShardQueryFunctionBuilderOptions } from './ShardQueryFunctionBuilderOptions';
 export type { ShardQueryResult } from './ShardQueryResult';
 export type { WithRequiredAndNonNullable } from './WithRequiredAndNonNullable';
 export type {

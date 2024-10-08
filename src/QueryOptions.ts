@@ -5,6 +5,8 @@ import type {
 } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { EntityManager } from './EntityManager';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 
 /**
@@ -28,14 +30,6 @@ export interface QueryOptions<
    * {@link Config | `EntityManager.config.entities.<entityToken>.keys`}.
    */
   hashKey: string;
-
-  /**
-   * A partial {@link ItemMap | `ItemMap`} object containing at least the properties specified in
-   * {@link Config | `EntityManager.config.entities.<entityToken>.keys.<keyToken>.elements`}, except for the properties specified in {@link Config | `EntityManager.config.tokens`}.
-   *
-   * This data will be used to generate query keys across all shards.
-   */
-  item?: Item;
 
   /**
    * The target maximum number of records to be returned by the query across

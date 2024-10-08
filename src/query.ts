@@ -49,7 +49,6 @@ export async function query<
   {
     entityToken,
     hashKey,
-    item,
     limit,
     pageKeyMap,
     pageSize,
@@ -183,7 +182,6 @@ export async function query<
     console.debug('queried entityToken across shards', {
       entityToken,
       hashKey,
-      item,
       limit,
       pageKeyMap,
       pageSize,
@@ -202,7 +200,6 @@ export async function query<
       console.error(error.message, {
         entityToken,
         hashKey,
-        item,
         limit,
         pageKeyMap,
         pageSize,
