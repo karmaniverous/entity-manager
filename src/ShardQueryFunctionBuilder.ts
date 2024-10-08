@@ -25,7 +25,7 @@ export abstract class ShardQueryFunctionBuilder<
     T
   >,
 > {
-  constructor(protected options: Options) {}
+  constructor(protected readonly options: Options) {}
 
   abstract getShardQueryFunction(): ShardQueryFunction<
     Item,

@@ -27,7 +27,7 @@ export interface ShardQueryFunctionBuilderOptions<
   entityToken: EntityToken;
 
   /** Either the designated entity hash key or a generated property with `sharded === true`. */
-  hashKeyToken: HashKey | PropertiesOfType<M[EntityToken], void>;
+  hashKeyToken: HashKey | (PropertiesOfType<M[EntityToken], void> & string);
 
   /** `entityManager.config.entities.<entityToken>.indexes` key. */
   indexToken: string;
