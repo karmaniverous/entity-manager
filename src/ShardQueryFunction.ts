@@ -1,7 +1,7 @@
 import type {
   DefaultTranscodeMap,
   Exactify,
-  PropertiesOfType,
+  PartialTranscodable,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
@@ -33,6 +33,6 @@ export type ShardQueryFunction<
   T extends TranscodeMap = DefaultTranscodeMap,
 > = (
   hashKey: string,
-  pageKey?: Partial<Pick<Item, PropertiesOfType<Item, T[keyof T]>>>,
+  pageKey?: PartialTranscodable<Item, T>,
   pageSize?: number,
 ) => Promise<ShardQueryResult<Item, EntityToken, M, HashKey, RangeKey, T>>;

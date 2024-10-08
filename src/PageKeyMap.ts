@@ -1,5 +1,5 @@
 import type {
-  PropertiesOfType,
+  PartialTranscodable,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
@@ -18,10 +18,4 @@ import type {
 export type PageKeyMap<
   Item extends Record<string, unknown>,
   T extends TranscodeMap,
-> = Record<
-  string,
-  Record<
-    string,
-    Partial<Pick<Item, PropertiesOfType<Item, T[keyof T]>>> | undefined
-  >
->;
+> = Record<string, Record<string, PartialTranscodable<Item, T> | undefined>>;

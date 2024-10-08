@@ -1,7 +1,7 @@
 import type {
   DefaultTranscodeMap,
   Exactify,
-  PropertiesOfType,
+  PartialTranscodable,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
@@ -30,5 +30,5 @@ export interface ShardQueryResult<
   items: Item[];
 
   /** The page key for the next query on this shard. */
-  pageKey?: Partial<Pick<Item, PropertiesOfType<Item, T[keyof T]>>>;
+  pageKey?: PartialTranscodable<Item, T>;
 }
