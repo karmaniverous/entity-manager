@@ -35,6 +35,7 @@ export type {
   defaultTranscodes,
   Entity,
   Exactify,
+  PropertiesNotOfType,
   PropertiesOfType,
   SortOrder,
   TranscodableProperties,
