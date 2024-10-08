@@ -34,6 +34,7 @@ export type {
   DefaultTranscodeMap,
   defaultTranscodes,
   Entity,
+  Exactify,
   PropertiesOfType,
   SortOrder,
   TranscodableProperties,
