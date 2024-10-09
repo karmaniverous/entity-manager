@@ -1,4 +1,6 @@
-import type { ClientShardQueryMap } from './ShardQueryMap';
+import type { Entity } from '@karmaniverous/entity-tools';
+
+import type { ShardQueryMap } from './ShardQueryMap';
 import type { ShardQueryMapBuilderOptions } from './ShardQueryMapBuilderOptions';
 
 /**
@@ -7,9 +9,10 @@ import type { ShardQueryMapBuilderOptions } from './ShardQueryMapBuilderOptions'
  * @category Query
  */
 export abstract class ShardQueryMapBuilder<
-  Options extends ShardQueryMapBuilderOptions,
+  Item extends Entity,
+  Options extends ShardQueryMapBuilderOptions<Item>,
 > {
   constructor(readonly options: Options) {}
 
-  abstract getShardQueryMap(): ClientShardQueryMap;
+  abstract getShardQueryMap(): ShardQueryMap<Item>;
 }

@@ -5,7 +5,7 @@ import type { Entity } from '@karmaniverous/entity-tools';
  *
  * @category Query
  */
-export interface ShardQueryMapBuilderOptions {
+export interface ShardQueryMapBuilderOptions<Item extends Entity> {
   /** `entityManager.config.entities` key. */
   entityToken: string;
 
@@ -13,7 +13,7 @@ export interface ShardQueryMapBuilderOptions {
   hashKeyToken: string;
 
   /** A partial `Item` sufficiently populated to generate the query hash key & index values. */
-  item: Entity;
+  item: Item;
 
   /** Dehydrated page key from the previous query data page. */
   pageKey?: string;
