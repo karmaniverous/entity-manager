@@ -64,7 +64,11 @@ export class EntityManager<
   addKeys<
     Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
     EntityToken extends keyof Exactify<M> & string,
-  >(item: Item, entityToken: EntityToken, overwrite = false): Item {
+  >(
+    item: Partial<Item>,
+    entityToken: EntityToken,
+    overwrite = false,
+  ): Partial<Item> {
     return addKeys(this, item, entityToken, overwrite);
   }
 
