@@ -1,5 +1,6 @@
 import type {
   DefaultTranscodeMap,
+  Entity,
   Exactify,
   PartialTranscodable,
   TranscodeMap,
@@ -31,4 +32,10 @@ export interface ShardQueryResult<
 
   /** The page key for the next query on this shard. */
   pageKey?: PartialTranscodable<Item, T>;
+}
+
+export interface ClientShardQueryResult {
+  count: number;
+  items: Entity[];
+  pageKey?: Entity;
 }

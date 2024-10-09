@@ -1,7 +1,10 @@
 import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
-import type { ShardQueryFunction } from './ShardQueryFunction';
+import type {
+  ClientShardQueryFunction,
+  ShardQueryFunction,
+} from './ShardQueryFunction';
 
 export type ShardQueryMap<
   Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
@@ -14,3 +17,5 @@ export type ShardQueryMap<
   string,
   ShardQueryFunction<Item, EntityToken, M, HashKey, RangeKey, T>
 >;
+
+export type ClientShardQueryMap = Record<string, ClientShardQueryFunction>;

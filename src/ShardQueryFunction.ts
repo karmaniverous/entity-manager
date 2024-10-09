@@ -1,12 +1,16 @@
 import type {
   DefaultTranscodeMap,
+  Entity,
   Exactify,
   PartialTranscodable,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
-import type { ShardQueryResult } from './ShardQueryResult';
+import type {
+  ClientShardQueryResult,
+  ShardQueryResult,
+} from './ShardQueryResult';
 
 /**
  * A query function that returns a single page of results from an individual
@@ -36,3 +40,9 @@ export type ShardQueryFunction<
   pageKey?: PartialTranscodable<Item, T>,
   pageSize?: number,
 ) => Promise<ShardQueryResult<Item, EntityToken, M, HashKey, RangeKey, T>>;
+
+export type ClientShardQueryFunction = (
+  hashKey: string,
+  pageKey?: Entity,
+  pageSize?: number,
+) => Promise<ClientShardQueryResult>;
