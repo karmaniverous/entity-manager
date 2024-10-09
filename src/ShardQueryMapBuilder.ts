@@ -25,7 +25,7 @@ export abstract class ShardQueryMapBuilder<
     T
   >,
 > {
-  constructor(protected readonly options: Options) {}
+  constructor(readonly options: Options) {}
 
   abstract getShardQueryMap(): ShardQueryMap<
     Item,
