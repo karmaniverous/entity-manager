@@ -85,7 +85,7 @@ export class EntityManager<
   removeKeys<
     Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
     EntityToken extends keyof Exactify<M> & string,
-  >(item: Item, entityToken: EntityToken): Item {
+  >(item: Partial<Item>, entityToken: EntityToken): Partial<Item> {
     return removeKeys(this, item, entityToken);
   }
 

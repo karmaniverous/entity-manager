@@ -24,9 +24,9 @@ export function removeKeys<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  item: Item,
+  item: Partial<Item>,
   entityToken: EntityToken,
-): Item {
+): Partial<Item> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
