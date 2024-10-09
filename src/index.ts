@@ -25,11 +25,17 @@ export type { Logger, LoggerEndpoint, LoggerOptions } from './Logger';
 export type { ParsedConfig } from './ParsedConfig';
 export type { QueryOptions } from './QueryOptions';
 export type { QueryResult } from './QueryResult';
-export type { ShardQueryFunction } from './ShardQueryFunction';
-export type { ShardQueryMap } from './ShardQueryMap';
+export type {
+  ClientShardQueryFunction,
+  ShardQueryFunction,
+} from './ShardQueryFunction';
+export type { ClientShardQueryMap, ShardQueryMap } from './ShardQueryMap';
 export { ShardQueryMapBuilder } from './ShardQueryMapBuilder';
 export type { ShardQueryMapBuilderOptions } from './ShardQueryMapBuilderOptions';
-export type { ShardQueryResult } from './ShardQueryResult';
+export type {
+  ClientShardQueryResult,
+  ShardQueryResult,
+} from './ShardQueryResult';
 export type { WithRequiredAndNonNullable } from './WithRequiredAndNonNullable';
 export type {
   DefaultTranscodeMap,
