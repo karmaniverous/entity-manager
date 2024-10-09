@@ -7,8 +7,8 @@ import { dehydrateIndexItem } from './dehydrateIndexItem';
 
 describe('dehydrateIndexItem', function () {
   it('should dehydrate item by index', function () {
-    const [item] = getUsers() as UserItem[];
-    addKeys(entityManager, item, 'user');
+    let [item] = getUsers() as Partial<UserItem>[];
+    item = addKeys(entityManager, item, 'user');
 
     const dehydrated = dehydrateIndexItem(
       entityManager,
@@ -21,9 +21,9 @@ describe('dehydrateIndexItem', function () {
   });
 
   it('should dehydrate item by index with missing component', function () {
-    const [item] = getUsers() as UserItem[];
+    let [item] = getUsers() as Partial<UserItem>[];
     delete item.phone;
-    addKeys(entityManager, item, 'user');
+    item = addKeys(entityManager, item, 'user');
 
     const dehydrated = dehydrateIndexItem(entityManager, item, 'user', 'phone');
 

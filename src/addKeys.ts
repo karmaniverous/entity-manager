@@ -12,14 +12,14 @@ import { updateItemRangeKey } from './updateItemRangeKey';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Update generated properties, hash key, and range key on an {@link ItemMap | `ItemMap`} object. Mutates `item`.
+ * Update generated properties, hash key, and range key on an {@link ItemMap | `ItemMap`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param item - {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
  * @param overwrite - Overwrite existing properties (default `false`).
  *
- * @returns Mutated `item` with updated properties.
+ * @returns Shallow clone of `item` with updated properties.
  *
  * @throws `Error` if `entityToken` is invalid.
  */
@@ -41,10 +41,20 @@ export function addKeys<
     validateEntityToken(entityManager, entityToken);
 
     // Update hash key.
-    updateItemHashKey(entityManager, item, entityToken, overwrite);
+    let newItem = updateItemHashKey(
+      entityManager,
+      item,
+      entityToken,
+      overwrite,
+    );
 
     // Update range key.
-    updateItemRangeKey(entityManager, item, entityToken, overwrite);
+    newItem = updateItemRangeKey(
+      entityManager,
+      newItem,
+      entityToken,
+      overwrite,
+    );
 
     // Update generated properties.
     for (const property in entityManager.config.entities[entityToken]
@@ -52,26 +62,27 @@ export function addKeys<
       if (overwrite || isNil(item[property as keyof Item])) {
         const encoded = encodeGeneratedProperty(
           entityManager,
-          item,
+          newItem,
           entityToken,
           property,
         );
 
-        if (encoded) Object.assign(item, { [property]: encoded });
-        else delete item[property as keyof Item];
+        if (encoded) Object.assign(newItem, { [property]: encoded });
+        else delete newItem[property as keyof Item];
       }
     }
 
     console.debug('updated entity item generated properties', {
+      item,
       entityToken,
       overwrite,
-      item,
+      newItem,
     });
 
-    return item;
+    return newItem;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { entityToken, overwrite, item });
+      console.error(error.message, { item, entityToken, overwrite });
 
     throw error;
   }

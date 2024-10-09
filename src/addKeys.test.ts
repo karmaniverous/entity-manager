@@ -6,9 +6,9 @@ import { addKeys } from './addKeys';
 
 describe('addKeys', function () {
   it('should add item generated properties', function () {
-    const [item] = getUsers() as UserItem[];
+    let [item] = getUsers() as Partial<UserItem>[];
 
-    addKeys(entityManager, item, 'user');
+    item = addKeys(entityManager, item, 'user');
 
     expect(item).to.haveOwnProperty('hashKey2');
     expect(item).to.haveOwnProperty('rangeKey');

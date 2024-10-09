@@ -10,21 +10,21 @@ import { type PageKeyMap } from './PageKeyMap';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
 
 describe('rehydratePageKeyMep', function () {
-  let item0, item1, item2, item3: UserItem;
+  let item0, item1, item2, item3: Partial<UserItem>;
   let pageKeyMap: PageKeyMap<UserItem, DefaultTranscodeMap>;
 
   beforeEach(function () {
-    [item0, item1, item2, item3] = getUsers(4) as UserItem[];
+    [item0, item1, item2, item3] = getUsers(4) as Partial<UserItem>[];
 
     item0.hashKey2 = 'user!0';
     item1.hashKey2 = 'user!1';
     item2.hashKey2 = 'user!2';
     item3.hashKey2 = 'user!3';
 
-    addKeys(entityManager, item0, 'user');
-    addKeys(entityManager, item1, 'user');
-    addKeys(entityManager, item2, 'user');
-    addKeys(entityManager, item3, 'user');
+    item0 = addKeys(entityManager, item0, 'user');
+    item1 = addKeys(entityManager, item1, 'user');
+    item2 = addKeys(entityManager, item2, 'user');
+    item3 = addKeys(entityManager, item3, 'user');
 
     pageKeyMap = {
       firstName: {

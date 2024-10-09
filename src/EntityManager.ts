@@ -51,13 +51,13 @@ export class EntityManager<
   }
 
   /**
-   * Update generated properties, hash key, and range key on an {@link ItemMap | `ItemMap`} object. Mutates `item`.
+   * Update generated properties, hash key, and range key on an {@link ItemMap | `ItemMap`} object.
    *
    * @param item - {@link ItemMap | `ItemMap`} object.
    * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
    * @param overwrite - Overwrite existing properties (default `false`).
    *
-   * @returns Mutated `item` with updated properties.
+   * @returns Shallow clone of `item` with updated properties.
    *
    * @throws `Error` if `entityToken` is invalid.
    */
@@ -73,12 +73,12 @@ export class EntityManager<
   }
 
   /**
-   * Strips generated properties, hash key, and range key from an {@link ItemMap | `ItemMap`} object. Mutates `item`.
+   * Strips generated properties, hash key, and range key from an {@link ItemMap | `ItemMap`} object.
    *
    * @param item - {@link ItemMap | `ItemMap`} object.
    * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
    *
-   * @returns Mutated `item` without generated properties, hash key or range key.
+   * @returns Shallow clone of `item` without generated properties, hash key or range key.
    *
    * @throws `Error` if `entityToken` is invalid.
    */

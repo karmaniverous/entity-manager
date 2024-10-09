@@ -76,7 +76,7 @@ export function rehydratePageKeyMap<
         zipToObject(hashKeySpace, (hashKey, i) => {
           if (!dehydratedIndexPageKeyMaps[i]) return;
 
-          const item = {
+          let item = {
             [entityManager.config.hashKey]: hashKey,
             ...rehydrateIndexItem(
               entityManager,
@@ -85,9 +85,9 @@ export function rehydratePageKeyMap<
               index,
               [entityManager.config.hashKey],
             ),
-          };
+          } as Partial<Item>;
 
-          updateItemRangeKey(entityManager, item, entityToken);
+          item = updateItemRangeKey(entityManager, item, entityToken);
 
           return zipToObject(
             entityManager.config.entities[entityToken].indexes[index],
@@ -99,7 +99,7 @@ export function rehydratePageKeyMap<
                     entityToken,
                     component,
                   )!
-                : item[component],
+                : item[component as keyof Item],
           );
         }),
     );

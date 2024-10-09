@@ -9,14 +9,14 @@ import { EntityManager } from './EntityManager';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Update the range key on a partial {@link ItemMap | `ItemMap`} object. Mutates `item`.
+ * Update the range key on a partial {@link ItemMap | `ItemMap`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
  * @param overwrite - Overwrite existing {@link ConfigKeys.rangeKey | `this.config.rangeKey`} property value (default `false`).
  *
- * @returns Mutated `item` with updated range key.
+ * @returns Shallow clone of `item` with updated range key.
  *
  * @throws `Error` if `entityToken` is invalid.
  * @throws `Error` if `item` {@link ConfigEntity.uniqueProperty | `this.config.entities<entityToken>.uniqueProperty`} property value is missing.
@@ -46,7 +46,7 @@ export function updateItemRangeKey<
         overwrite,
       });
 
-      return item;
+      return { ...item };
     }
 
     // Get item unique property & validate.
@@ -58,20 +58,24 @@ export function updateItemRangeKey<
     if (isNil(uniqueProperty)) throw new Error(`missing item unique property`);
 
     // Update range key.
-    Object.assign(item, {
-      [entityManager.config.rangeKey]: [
-        entityManager.config.entities[entityToken].uniqueProperty,
-        uniqueProperty,
-      ].join(entityManager.config.generatedValueDelimiter),
-    });
+    const newItem = Object.assign(
+      { ...item },
+      {
+        [entityManager.config.rangeKey]: [
+          entityManager.config.entities[entityToken].uniqueProperty,
+          uniqueProperty,
+        ].join(entityManager.config.generatedValueDelimiter),
+      },
+    );
 
     console.debug('updated entity item range key', {
       entityToken,
       overwrite,
       item,
+      newItem,
     });
 
-    return item;
+    return newItem;
   } catch (error) {
     if (error instanceof Error)
       console.error(error.message, { item, entityToken, overwrite });

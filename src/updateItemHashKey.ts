@@ -11,14 +11,14 @@ import { getShardBump } from './getShardBump';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Update the hash key on a partial {@link ItemMap | `ItemMap`} object. Mutates `item`.
+ * Update the hash key on a partial {@link ItemMap | `ItemMap`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
  * @param overwrite - Overwrite existing {@link ConfigKeys.hashKey | `this.config.hashKey`} property value (default `false`).
  *
- * @returns Mutated `item` with updated hash key.
+ * @returns Shallow clone of `item` with updated hash key.
  *
  * @throws `Error` if `entityToken` is invalid.
  */
@@ -47,7 +47,7 @@ export function updateItemHashKey<
         overwrite,
       });
 
-      return item;
+      return { ...item };
     }
 
     // Get item timestamp property & validate.
@@ -84,15 +84,19 @@ export function updateItemHashKey<
         .padStart(chars, '0');
     }
 
-    Object.assign(item, { [entityManager.config.hashKey]: hashKey });
+    const newItem = Object.assign(
+      { ...item },
+      { [entityManager.config.hashKey]: hashKey },
+    );
 
     console.debug('updated entity item hash key', {
       entityToken,
       overwrite,
       item,
+      newItem,
     });
 
-    return item;
+    return newItem;
   } catch (error) {
     if (error instanceof Error)
       console.error(error.message, { item, entityToken, overwrite });

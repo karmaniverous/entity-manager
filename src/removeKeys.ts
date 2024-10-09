@@ -5,13 +5,13 @@ import { EntityManager } from './EntityManager';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Strips generated properties, hash key, and range key from an {@link ItemMap | `ItemMap`} object. Mutates `item`.
+ * Strips generated properties, hash key, and range key from an {@link ItemMap | `ItemMap`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param item - {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
  *
- * @returns Mutated `item` without generated properties, hash key or range key.
+ * @returns Shallow clone of `item` without generated properties, hash key or range key.
  *
  * @throws `Error` if `entityToken` is invalid.
  */
@@ -32,19 +32,21 @@ export function removeKeys<
     validateEntityToken(entityManager, entityToken);
 
     // Delete hash & range keys.
-    delete item[entityManager.config.hashKey as keyof Item];
-    delete item[entityManager.config.rangeKey as keyof Item];
+    const newItem = { ...item };
+    delete newItem[entityManager.config.hashKey as keyof Item];
+    delete newItem[entityManager.config.rangeKey as keyof Item];
 
     // Delete generated properties.
     for (const property in entityManager.config.entities[entityToken].generated)
-      delete item[property as keyof Item];
+      delete newItem[property as keyof Item];
 
     console.debug('stripped entity item generated properties', {
-      entityToken,
       item,
+      entityToken,
+      newItem,
     });
 
-    return item;
+    return newItem;
   } catch (error) {
     if (error instanceof Error)
       console.error(error.message, { item, entityToken });
