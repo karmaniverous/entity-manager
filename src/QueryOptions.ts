@@ -7,7 +7,7 @@ import type {
 import type { EntityMap, ItemMap } from './Config';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { EntityManager } from './EntityManager';
-import type { ShardQueryFunction } from './ShardQueryFunction';
+import { ShardQueryMap } from './ShardQueryMap';
 
 /**
  * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
@@ -65,10 +65,7 @@ export interface QueryOptions<
    * page key, e.g. to match the same string against `firstName` and `lastName`
    * properties without performing a table scan for either.
    */
-  queryMap: Record<
-    string,
-    ShardQueryFunction<Item, EntityToken, M, HashKey, RangeKey, T>
-  >;
+  shardQueryMap: ShardQueryMap<Item, EntityToken, M, HashKey, RangeKey, T>;
 
   /**
    * A {@link SortOrder | `SortOrder`} object specifying the sort order of the result set. Defaults to `[]`.

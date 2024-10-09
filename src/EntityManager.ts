@@ -101,7 +101,7 @@ export class EntityManager<
    *
    * @returns {@link QueryResult} object.
    *
-   * @throws Error if {@link QueryOptions.pageKeyMap | `pageKeyMap`} keys do not match {@link QueryOptions.queryMap | `queryMap`} keys.
+   * @throws Error if {@link QueryOptions.pageKeyMap | `pageKeyMap`} keys do not match {@link QueryOptions.shardQueryMap | `shardQueryMap`} keys.
    */
   async query<
     Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],

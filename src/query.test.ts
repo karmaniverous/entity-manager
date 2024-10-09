@@ -52,7 +52,7 @@ describe('query', function () {
     let result = await entityManager.query({
       entityToken: 'user',
       hashKey: 'hashKey2',
-      queryMap: { lastName: lastNameQuery },
+      shardQueryMap: { lastName: lastNameQuery },
     });
 
     expect(result.count).to.equal(
@@ -63,7 +63,7 @@ describe('query', function () {
       entityToken: 'user',
       hashKey: 'hashKey2',
       pageKeyMap: result.pageKeyMap,
-      queryMap: { lastName: lastNameQuery },
+      shardQueryMap: { lastName: lastNameQuery },
     });
 
     expect(result.count).to.equal(
@@ -75,7 +75,7 @@ describe('query', function () {
     let result = await entityManager.query({
       entityToken: 'user',
       hashKey: 'hashKey2',
-      queryMap: { lastName: lastNameQuery },
+      shardQueryMap: { lastName: lastNameQuery },
       timestampFrom: now,
       timestampTo: now + day,
     });
@@ -88,7 +88,7 @@ describe('query', function () {
       entityToken: 'user',
       hashKey: 'hashKey2',
       pageKeyMap: result.pageKeyMap,
-      queryMap: { lastName: lastNameQuery },
+      shardQueryMap: { lastName: lastNameQuery },
       timestampFrom: now,
       timestampTo: now + day,
     });
@@ -102,7 +102,7 @@ describe('query', function () {
     let result = await entityManager.query({
       entityToken: 'user',
       hashKey: 'hashKey2',
-      queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
     });
 
     expect(result.count).to.be.greaterThan(
@@ -113,7 +113,7 @@ describe('query', function () {
       entityToken: 'user',
       hashKey: 'hashKey2',
       pageKeyMap: result.pageKeyMap,
-      queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
     });
 
     expect(result.count).to.be.greaterThan(
@@ -125,7 +125,7 @@ describe('query', function () {
     let result = await entityManager.query({
       entityToken: 'user',
       hashKey: 'hashKey2',
-      queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
       timestampFrom: now,
       timestampTo: now + day,
     });
@@ -138,7 +138,7 @@ describe('query', function () {
       entityToken: 'user',
       hashKey: 'hashKey2',
       pageKeyMap: result.pageKeyMap,
-      queryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
       sortOrder: [
         { property: 'lastNameCanonical', desc: true },
         { property: 'firstNameCanonical' },

@@ -35,7 +35,7 @@ const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
  *
  * @returns {@link QueryResult} object.
  *
- * @throws Error if {@link QueryOptions.pageKeyMap | `pageKeyMap`} keys do not match {@link QueryOptions.queryMap | `queryMap`} keys.
+ * @throws Error if {@link QueryOptions.pageKeyMap | `pageKeyMap`} keys do not match {@link QueryOptions.shardQueryMap | `shardQueryMap`} keys.
  */
 export async function query<
   Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
@@ -52,7 +52,7 @@ export async function query<
     limit,
     pageKeyMap,
     pageSize,
-    queryMap,
+    shardQueryMap,
     sortOrder = [],
     timestampFrom = 0,
     timestampTo = Date.now(),
@@ -84,7 +84,7 @@ export async function query<
           ) as string[])
         : undefined,
       entityToken,
-      Object.keys(queryMap),
+      Object.keys(shardQueryMap),
       timestampFrom,
       timestampTo,
     );
@@ -126,7 +126,7 @@ export async function query<
           Item | undefined,
         ]) => ({
           index,
-          queryResult: await queryMap[index](hashKey, pageKey, pageSize),
+          queryResult: await shardQueryMap[index](hashKey, pageKey, pageSize),
           hashKey,
         }),
       );
@@ -185,7 +185,7 @@ export async function query<
       limit,
       pageKeyMap,
       pageSize,
-      queryMap,
+      shardQueryMap,
       timestampFrom,
       timestampTo,
       throttle,
@@ -203,7 +203,7 @@ export async function query<
         limit,
         pageKeyMap,
         pageSize,
-        queryMap,
+        shardQueryMap,
         timestampFrom,
         timestampTo,
         throttle,

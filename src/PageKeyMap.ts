@@ -6,7 +6,7 @@ import type {
 /**
  * A two-layer map of page keys, used to query the next page of data across a set of indexes and on each shard of a given hash key.
  *
- * The keys of the outer object are the keys of the {@link QueryOptions.queryMap | `QueryMap`} object passed with the {@link EntityManager.query | `query`} method {@link QueryOptions.queryMap | options}. Each should correspond to a {@link ConfigEntity.indexes | `Config` entity index} for the given {@link Entity | `Entity`}.
+ * The keys of the outer object are the keys of the {@link QueryOptions.shardQueryMap | `QueryMap`} object passed with the {@link EntityManager.query | `query`} method {@link QueryOptions.shardQueryMap | options}. Each should correspond to a {@link ConfigEntity.indexes | `Config` entity index} for the given {@link Entity | `Entity`}.
  *
  * The keys of the inner object are the shard space for `hashKey` as constrained by the {@link QueryOptions | query options} timestamps.
  *

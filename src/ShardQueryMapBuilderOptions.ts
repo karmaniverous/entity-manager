@@ -8,11 +8,11 @@ import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
 
 /**
- * {@link ShardQueryFunctionBuilder | `ShardQueryFunctionBuilder`} options.
+ * {@link ShardQueryMapBuilder | `ShardQueryMapBuilder`} options.
  *
  * @category Query
  */
-export interface ShardQueryFunctionBuilderOptions<
+export interface ShardQueryMapBuilderOptions<
   Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
@@ -28,9 +28,6 @@ export interface ShardQueryFunctionBuilderOptions<
 
   /** Either the designated entity hash key or a generated property with `sharded === true`. */
   hashKeyToken: HashKey | (PropertiesOfType<M[EntityToken], void> & string);
-
-  /** `entityManager.config.entities.<entityToken>.indexes` key. */
-  indexToken: string;
 
   /** A partial `Item` sufficiently populated to generate the query hash key & index values. */
   item: Partial<Item>;

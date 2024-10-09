@@ -1,22 +1,22 @@
 import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
-import { ShardQueryFunction } from './ShardQueryFunction';
-import type { ShardQueryFunctionBuilderOptions } from './ShardQueryFunctionBuilderOptions';
+import type { ShardQueryMap } from './ShardQueryMap';
+import type { ShardQueryMapBuilderOptions } from './ShardQueryMapBuilderOptions';
 
 /**
  * Entity Manager shard query builder base class.
  *
  * @category Query
  */
-export abstract class ShardQueryFunctionBuilder<
+export abstract class ShardQueryMapBuilder<
   Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
   T extends TranscodeMap,
-  Options extends ShardQueryFunctionBuilderOptions<
+  Options extends ShardQueryMapBuilderOptions<
     Item,
     EntityToken,
     M,
@@ -27,7 +27,7 @@ export abstract class ShardQueryFunctionBuilder<
 > {
   constructor(protected readonly options: Options) {}
 
-  abstract getShardQueryFunction(): ShardQueryFunction<
+  abstract getShardQueryMap(): ShardQueryMap<
     Item,
     EntityToken,
     M,
