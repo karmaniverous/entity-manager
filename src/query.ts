@@ -57,7 +57,7 @@ export async function query<
     timestampFrom = 0,
     timestampTo = Date.now(),
     throttle = entityManager.config.throttle,
-  }: QueryOptions<Item, EntityToken, M, HashKey, RangeKey, T>,
+  }: QueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
 ): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
   try {
     // Get defaults.

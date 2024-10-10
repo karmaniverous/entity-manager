@@ -111,7 +111,7 @@ export class EntityManager<
     Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
     EntityToken extends keyof Exactify<M> & string,
   >(
-    options: QueryOptions<Item, EntityToken, M, HashKey, RangeKey, T>,
+    options: QueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
   ): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
     return await query(this, options);
   }

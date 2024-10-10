@@ -1,8 +1,4 @@
-import type {
-  Exactify,
-  SortOrder,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
+import type { Exactify, SortOrder } from '@karmaniverous/entity-tools';
 
 import type { EntityMap, ItemMap } from './Config';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -20,7 +16,6 @@ export interface QueryOptions<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  T extends TranscodeMap,
 > {
   /** Identifies the entity to be queried. Key of {@link Config | `EntityManager.config.entities`}. */
   entityToken: EntityToken;
@@ -65,7 +60,7 @@ export interface QueryOptions<
    * page key, e.g. to match the same string against `firstName` and `lastName`
    * properties without performing a table scan for either.
    */
-  shardQueryMap: ShardQueryMap<Item, EntityToken, M, HashKey, RangeKey, T>;
+  shardQueryMap: ShardQueryMap<Item>;
 
   /**
    * A {@link SortOrder | `SortOrder`} object specifying the sort order of the result set. Defaults to `[]`.

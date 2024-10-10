@@ -3,20 +3,19 @@
 import { MockDb } from '@karmaniverous/mock-db';
 import { expect } from 'chai';
 
-import { config, day, MyEntityMap, now, type UserItem } from '../test/config';
+import { config, day, now, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
 import { addKeys } from './addKeys';
 import { EntityManager } from './EntityManager';
 import type { ShardQueryFunction } from './ShardQueryFunction';
-import type { ShardQueryResult } from './ShardQueryResult';
 
 const entityManager = new EntityManager(config);
 
 describe('query', function () {
   let users: UserItem[];
   let mockDb: MockDb<UserItem>;
-  let lastNameQuery: ShardQueryFunction<UserItem, 'user', MyEntityMap>;
-  let firstNameQuery: ShardQueryFunction<UserItem, 'user', MyEntityMap>;
+  let lastNameQuery: ShardQueryFunction<UserItem>;
+  let firstNameQuery: ShardQueryFunction<UserItem>;
 
   before(function () {
     users = getUsers(1000, 0, 2).map((user) =>
@@ -26,7 +25,7 @@ describe('query', function () {
     mockDb = new MockDb(users);
 
     lastNameQuery = async (shardedKey, pageKey, pageSize) =>
-      (await mockDb.query({
+      await mockDb.query({
         hashKey: 'hashKey2',
         hashValue: shardedKey,
         indexComponents: entityManager.config.entities.user.indexes
@@ -34,10 +33,10 @@ describe('query', function () {
         limit: pageSize,
         pageKey,
         sortOrder: [{ property: 'lastNameCanonical' }],
-      })) as ShardQueryResult<UserItem, 'user', MyEntityMap>;
+      });
 
     firstNameQuery = async (shardedKey, pageKey, pageSize) =>
-      (await mockDb.query({
+      await mockDb.query({
         hashKey: 'hashKey2',
         hashValue: shardedKey,
         indexComponents: entityManager.config.entities.user.indexes
@@ -45,7 +44,7 @@ describe('query', function () {
         limit: pageSize,
         pageKey,
         sortOrder: [{ property: 'firstNameCanonical' }],
-      })) as ShardQueryResult<UserItem, 'user', MyEntityMap>;
+      });
   });
 
   it('simple query', async function () {
