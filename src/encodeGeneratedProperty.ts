@@ -56,7 +56,7 @@ export function encodeGeneratedProperty<
       ),
     ].join(entityManager.config.generatedKeyDelimiter);
 
-    console.debug('encoded generated property', {
+    entityManager.logger.debug('encoded generated property', {
       item,
       entityToken,
       property,
@@ -66,7 +66,11 @@ export function encodeGeneratedProperty<
     return encoded;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { item, entityToken, property });
+      entityManager.logger.error(error.message, {
+        item,
+        entityToken,
+        property,
+      });
 
     throw error;
   }

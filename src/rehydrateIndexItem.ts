@@ -67,7 +67,7 @@ export function rehydrateIndexItem<
       ),
     ) as Partial<Item>;
 
-    console.debug('rehydrated index', {
+    entityManager.logger.debug('rehydrated index', {
       dehydrated,
       entityToken,
       indexToken,
@@ -79,7 +79,11 @@ export function rehydrateIndexItem<
     return rehydrated;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { dehydrated, entityToken, indexToken });
+      entityManager.logger.error(error.message, {
+        dehydrated,
+        entityToken,
+        indexToken,
+      });
 
     throw error;
   }

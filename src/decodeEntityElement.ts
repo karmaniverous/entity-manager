@@ -46,7 +46,7 @@ export function decodeEntityElement<
       entities[entityToken].elementTranscodes[element]
     ].decode(value) as Item[keyof Item];
 
-    console.debug('decoded entity element', {
+    entityManager.logger.debug('decoded entity element', {
       value,
       entityToken,
       element,
@@ -56,7 +56,11 @@ export function decodeEntityElement<
     return decoded;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { value, entityToken, element });
+      entityManager.logger.error(error.message, {
+        value,
+        entityToken,
+        element,
+      });
 
     throw error;
   }

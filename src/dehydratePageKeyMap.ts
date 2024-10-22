@@ -47,7 +47,7 @@ export function dehydratePageKeyMap<
     if (!Object.keys(pageKeyMap).length) {
       const dehydrated: string[] = [];
 
-      console.debug('dehydrated empty page key map', {
+      entityManager.logger.debug('dehydrated empty page key map', {
         pageKeyMap,
         entityToken,
         dehydrated,
@@ -109,7 +109,7 @@ export function dehydratePageKeyMap<
     // Replace with empty array if all pageKeys are empty strings.
     if (dehydrated.every((pageKey) => pageKey === '')) dehydrated = [];
 
-    console.debug('dehydrated page key map', {
+    entityManager.logger.debug('dehydrated page key map', {
       pageKeyMap,
       entityToken,
       indexes,
@@ -120,7 +120,7 @@ export function dehydratePageKeyMap<
     return dehydrated;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { entityToken, pageKeyMap });
+      entityManager.logger.error(error.message, { entityToken, pageKeyMap });
 
     throw error;
   }

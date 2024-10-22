@@ -48,7 +48,7 @@ export function encodeEntityElement<
         item[element],
       ) || undefined;
 
-    console.debug('encoded entity element', {
+    entityManager.logger.debug('encoded entity element', {
       item,
       entityToken,
       element,
@@ -58,7 +58,7 @@ export function encodeEntityElement<
     return encoded;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { item, entityToken, element });
+      entityManager.logger.error(error.message, { item, entityToken, element });
 
     throw error;
   }

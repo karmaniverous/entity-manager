@@ -40,11 +40,14 @@ export function updateItemRangeKey<
 
     // Return current item if rangeKey exists and overwrite is false.
     if (item[entityManager.config.rangeKey as keyof Item] && !overwrite) {
-      console.debug('did not overwrite existing entity item range key', {
-        item,
-        entityToken,
-        overwrite,
-      });
+      entityManager.logger.debug(
+        'did not overwrite existing entity item range key',
+        {
+          item,
+          entityToken,
+          overwrite,
+        },
+      );
 
       return { ...item };
     }
@@ -68,7 +71,7 @@ export function updateItemRangeKey<
       },
     );
 
-    console.debug('updated entity item range key', {
+    entityManager.logger.debug('updated entity item range key', {
       entityToken,
       overwrite,
       item,
@@ -78,7 +81,11 @@ export function updateItemRangeKey<
     return newItem;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { item, entityToken, overwrite });
+      entityManager.logger.error(error.message, {
+        item,
+        entityToken,
+        overwrite,
+      });
 
     throw error;
   }

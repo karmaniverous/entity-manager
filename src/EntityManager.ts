@@ -22,14 +22,20 @@ export class EntityManager<
   T extends TranscodeMap,
 > {
   #config: ParsedConfig;
+  logger: Pick<Console, 'debug' | 'error'>;
 
   /**
    * Create an EntityManager instance.
    *
    * @param config - EntityManager {@link Config | `Config`} object.
+   * @param logger - Logger object (defaults to `console`, must support `debug` & `error` methods).
    */
-  constructor(config: Config<M, HashKey, RangeKey, T>) {
+  constructor(
+    config: Config<M, HashKey, RangeKey, T>,
+    logger: Pick<Console, 'debug' | 'error'> = console,
+  ) {
     this.#config = configSchema.parse(config);
+    this.logger = logger;
   }
 
   /**

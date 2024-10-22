@@ -41,11 +41,14 @@ export function updateItemHashKey<
 
     // Return current item if hashKey exists and overwrite is false.
     if (item[entityManager.config.hashKey as keyof Item] && !overwrite) {
-      console.debug('did not overwrite existing entity item hash key', {
-        item,
-        entityToken,
-        overwrite,
-      });
+      entityManager.logger.debug(
+        'did not overwrite existing entity item hash key',
+        {
+          item,
+          entityToken,
+          overwrite,
+        },
+      );
 
       return { ...item };
     }
@@ -89,7 +92,7 @@ export function updateItemHashKey<
       { [entityManager.config.hashKey]: hashKey },
     );
 
-    console.debug('updated entity item hash key', {
+    entityManager.logger.debug('updated entity item hash key', {
       entityToken,
       overwrite,
       item,
@@ -99,7 +102,11 @@ export function updateItemHashKey<
     return newItem;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { item, entityToken, overwrite });
+      entityManager.logger.error(error.message, {
+        item,
+        entityToken,
+        overwrite,
+      });
 
     throw error;
   }

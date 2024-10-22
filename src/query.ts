@@ -179,7 +179,7 @@ export async function query<
       ),
     } as QueryResult<Item, EntityToken, M, HashKey, RangeKey>;
 
-    console.debug('queried entityToken across shards', {
+    entityManager.logger.debug('queried entityToken across shards', {
       entityToken,
       hashKey,
       limit,
@@ -197,7 +197,7 @@ export async function query<
     return result;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, {
+      entityManager.logger.error(error.message, {
         entityToken,
         hashKey,
         limit,

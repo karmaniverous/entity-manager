@@ -50,7 +50,7 @@ export function unwrapIndex<
       .sort() as (keyof Item & string)[];
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { indexToken, entityToken });
+      entityManager.logger.error(error.message, { indexToken, entityToken });
 
     throw error;
   }

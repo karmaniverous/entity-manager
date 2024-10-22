@@ -104,7 +104,7 @@ export function rehydratePageKeyMap<
         }),
     );
 
-    console.debug('rehydrated page key map', {
+    entityManager.logger.debug('rehydrated page key map', {
       dehydrated,
       entityToken,
       indexTokens,
@@ -114,7 +114,7 @@ export function rehydratePageKeyMap<
     return rehydrated as PageKeyMap<Item, T>;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, {
+      entityManager.logger.error(error.message, {
         dehydrated,
         entityToken,
         indexTokens,

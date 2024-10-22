@@ -65,7 +65,7 @@ export function dehydrateIndexItem<
       )
       .join(generatedKeyDelimiter);
 
-    console.debug('dehydrated index', {
+    entityManager.logger.debug('dehydrated index', {
       item,
       entityToken,
       indexToken,
@@ -76,7 +76,11 @@ export function dehydrateIndexItem<
     return dehydrated;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { item, entityToken, indexToken });
+      entityManager.logger.error(error.message, {
+        item,
+        entityToken,
+        indexToken,
+      });
 
     throw error;
   }

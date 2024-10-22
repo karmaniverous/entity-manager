@@ -40,7 +40,7 @@ export function removeKeys<
     for (const property in entityManager.config.entities[entityToken].generated)
       delete newItem[property as keyof Item];
 
-    console.debug('stripped entity item generated properties', {
+    entityManager.logger.debug('stripped entity item generated properties', {
       item,
       entityToken,
       newItem,
@@ -49,7 +49,7 @@ export function removeKeys<
     return newItem;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { item, entityToken });
+      entityManager.logger.error(error.message, { item, entityToken });
 
     throw error;
   }

@@ -55,7 +55,7 @@ export function getHashKeySpace<
           `${entityToken}${entityManager.config.shardKeyDelimiter}${shardKey}`,
       );
 
-    console.debug('generated hash key space', {
+    entityManager.logger.debug('generated hash key space', {
       entityToken,
       timestampFrom,
       timestampTo,
@@ -65,7 +65,7 @@ export function getHashKeySpace<
     return hashKeySpace;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, {
+      entityManager.logger.error(error.message, {
         entityToken,
         timestampFrom,
         timestampTo,

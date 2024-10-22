@@ -77,7 +77,7 @@ export function decodeGeneratedProperty<
       ),
     );
 
-    console.debug('decoded generated property', {
+    entityManager.logger.debug('decoded generated property', {
       encoded,
       entityToken,
       decoded,
@@ -86,7 +86,7 @@ export function decodeGeneratedProperty<
     return decoded as Partial<Item>;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { encoded, entityToken });
+      entityManager.logger.error(error.message, { encoded, entityToken });
 
     throw error;
   }

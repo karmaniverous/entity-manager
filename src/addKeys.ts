@@ -72,7 +72,7 @@ export function addKeys<
       }
     }
 
-    console.debug('updated entity item generated properties', {
+    entityManager.logger.debug('updated entity item generated properties', {
       item,
       entityToken,
       overwrite,
@@ -82,7 +82,11 @@ export function addKeys<
     return newItem;
   } catch (error) {
     if (error instanceof Error)
-      console.error(error.message, { item, entityToken, overwrite });
+      entityManager.logger.error(error.message, {
+        item,
+        entityToken,
+        overwrite,
+      });
 
     throw error;
   }
