@@ -1,9 +1,9 @@
 /**
- * {@link ShardQueryMapBuilder | `ShardQueryMapBuilder`} options.
+ * {@link BaseShardQueryMapBuilder | `BaseShardQueryMapBuilder`} options.
  *
  * @category Query
  */
-export interface ShardQueryMapBuilderOptions {
+export interface BaseShardQueryMapBuilderOptions {
   /** `entityManager.config.entities` key. */
   entityToken: string;
 
