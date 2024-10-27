@@ -8,8 +8,11 @@ import type { ShardQueryMapBuilderOptions } from './ShardQueryMapBuilderOptions'
  *
  * @category Query
  */
-export abstract class ShardQueryMapBuilder<Item extends Entity> {
-  constructor(readonly options: ShardQueryMapBuilderOptions) {}
+export abstract class ShardQueryMapBuilder<
+  Item extends Entity,
+  Options extends ShardQueryMapBuilderOptions,
+> {
+  constructor(readonly options: Options) {}
 
   abstract getShardQueryMap(): ShardQueryMap<Item>;
 }
