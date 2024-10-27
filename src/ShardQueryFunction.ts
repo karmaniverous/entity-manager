@@ -1,5 +1,7 @@
 import type { Entity } from '@karmaniverous/entity-tools';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { EntityManager } from './EntityManager';
 import type { ShardQueryResult } from './ShardQueryResult';
 
 /**
