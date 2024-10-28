@@ -24,16 +24,18 @@ export type { ShardQueryFunction } from './ShardQueryFunction';
 export type { ShardQueryMap } from './ShardQueryMap';
 export type { ShardQueryResult } from './ShardQueryResult';
 export type { WithRequiredAndNonNullable } from './WithRequiredAndNonNullable';
-export type {
-  DefaultTranscodeMap,
+export {
+  type DefaultTranscodeMap,
   defaultTranscodes,
-  Entity,
-  Exactify,
-  PartialTranscodable,
-  PropertiesNotOfType,
-  PropertiesOfType,
-  SortOrder,
-  TranscodableProperties,
-  TranscodeMap,
-  Transcodes,
+  type Entity,
+  type Exactify,
+  isNil,
+  type Nil,
+  type PartialTranscodable,
+  type PropertiesNotOfType,
+  type PropertiesOfType,
+  type SortOrder,
+  type TranscodableProperties,
+  type TranscodeMap,
+  type Transcodes,
 } from '@karmaniverous/entity-tools';
