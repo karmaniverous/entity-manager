@@ -445,8 +445,6 @@ export type ItemMap<
       ] extends [never]
         ? string
         : M[EntityToken][P];
-    } & {
-      [P in HashKey | RangeKey]?: string;
-    }
+    } & Partial<Record<HashKey | RangeKey, string>>
   >;
 };
