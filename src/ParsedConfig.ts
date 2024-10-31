@@ -299,7 +299,7 @@ export const configSchema = z
   });
 
 /**
- * Foo
+ * Simplified type taken on by a {@link Config | `Config`} object after parsing in the {@link EntityManager | `EntityManager`} constructor.
  *
  * @category Config
  */
