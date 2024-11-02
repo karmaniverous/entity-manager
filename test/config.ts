@@ -46,11 +46,14 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
         },
         lastNameRK: {
           elements: ['lastNameCanonical', 'firstNameCanonical'],
-          sharded: true,
         },
         phoneRK: {
           atomic: true,
           elements: ['phone', 'created'],
+        },
+        userPK: {
+          elements: ['userId'],
+          sharded: true,
         },
       },
       elementTranscodes: {
