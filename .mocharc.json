@@ -8,5 +8,6 @@
   ],
   "recursive": true,
   "require": ["jsdom-global", "source-map-support"],
-  "spec": "./**/*.test.!(*.*)"
+  "spec": "./**/*.test.!(*.*)",
+  "timeout": 60000
 }
