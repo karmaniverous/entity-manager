@@ -3,6 +3,7 @@ import { shake } from 'radash';
 
 import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
+import { getIndexComponents } from './getIndexComponents';
 import { validateEntityIndexToken } from './validateEntityIndexToken';
 
 /**
@@ -36,9 +37,7 @@ export function unwrapIndex<
     const generated = entityManager.config.entities[entityToken].generated;
     const generatedKeys = Object.keys(shake(generated));
 
-    return entityManager.config.entities[entityToken].indexes[
-      indexToken
-    ].components
+    return getIndexComponents(entityManager, entityToken, indexToken)
       .map((component) =>
         component === entityManager.config.hashKey
           ? entityManager.config.hashKey

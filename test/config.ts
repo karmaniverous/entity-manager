@@ -27,18 +27,18 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
         userId: 'string',
       },
       indexes: {
-        userId: { components: ['hashKey2', 'rangeKey', 'userId'] },
+        userId: { hashKey: 'hashKey2', rangeKey: 'userId' },
       },
       timestampProperty: 'created',
       uniqueProperty: 'email',
     },
     user: {
       indexes: {
-        created: { components: ['hashKey2', 'rangeKey', 'created'] },
-        firstName: { components: ['hashKey2', 'rangeKey', 'firstNameRK'] },
-        lastName: { components: ['hashKey2', 'rangeKey', 'lastNameRK'] },
-        phone: { components: ['hashKey2', 'rangeKey', 'phone'] },
-        updated: { components: ['hashKey2', 'rangeKey', 'updated'] },
+        created: { hashKey: 'hashKey2', rangeKey: 'created' },
+        firstName: { hashKey: 'hashKey2', rangeKey: 'firstNameRK' },
+        lastName: { hashKey: 'hashKey2', rangeKey: 'lastNameRK' },
+        phone: { hashKey: 'hashKey2', rangeKey: 'phone' },
+        updated: { hashKey: 'hashKey2', rangeKey: 'updated' },
       },
       generated: {
         firstNameRK: {
@@ -46,11 +46,14 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
         },
         lastNameRK: {
           elements: ['lastNameCanonical', 'firstNameCanonical'],
-          sharded: true,
         },
         phoneRK: {
           atomic: true,
           elements: ['phone', 'created'],
+        },
+        userPK: {
+          elements: ['userId'],
+          sharded: true,
         },
       },
       elementTranscodes: {

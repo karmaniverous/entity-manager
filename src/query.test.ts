@@ -7,6 +7,7 @@ import { config, day, now, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
 import { addKeys } from './addKeys';
 import { EntityManager } from './EntityManager';
+import { getIndexComponents } from './getIndexComponents';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 
 const entityManager = new EntityManager(config);
@@ -24,12 +25,23 @@ describe('query', function () {
 
     mockDb = new MockDb(users);
 
+    const firstNameIndexComponents = getIndexComponents(
+      entityManager,
+      'user',
+      'firstName',
+    ) as (keyof UserItem)[];
+
+    const lastNameIndexComponents = getIndexComponents(
+      entityManager,
+      'user',
+      'lastName',
+    ) as (keyof UserItem)[];
+
     lastNameQuery = async (shardedKey, pageKey, pageSize) =>
       await mockDb.query({
         hashKey: 'hashKey2',
         hashValue: shardedKey,
-        indexComponents: entityManager.config.entities.user.indexes.lastName
-          .components as (keyof UserItem)[],
+        indexComponents: lastNameIndexComponents,
         limit: pageSize,
         pageKey,
         sortOrder: [{ property: 'lastNameCanonical' }],
@@ -39,8 +51,7 @@ describe('query', function () {
       await mockDb.query({
         hashKey: 'hashKey2',
         hashValue: shardedKey,
-        indexComponents: entityManager.config.entities.user.indexes.firstName
-          .components as (keyof UserItem)[],
+        indexComponents: firstNameIndexComponents,
         limit: pageSize,
         pageKey,
         sortOrder: [{ property: 'firstNameCanonical' }],

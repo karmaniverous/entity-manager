@@ -6,6 +6,7 @@ import { day, entityManager, now, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
 import { addKeys } from './addKeys';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
+import { getIndexComponents } from './getIndexComponents';
 import { type PageKeyMap } from './PageKeyMap';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
 
@@ -26,50 +27,30 @@ describe('rehydratePageKeyMep', function () {
     item2 = addKeys(entityManager, item2, 'user');
     item3 = addKeys(entityManager, item3, 'user');
 
+    const firstNameIndexComponents = getIndexComponents(
+      entityManager,
+      'user',
+      'firstName',
+    ) as (keyof UserItem)[];
+
+    const lastNameIndexComponents = getIndexComponents(
+      entityManager,
+      'user',
+      'lastName',
+    ) as (keyof UserItem)[];
+
     pageKeyMap = {
       firstName: {
-        'user!0': pick(
-          item0,
-          entityManager.config.entities.user.indexes.firstName
-            .components as (keyof UserItem)[],
-        ),
-        'user!1': pick(
-          item1,
-          entityManager.config.entities.user.indexes.firstName
-            .components as (keyof UserItem)[],
-        ),
-        'user!2': pick(
-          item2,
-          entityManager.config.entities.user.indexes.firstName
-            .components as (keyof UserItem)[],
-        ),
-        'user!3': pick(
-          item3,
-          entityManager.config.entities.user.indexes.firstName
-            .components as (keyof UserItem)[],
-        ),
+        'user!0': pick(item0, firstNameIndexComponents),
+        'user!1': pick(item1, firstNameIndexComponents),
+        'user!2': pick(item2, firstNameIndexComponents),
+        'user!3': pick(item3, firstNameIndexComponents),
       },
       lastName: {
-        'user!0': pick(
-          item0,
-          entityManager.config.entities.user.indexes.lastName
-            .components as (keyof UserItem)[],
-        ),
-        'user!1': pick(
-          item1,
-          entityManager.config.entities.user.indexes.lastName
-            .components as (keyof UserItem)[],
-        ),
-        'user!2': pick(
-          item2,
-          entityManager.config.entities.user.indexes.lastName
-            .components as (keyof UserItem)[],
-        ),
-        'user!3': pick(
-          item3,
-          entityManager.config.entities.user.indexes.lastName
-            .components as (keyof UserItem)[],
-        ),
+        'user!0': pick(item0, lastNameIndexComponents),
+        'user!1': pick(item1, lastNameIndexComponents),
+        'user!2': pick(item2, lastNameIndexComponents),
+        'user!3': pick(item3, lastNameIndexComponents),
       },
     };
   });

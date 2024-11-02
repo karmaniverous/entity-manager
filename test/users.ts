@@ -12,6 +12,7 @@ export interface User extends Entity {
   phoneRK?: never;
   updated: number;
   userId: string;
+  userPK?: never;
 }
 
 export const getUsers = (count = 1, daysFromNow = 0, forDays = 1) => {

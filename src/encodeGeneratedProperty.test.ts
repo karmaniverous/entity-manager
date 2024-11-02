@@ -26,12 +26,10 @@ describe('encodeGeneratedProperty', function () {
       entityManager,
       item,
       'user',
-      'lastNameRK',
+      'userPK',
     );
 
-    expect(encoded).to.match(
-      /^user!q\|lastNameCanonical#\w+\|firstNameCanonical#\w+$/,
-    );
+    expect(encoded).to.match(/^user!q\|userId#\w+$/);
   });
 
   it('should encode atomic generated property', function () {
