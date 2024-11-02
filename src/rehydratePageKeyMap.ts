@@ -90,7 +90,8 @@ export function rehydratePageKeyMap<
           item = updateItemRangeKey(entityManager, item, entityToken);
 
           return zipToObject(
-            entityManager.config.entities[entityToken].indexes[index],
+            entityManager.config.entities[entityToken].indexes[index]
+              .components,
             (component) =>
               entityManager.config.entities[entityToken].generated[component]
                 ? encodeGeneratedProperty(

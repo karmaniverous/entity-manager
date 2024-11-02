@@ -36,7 +36,9 @@ export function unwrapIndex<
     const generated = entityManager.config.entities[entityToken].generated;
     const generatedKeys = Object.keys(shake(generated));
 
-    return entityManager.config.entities[entityToken].indexes[indexToken]
+    return entityManager.config.entities[entityToken].indexes[
+      indexToken
+    ].components
       .map((component) =>
         component === entityManager.config.hashKey
           ? entityManager.config.hashKey

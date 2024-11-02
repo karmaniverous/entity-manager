@@ -27,35 +27,35 @@ describe('dehydratePageKeyMep', function () {
       firstName: {
         'user!': pick(
           item,
-          entityManager.config.entities.user.indexes
-            .firstName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.firstName
+            .components as (keyof UserItem)[],
         ),
         'user!0': pick(
           item0,
-          entityManager.config.entities.user.indexes
-            .firstName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.firstName
+            .components as (keyof UserItem)[],
         ),
         'user!1': pick(
           item1,
-          entityManager.config.entities.user.indexes
-            .firstName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.firstName
+            .components as (keyof UserItem)[],
         ),
       },
       lastName: {
         'user!': pick(
           item,
-          entityManager.config.entities.user.indexes
-            .lastName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.lastName
+            .components as (keyof UserItem)[],
         ),
         'user!0': pick(
           item0,
-          entityManager.config.entities.user.indexes
-            .lastName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.lastName
+            .components as (keyof UserItem)[],
         ),
         'user!1': pick(
           item1,
-          entityManager.config.entities.user.indexes
-            .lastName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.lastName
+            .components as (keyof UserItem)[],
         ),
       },
     };

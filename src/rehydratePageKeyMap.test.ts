@@ -30,45 +30,45 @@ describe('rehydratePageKeyMep', function () {
       firstName: {
         'user!0': pick(
           item0,
-          entityManager.config.entities.user.indexes
-            .firstName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.firstName
+            .components as (keyof UserItem)[],
         ),
         'user!1': pick(
           item1,
-          entityManager.config.entities.user.indexes
-            .firstName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.firstName
+            .components as (keyof UserItem)[],
         ),
         'user!2': pick(
           item2,
-          entityManager.config.entities.user.indexes
-            .firstName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.firstName
+            .components as (keyof UserItem)[],
         ),
         'user!3': pick(
           item3,
-          entityManager.config.entities.user.indexes
-            .firstName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.firstName
+            .components as (keyof UserItem)[],
         ),
       },
       lastName: {
         'user!0': pick(
           item0,
-          entityManager.config.entities.user.indexes
-            .lastName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.lastName
+            .components as (keyof UserItem)[],
         ),
         'user!1': pick(
           item1,
-          entityManager.config.entities.user.indexes
-            .lastName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.lastName
+            .components as (keyof UserItem)[],
         ),
         'user!2': pick(
           item2,
-          entityManager.config.entities.user.indexes
-            .lastName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.lastName
+            .components as (keyof UserItem)[],
         ),
         'user!3': pick(
           item3,
-          entityManager.config.entities.user.indexes
-            .lastName as (keyof UserItem)[],
+          entityManager.config.entities.user.indexes.lastName
+            .components as (keyof UserItem)[],
         ),
       },
     };

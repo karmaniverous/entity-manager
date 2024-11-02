@@ -102,6 +102,31 @@ export interface ShardBump {
 }
 
 /**
+ * Returns a Config entity index components type.
+ *
+ * @typeParam EntityToken - The {@link Entity | `Entity`} token.
+ * @typeParam M - The {@link EntityMap | `EntityMap`}.
+ * @typeParam HashKey - The property used across the configuration to store an {@link Entity | `Entity`}'s sharded hash key. Should be configured as the table hash key. Must not conflict with any {@link Entity | `Entity`} property.
+ * @typeParam RangeKey - The property used across the configuration to store an {@link Entity | `Entity`}'s range key. Should be configured as the table range key. Must not conflict with any {@link Entity | `Entity`} property.
+ * @typeParam T - The {@link TranscodeMap | `TranscodeMap`} identifying transcodable property types. Only {@link Entity | `Entity`} properties of these types can be components of an {@link ConfigEntity.indexes | index} or a {@link ConfigEntityGenerated | generated property}. 
+
+ * @category Config
+ * @protected
+ */
+export type ConfigEntityIndexComponents<
+  EntityToken extends keyof Exactify<M>,
+  M extends EntityMap,
+  HashKey extends string,
+  RangeKey extends string,
+  T extends TranscodeMap,
+> = (
+  | TranscodableProperties<M[EntityToken], T>
+  | PropertiesOfType<M[EntityToken], never>
+  | HashKey
+  | RangeKey
+)[];
+
+/**
  * Returns a Config entity type.
  *
  * @typeParam EntityToken - The {@link Entity | `Entity`} token.
@@ -216,12 +241,16 @@ export type ConfigEntity<
    */
   indexes?: Record<
     string,
-    (
-      | TranscodableProperties<M[EntityToken], T>
-      | PropertiesOfType<M[EntityToken], never>
-      | HashKey
-      | RangeKey
-    )[]
+    {
+      components: ConfigEntityIndexComponents<
+        EntityToken,
+        M,
+        HashKey,
+        RangeKey,
+        T
+      >;
+      projections?: (keyof M[EntityToken])[];
+    }
   >;
 
   /**

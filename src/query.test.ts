@@ -28,8 +28,8 @@ describe('query', function () {
       await mockDb.query({
         hashKey: 'hashKey2',
         hashValue: shardedKey,
-        indexComponents: entityManager.config.entities.user.indexes
-          .lastName as (keyof UserItem)[],
+        indexComponents: entityManager.config.entities.user.indexes.lastName
+          .components as (keyof UserItem)[],
         limit: pageSize,
         pageKey,
         sortOrder: [{ property: 'lastNameCanonical' }],
@@ -39,8 +39,8 @@ describe('query', function () {
       await mockDb.query({
         hashKey: 'hashKey2',
         hashValue: shardedKey,
-        indexComponents: entityManager.config.entities.user.indexes
-          .firstName as (keyof UserItem)[],
+        indexComponents: entityManager.config.entities.user.indexes.firstName
+          .components as (keyof UserItem)[],
         limit: pageSize,
         pageKey,
         sortOrder: [{ property: 'firstNameCanonical' }],

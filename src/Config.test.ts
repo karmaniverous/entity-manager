@@ -77,11 +77,11 @@ const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
   entities: {
     user: {
       indexes: {
-        created: ['entityPK', 'entitySK', 'created'],
-        firstName: ['entityPK', 'entitySK', 'firstNameRK'],
-        lastName: ['entityPK', 'entitySK', 'lastNameRK'],
-        phone: ['entityPK', 'entitySK', 'phone'],
-        updated: ['entityPK', 'entitySK', 'updated'],
+        created: { components: ['entityPK', 'entitySK', 'created'] },
+        firstName: { components: ['entityPK', 'entitySK', 'firstNameRK'] },
+        lastName: { components: ['entityPK', 'entitySK', 'lastNameRK'] },
+        phone: { components: ['entityPK', 'entitySK', 'phone'] },
+        updated: { components: ['entityPK', 'entitySK', 'updated'] },
       },
       generated: {
         firstNameRK: {
@@ -104,7 +104,7 @@ const config: Config<MyEntityMap, 'entityPK', 'entitySK'> = {
     },
     email: {
       indexes: {
-        userId: ['entityPK', 'entitySK', 'userId'],
+        userId: { components: ['entityPK', 'entitySK', 'userId'] },
       },
       elementTranscodes: {
         created: 'timestamp',

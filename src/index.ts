@@ -7,6 +7,7 @@ export type {
   ConfigEntities,
   ConfigEntity,
   ConfigEntityGenerated,
+  ConfigEntityIndexComponents,
   ConfigKeys,
   ConfigTranscodes,
   EntityMap,

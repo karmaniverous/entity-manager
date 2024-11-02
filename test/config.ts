@@ -27,18 +27,18 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
         userId: 'string',
       },
       indexes: {
-        userId: ['hashKey2', 'rangeKey', 'userId'],
+        userId: { components: ['hashKey2', 'rangeKey', 'userId'] },
       },
       timestampProperty: 'created',
       uniqueProperty: 'email',
     },
     user: {
       indexes: {
-        created: ['hashKey2', 'rangeKey', 'created'],
-        firstName: ['hashKey2', 'rangeKey', 'firstNameRK'],
-        lastName: ['hashKey2', 'rangeKey', 'lastNameRK'],
-        phone: ['hashKey2', 'rangeKey', 'phone'],
-        updated: ['hashKey2', 'rangeKey', 'updated'],
+        created: { components: ['hashKey2', 'rangeKey', 'created'] },
+        firstName: { components: ['hashKey2', 'rangeKey', 'firstNameRK'] },
+        lastName: { components: ['hashKey2', 'rangeKey', 'lastNameRK'] },
+        phone: { components: ['hashKey2', 'rangeKey', 'phone'] },
+        updated: { components: ['hashKey2', 'rangeKey', 'updated'] },
       },
       generated: {
         firstNameRK: {

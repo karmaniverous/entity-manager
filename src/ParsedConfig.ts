@@ -36,6 +36,11 @@ const validateKeyExclusive = (
     });
 };
 
+const componentArray = z
+  .array(z.string().min(1))
+  .nonempty()
+  .superRefine(validateArrayUnique);
+
 export const configSchema = z
   .object({
     entities: z
@@ -61,10 +66,7 @@ export const configSchema = z
                 z
                   .object({
                     atomic: z.boolean().optional().default(false),
-                    elements: z
-                      .array(z.string().min(1))
-                      .nonempty()
-                      .superRefine(validateArrayUnique),
+                    elements: componentArray,
                     sharded: z.boolean().optional().default(false),
                   })
                   .optional(),
@@ -74,10 +76,10 @@ export const configSchema = z
             elementTranscodes: z.record(z.string()).optional().default({}),
             indexes: z
               .record(
-                z
-                  .array(z.string().min(1))
-                  .nonempty()
-                  .superRefine(validateArrayUnique),
+                z.object({
+                  components: componentArray,
+                  projections: componentArray.optional(),
+                }),
               )
               .optional()
               .default({}),
@@ -278,11 +280,12 @@ export const configSchema = z
               received: element,
             });
 
-      // validate all ungenerated entity index components have a corresponding entity element type.
+      // validate indexes.
       const generatedProperties = Object.keys(entity.generated);
 
-      for (const [indexKey, index] of Object.entries(entity.indexes))
-        for (const component of index)
+      for (const [indexKey, index] of Object.entries(entity.indexes)) {
+        // validate all ungenerated entity index components have a corresponding entity element type
+        for (const component of index.components)
           if (
             ![data.hashKey, data.rangeKey, ...generatedProperties].includes(
               component,
@@ -292,9 +295,38 @@ export const configSchema = z
             ctx.addIssue({
               code: z.ZodIssueCode.invalid_enum_value,
               options: typedElements,
-              path: ['entities', entityToken, 'indexes', indexKey],
+              path: [
+                'entities',
+                entityToken,
+                'indexes',
+                indexKey,
+                'components',
+              ],
               received: component,
             });
+
+        // validate no index projections are index components, hashKey, or rangeKey
+        if (index.projections)
+          for (const projection of index.projections) {
+            if (
+              [data.hashKey, data.rangeKey, ...index.components].includes(
+                projection,
+              )
+            )
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message:
+                  'index projection is an index component, hash key, or range key',
+                path: [
+                  'entities',
+                  entityToken,
+                  'indexes',
+                  indexKey,
+                  'projections',
+                ],
+              });
+          }
+      }
     }
   });
 
