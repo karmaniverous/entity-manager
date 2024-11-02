@@ -185,50 +185,6 @@ describe('Config', function () {
     );
   });
 
-  it('should fail when entity index components are empty', function () {
-    interface MyEntityMap extends EntityMap {
-      foo: { bar: string; baz: number };
-    }
-
-    const config: Config<MyEntityMap> = {
-      entities: {
-        foo: {
-          indexes: { id: { components: [] } },
-          elementTranscodes: { bar: 'string', baz: 'int' },
-          timestampProperty: 'baz',
-          uniqueProperty: 'bar',
-        },
-      },
-      hashKey: 'hashKey',
-      rangeKey: 'rangeKey',
-    };
-
-    expect(() => configSchema.parse(config)).to.throw('too_small');
-  });
-
-  it('should fail when entity index components contain dupes', function () {
-    interface MyEntityMap extends EntityMap {
-      foo: { bar: string; baz: number };
-    }
-
-    const config: Config<MyEntityMap> = {
-      entities: {
-        foo: {
-          indexes: { id: { components: ['bar', 'bar'] } },
-          elementTranscodes: { bar: 'string', baz: 'int' },
-          timestampProperty: 'baz',
-          uniqueProperty: 'bar',
-        },
-      },
-      hashKey: 'hashKey',
-      rangeKey: 'rangeKey',
-    };
-
-    expect(() => configSchema.parse(config)).to.throw(
-      "duplicate array element 'bar'",
-    );
-  });
-
   it('should fail when entity index projections are empty', function () {
     interface MyEntityMap extends EntityMap {
       foo: { bar: string; baz: number };
@@ -238,7 +194,7 @@ describe('Config', function () {
       entities: {
         foo: {
           indexes: {
-            id: { components: ['hashKey', 'rangeKey', 'bar'], projections: [] },
+            id: { hashKey: 'hashKey', rangeKey: 'bar', projections: [] },
           },
           elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
@@ -261,8 +217,12 @@ describe('Config', function () {
       entities: {
         foo: {
           indexes: {
-            // @ts-expect-error Type '"bang"' is not assignable to type '"bar" | "baz"'
-            id: { components: ['bar', 'baz'], projections: ['bang', 'bang'] },
+            id: {
+              hashKey: 'hashKey',
+              rangeKey: 'bar',
+              // @ts-expect-error Type '"bang"' is not assignable to type '"bar" | "baz"'
+              projections: ['bang', 'bang'],
+            },
           },
           elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
@@ -287,7 +247,7 @@ describe('Config', function () {
       entities: {
         foo: {
           indexes: {
-            id: { components: ['bar', 'baz'], projections: ['bar'] },
+            id: { hashKey: 'hashKey', rangeKey: 'bar', projections: ['bar'] },
           },
           elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',
@@ -312,8 +272,12 @@ describe('Config', function () {
       entities: {
         foo: {
           indexes: {
-            // @ts-expect-error Type '"hashKey"' is not assignable to type '"bar" | "baz"'
-            id: { components: ['bar', 'baz'], projections: ['hashKey'] },
+            id: {
+              hashKey: 'hashKey',
+              rangeKey: 'rangeKey',
+              // @ts-expect-error Type '"hashKey"' is not assignable to type '"bar" | "baz"'
+              projections: ['hashKey'],
+            },
           },
           elementTranscodes: { bar: 'string', baz: 'int' },
           timestampProperty: 'baz',

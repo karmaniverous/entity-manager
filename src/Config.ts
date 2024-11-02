@@ -113,18 +113,17 @@ export interface ShardBump {
  * @category Config
  * @protected
  */
-export type ConfigEntityIndexComponents<
+export type ConfigEntityIndexComponent<
   EntityToken extends keyof Exactify<M>,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
   T extends TranscodeMap,
-> = (
+> =
   | TranscodableProperties<M[EntityToken], T>
   | PropertiesOfType<M[EntityToken], never>
   | HashKey
-  | RangeKey
-)[];
+  | RangeKey;
 
 /**
  * Returns a Config entity type.
@@ -235,14 +234,15 @@ export type ConfigEntity<
   /**
    * Indexes defined for the {@link Entity | `Entity`}. Should reflect the underlying database table indexes.
    *
-   * Each key is the name of an index, and each value is a non-empty array of {@link Entity | `Entity`} property names that define the index.
+   * Each key is the name of an index, and each value defines the hash key, range key, and projected properties of the index.
    *
-   * Related property types must be align with the {@link Config | `Config`} `T` type parameter. Note tha all {@link ConfigEntityGenerated | generated property} types are transcodable by definition.
+   * hashKey and rangeKey types must align with the {@link Config | `Config`} `T` type parameter. Note that all {@link ConfigEntityGenerated | generated property} types are transcodable by definition.
    */
   indexes?: Record<
     string,
     {
-      components: ConfigEntityIndexComponents<
+      hashKey: ConfigEntityIndexComponent<EntityToken, M, HashKey, RangeKey, T>;
+      rangeKey: ConfigEntityIndexComponent<
         EntityToken,
         M,
         HashKey,

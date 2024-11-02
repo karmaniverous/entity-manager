@@ -77,7 +77,8 @@ export const configSchema = z
             indexes: z
               .record(
                 z.object({
-                  components: componentArray,
+                  hashKey: z.string().min(1),
+                  rangeKey: z.string().min(1),
                   projections: componentArray.optional(),
                 }),
               )
@@ -283,9 +284,28 @@ export const configSchema = z
       // validate indexes.
       const generatedProperties = Object.keys(entity.generated);
 
-      for (const [indexKey, index] of Object.entries(entity.indexes)) {
+      for (const [
+        indexKey,
+        { hashKey, rangeKey, projections },
+      ] of Object.entries(entity.indexes)) {
+        // validate index hash key is sharded
+        if (hashKey !== data.hashKey && !entity.generated[hashKey]?.sharded)
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'index hash key is not sharded',
+            path: ['entities', entityToken, 'indexes', indexKey, 'hashKey'],
+          });
+
+        // validate index range key is unsharded
+        if (rangeKey !== data.rangeKey && entity.generated[rangeKey]?.sharded)
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'index range key is sharded',
+            path: ['entities', entityToken, 'indexes', indexKey, 'rangeKey'],
+          });
+
         // validate all ungenerated entity index components have a corresponding entity element type
-        for (const component of index.components)
+        for (const component of [hashKey, rangeKey])
           if (
             ![data.hashKey, data.rangeKey, ...generatedProperties].includes(
               component,
@@ -306,10 +326,10 @@ export const configSchema = z
             });
 
         // validate no index projections are index components, hashKey, or rangeKey
-        if (index.projections)
-          for (const projection of index.projections) {
+        if (projections)
+          for (const projection of projections) {
             if (
-              [data.hashKey, data.rangeKey, ...index.components].includes(
+              [data.hashKey, data.rangeKey, hashKey, rangeKey].includes(
                 projection,
               )
             )

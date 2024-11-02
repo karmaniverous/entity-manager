@@ -6,6 +6,7 @@ import { entityManager, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
 import { addKeys } from './addKeys';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
+import { getIndexComponents } from './getIndexComponents';
 import { type PageKeyMap } from './PageKeyMap';
 
 describe('dehydratePageKeyMep', function () {
@@ -23,40 +24,28 @@ describe('dehydratePageKeyMep', function () {
     addKeys(entityManager, item0, 'user');
     addKeys(entityManager, item1, 'user');
 
+    const firstNameIndexComponents = getIndexComponents(
+      entityManager,
+      'user',
+      'firstName',
+    ) as (keyof UserItem)[];
+
+    const lastNameIndexComponents = getIndexComponents(
+      entityManager,
+      'user',
+      'lastName',
+    ) as (keyof UserItem)[];
+
     pageKeyMap = {
       firstName: {
-        'user!': pick(
-          item,
-          entityManager.config.entities.user.indexes.firstName
-            .components as (keyof UserItem)[],
-        ),
-        'user!0': pick(
-          item0,
-          entityManager.config.entities.user.indexes.firstName
-            .components as (keyof UserItem)[],
-        ),
-        'user!1': pick(
-          item1,
-          entityManager.config.entities.user.indexes.firstName
-            .components as (keyof UserItem)[],
-        ),
+        'user!': pick(item, firstNameIndexComponents),
+        'user!0': pick(item0, firstNameIndexComponents),
+        'user!1': pick(item1, firstNameIndexComponents),
       },
       lastName: {
-        'user!': pick(
-          item,
-          entityManager.config.entities.user.indexes.lastName
-            .components as (keyof UserItem)[],
-        ),
-        'user!0': pick(
-          item0,
-          entityManager.config.entities.user.indexes.lastName
-            .components as (keyof UserItem)[],
-        ),
-        'user!1': pick(
-          item1,
-          entityManager.config.entities.user.indexes.lastName
-            .components as (keyof UserItem)[],
-        ),
+        'user!': pick(item, lastNameIndexComponents),
+        'user!0': pick(item0, lastNameIndexComponents),
+        'user!1': pick(item1, lastNameIndexComponents),
       },
     };
   });

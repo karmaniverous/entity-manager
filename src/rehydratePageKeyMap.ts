@@ -5,6 +5,7 @@ import type { EntityMap, ItemMap } from './Config';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import { EntityManager } from './EntityManager';
 import { getHashKeySpace } from './getHashKeySpace';
+import { getIndexComponents } from './getIndexComponents';
 import type { PageKeyMap } from './PageKeyMap';
 import { rehydrateIndexItem } from './rehydrateIndexItem';
 import { updateItemRangeKey } from './updateItemRangeKey';
@@ -90,8 +91,7 @@ export function rehydratePageKeyMap<
           item = updateItemRangeKey(entityManager, item, entityToken);
 
           return zipToObject(
-            entityManager.config.entities[entityToken].indexes[index]
-              .components,
+            getIndexComponents(entityManager, entityToken, index),
             (component) =>
               entityManager.config.entities[entityToken].generated[component]
                 ? encodeGeneratedProperty(
