@@ -102,7 +102,7 @@ export interface ShardBump {
 }
 
 /**
- * Returns a Config entity index components type.
+ * Returns a Config entity index component type.
  *
  * @typeParam EntityToken - The {@link Entity | `Entity`} token.
  * @typeParam M - The {@link EntityMap | `EntityMap`}.
