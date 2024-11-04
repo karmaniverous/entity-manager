@@ -12,8 +12,8 @@ import { validateEntityToken } from './validateEntityToken';
  * Update the range key on a partial {@link ItemMap | `ItemMap`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+ * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param overwrite - Overwrite existing {@link ConfigKeys.rangeKey | `this.config.rangeKey`} property value (default `false`).
  *
  * @returns Shallow clone of `item` with updated range key.
@@ -30,8 +30,8 @@ export function updateItemRangeKey<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  item: Partial<Item>,
   entityToken: EntityToken,
+  item: Partial<Item>,
   overwrite = false,
 ): Partial<Item> {
   try {
@@ -43,8 +43,8 @@ export function updateItemRangeKey<
       entityManager.logger.debug(
         'did not overwrite existing entity item range key',
         {
-          item,
           entityToken,
+          item,
           overwrite,
         },
       );
@@ -82,8 +82,8 @@ export function updateItemRangeKey<
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, {
-        item,
         entityToken,
+        item,
         overwrite,
       });
 

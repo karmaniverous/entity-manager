@@ -8,8 +8,8 @@ import { validateEntityToken } from './validateEntityToken';
  * Strips generated properties, hash key, and range key from an {@link ItemMap | `ItemMap`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param item - {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
+ * @param item - {@link ItemMap | `ItemMap`} object.
  *
  * @returns Shallow clone of `item` without generated properties, hash key or range key.
  *
@@ -24,8 +24,8 @@ export function removeKeys<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  item: Partial<Item>,
   entityToken: EntityToken,
+  item: Partial<Item>,
 ): Partial<Item> {
   try {
     // Validate params.
@@ -41,15 +41,15 @@ export function removeKeys<
       delete newItem[property as keyof Item];
 
     entityManager.logger.debug('stripped entity item generated properties', {
-      item,
       entityToken,
+      item,
       newItem,
     });
 
     return newItem;
   } catch (error) {
     if (error instanceof Error)
-      entityManager.logger.error(error.message, { item, entityToken });
+      entityManager.logger.error(error.message, { entityToken, item });
 
     throw error;
   }

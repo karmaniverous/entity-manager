@@ -9,13 +9,13 @@ import { rehydrateIndexItem } from './rehydrateIndexItem';
 describe('rehydrateIndexItem', function () {
   it('should rehydrate item by index', function () {
     const [item] = getUsers() as UserItem[];
-    addKeys(entityManager, item, 'user');
+    addKeys(entityManager, 'user', item);
 
     const rehydrated = rehydrateIndexItem(
       entityManager,
-      dehydrateIndexItem(entityManager, item, 'user', 'firstName'),
       'user',
       'firstName',
+      dehydrateIndexItem(entityManager, 'user', 'firstName', item),
     );
 
     expect(item).to.deep.include(rehydrated);
@@ -23,14 +23,14 @@ describe('rehydrateIndexItem', function () {
 
   it('should rehydrate item by index with missing component', function () {
     const [item] = getUsers() as UserItem[];
-    addKeys(entityManager, item, 'user');
+    addKeys(entityManager, 'user', item);
     delete item.phone;
 
     const rehydrated = rehydrateIndexItem(
       entityManager,
-      dehydrateIndexItem(entityManager, item, 'user', 'phone'),
       'user',
       'phone',
+      dehydrateIndexItem(entityManager, 'user', 'phone', item),
     );
 
     expect(item).to.deep.include(rehydrated);

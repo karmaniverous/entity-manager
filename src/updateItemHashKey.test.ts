@@ -9,7 +9,7 @@ describe('updateItemHashKey', function () {
     let [item] = getUsers() as Partial<UserItem>[];
     item.created = now;
 
-    item = updateItemHashKey(entityManager, item, 'user');
+    item = updateItemHashKey(entityManager, 'user', item);
 
     expect(item.hashKey2).to.equal('user!');
   });
@@ -18,7 +18,7 @@ describe('updateItemHashKey', function () {
     let [item] = getUsers() as Partial<UserItem>[];
     item.created = now + day;
 
-    item = updateItemHashKey(entityManager, item, 'user');
+    item = updateItemHashKey(entityManager, 'user', item);
 
     expect(item.hashKey2?.length).to.equal(6);
   });
@@ -28,7 +28,7 @@ describe('updateItemHashKey', function () {
     item.created = now + day * 2;
     item.hashKey2 = 'user!q';
 
-    updateItemHashKey(entityManager, item, 'user');
+    updateItemHashKey(entityManager, 'user', item);
 
     expect(item.hashKey2).to.equal('user!q');
   });
@@ -38,7 +38,7 @@ describe('updateItemHashKey', function () {
     item.created = now + day * 2;
     item.hashKey2 = 'user!q';
 
-    item = updateItemHashKey(entityManager, item, 'user', true);
+    item = updateItemHashKey(entityManager, 'user', item, true);
 
     expect(item.hashKey2?.length).to.equal(7);
   });

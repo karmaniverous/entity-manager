@@ -14,8 +14,8 @@ import { validateEntityToken } from './validateEntityToken';
  * Reverses {@link EntityManager.rehydratePageKeyMap | `rehydratePageKeyMap`}.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param pageKeyMap - {@link PageKeyMap | `PageKeyMap`} object to dehydrate.
  * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
+ * @param pageKeyMap - {@link PageKeyMap | `PageKeyMap`} object to dehydrate.
  *
  * @returns  Array of dehydrated page keys.
  *
@@ -36,8 +36,8 @@ export function dehydratePageKeyMap<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  pageKeyMap: PageKeyMap<Item, T>,
   entityToken: EntityToken,
+  pageKeyMap: PageKeyMap<Item, T>,
 ): string[] {
   try {
     // Validate params.
@@ -48,8 +48,8 @@ export function dehydratePageKeyMap<
       const dehydrated: string[] = [];
 
       entityManager.logger.debug('dehydrated empty page key map', {
-        pageKeyMap,
         entityToken,
+        pageKeyMap,
         dehydrated,
       });
 
@@ -88,8 +88,8 @@ export function dehydratePageKeyMap<
               item,
               decodeGeneratedProperty(
                 entityManager,
-                value as string,
                 entityToken,
+                value as string,
               ),
             );
           else Object.assign(item, { [property]: value });
@@ -99,7 +99,7 @@ export function dehydratePageKeyMap<
 
         // Dehydrate index from item.
         dehydrated.push(
-          dehydrateIndexItem(entityManager, item, entityToken, index, [
+          dehydrateIndexItem(entityManager, entityToken, index, item, [
             entityManager.config.hashKey,
           ]),
         );
@@ -110,8 +110,8 @@ export function dehydratePageKeyMap<
     if (dehydrated.every((pageKey) => pageKey === '')) dehydrated = [];
 
     entityManager.logger.debug('dehydrated page key map', {
-      pageKeyMap,
       entityToken,
+      pageKeyMap,
       indexes,
       hashKeys,
       dehydrated,

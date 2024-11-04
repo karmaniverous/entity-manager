@@ -78,13 +78,13 @@ export async function query<
     // Rehydrate pageKeyMap.
     const rehydratedPageKeyMap = rehydratePageKeyMap(
       entityManager,
+      entityToken,
+      Object.keys(shardQueryMap),
       pageKeyMap
         ? (JSON.parse(
             decompressFromEncodedURIComponent(pageKeyMap),
           ) as string[])
         : undefined,
-      entityToken,
-      Object.keys(shardQueryMap),
       timestampFrom,
       timestampTo,
     );
@@ -172,8 +172,8 @@ export async function query<
         JSON.stringify(
           dehydratePageKeyMap(
             entityManager,
-            workingResult.pageKeyMap,
             entityToken,
+            workingResult.pageKeyMap,
           ),
         ),
       ),

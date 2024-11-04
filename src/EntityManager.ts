@@ -59,8 +59,8 @@ export class EntityManager<
   /**
    * Update generated properties, hash key, and range key on an {@link ItemMap | `ItemMap`} object.
    *
-   * @param item - {@link ItemMap | `ItemMap`} object.
    * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param item - {@link ItemMap | `ItemMap`} object.
    * @param overwrite - Overwrite existing properties (default `false`).
    *
    * @returns Shallow clone of `item` with updated properties.
@@ -71,18 +71,18 @@ export class EntityManager<
     Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
     EntityToken extends keyof Exactify<M> & string,
   >(
-    item: Partial<Item>,
     entityToken: EntityToken,
+    item: Partial<Item>,
     overwrite = false,
   ): Partial<Item> {
-    return addKeys(this, item, entityToken, overwrite);
+    return addKeys(this, entityToken, item, overwrite);
   }
 
   /**
    * Strips generated properties, hash key, and range key from an {@link ItemMap | `ItemMap`} object.
    *
-   * @param item - {@link ItemMap | `ItemMap`} object.
    * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+   * @param item - {@link ItemMap | `ItemMap`} object.
    *
    * @returns Shallow clone of `item` without generated properties, hash key or range key.
    *
@@ -91,8 +91,8 @@ export class EntityManager<
   removeKeys<
     Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
     EntityToken extends keyof Exactify<M> & string,
-  >(item: Partial<Item>, entityToken: EntityToken): Partial<Item> {
-    return removeKeys(this, item, entityToken);
+  >(entityToken: EntityToken, item: Partial<Item>): Partial<Item> {
+    return removeKeys(this, entityToken, item);
   }
 
   /**

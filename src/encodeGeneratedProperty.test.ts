@@ -10,9 +10,9 @@ describe('encodeGeneratedProperty', function () {
 
     const encoded = encodeGeneratedProperty(
       entityManager,
-      item,
       'user',
       'firstNameRK',
+      item,
     );
 
     expect(encoded).to.match(/^firstNameCanonical#\w+\|lastNameCanonical#\w+$/);
@@ -24,9 +24,9 @@ describe('encodeGeneratedProperty', function () {
 
     const encoded = encodeGeneratedProperty(
       entityManager,
-      item,
       'user',
       'userPK',
+      item,
     );
 
     expect(encoded).to.match(/^user!q\|userId#\w+$/);
@@ -37,9 +37,9 @@ describe('encodeGeneratedProperty', function () {
 
     const encoded = encodeGeneratedProperty(
       entityManager,
-      item,
       'user',
       'phoneRK',
+      item,
     );
 
     expect(encoded).to.match(/^phone#\+\d+\|created#\d+$/);
@@ -51,9 +51,9 @@ describe('encodeGeneratedProperty', function () {
 
     const encoded = encodeGeneratedProperty(
       entityManager,
-      item,
       'user',
       'phoneRK',
+      item,
     );
 
     expect(encoded).to.be.undefined;
@@ -63,7 +63,7 @@ describe('encodeGeneratedProperty', function () {
     const [item] = getUsers() as UserItem[];
 
     expect(() =>
-      encodeGeneratedProperty(entityManager, item, 'user', 'foo'),
+      encodeGeneratedProperty(entityManager, 'user', 'foo', item),
     ).to.throw('invalid');
   });
 });

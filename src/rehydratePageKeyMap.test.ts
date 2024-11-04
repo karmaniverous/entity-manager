@@ -22,10 +22,10 @@ describe('rehydratePageKeyMep', function () {
     item2.hashKey2 = 'user!2';
     item3.hashKey2 = 'user!3';
 
-    item0 = addKeys(entityManager, item0, 'user');
-    item1 = addKeys(entityManager, item1, 'user');
-    item2 = addKeys(entityManager, item2, 'user');
-    item3 = addKeys(entityManager, item3, 'user');
+    item0 = addKeys(entityManager, 'user', item0);
+    item1 = addKeys(entityManager, 'user', item1);
+    item2 = addKeys(entityManager, 'user', item2);
+    item3 = addKeys(entityManager, 'user', item3);
 
     const firstNameIndexComponents = getIndexComponents(
       entityManager,
@@ -56,12 +56,12 @@ describe('rehydratePageKeyMep', function () {
   });
 
   it('should rehydrate page key map', function () {
-    const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
+    const dehydrated = dehydratePageKeyMap(entityManager, 'user', pageKeyMap);
     const rehydrated = rehydratePageKeyMap(
       entityManager,
-      dehydrated,
       'user',
       ['firstName', 'lastName'],
+      dehydrated,
       now + day,
       now + day,
     );
@@ -72,12 +72,12 @@ describe('rehydratePageKeyMep', function () {
   it('should dehydrate page key map with undefined page key', function () {
     pageKeyMap.firstName['user!0'] = undefined;
 
-    const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
+    const dehydrated = dehydratePageKeyMap(entityManager, 'user', pageKeyMap);
     const rehydrated = rehydratePageKeyMap(
       entityManager,
-      dehydrated,
       'user',
       ['firstName', 'lastName'],
+      dehydrated,
       now + day,
       now + day,
     );
@@ -90,12 +90,12 @@ describe('rehydratePageKeyMep', function () {
       mapValues(indexMap, () => undefined),
     );
 
-    const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
+    const dehydrated = dehydratePageKeyMap(entityManager, 'user', pageKeyMap);
     const rehydrated = rehydratePageKeyMap(
       entityManager,
-      dehydrated,
       'user',
       ['firstName', 'lastName'],
+      dehydrated,
       now + day,
       now + day,
     );

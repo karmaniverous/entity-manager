@@ -17,9 +17,9 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * Reverses the {@link EntityManager.dehydratePageKeyMap | `dehydratePageKeyMap`} method.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param dehydrated - Array of dehydrated page keys or undefined if new query.
  * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
  * @param indexTokens - Array of {@link ConfigEntity.indexes | `entityManager.config.entities.<entityToken>.indexes`} keys used as keys of the original {@link PageKeyMap | `PageKeyMap`}.
+ * @param dehydrated - Array of dehydrated page keys or undefined if new query.
  * @param timestampFrom - Lower timestanp limit used to generate the original {@link PageKeyMap | `PageKeyMap`}. Defaults to `0`.
  * @param timestampTo - Upper timestamp limit used to generate the original {@link PageKeyMap | `PageKeyMap`}. Defaults to `Date.now()`.
  *
@@ -39,9 +39,9 @@ export function rehydratePageKeyMap<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  dehydrated: string[] | undefined,
   entityToken: EntityToken,
   indexTokens: string[],
+  dehydrated: string[] | undefined,
   timestampFrom = 0,
   timestampTo = Date.now(),
 ): PageKeyMap<Item, T> {
@@ -81,14 +81,14 @@ export function rehydratePageKeyMap<
             [entityManager.config.hashKey]: hashKey,
             ...rehydrateIndexItem(
               entityManager,
-              dehydratedIndexPageKeyMaps[i],
               entityToken,
               index,
+              dehydratedIndexPageKeyMaps[i],
               [entityManager.config.hashKey],
             ),
           } as Partial<Item>;
 
-          item = updateItemRangeKey(entityManager, item, entityToken);
+          item = updateItemRangeKey(entityManager, entityToken, item);
 
           return zipToObject(
             getIndexComponents(entityManager, entityToken, index),
@@ -96,9 +96,9 @@ export function rehydratePageKeyMap<
               entityManager.config.entities[entityToken].generated[component]
                 ? encodeGeneratedProperty(
                     entityManager,
-                    item,
                     entityToken,
                     component,
+                    item,
                   )!
                 : item[component as keyof Item],
           );
@@ -106,9 +106,9 @@ export function rehydratePageKeyMap<
     );
 
     entityManager.logger.debug('rehydrated page key map', {
-      dehydrated,
       entityToken,
       indexTokens,
+      dehydrated,
       rehydrated,
     });
 
@@ -116,9 +116,9 @@ export function rehydratePageKeyMap<
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, {
-        dehydrated,
         entityToken,
         indexTokens,
+        dehydrated,
       });
 
     throw error;

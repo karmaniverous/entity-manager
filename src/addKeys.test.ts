@@ -8,7 +8,7 @@ describe('addKeys', function () {
   it('should add item generated properties', function () {
     let [item] = getUsers() as Partial<UserItem>[];
 
-    item = addKeys(entityManager, item, 'user');
+    item = addKeys(entityManager, 'user', item);
 
     expect(item).to.haveOwnProperty('hashKey2');
     expect(item).to.haveOwnProperty('rangeKey');
@@ -20,14 +20,10 @@ describe('addKeys', function () {
   it('should not overwrite item generated properties', function () {
     const [item] = getUsers() as UserItem[];
 
-    const newItem = addKeys(
-      entityManager,
-      {
-        ...item,
-        firstNameCanonical: 'foo',
-      },
-      'user',
-    );
+    const newItem = addKeys(entityManager, 'user', {
+      ...item,
+      firstNameCanonical: 'foo',
+    });
 
     expect(newItem.firstNameRK).to.equal(newItem.firstNameRK);
   });
@@ -37,11 +33,11 @@ describe('addKeys', function () {
 
     const newItem = addKeys(
       entityManager,
+      'user',
       {
         ...item,
         firstNameCanonical: 'foo',
       },
-      'user',
       true,
     );
 

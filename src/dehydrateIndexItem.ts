@@ -20,9 +20,9 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * `item` must be populated with all required index component elements!
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
  * @param indexToken - {@link ConfigEntity.indexes | `entityManager.config.entities.<entityToken>.indexes`} key.
+ * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param omit - Array of index components to omit from the output value.
  *
  * @returns Dehydrated index value.
@@ -39,9 +39,9 @@ export function dehydrateIndexItem<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  item: Partial<Item> | undefined,
   entityToken: EntityToken,
   indexToken: string,
+  item: Partial<Item> | undefined,
   omit: string[] = [],
 ): string {
   try {
@@ -61,7 +61,7 @@ export function dehydrateIndexItem<
     // Join index element values.
     const dehydrated = elements
       .map((element) =>
-        encodeEntityElement(entityManager, item, entityToken, element),
+        encodeEntityElement(entityManager, entityToken, element, item),
       )
       .join(generatedKeyDelimiter);
 

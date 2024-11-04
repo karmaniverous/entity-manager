@@ -15,8 +15,8 @@ import { validateEntityToken } from './validateEntityToken';
  * Update generated properties, hash key, and range key on an {@link ItemMap | `ItemMap`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param item - {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+ * @param item - {@link ItemMap | `ItemMap`} object.
  * @param overwrite - Overwrite existing properties (default `false`).
  *
  * @returns Shallow clone of `item` with updated properties.
@@ -32,8 +32,8 @@ export function addKeys<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  item: Partial<Item>,
   entityToken: EntityToken,
+  item: Partial<Item>,
   overwrite = false,
 ): Partial<Item> {
   try {
@@ -43,16 +43,16 @@ export function addKeys<
     // Update hash key.
     let newItem = updateItemHashKey(
       entityManager,
-      item,
       entityToken,
+      item,
       overwrite,
     );
 
     // Update range key.
     newItem = updateItemRangeKey(
       entityManager,
-      newItem,
       entityToken,
+      newItem,
       overwrite,
     );
 
@@ -62,9 +62,9 @@ export function addKeys<
       if (overwrite || isNil(item[property as keyof Item])) {
         const encoded = encodeGeneratedProperty(
           entityManager,
-          newItem,
           entityToken,
           property,
+          newItem,
         );
 
         if (encoded) Object.assign(newItem, { [property]: encoded });

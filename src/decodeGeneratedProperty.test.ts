@@ -5,25 +5,25 @@ import { decodeGeneratedProperty } from './decodeGeneratedProperty';
 
 describe('decodeGeneratedProperty', function () {
   it('should decode empty string to empty object', function () {
-    const decoded = decodeGeneratedProperty(entityManager, '', 'user');
+    const decoded = decodeGeneratedProperty(entityManager, 'user', '');
 
     expect(decoded).to.deep.equal({});
   });
 
   it('should fail on no value delimiters', function () {
     expect(() =>
-      decodeGeneratedProperty(entityManager, 'abc', 'user'),
+      decodeGeneratedProperty(entityManager, 'user', 'abc'),
     ).to.throw('invalid generated property value');
   });
 
   it('should fail on too many value delimiters', function () {
     expect(() =>
-      decodeGeneratedProperty(entityManager, 'abc#def#ghi', 'user'),
+      decodeGeneratedProperty(entityManager, 'user', 'abc#def#ghi'),
     ).to.throw('invalid generated property value');
   });
 
   it('should decode hash key', function () {
-    const decoded = decodeGeneratedProperty(entityManager, 'user!q', 'user');
+    const decoded = decodeGeneratedProperty(entityManager, 'user', 'user!q');
 
     expect(decoded).to.deep.equal({ hashKey2: 'user!q' });
   });
@@ -31,8 +31,8 @@ describe('decodeGeneratedProperty', function () {
   it('should decode generated property', function () {
     const decoded = decodeGeneratedProperty(
       entityManager,
-      'firstNameCanonical#lilian|lastNameCanonical#fahey',
       'user',
+      'firstNameCanonical#lilian|lastNameCanonical#fahey',
     );
 
     expect(decoded).to.deep.equal({
@@ -44,8 +44,8 @@ describe('decodeGeneratedProperty', function () {
   it('should decode generated property with hash key', function () {
     const decoded = decodeGeneratedProperty(
       entityManager,
-      'user!q|firstNameCanonical#lilian|lastNameCanonical#fahey',
       'user',
+      'user!q|firstNameCanonical#lilian|lastNameCanonical#fahey',
     );
 
     expect(decoded).to.deep.equal({
@@ -59,8 +59,8 @@ describe('decodeGeneratedProperty', function () {
     expect(() =>
       decodeGeneratedProperty(
         entityManager,
-        'firstNameCanonical#lilian|user!q|lastNameCanonical#fahey',
         'user',
+        'firstNameCanonical#lilian|user!q|lastNameCanonical#fahey',
       ),
     ).to.throw('invalid generated property value');
   });

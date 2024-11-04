@@ -10,8 +10,8 @@ import { validateEntityToken } from './validateEntityToken';
  * Decode a generated property value. Returns a partial ItemMap.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param encoded - Encoded generated property value.
  * @param entityToken - `entityManager.config.entities` key.
+ * @param encoded - Encoded generated property value.
  *
  * @returns Partial {@link ItemMap | `ItemMap`} object with updated properties decoded from `encoded`.
  *
@@ -26,8 +26,8 @@ export function decodeGeneratedProperty<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  encoded: string,
   entityToken: EntityToken,
+  encoded: string,
 ): Partial<Item> {
   try {
     const {
@@ -70,23 +70,23 @@ export function decodeGeneratedProperty<
         ([key, value]) =>
           decodeEntityElement(
             entityManager,
-            value,
             entityToken,
             key as keyof Item & string,
+            value,
           ),
       ),
     );
 
     entityManager.logger.debug('decoded generated property', {
-      encoded,
       entityToken,
+      encoded,
       decoded,
     });
 
     return decoded as Partial<Item>;
   } catch (error) {
     if (error instanceof Error)
-      entityManager.logger.error(error.message, { encoded, entityToken });
+      entityManager.logger.error(error.message, { entityToken, encoded });
 
     throw error;
   }

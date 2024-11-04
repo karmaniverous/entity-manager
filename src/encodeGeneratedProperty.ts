@@ -8,9 +8,9 @@ import { validateEntityGeneratedProperty } from './validateEntityGeneratedProper
  * Encode a generated property value. Returns a string or undefined if atomicity requirement not met.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param entityToken - `entityManager.config.entities` key.
  * @param property - {@link ConfigEntityGenerated | `entityManager.config.entities.<entityToken>.generated`} key.
+ * @param item - Partial {@link ItemMap | `ItemMap`} object.
  *
  * @returns Encoded generated property value.
  *
@@ -26,9 +26,9 @@ export function encodeGeneratedProperty<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  item: Partial<Item>,
   entityToken: EntityToken,
   property: keyof M[EntityToken] & string,
+  item: Partial<Item>,
 ): string | undefined {
   try {
     // Validate params.
@@ -57,9 +57,9 @@ export function encodeGeneratedProperty<
     ].join(entityManager.config.generatedKeyDelimiter);
 
     entityManager.logger.debug('encoded generated property', {
-      item,
       entityToken,
       property,
+      item,
       encoded,
     });
 
@@ -67,9 +67,9 @@ export function encodeGeneratedProperty<
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, {
-        item,
         entityToken,
         property,
+        item,
       });
 
     throw error;

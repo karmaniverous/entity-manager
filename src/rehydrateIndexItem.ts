@@ -16,9 +16,9 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * {@link EntityManager.dehydrateIndexItem | `dehydrateIndexItem`} alphebetically sorts unwrapped index elements during the dehydration process. This method assumes delimited element values are presented in the same order.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param dehydrated - Dehydrated index value.
  * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
  * @param indexToken - {@link ConfigEntity.indexes | `entityManager.config.entities.<entityToken>.indexes`} key.
+ * @param dehydrated - Dehydrated index value.
  * @param omit - Array of index components omitted from `dehydrated`.
  *
  * @returns Partial {@link ItemMap | `ItemMap`} object containing rehydrated index component elements.
@@ -35,9 +35,9 @@ export function rehydrateIndexItem<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  dehydrated: string,
   entityToken: EntityToken,
   indexToken: string,
+  dehydrated: string,
   omit: string[] = [],
 ): Partial<Item> {
   try {
@@ -62,15 +62,15 @@ export function rehydrateIndexItem<
       zipToObject(
         elements,
         values.map((value, i) =>
-          decodeEntityElement(entityManager, value, entityToken, elements[i]),
+          decodeEntityElement(entityManager, entityToken, elements[i], value),
         ),
       ),
     ) as Partial<Item>;
 
     entityManager.logger.debug('rehydrated index', {
-      dehydrated,
       entityToken,
       indexToken,
+      dehydrated,
       elements,
       values,
       rehydrated,
@@ -80,9 +80,9 @@ export function rehydrateIndexItem<
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, {
-        dehydrated,
         entityToken,
         indexToken,
+        dehydrated,
       });
 
     throw error;

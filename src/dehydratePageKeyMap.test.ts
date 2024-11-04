@@ -20,9 +20,9 @@ describe('dehydratePageKeyMep', function () {
     item0.hashKey2 = 'user!0';
     item1.hashKey2 = 'user!1';
 
-    addKeys(entityManager, item, 'user');
-    addKeys(entityManager, item0, 'user');
-    addKeys(entityManager, item1, 'user');
+    addKeys(entityManager, 'user', item);
+    addKeys(entityManager, 'user', item0);
+    addKeys(entityManager, 'user', item1);
 
     const firstNameIndexComponents = getIndexComponents(
       entityManager,
@@ -51,7 +51,7 @@ describe('dehydratePageKeyMep', function () {
   });
 
   it('should dehydrate page key map', function () {
-    const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
+    const dehydrated = dehydratePageKeyMap(entityManager, 'user', pageKeyMap);
 
     expect(dehydrated.length).to.equal(6);
     expect(dehydrated[0]).to.be.a('string');
@@ -60,7 +60,7 @@ describe('dehydratePageKeyMep', function () {
   it('should dehydrate page key map with undefined page key', function () {
     pageKeyMap.firstName['user!0'] = undefined;
 
-    const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
+    const dehydrated = dehydratePageKeyMap(entityManager, 'user', pageKeyMap);
 
     expect(dehydrated.length).to.equal(6);
     expect(dehydrated[0]).to.be.a('string');
@@ -72,7 +72,7 @@ describe('dehydratePageKeyMep', function () {
       mapValues(indexMap, () => undefined),
     );
 
-    const dehydrated = dehydratePageKeyMap(entityManager, pageKeyMap, 'user');
+    const dehydrated = dehydratePageKeyMap(entityManager, 'user', pageKeyMap);
 
     expect(dehydrated).to.deep.equal([]);
   });

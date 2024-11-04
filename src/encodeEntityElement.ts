@@ -12,9 +12,9 @@ import { validateEntityToken } from './validateEntityToken';
  * If `element` is the {@link Config.hashKey | `hashKey`} or {@link Config.rangeKey | `rangeKey`}, returns the value as-is.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
  * @param element - The {@link Entity | `Entity`} generated property element or ungenerated index component to encode.
+ * @param item - Partial {@link ItemMap | `ItemMap`} object.
  *
  * @returns Encoded value.
  *
@@ -29,9 +29,9 @@ export function encodeEntityElement<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  item: Partial<Item>,
   entityToken: EntityToken,
   element: keyof Item & string,
+  item: Partial<Item>,
 ): string | undefined {
   try {
     validateEntityToken(entityManager, entityToken);
@@ -49,16 +49,16 @@ export function encodeEntityElement<
       ) || undefined;
 
     entityManager.logger.debug('encoded entity element', {
-      item,
       entityToken,
       element,
+      item,
       encoded,
     });
 
     return encoded;
   } catch (error) {
     if (error instanceof Error)
-      entityManager.logger.error(error.message, { item, entityToken, element });
+      entityManager.logger.error(error.message, { entityToken, element, item });
 
     throw error;
   }

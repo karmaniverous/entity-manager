@@ -20,7 +20,7 @@ describe('query', function () {
 
   before(function () {
     users = getUsers(1000, 0, 2).map((user) =>
-      addKeys(entityManager, user as UserItem, 'user'),
+      addKeys(entityManager, 'user', user as UserItem),
     ) as UserItem[];
 
     mockDb = new MockDb(users);
