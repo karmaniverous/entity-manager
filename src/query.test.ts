@@ -8,6 +8,7 @@ import { getUsers } from '../test/users';
 import { addKeys } from './addKeys';
 import { EntityManager } from './EntityManager';
 import { getIndexComponents } from './getIndexComponents';
+import { query } from './query';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 
 const entityManager = new EntityManager(config);
@@ -59,9 +60,9 @@ describe('query', function () {
   });
 
   it('simple query', async function () {
-    let result = await entityManager.query({
+    let result = await query(entityManager, {
       entityToken: 'user',
-      hashKey: 'hashKey2',
+      hashKeyToken: 'hashKey2',
       shardQueryMap: { lastName: lastNameQuery },
     });
 
@@ -69,9 +70,9 @@ describe('query', function () {
       entityManager.config.entities.user.defaultLimit,
     );
 
-    result = await entityManager.query({
+    result = await query(entityManager, {
       entityToken: 'user',
-      hashKey: 'hashKey2',
+      hashKeyToken: 'hashKey2',
       pageKeyMap: result.pageKeyMap,
       shardQueryMap: { lastName: lastNameQuery },
     });
@@ -82,9 +83,9 @@ describe('query', function () {
   });
 
   it('simple sharded query', async function () {
-    let result = await entityManager.query({
+    let result = await query(entityManager, {
       entityToken: 'user',
-      hashKey: 'hashKey2',
+      hashKeyToken: 'hashKey2',
       shardQueryMap: { lastName: lastNameQuery },
       timestampFrom: now,
       timestampTo: now + day,
@@ -94,9 +95,9 @@ describe('query', function () {
       entityManager.config.entities.user.defaultLimit * 5,
     );
 
-    result = await entityManager.query({
+    result = await query(entityManager, {
       entityToken: 'user',
-      hashKey: 'hashKey2',
+      hashKeyToken: 'hashKey2',
       pageKeyMap: result.pageKeyMap,
       shardQueryMap: { lastName: lastNameQuery },
       timestampFrom: now,
@@ -109,9 +110,9 @@ describe('query', function () {
   });
 
   it('complex query', async function () {
-    let result = await entityManager.query({
+    let result = await query(entityManager, {
       entityToken: 'user',
-      hashKey: 'hashKey2',
+      hashKeyToken: 'hashKey2',
       shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
     });
 
@@ -119,9 +120,9 @@ describe('query', function () {
       entityManager.config.entities.user.defaultLimit,
     );
 
-    result = await entityManager.query({
+    result = await query(entityManager, {
       entityToken: 'user',
-      hashKey: 'hashKey2',
+      hashKeyToken: 'hashKey2',
       pageKeyMap: result.pageKeyMap,
       shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
     });
@@ -132,9 +133,9 @@ describe('query', function () {
   });
 
   it('complex sharded query', async function () {
-    let result = await entityManager.query({
+    let result = await query(entityManager, {
       entityToken: 'user',
-      hashKey: 'hashKey2',
+      hashKeyToken: 'hashKey2',
       shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
       timestampFrom: now,
       timestampTo: now + day,
@@ -144,9 +145,9 @@ describe('query', function () {
       entityManager.config.entities.user.defaultLimit * 5,
     );
 
-    result = await entityManager.query({
+    result = await query(entityManager, {
       entityToken: 'user',
-      hashKey: 'hashKey2',
+      hashKeyToken: 'hashKey2',
       pageKeyMap: result.pageKeyMap,
       shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
       sortOrder: [

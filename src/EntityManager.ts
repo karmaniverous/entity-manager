@@ -99,7 +99,7 @@ export class EntityManager<
    * Query a database entity across shards in a provider-generic fashion.
    *
    * @remarks
-   * The provided {@link ShardQueryFunction | `ShardQueryFunction`} performs the actual query of individual data pages on individual shards. This function is presumed to express provider-specific query logic, including any necessary indexing or search constraints.
+   * The provided `shardQueryMap` performs the actual query of individual data pages on individual index/shard combinations.
    *
    * Individual shard query results will be combined, deduped by {@link ConfigEntity.uniqueProperty} property value, and sorted by {@link QueryOptions.sortOrder | `sortOrder`}.
    *
@@ -111,14 +111,33 @@ export class EntityManager<
    *
    * @returns {@link QueryResult} object.
    *
-   * @throws Error if {@link QueryOptions.pageKeyMap | `pageKeyMap`} keys do not match {@link QueryOptions.shardQueryMap | `shardQueryMap`} keys.
+   * @throws Error if {@link QueryOptions.shardQueryMapBuilder | `shardQueryMapBuilder`} `pageKeyMap` keys do not match its `shardQueryMap` keys.
    */
   async query<
+    IndexParams,
     Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
     EntityToken extends keyof Exactify<M> & string,
   >(
-    options: QueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
+    options: QueryOptions<
+      IndexParams,
+      Item,
+      EntityToken,
+      M,
+      HashKey,
+      RangeKey,
+      T
+    >,
   ): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
-    return await query(this, options);
+    const { shardQueryMapBuilder, ...baseOptions } = options;
+    const { entityToken, hashKeyToken, pageKeyMap } = shardQueryMapBuilder;
+    const shardQueryMap = shardQueryMapBuilder.build();
+
+    return await query(this, {
+      entityToken,
+      hashKeyToken,
+      pageKeyMap,
+      shardQueryMap,
+      ...baseOptions,
+    });
   }
 }

@@ -1,6 +1,7 @@
 /**
  * @module entity-manager
  */
+export { BaseShardQueryMapBuilder } from './BaseShardQueryMapBuilder';
 export { conditionalize } from './conditionalize';
 export type {
   Config,

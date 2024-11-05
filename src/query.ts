@@ -9,7 +9,7 @@ import { isInt, parallel, unique } from 'radash';
 import type { EntityMap, ItemMap } from './Config';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
 import { EntityManager } from './EntityManager';
-import type { QueryOptions } from './QueryOptions';
+import type { InternalQueryOptions } from './InternalQueryOptions';
 import type { QueryResult } from './QueryResult';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
 import { validateEntityGeneratedProperty } from './validateEntityGeneratedProperty';
@@ -48,7 +48,7 @@ export async function query<
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
   {
     entityToken,
-    hashKey,
+    hashKeyToken,
     limit,
     pageKeyMap,
     pageSize,
@@ -57,7 +57,7 @@ export async function query<
     timestampFrom = 0,
     timestampTo = Date.now(),
     throttle = entityManager.config.throttle,
-  }: QueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
+  }: InternalQueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
 ): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
   try {
     // Get defaults.
@@ -67,7 +67,12 @@ export async function query<
     pageSize ??= defaultPageSize;
 
     // Validate params.
-    validateEntityGeneratedProperty(entityManager, entityToken, hashKey, true);
+    validateEntityGeneratedProperty(
+      entityManager,
+      entityToken,
+      hashKeyToken,
+      true,
+    );
 
     if (!(limit === Infinity || (isInt(limit) && limit >= 1)))
       throw new Error('limit must be a positive integer or Infinity.');
@@ -181,7 +186,7 @@ export async function query<
 
     entityManager.logger.debug('queried entityToken across shards', {
       entityToken,
-      hashKey,
+      hashKeyToken,
       limit,
       pageKeyMap,
       pageSize,
@@ -199,7 +204,7 @@ export async function query<
     if (error instanceof Error)
       entityManager.logger.error(error.message, {
         entityToken,
-        hashKey,
+        hashKeyToken,
         limit,
         pageKeyMap,
         pageSize,
