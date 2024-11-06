@@ -70,7 +70,7 @@ export function dehydratePageKeyMap<
 
     for (const index of indexes) {
       for (const hashKey of hashKeys) {
-        // Undefineed pageKey.
+        // Undefined pageKey.
         if (!pageKeyMap[index][hashKey]) {
           dehydrated.push('');
           continue;

@@ -17,6 +17,11 @@ export interface BaseQueryOptions<
   RangeKey extends string,
 > {
   /**
+   * Partial item object sufficiently populated to generate index hash keys.
+   */
+  item: Partial<Item>;
+
+  /**
    * The target maximum number of records to be returned by the query across
    * all shards.
    *

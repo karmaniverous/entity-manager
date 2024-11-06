@@ -1,4 +1,4 @@
-import type { TranscodeMap } from '@karmaniverous/entity-tools';
+import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import type { EntityMap } from './Config';
 import { EntityManager } from './EntityManager';
@@ -12,13 +12,14 @@ import { EntityManager } from './EntityManager';
  * @throws `Error` if `entityToken` is invalid.
  */
 export function validateEntityToken<
+  EntityToken extends keyof Exactify<M>,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: string,
+  entityToken: EntityToken,
 ): void {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!entityManager.config.entities[entityToken])

@@ -22,12 +22,6 @@ export interface InternalQueryOptions<
   entityToken: EntityToken;
 
   /**
-   * Identifies the entity key across which the query will be sharded. Key of
-   * {@link Config | `EntityManager.config.entities.<entityToken>.keys`}.
-   */
-  hashKeyToken: string;
-
-  /**
    * {@link QueryResult.pageKeyMap | `pageKeyMap`} returned by the previous iteration of this query.
    */
   pageKeyMap?: string;

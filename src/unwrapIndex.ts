@@ -1,5 +1,5 @@
 import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
-import { shake } from 'radash';
+import { shake, unique } from 'radash';
 
 import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
@@ -37,18 +37,19 @@ export function unwrapIndex<
     const generated = entityManager.config.entities[entityToken].generated;
     const generatedKeys = Object.keys(shake(generated));
 
-    return getIndexComponents(entityManager, entityToken, indexToken)
-      .map((component) =>
-        component === entityManager.config.hashKey
-          ? entityManager.config.hashKey
-          : component === entityManager.config.rangeKey
-            ? entityManager.config.entities[entityToken].uniqueProperty
-            : generatedKeys.includes(component)
-              ? generated[component]!.elements
-              : component,
-      )
-      .flat()
-      .sort() as (keyof Item & string)[];
+    return unique(
+      getIndexComponents(entityManager, entityToken, indexToken)
+        .map((component) =>
+          component === entityManager.config.hashKey
+            ? entityManager.config.hashKey
+            : component === entityManager.config.rangeKey
+              ? entityManager.config.entities[entityToken].uniqueProperty
+              : generatedKeys.includes(component)
+                ? generated[component]!.elements
+                : component,
+        )
+        .flat(),
+    ).sort() as (keyof Item & string)[];
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, { indexToken, entityToken });

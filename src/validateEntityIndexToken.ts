@@ -1,4 +1,4 @@
-import type { TranscodeMap } from '@karmaniverous/entity-tools';
+import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import type { EntityMap } from './Config';
 import { EntityManager } from './EntityManager';
@@ -15,13 +15,14 @@ import { validateEntityToken } from './validateEntityToken';
  * @throws `Error` if `indexToken` is invalid.
  */
 export function validateEntityIndexToken<
+  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: string,
+  entityToken: EntityToken,
   indexToken: string,
 ): void {
   validateEntityToken(entityManager, entityToken);

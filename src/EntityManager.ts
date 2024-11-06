@@ -129,12 +129,11 @@ export class EntityManager<
     >,
   ): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
     const { shardQueryMapBuilder, ...baseOptions } = options;
-    const { entityToken, hashKeyToken, pageKeyMap } = shardQueryMapBuilder;
+    const { entityToken, pageKeyMap } = shardQueryMapBuilder;
     const shardQueryMap = shardQueryMapBuilder.build();
 
     return await query(this, {
       entityToken,
-      hashKeyToken,
       pageKeyMap,
       shardQueryMap,
       ...baseOptions,

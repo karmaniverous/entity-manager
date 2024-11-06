@@ -61,15 +61,47 @@ describe('rehydratePageKeyMep', function () {
       entityManager,
       'user',
       ['firstName', 'lastName'],
+      {},
       dehydrated,
       now + day,
       now + day,
     );
 
-    expect(rehydrated).to.deep.equal(pageKeyMap);
+    expect(rehydrated).to.deep.equal(['hashKey2', pageKeyMap]);
   });
 
-  it('should dehydrate page key map with undefined page key', function () {
+  it('should rehydrate undefined page key map', function () {
+    const dehydrated = undefined;
+    const rehydrated = rehydratePageKeyMap(
+      entityManager,
+      'user',
+      ['firstName', 'lastName'],
+      {},
+      dehydrated,
+      now + day,
+      now + day,
+    );
+
+    expect(rehydrated).to.deep.equal([
+      'hashKey2',
+      {
+        firstName: {
+          'user!0': undefined,
+          'user!1': undefined,
+          'user!2': undefined,
+          'user!3': undefined,
+        },
+        lastName: {
+          'user!0': undefined,
+          'user!1': undefined,
+          'user!2': undefined,
+          'user!3': undefined,
+        },
+      },
+    ]);
+  });
+
+  it('should dehydrate page key map with one undefined page key', function () {
     pageKeyMap.firstName['user!0'] = undefined;
 
     const dehydrated = dehydratePageKeyMap(entityManager, 'user', pageKeyMap);
@@ -77,29 +109,27 @@ describe('rehydratePageKeyMep', function () {
       entityManager,
       'user',
       ['firstName', 'lastName'],
+      {},
       dehydrated,
       now + day,
       now + day,
     );
 
-    expect(rehydrated).to.deep.equal(pageKeyMap);
+    expect(rehydrated).to.deep.equal(['hashKey2', pageKeyMap]);
   });
 
-  it('should rehydrate page key map with all undefined page keys', function () {
-    pageKeyMap = mapValues(pageKeyMap, (indexMap) =>
-      mapValues(indexMap, () => undefined),
-    );
-
-    const dehydrated = dehydratePageKeyMap(entityManager, 'user', pageKeyMap);
+  it('should rehydrate empty page key map', function () {
+    const dehydrated = [] as string[];
     const rehydrated = rehydratePageKeyMap(
       entityManager,
       'user',
       ['firstName', 'lastName'],
+      {},
       dehydrated,
       now + day,
       now + day,
     );
 
-    expect(rehydrated).to.deep.equal({});
+    expect(rehydrated).to.deep.equal(['hashKey2', {}]);
   });
 });

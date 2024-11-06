@@ -11,6 +11,7 @@ export interface Email extends Entity {
   created: number;
   email: string;
   userId: string;
+  userPK?: never;
 }
 
 export interface MyEntityMap extends EntityMap {
@@ -27,7 +28,11 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
         userId: 'string',
       },
       indexes: {
-        userId: { hashKey: 'hashKey2', rangeKey: 'userId' },
+        created: { hashKey: 'hashKey2', rangeKey: 'created' },
+        userCreated: { hashKey: 'userPK', rangeKey: 'created' },
+      },
+      generated: {
+        userPK: { atomic: true, elements: ['userId'], sharded: true },
       },
       timestampProperty: 'created',
       uniqueProperty: 'email',
@@ -39,6 +44,7 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
         lastName: { hashKey: 'hashKey2', rangeKey: 'lastNameRK' },
         phone: { hashKey: 'hashKey2', rangeKey: 'phone' },
         updated: { hashKey: 'hashKey2', rangeKey: 'updated' },
+        userCreated: { hashKey: 'userPK', rangeKey: 'created' },
       },
       generated: {
         firstNameRK: {
@@ -51,10 +57,7 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
           atomic: true,
           elements: ['phone', 'created'],
         },
-        userPK: {
-          elements: ['userId'],
-          sharded: true,
-        },
+        userPK: { atomic: true, elements: ['userId'], sharded: true },
       },
       elementTranscodes: {
         created: 'int',

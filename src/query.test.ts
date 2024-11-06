@@ -62,7 +62,7 @@ describe('query', function () {
   it('simple query', async function () {
     let result = await query(entityManager, {
       entityToken: 'user',
-      hashKeyToken: 'hashKey2',
+      item: {},
       shardQueryMap: { lastName: lastNameQuery },
     });
 
@@ -72,7 +72,7 @@ describe('query', function () {
 
     result = await query(entityManager, {
       entityToken: 'user',
-      hashKeyToken: 'hashKey2',
+      item: {},
       pageKeyMap: result.pageKeyMap,
       shardQueryMap: { lastName: lastNameQuery },
     });
@@ -85,7 +85,7 @@ describe('query', function () {
   it('simple sharded query', async function () {
     let result = await query(entityManager, {
       entityToken: 'user',
-      hashKeyToken: 'hashKey2',
+      item: {},
       shardQueryMap: { lastName: lastNameQuery },
       timestampFrom: now,
       timestampTo: now + day,
@@ -97,7 +97,7 @@ describe('query', function () {
 
     result = await query(entityManager, {
       entityToken: 'user',
-      hashKeyToken: 'hashKey2',
+      item: {},
       pageKeyMap: result.pageKeyMap,
       shardQueryMap: { lastName: lastNameQuery },
       timestampFrom: now,
@@ -112,7 +112,7 @@ describe('query', function () {
   it('complex query', async function () {
     let result = await query(entityManager, {
       entityToken: 'user',
-      hashKeyToken: 'hashKey2',
+      item: {},
       shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
     });
 
@@ -122,7 +122,7 @@ describe('query', function () {
 
     result = await query(entityManager, {
       entityToken: 'user',
-      hashKeyToken: 'hashKey2',
+      item: {},
       pageKeyMap: result.pageKeyMap,
       shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
     });
@@ -135,7 +135,7 @@ describe('query', function () {
   it('complex sharded query', async function () {
     let result = await query(entityManager, {
       entityToken: 'user',
-      hashKeyToken: 'hashKey2',
+      item: {},
       shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
       timestampFrom: now,
       timestampTo: now + day,
@@ -147,7 +147,7 @@ describe('query', function () {
 
     result = await query(entityManager, {
       entityToken: 'user',
-      hashKeyToken: 'hashKey2',
+      item: {},
       pageKeyMap: result.pageKeyMap,
       shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
       sortOrder: [

@@ -1,4 +1,4 @@
-import type { TranscodeMap } from '@karmaniverous/entity-tools';
+import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import type { EntityMap } from './Config';
 import { EntityManager } from './EntityManager';
@@ -18,13 +18,14 @@ import { validateEntityToken } from './validateEntityToken';
  * @throws `Error` if `sharded` is specified & does not match `this.config.entities.<entityToken>.generated.<property>.sharded`.
  */
 export function validateEntityGeneratedProperty<
+  EntityToken extends keyof Exactify<M>,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: string,
+  entityToken: EntityToken,
   property: string,
   sharded?: boolean,
 ): void {

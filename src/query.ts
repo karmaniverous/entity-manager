@@ -12,7 +12,6 @@ import { EntityManager } from './EntityManager';
 import type { InternalQueryOptions } from './InternalQueryOptions';
 import type { QueryResult } from './QueryResult';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
-import { validateEntityGeneratedProperty } from './validateEntityGeneratedProperty';
 import type { WorkingQueryResult } from './WorkingQueryResult';
 
 const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
@@ -46,34 +45,28 @@ export async function query<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  {
-    entityToken,
-    hashKeyToken,
-    limit,
-    pageKeyMap,
-    pageSize,
-    shardQueryMap,
-    sortOrder = [],
-    timestampFrom = 0,
-    timestampTo = Date.now(),
-    throttle = entityManager.config.throttle,
-  }: InternalQueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
+  options: InternalQueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
 ): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
   try {
     // Get defaults.
     const { defaultLimit, defaultPageSize } =
-      entityManager.config.entities[entityToken];
-    limit ??= defaultLimit;
-    pageSize ??= defaultPageSize;
+      entityManager.config.entities[options.entityToken];
+
+    // Extract params.
+    const {
+      entityToken,
+      limit = defaultLimit,
+      item,
+      pageKeyMap,
+      pageSize = defaultPageSize,
+      shardQueryMap,
+      sortOrder = [],
+      timestampFrom = 0,
+      timestampTo = Date.now(),
+      throttle = entityManager.config.throttle,
+    } = options;
 
     // Validate params.
-    validateEntityGeneratedProperty(
-      entityManager,
-      entityToken,
-      hashKeyToken,
-      true,
-    );
-
     if (!(limit === Infinity || (isInt(limit) && limit >= 1)))
       throw new Error('limit must be a positive integer or Infinity.');
 
@@ -81,10 +74,11 @@ export async function query<
       throw new Error('pageSize must be a positive integer');
 
     // Rehydrate pageKeyMap.
-    const rehydratedPageKeyMap = rehydratePageKeyMap(
+    const [hashKeyToken, rehydratedPageKeyMap] = rehydratePageKeyMap(
       entityManager,
       entityToken,
       Object.keys(shardQueryMap),
+      item,
       pageKeyMap
         ? (JSON.parse(
             decompressFromEncodedURIComponent(pageKeyMap),
@@ -118,20 +112,25 @@ export async function query<
       // Query every shard on every index in pageKeyMap.
       const shardQueryResults = await parallel(
         throttle,
-        Object.entries(rehydratedPageKeyMap).flatMap(([index, indexPageKeys]) =>
-          Object.entries(indexPageKeys).map(([hashKey, pageKey]) => [
-            index,
-            hashKey,
-            pageKey,
-          ]),
+        Object.entries(rehydratedPageKeyMap).flatMap(
+          ([indexToken, indexPageKeys]) =>
+            Object.entries(indexPageKeys).map(([hashKey, pageKey]) => [
+              indexToken,
+              hashKey,
+              pageKey,
+            ]),
         ) as [string, string, Item | undefined][],
-        async ([index, hashKey, pageKey]: [
+        async ([indexToken, hashKey, pageKey]: [
           string,
           string,
           Item | undefined,
         ]) => ({
-          index,
-          queryResult: await shardQueryMap[index](hashKey, pageKey, pageSize),
+          indexToken,
+          queryResult: await shardQueryMap[indexToken](
+            hashKey,
+            pageKey,
+            pageSize,
+          ),
           hashKey,
         }),
       );
@@ -139,8 +138,8 @@ export async function query<
       // Reduce shardQueryResults & updateworkingRresult.
       workingResult = shardQueryResults.reduce<
         WorkingQueryResult<Item, EntityToken, M, HashKey, RangeKey>
-      >(({ items, pageKeyMap }, { index, queryResult, hashKey }) => {
-        Object.assign(rehydratedPageKeyMap[index], {
+      >(({ items, pageKeyMap }, { indexToken, queryResult, hashKey }) => {
+        Object.assign(rehydratedPageKeyMap[indexToken], {
           [hashKey]: queryResult.pageKey,
         });
 
@@ -185,15 +184,8 @@ export async function query<
     } as QueryResult<Item, EntityToken, M, HashKey, RangeKey>;
 
     entityManager.logger.debug('queried entityToken across shards', {
-      entityToken,
+      options,
       hashKeyToken,
-      limit,
-      pageKeyMap,
-      pageSize,
-      shardQueryMap,
-      timestampFrom,
-      timestampTo,
-      throttle,
       rehydratedPageKeyMap,
       workingResult,
       result,
@@ -202,17 +194,7 @@ export async function query<
     return result;
   } catch (error) {
     if (error instanceof Error)
-      entityManager.logger.error(error.message, {
-        entityToken,
-        hashKeyToken,
-        limit,
-        pageKeyMap,
-        pageSize,
-        shardQueryMap,
-        timestampFrom,
-        timestampTo,
-        throttle,
-      });
+      entityManager.logger.error(error.message, options);
 
     throw error;
   }
