@@ -1,11 +1,13 @@
 import { type DefaultTranscodeMap } from '@karmaniverous/entity-tools';
 import { expect } from 'chai';
-import { mapValues, pick } from 'radash';
+import { pick, zipToObject } from 'radash';
 
 import { day, entityManager, now, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
 import { addKeys } from './addKeys';
+import { decodeGeneratedProperty } from './decodeGeneratedProperty';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
+import { getHashKeySpace } from './getHashKeySpace';
 import { getIndexComponents } from './getIndexComponents';
 import { type PageKeyMap } from './PageKeyMap';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
@@ -131,5 +133,52 @@ describe('rehydratePageKeyMep', function () {
     );
 
     expect(rehydrated).to.deep.equal(['hashKey2', {}]);
+  });
+
+  it('should rehydrate complex alternate hash key index', function () {
+    const items = (getUsers(21) as Partial<UserItem>[]).map((item) =>
+      addKeys(entityManager, 'user', item),
+    );
+
+    const beneficiaryCreatedIndexComponents = getIndexComponents(
+      entityManager,
+      'user',
+      'beneficiaryCreated',
+    ) as (keyof UserItem)[];
+
+    pageKeyMap = {
+      beneficiaryCreated: zipToObject(
+        getHashKeySpace(
+          entityManager,
+          'user',
+          'beneficiaryPK',
+          { beneficiaryId: 'abc123' },
+          now,
+          Infinity,
+        ),
+        (beneficiaryPK, i) =>
+          pick(
+            {
+              ...items[i],
+              ...decodeGeneratedProperty(entityManager, 'user', beneficiaryPK),
+              beneficiaryPK,
+            },
+            beneficiaryCreatedIndexComponents,
+          ),
+      ),
+    };
+
+    const dehydrated = dehydratePageKeyMap(entityManager, 'user', pageKeyMap);
+    const rehydrated = rehydratePageKeyMap(
+      entityManager,
+      'user',
+      ['beneficiaryCreated'],
+      { beneficiaryId: 'abc123' },
+      dehydrated,
+      now,
+      Infinity,
+    );
+
+    expect(rehydrated).to.deep.equal(['beneficiaryPK', pageKeyMap]);
   });
 });

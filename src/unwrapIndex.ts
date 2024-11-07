@@ -12,6 +12,7 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
  * @param indexToken - {@link ConfigEntity.indexes | `entityManager.config.entities.<entityToken>.indexes`} key.
+ * @param omit - Array of index components or elements to omit from the output value.
  *
  * @returns Deduped, sorted array of ungenerated index component elements.
  *
@@ -29,6 +30,7 @@ export function unwrapIndex<
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
   entityToken: EntityToken,
   indexToken: string,
+  omit: string[] = [],
 ): (keyof Item & string)[] {
   try {
     // Validate params.
@@ -39,16 +41,18 @@ export function unwrapIndex<
 
     return unique(
       getIndexComponents(entityManager, entityToken, indexToken)
+        .filter((component) => !omit.includes(component))
         .map((component) =>
           component === entityManager.config.hashKey
-            ? entityManager.config.hashKey
+            ? entityManager.config.entities[entityToken].timestampProperty
             : component === entityManager.config.rangeKey
               ? entityManager.config.entities[entityToken].uniqueProperty
               : generatedKeys.includes(component)
                 ? generated[component]!.elements
                 : component,
         )
-        .flat(),
+        .flat()
+        .filter((element) => !omit.includes(element)),
     ).sort() as (keyof Item & string)[];
   } catch (error) {
     if (error instanceof Error)

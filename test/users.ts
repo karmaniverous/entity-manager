@@ -3,6 +3,8 @@ import type { Entity } from '@karmaniverous/entity-tools';
 import { normstr } from '@karmaniverous/string-utilities';
 
 export interface User extends Entity {
+  beneficiaryId: string;
+  beneficiaryPK?: never;
   created: number;
   firstNameCanonical: string;
   firstNameRK?: never;
@@ -30,6 +32,7 @@ export const getUsers = (count = 1, daysFromNow = 0, forDays = 1) => {
       .getTime();
 
     users.push({
+      beneficiaryId: 'abc123',
       created: timestamp,
       firstName,
       firstNameCanonical: normstr(firstName)!,

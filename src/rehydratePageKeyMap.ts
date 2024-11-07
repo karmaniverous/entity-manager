@@ -2,6 +2,7 @@ import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
 import { cluster, mapValues, range, unique, zipToObject } from 'radash';
 
 import type { EntityMap, ItemMap } from './Config';
+import { decodeGeneratedProperty } from './decodeGeneratedProperty';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import { EntityManager } from './EntityManager';
 import { getHashKeySpace } from './getHashKeySpace';
@@ -97,18 +98,21 @@ export function rehydratePageKeyMap<
         zipToObject(hashKeySpace, (hashKey, i) => {
           if (!dehydratedIndexPageKeyMaps[i]) return;
 
-          let item = {
-            [hashKeyToken]: hashKey,
+          let pageKeyItem = {
+            ...decodeGeneratedProperty(entityManager, entityToken, hashKey),
             ...rehydrateIndexItem(
               entityManager,
               entityToken,
               index,
               dehydratedIndexPageKeyMaps[i],
-              [hashKeyToken],
             ),
-          } as Partial<Item>;
+          };
 
-          item = updateItemRangeKey(entityManager, entityToken, item);
+          pageKeyItem = updateItemRangeKey(
+            entityManager,
+            entityToken,
+            pageKeyItem,
+          );
 
           return zipToObject(
             getIndexComponents(entityManager, entityToken, index),
@@ -118,9 +122,15 @@ export function rehydratePageKeyMap<
                     entityManager,
                     entityToken,
                     component,
-                    item,
+                    pageKeyItem,
                   )!
-                : item[component as keyof Item],
+                : pageKeyItem[
+                    component as keyof ItemMap<
+                      M,
+                      HashKey,
+                      RangeKey
+                    >[EntityToken]
+                  ],
           );
         }),
     );

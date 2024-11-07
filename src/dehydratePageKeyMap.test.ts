@@ -1,16 +1,14 @@
 import { type DefaultTranscodeMap } from '@karmaniverous/entity-tools';
 import { expect } from 'chai';
-import { mapValues, pick, range } from 'radash';
+import { mapValues, pick } from 'radash';
 
 import { entityManager, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
+import { dehydratedPattern } from '../test/util';
 import { addKeys } from './addKeys';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
 import { getIndexComponents } from './getIndexComponents';
 import { type PageKeyMap } from './PageKeyMap';
-
-const dehydratedPattern = (n: number) =>
-  new RegExp([...range<string>(n - 1)].fill('[^|]+').join('\\|'));
 
 describe('dehydratePageKeyMap', function () {
   let item: Partial<UserItem>;

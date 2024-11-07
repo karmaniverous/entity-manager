@@ -19,7 +19,6 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
  * @param indexToken - {@link ConfigEntity.indexes | `entityManager.config.entities.<entityToken>.indexes`} key.
  * @param dehydrated - Dehydrated index value.
- * @param omit - Array of index components omitted from `dehydrated`.
  *
  * @returns Partial {@link ItemMap | `ItemMap`} object containing rehydrated index component elements.
  *
@@ -38,7 +37,6 @@ export function rehydrateIndexItem<
   entityToken: EntityToken,
   indexToken: string,
   dehydrated: string,
-  omit: string[] = [],
 ): Partial<Item> {
   try {
     const { generatedKeyDelimiter } = entityManager.config;
@@ -47,9 +45,11 @@ export function rehydrateIndexItem<
     validateEntityIndexToken(entityManager, entityToken, indexToken);
 
     // Unwrap index elements.
-    const elements = unwrapIndex(entityManager, entityToken, indexToken).filter(
-      (element) => !omit.includes(element),
-    );
+    const { hashKey } =
+      entityManager.config.entities[entityToken].indexes[indexToken];
+    const elements = unwrapIndex(entityManager, entityToken, indexToken, [
+      hashKey,
+    ]);
 
     // Split dehydrated value & validate.
     const values = dehydrated.split(generatedKeyDelimiter);

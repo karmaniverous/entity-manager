@@ -29,7 +29,7 @@ describe('encodeGeneratedProperty', function () {
       item,
     );
 
-    expect(encoded).to.match(/^user!q\|userId#\w+$/);
+    expect(encoded).to.match(/^user!q\|userId#[\w-]+$/);
   });
 
   it('should encode atomic generated property', function () {

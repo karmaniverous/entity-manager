@@ -99,9 +99,7 @@ export function dehydratePageKeyMap<
 
         // Dehydrate index from item.
         dehydrated.push(
-          dehydrateIndexItem(entityManager, entityToken, index, item, [
-            entityManager.config.hashKey,
-          ]),
+          dehydrateIndexItem(entityManager, entityToken, index, item),
         );
       }
     }

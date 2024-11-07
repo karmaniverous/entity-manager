@@ -2,6 +2,7 @@ import { expect } from 'chai';
 
 import { entityManager, type UserItem } from '../test/config';
 import { getUsers } from '../test/users';
+import { dehydratedPattern } from '../test/util';
 import { addKeys } from './addKeys';
 import { dehydrateIndexItem } from './dehydrateIndexItem';
 
@@ -17,7 +18,7 @@ describe('dehydrateIndexItem', function () {
       item,
     );
 
-    expect(dehydrated).to.match(/\w+\|[\w!]+\|\w+\|[\w-]+/);
+    expect(dehydrated).to.match(dehydratedPattern(3));
   });
 
   it('should dehydrate item by index with missing component', function () {
@@ -27,6 +28,6 @@ describe('dehydrateIndexItem', function () {
 
     const dehydrated = dehydrateIndexItem(entityManager, 'user', 'phone', item);
 
-    expect(dehydrated).to.match(/[\w!]+\|\|[\w-]+/);
+    expect(dehydrated).to.match(dehydratedPattern(2));
   });
 });

@@ -23,7 +23,7 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
   entities: {
     email: {
       elementTranscodes: {
-        created: 'int',
+        created: 'timestamp',
         email: 'string',
         userId: 'string',
       },
@@ -39,6 +39,7 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
     },
     user: {
       indexes: {
+        beneficiaryCreated: { hashKey: 'beneficiaryPK', rangeKey: 'created' },
         created: { hashKey: 'hashKey2', rangeKey: 'created' },
         firstName: { hashKey: 'hashKey2', rangeKey: 'firstNameRK' },
         lastName: { hashKey: 'hashKey2', rangeKey: 'lastNameRK' },
@@ -47,6 +48,11 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
         userCreated: { hashKey: 'userPK', rangeKey: 'created' },
       },
       generated: {
+        beneficiaryPK: {
+          atomic: true,
+          elements: ['beneficiaryId'],
+          sharded: true,
+        },
         firstNameRK: {
           elements: ['firstNameCanonical', 'lastNameCanonical'],
         },
@@ -60,11 +66,12 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
         userPK: { atomic: true, elements: ['userId'], sharded: true },
       },
       elementTranscodes: {
-        created: 'int',
+        beneficiaryId: 'string',
+        created: 'timestamp',
         firstNameCanonical: 'string',
         lastNameCanonical: 'string',
         phone: 'string',
-        updated: 'int',
+        updated: 'timestamp',
         userId: 'string',
       },
       shardBumps: [
