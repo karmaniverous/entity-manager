@@ -5,11 +5,12 @@ import type {
 } from '@karmaniverous/entity-tools';
 import { mapValues } from 'radash';
 
-import type { BuilderQueryOptions } from './BuilderQueryOptions';
+import type { BaseShardQueryMapBuilderOptions } from './BaseShardQueryMapBuilderOptions';
 import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 import type { ShardQueryMap } from './ShardQueryMap';
+import type { ShardQueryMapBuilderQueryOptions } from './ShardQueryMapBuilderQueryOptions';
 
 /**
  * Abstract base class supporting a fluent API for building a {@link ShardQueryMap | `ShardQueryMap`} using a database client.
@@ -25,8 +26,22 @@ export abstract class BaseShardQueryMapBuilder<
   RangeKey extends string,
   T extends TranscodeMap,
 > {
+  /** {@link EntityManager | `EntityManager`} instance. */
+  public readonly entityManager: EntityManager<M, HashKey, RangeKey, T>;
+
+  /** Entity token. */
+  public readonly entityToken: EntityToken;
+
+  /** Hash key token. */
+  public readonly hashKeyToken:
+    | PropertiesOfType<M[EntityToken], never>
+    | HashKey;
+
+  /** Dehydrated page key map. */
+  public readonly pageKeyMap?: string;
+
   /**
-   * Maps `indexToken` values to database platform-specific parameters.
+   * Maps `indexToken` values to database platform-specific query parameters.
    *
    * @protected
    */
@@ -34,13 +49,21 @@ export abstract class BaseShardQueryMapBuilder<
 
   /** BaseShardQueryMapBuilder constructor. */
   constructor(
-    public readonly entityManager: EntityManager<M, HashKey, RangeKey, T>,
-    public readonly entityToken: EntityToken,
-    public readonly hashKeyToken:
-      | PropertiesOfType<M[EntityToken], never>
-      | HashKey,
-    public readonly pageKeyMap?: string,
-  ) {}
+    options: BaseShardQueryMapBuilderOptions<
+      EntityToken,
+      M,
+      HashKey,
+      RangeKey,
+      T
+    >,
+  ) {
+    const { entityManager, entityToken, hashKeyToken, pageKeyMap } = options;
+
+    this.entityManager = entityManager;
+    this.entityToken = entityToken;
+    this.hashKeyToken = hashKeyToken;
+    this.pageKeyMap = pageKeyMap;
+  }
 
   protected abstract getShardQueryFunction(
     indexToken: string,
@@ -58,7 +81,13 @@ export abstract class BaseShardQueryMapBuilder<
   }
 
   async query(
-    options: BuilderQueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
+    options: ShardQueryMapBuilderQueryOptions<
+      Item,
+      EntityToken,
+      M,
+      HashKey,
+      RangeKey
+    >,
   ) {
     const { entityManager, entityToken, pageKeyMap } = this;
     const shardQueryMap = this.build();

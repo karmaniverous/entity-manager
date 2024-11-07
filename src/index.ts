@@ -2,6 +2,7 @@
  * @module entity-manager
  */
 export { BaseShardQueryMapBuilder } from './BaseShardQueryMapBuilder';
+export type { BaseShardQueryMapBuilderOptions } from './BaseShardQueryMapBuilderOptions';
 export { conditionalize } from './conditionalize';
 export type {
   Config,
@@ -23,4 +24,5 @@ export type { QueryOptions } from './QueryOptions';
 export type { QueryResult } from './QueryResult';
 export type { ShardQueryFunction } from './ShardQueryFunction';
 export type { ShardQueryMap } from './ShardQueryMap';
+export type { ShardQueryMapBuilderQueryOptions } from './ShardQueryMapBuilderQueryOptions';
 export type { ShardQueryResult } from './ShardQueryResult';
