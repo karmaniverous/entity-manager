@@ -114,29 +114,11 @@ export class EntityManager<
    * @throws Error if {@link QueryOptions.shardQueryMapBuilder | `shardQueryMapBuilder`} `pageKeyMap` keys do not match its `shardQueryMap` keys.
    */
   async query<
-    IndexParams,
     Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
     EntityToken extends keyof Exactify<M> & string,
   >(
-    options: QueryOptions<
-      IndexParams,
-      Item,
-      EntityToken,
-      M,
-      HashKey,
-      RangeKey,
-      T
-    >,
+    options: QueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
   ): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
-    const { shardQueryMapBuilder, ...baseOptions } = options;
-    const { entityToken, pageKeyMap } = shardQueryMapBuilder;
-    const shardQueryMap = shardQueryMapBuilder.build();
-
-    return await query(this, {
-      entityToken,
-      pageKeyMap,
-      shardQueryMap,
-      ...baseOptions,
-    });
+    return await query(this, options);
   }
 }

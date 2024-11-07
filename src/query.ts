@@ -9,7 +9,7 @@ import { isInt, parallel, unique } from 'radash';
 import type { EntityMap, ItemMap } from './Config';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
 import { EntityManager } from './EntityManager';
-import type { InternalQueryOptions } from './InternalQueryOptions';
+import type { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
 import type { WorkingQueryResult } from './WorkingQueryResult';
@@ -45,7 +45,7 @@ export async function query<
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  options: InternalQueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
+  options: QueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
 ): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
   try {
     // Get defaults.
