@@ -5,6 +5,7 @@ import type {
 } from '@karmaniverous/entity-tools';
 import { mapValues } from 'radash';
 
+import type { BuilderQueryOptions } from './BuilderQueryOptions';
 import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
 import type { ShardQueryFunction } from './ShardQueryFunction';
@@ -54,5 +55,19 @@ export abstract class BaseShardQueryMapBuilder<
     return mapValues(this.indexParamsMap, (indexConfig, indexToken) =>
       this.getShardQueryFunction(indexToken),
     );
+  }
+
+  async query(
+    options: BuilderQueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
+  ) {
+    const { entityManager, entityToken, pageKeyMap } = this;
+    const shardQueryMap = this.build();
+
+    return await entityManager.query<Item, EntityToken>({
+      ...options,
+      entityToken,
+      pageKeyMap,
+      shardQueryMap,
+    });
   }
 }
