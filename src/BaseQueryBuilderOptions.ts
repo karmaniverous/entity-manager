@@ -9,11 +9,11 @@ import type { EntityMap } from './Config';
 import { EntityManager } from './EntityManager';
 
 /**
- * Constructor options for {@link BaseShardQueryMapBuilder | `BaseShardQueryMapBuilder`}.
+ * Constructor options for {@link BaseQueryBuilder | `BaseQueryBuilder`}.
  *
  * @category ShardQueryMapBuilder
  */
-export interface BaseShardQueryMapBuilderOptions<
+export interface BaseQueryBuilderOptions<
   EntityClient extends BaseEntityClient,
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,

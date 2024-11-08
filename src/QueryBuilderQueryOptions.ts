@@ -3,7 +3,7 @@ import type { Exactify } from '@karmaniverous/entity-tools';
 import type { EntityMap, ItemMap } from './Config';
 import type { QueryOptions } from './QueryOptions';
 
-export type ShardQueryMapBuilderQueryOptions<
+export type QueryBuilderQueryOptions<
   Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,

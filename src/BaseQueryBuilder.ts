@@ -6,19 +6,19 @@ import type {
 import { mapValues } from 'radash';
 
 import { BaseEntityClient } from './BaseEntityClient';
-import type { BaseShardQueryMapBuilderOptions } from './BaseShardQueryMapBuilderOptions';
+import type { BaseQueryBuilderOptions } from './BaseQueryBuilderOptions';
 import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
+import type { QueryBuilderQueryOptions } from './QueryBuilderQueryOptions';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 import type { ShardQueryMap } from './ShardQueryMap';
-import type { ShardQueryMapBuilderQueryOptions } from './ShardQueryMapBuilderQueryOptions';
 
 /**
  * Abstract base class supporting a fluent API for building a {@link ShardQueryMap | `ShardQueryMap`} using a database client.
  *
  * @category ShardQueryMapBuilder
  */
-export abstract class BaseShardQueryMapBuilder<
+export abstract class BaseQueryBuilder<
   IndexParams,
   EntityClient extends BaseEntityClient,
   Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
@@ -52,9 +52,9 @@ export abstract class BaseShardQueryMapBuilder<
    */
   readonly indexParamsMap: Record<string, IndexParams> = {};
 
-  /** BaseShardQueryMapBuilder constructor. */
+  /** BaseQueryBuilder constructor. */
   constructor(
-    options: BaseShardQueryMapBuilderOptions<
+    options: BaseQueryBuilderOptions<
       EntityClient,
       EntityToken,
       M,
@@ -94,13 +94,7 @@ export abstract class BaseShardQueryMapBuilder<
   }
 
   async query(
-    options: ShardQueryMapBuilderQueryOptions<
-      Item,
-      EntityToken,
-      M,
-      HashKey,
-      RangeKey
-    >,
+    options: QueryBuilderQueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
   ) {
     const { entityManager, entityToken, pageKeyMap } = this;
     const shardQueryMap = this.build();
