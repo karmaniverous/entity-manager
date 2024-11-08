@@ -1,6 +1,8 @@
 /**
  * @module entity-manager
  */
+export { BaseEntityClient } from './BaseEntityClient';
+export type { BaseEntityClientOptions } from './BaseEntityClientOptions';
 export { BaseShardQueryMapBuilder } from './BaseShardQueryMapBuilder';
 export type { BaseShardQueryMapBuilderOptions } from './BaseShardQueryMapBuilderOptions';
 export { conditionalize } from './conditionalize';

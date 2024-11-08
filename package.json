@@ -4,6 +4,7 @@
     "url": "https://github.com/karmaniverous/entity-manager/issues"
   },
   "dependencies": {
+    "@karmaniverous/batch-process": "^0.1.0",
     "@karmaniverous/entity-tools": "^0.4.4",
     "@karmaniverous/string-utilities": "^0.2.1",
     "lz-string": "^1.5.0",

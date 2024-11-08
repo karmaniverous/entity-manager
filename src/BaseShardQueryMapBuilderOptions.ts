@@ -4,19 +4,26 @@ import type {
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
+import { BaseEntityClient } from './BaseEntityClient';
 import type { EntityMap } from './Config';
 import { EntityManager } from './EntityManager';
 
 /**
  * Constructor options for {@link BaseShardQueryMapBuilder | `BaseShardQueryMapBuilder`}.
+ *
+ * @category ShardQueryMapBuilder
  */
 export interface BaseShardQueryMapBuilderOptions<
+  EntityClient extends BaseEntityClient,
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
   T extends TranscodeMap,
 > {
+  /** {@link BaseEntityClient | `EntityClient`} instance. */
+  entityClient: EntityClient;
+
   /** {@link EntityManager | `EntityManager`} instance. */
   entityManager: EntityManager<M, HashKey, RangeKey, T>;
 

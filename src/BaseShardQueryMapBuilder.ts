@@ -5,6 +5,7 @@ import type {
 } from '@karmaniverous/entity-tools';
 import { mapValues } from 'radash';
 
+import { BaseEntityClient } from './BaseEntityClient';
 import type { BaseShardQueryMapBuilderOptions } from './BaseShardQueryMapBuilderOptions';
 import type { EntityMap, ItemMap } from './Config';
 import { EntityManager } from './EntityManager';
@@ -19,6 +20,7 @@ import type { ShardQueryMapBuilderQueryOptions } from './ShardQueryMapBuilderQue
  */
 export abstract class BaseShardQueryMapBuilder<
   IndexParams,
+  EntityClient extends BaseEntityClient,
   Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
   EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
@@ -26,6 +28,9 @@ export abstract class BaseShardQueryMapBuilder<
   RangeKey extends string,
   T extends TranscodeMap,
 > {
+  /** {@link BaseEntityClient | `EntityClient`} instance. */
+  public readonly entityClient: EntityClient;
+
   /** {@link EntityManager | `EntityManager`} instance. */
   public readonly entityManager: EntityManager<M, HashKey, RangeKey, T>;
 
@@ -50,6 +55,7 @@ export abstract class BaseShardQueryMapBuilder<
   /** BaseShardQueryMapBuilder constructor. */
   constructor(
     options: BaseShardQueryMapBuilderOptions<
+      EntityClient,
       EntityToken,
       M,
       HashKey,
@@ -57,8 +63,15 @@ export abstract class BaseShardQueryMapBuilder<
       T
     >,
   ) {
-    const { entityManager, entityToken, hashKeyToken, pageKeyMap } = options;
+    const {
+      entityClient,
+      entityManager,
+      entityToken,
+      hashKeyToken,
+      pageKeyMap,
+    } = options;
 
+    this.entityClient = entityClient;
     this.entityManager = entityManager;
     this.entityToken = entityToken;
     this.hashKeyToken = hashKeyToken;
