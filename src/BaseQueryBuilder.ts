@@ -16,7 +16,7 @@ import type { ShardQueryMap } from './ShardQueryMap';
 /**
  * Abstract base class supporting a fluent API for building a {@link ShardQueryMap | `ShardQueryMap`} using a database client.
  *
- * @category ShardQueryMapBuilder
+ * @category QueryBuilder
  */
 export abstract class BaseQueryBuilder<
   IndexParams,

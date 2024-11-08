@@ -11,7 +11,7 @@ import { EntityManager } from './EntityManager';
 /**
  * Constructor options for {@link BaseQueryBuilder | `BaseQueryBuilder`}.
  *
- * @category ShardQueryMapBuilder
+ * @category QueryBuilder
  */
 export interface BaseQueryBuilderOptions<
   EntityClient extends BaseEntityClient,
