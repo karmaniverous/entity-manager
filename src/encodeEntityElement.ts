@@ -44,7 +44,7 @@ export function encodeEntityElement<
       return value;
 
     const encoded =
-      transcodes[entities[entityToken].elementTranscodes[element]].encode(
+      transcodes[entities[entityToken].propertyTranscodes[element]].encode(
         item[element],
       ) || undefined;
 

@@ -1,7 +1,12 @@
-import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
+import type {
+  EntityMap,
+  Exactify,
+  TranscodableProperties,
+  TranscodeMap,
+} from '@karmaniverous/entity-tools';
 
-import type { EntityMap, ShardBump } from './Config';
 import { EntityManager } from './EntityManager';
+import type { ShardBump } from './ShardBump';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
@@ -19,9 +24,20 @@ export function getShardBump<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, T>,
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >,
   entityToken: keyof Exactify<M> & string,
   timestamp: number,
 ): ShardBump {

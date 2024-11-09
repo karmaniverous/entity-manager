@@ -1,15 +1,17 @@
 import {
+  EntityMap,
   type Exactify,
   isNil,
+  TranscodableProperties,
   type TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
-import type { EntityMap, ItemMap } from './Config';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import { EntityManager } from './EntityManager';
 import { updateItemHashKey } from './updateItemHashKey';
 import { updateItemRangeKey } from './updateItemRangeKey';
 import { validateEntityToken } from './validateEntityToken';
+import { EntityItem } from './EntityItem';
 
 /**
  * Update generated properties, hash key, and range key on an {@link ItemMap | `ItemMap`} object.
@@ -24,18 +26,28 @@ import { validateEntityToken } from './validateEntityToken';
  * @throws `Error` if `entityToken` is invalid.
  */
 export function addKeys<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: EntityToken,
-  item: Partial<Item>,
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >,
+  entityToken: keyof Exactify<M> & string,
+  item: Item,
   overwrite = false,
-): Partial<Item> {
+): Item {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -57,8 +69,7 @@ export function addKeys<
     );
 
     // Update generated properties.
-    for (const property in entityManager.config.entities[entityToken]
-      .generated) {
+    for (const property in entityManager.config.generatedProperties) {
       if (overwrite || isNil(item[property as keyof Item])) {
         const encoded = encodeGeneratedProperty(
           entityManager,

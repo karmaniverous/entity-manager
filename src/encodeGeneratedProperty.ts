@@ -1,6 +1,12 @@
-import { Exactify, isNil, TranscodeMap } from '@karmaniverous/entity-tools';
+import {
+  type EntityMap,
+  type Exactify,
+  isNil,
+  type TranscodableProperties,
+  type TranscodeMap,
+} from '@karmaniverous/entity-tools';
 
-import type { EntityMap, ItemMap } from './Config';
+import type { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
 import { validateEntityGeneratedProperty } from './validateEntityGeneratedProperty';
 
@@ -18,24 +24,39 @@ import { validateEntityGeneratedProperty } from './validateEntityGeneratedProper
  * @throws `Error` if `property` is invalid.
  */
 export function encodeGeneratedProperty<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: EntityToken,
-  property: keyof M[EntityToken] & string,
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >,
+  entityToken: keyof Exactify<M> & string,
+  property: ShardedKeys | UnshardedKeys,
   item: Partial<Item>,
 ): string | undefined {
   try {
     // Validate params.
     validateEntityGeneratedProperty(entityManager, entityToken, property);
 
-    const { atomic, elements, sharded } =
-      entityManager.config.entities[entityToken].generated[property]!;
+    const sharded =
+      property in entityManager.config.generatedProperties.sharded;
+
+    const elements =
+      entityManager.config.generatedProperties[
+        sharded ? 'sharded' : 'unsharded'
+      ][property];
 
     // Map elements to [element, value] pairs.
     const elementMap = elements.map((element) => [
@@ -44,7 +65,7 @@ export function encodeGeneratedProperty<
     ]);
 
     // Validate atomicity requirement.
-    if (atomic && elementMap.some(([, value]) => isNil(value))) return;
+    if (sharded && elementMap.some(([, value]) => isNil(value))) return;
 
     // Encode property value.
     const encoded = [

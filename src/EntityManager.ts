@@ -1,8 +1,13 @@
-import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
+import type {
+  EntityMap,
+  Exactify,
+  TranscodableProperties,
+  TranscodeMap,
+} from '@karmaniverous/entity-tools';
 
 import { addKeys } from './addKeys';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { Config, ConfigEntity, EntityMap, ItemMap } from './Config';
+import type { Config } from './Config';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
@@ -19,10 +24,13 @@ export class EntityManager<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
 > {
   #config: ParsedConfig;
-  logger: Pick<Console, 'debug' | 'error'>;
+  readonly logger: Pick<Console, 'debug' | 'error'>;
 
   /**
    * Create an EntityManager instance.
@@ -31,7 +39,15 @@ export class EntityManager<
    * @param logger - Logger object (defaults to `console`, must support `debug` & `error` methods).
    */
   constructor(
-    config: Config<M, HashKey, RangeKey, T>,
+    config: Config<
+      M,
+      HashKey,
+      RangeKey,
+      ShardedKeys,
+      UnshardedKeys,
+      TranscodedProperties,
+      T
+    >,
     logger: Pick<Console, 'debug' | 'error'> = console,
   ) {
     this.#config = configSchema.parse(config);

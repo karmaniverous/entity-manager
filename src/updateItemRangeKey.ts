@@ -1,10 +1,12 @@
 import {
+  type EntityMap,
   type Exactify,
   isNil,
+  type TranscodableProperties,
   type TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
-import type { EntityMap, ItemMap } from './Config';
+import type { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
 import { validateEntityToken } from './validateEntityToken';
 
@@ -22,18 +24,28 @@ import { validateEntityToken } from './validateEntityToken';
  * @throws `Error` if `item` {@link ConfigEntity.uniqueProperty | `this.config.entities<entityToken>.uniqueProperty`} property value is missing.
  */
 export function updateItemRangeKey<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: EntityToken,
-  item: Partial<Item>,
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >,
+  entityToken: keyof Exactify<M> & string,
+  item: Item,
   overwrite = false,
-): Partial<Item> {
+): Item {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);

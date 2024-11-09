@@ -43,7 +43,7 @@ export function decodeEntityElement<
     if ([hashKey, rangeKey].includes(element)) return value;
 
     const decoded = transcodes[
-      entities[entityToken].elementTranscodes[element]
+      entities[entityToken].propertyTranscodes[element]
     ].decode(value) as Item[keyof Item];
 
     entityManager.logger.debug('decoded entity element', {

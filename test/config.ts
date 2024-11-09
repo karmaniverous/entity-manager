@@ -22,7 +22,7 @@ export interface MyEntityMap extends EntityMap {
 export const config: Config<MyEntityMap, 'hashKey2'> = {
   entities: {
     email: {
-      elementTranscodes: {
+      propertyTranscodes: {
         created: 'timestamp',
         email: 'string',
         userId: 'string',
@@ -65,7 +65,7 @@ export const config: Config<MyEntityMap, 'hashKey2'> = {
         },
         userPK: { atomic: true, elements: ['userId'], sharded: true },
       },
-      elementTranscodes: {
+      propertyTranscodes: {
         beneficiaryId: 'string',
         created: 'timestamp',
         firstNameCanonical: 'string',

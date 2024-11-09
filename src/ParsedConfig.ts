@@ -17,22 +17,25 @@ const validateArrayUnique = <T>(
     if (count > 1)
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `duplicate array element '${element}'`,
+        message: `duplicate array element`,
+        params: { element },
         path,
       });
   }
 };
 
-const validateKeyExclusive = (
-  key: string,
+const validateKeysExclusive = (
+  keys: string[],
   label: string,
   ref: string[],
   ctx: z.RefinementCtx,
 ) => {
-  if (ref.includes(key))
+  const intersection = keys.filter((key) => ref.includes(key));
+
+  if (intersection.length)
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
-      message: `${label} '${key}' is not exclusive`,
+      message: `${label} key collision: ${intersection.toString()}`,
     });
 };
 
@@ -61,29 +64,6 @@ export const configSchema = z
               .safe()
               .optional()
               .default(10),
-            generated: z
-              .record(
-                z
-                  .object({
-                    atomic: z.boolean().optional().default(false),
-                    elements: componentArray,
-                    sharded: z.boolean().optional().default(false),
-                  })
-                  .optional(),
-              )
-              .optional()
-              .default({}),
-            elementTranscodes: z.record(z.string()).optional().default({}),
-            indexes: z
-              .record(
-                z.object({
-                  hashKey: z.string().min(1),
-                  rangeKey: z.string().min(1),
-                  projections: componentArray.optional(),
-                }),
-              )
-              .optional()
-              .default({}),
             shardBumps: z
               .array(
                 z
@@ -131,34 +111,30 @@ export const configSchema = z
             timestampProperty: z.string().min(1),
             uniqueProperty: z.string().min(1),
           })
-          .strict()
-          .superRefine((data, ctx) => {
-            const generatedKeys = Object.keys(data.generated);
-
-            // validate timestampProperty is not a generated key.
-            validateKeyExclusive(
-              data.timestampProperty,
-              'timestampProperty',
-              generatedKeys,
-              ctx,
-            );
-
-            // validate uniqueProperty is not a generated key.
-            validateKeyExclusive(
-              data.uniqueProperty,
-              'uniqueProperty',
-              generatedKeys,
-              ctx,
-            );
-          }),
+          .strict(),
+      )
+      .optional()
+      .default({}),
+    generatedProperties: z.object({
+      sharded: z.record(componentArray).optional().default({}),
+      unsharded: z.record(componentArray).optional().default({}),
+    }),
+    hashKey: z.string(),
+    indexes: z
+      .record(
+        z.object({
+          hashKey: z.string().min(1),
+          rangeKey: z.string().min(1),
+          projections: componentArray.optional(),
+        }),
       )
       .optional()
       .default({}),
     generatedKeyDelimiter: z.string().regex(/\W+/).optional().default('|'),
     generatedValueDelimiter: z.string().regex(/\W+/).optional().default('#'),
+    propertyTranscodes: z.record(z.string()).optional().default({}),
+    rangeKey: z.string(),
     shardKeyDelimiter: z.string().regex(/\W+/).optional().default('!'),
-    hashKey: z.string().optional().default('hashKey'),
-    rangeKey: z.string().optional().default('rangeKey'),
     throttle: z.number().int().positive().safe().optional().default(10),
     transcodes: z
       .record(
@@ -179,6 +155,10 @@ export const configSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'generatedKeyDelimiter contains generatedValueDelimiter',
+        params: {
+          generatedKeyDelimiter: data.generatedKeyDelimiter,
+          generatedValueDelimiter: data.generatedValueDelimiter,
+        },
         path: ['generatedKeyDelimiter'],
       });
 
@@ -186,6 +166,10 @@ export const configSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'generatedKeyDelimiter contains shardKeyDelimiter',
+        params: {
+          generatedKeyDelimiter: data.generatedKeyDelimiter,
+          shardKeyDelimiter: data.shardKeyDelimiter,
+        },
         path: ['generatedKeyDelimiter'],
       });
 
@@ -194,6 +178,10 @@ export const configSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'generatedValueDelimiter contains generatedKeyDelimiter',
+        params: {
+          generatedValueDelimiter: data.generatedValueDelimiter,
+          generatedKeyDelimiter: data.generatedKeyDelimiter,
+        },
         path: ['generatedValueDelimiter'],
       });
 
@@ -201,6 +189,10 @@ export const configSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'generatedValueDelimiter contains shardKeyDelimiter',
+        params: {
+          generatedValueDelimiter: data.generatedValueDelimiter,
+          shardKeyDelimiter: data.shardKeyDelimiter,
+        },
         path: ['generatedValueDelimiter'],
       });
 
@@ -209,6 +201,10 @@ export const configSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'shardKeyDelimiter contains generatedKeyDelimiter',
+        params: {
+          generatedKeyDelimiter: data.generatedKeyDelimiter,
+          shardKeyDelimiter: data.shardKeyDelimiter,
+        },
         path: ['shardKeyDelimiter'],
       });
 
@@ -216,137 +212,155 @@ export const configSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'shardKeyDelimiter contains generatedValueDelimiter',
+        params: {
+          generatedValueDelimiter: data.generatedValueDelimiter,
+          shardKeyDelimiter: data.shardKeyDelimiter,
+        },
         path: ['shardKeyDelimiter'],
       });
 
-    const reservedKeys = Object.values(data.entities).reduce(
-      (reserved, { generated, timestampProperty, uniqueProperty }) =>
-        new Set([
-          ...reserved,
-          ...Object.keys(generated),
-          timestampProperty,
-          uniqueProperty,
-        ]),
-      new Set<string>(),
-    );
+    // get reserved keys
+    const shardedKeys = Object.keys(data.generatedProperties.sharded);
+    const unshardedKeys = Object.keys(data.generatedProperties.unsharded);
+    const transcodedProperties = Object.keys(data.propertyTranscodes);
 
-    // validate hashKey is not a reserved key.
-    validateKeyExclusive(
-      data.hashKey,
+    // validate hashKey exclusive.
+    validateKeysExclusive(
+      [data.hashKey],
       'hashKey',
-      [...reservedKeys, data.rangeKey],
+      [
+        data.rangeKey,
+        ...shardedKeys,
+        ...unshardedKeys,
+        ...transcodedProperties,
+      ],
       ctx,
     );
 
-    // validate rangeKey is not a reserved key.
-    validateKeyExclusive(
-      data.rangeKey,
+    // validate rangeKey exclusive.
+    validateKeysExclusive(
+      [data.rangeKey],
       'rangeKey',
-      [...reservedKeys, data.hashKey],
+      [...shardedKeys, ...unshardedKeys, ...transcodedProperties],
       ctx,
     );
 
-    // validate entities
+    // validate shardedKeys exclusive.
+    validateKeysExclusive(
+      shardedKeys,
+      'shardedKeys',
+      [...unshardedKeys, ...transcodedProperties],
+      ctx,
+    );
+
+    // validate unshardedKeys exclusive.
+    validateKeysExclusive(
+      unshardedKeys,
+      'unshardedKeys',
+      transcodedProperties,
+      ctx,
+    );
+
+    // validate all propertyTranscode values are transcode keys.
     const transcodes = Object.keys(data.transcodes);
 
-    for (const [entityToken, entity] of Object.entries(data.entities)) {
-      // validate all entity generated element type values are transcode keys.
-      for (const [element, generatedElementType] of Object.entries(
-        entity.elementTranscodes,
-      ))
-        if (!transcodes.includes(generatedElementType))
+    for (const [property, transcode] of Object.entries(data.propertyTranscodes))
+      if (!transcodes.includes(transcode))
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_enum_value,
+          options: transcodes,
+          path: ['propertyTranscodes', property],
+          received: transcode,
+        });
+
+    // Validate all sharded property elements are transcoded properties.
+    for (const [property, elements] of Object.entries(
+      data.generatedProperties.sharded,
+    ))
+      for (const element of elements)
+        if (!transcodedProperties.includes(element))
           ctx.addIssue({
             code: z.ZodIssueCode.invalid_enum_value,
-            options: transcodes,
-            path: ['entities', entityToken, 'elementTranscodes', element],
-            received: generatedElementType,
+            options: transcodedProperties,
+            received: element,
+            path: ['generatedProperties', 'sharded', property],
           });
 
-      // validate all entity generated property elements have a corresponding entity element type.
-      const typedElements = Object.keys(entity.elementTranscodes);
-
-      for (const [generatedKey, generated] of Object.entries(entity.generated))
-        for (const element of generated?.elements ?? [])
-          if (!typedElements.includes(element))
-            ctx.addIssue({
-              code: z.ZodIssueCode.invalid_enum_value,
-              options: typedElements,
-              path: [
-                'entities',
-                entityToken,
-                'generated',
-                generatedKey,
-                'elements',
-              ],
-              received: element,
-            });
-
-      // validate indexes.
-      const generatedProperties = Object.keys(entity.generated);
-
-      for (const [
-        indexKey,
-        { hashKey, rangeKey, projections },
-      ] of Object.entries(entity.indexes)) {
-        // validate index hash key is sharded
-        if (hashKey !== data.hashKey && !entity.generated[hashKey]?.sharded)
+    // Validate all unsharded property elements are transcoded properties.
+    for (const [property, elements] of Object.entries(
+      data.generatedProperties.unsharded,
+    ))
+      for (const element of elements)
+        if (!transcodedProperties.includes(element))
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'index hash key is not sharded',
-            path: ['entities', entityToken, 'indexes', indexKey, 'hashKey'],
+            code: z.ZodIssueCode.invalid_enum_value,
+            options: transcodedProperties,
+            received: element,
+            path: ['generatedProperties', 'unsharded', property],
           });
 
-        // validate index range key is unsharded
-        if (rangeKey !== data.rangeKey && entity.generated[rangeKey]?.sharded)
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: 'index range key is sharded',
-            path: ['entities', entityToken, 'indexes', indexKey, 'rangeKey'],
-          });
+    // Validate indexes.
+    for (const [indexKey, { hashKey, rangeKey, projections }] of Object.entries(
+      data.indexes,
+    )) {
+      // Validate hash key is sharded.
+      if (![data.hashKey, ...shardedKeys].includes(hashKey)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_enum_value,
+          options: [data.hashKey, ...shardedKeys],
+          path: ['indexes', indexKey, 'hashKey'],
+          received: hashKey,
+        });
+      }
 
-        // validate all ungenerated entity index components have a corresponding entity element type
-        for (const component of [hashKey, rangeKey])
+      // Validate range key is unsharded.
+      if (![data.rangeKey, ...unshardedKeys].includes(rangeKey)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_enum_value,
+          options: [data.rangeKey, ...unshardedKeys],
+          path: ['indexes', indexKey, 'rangeKey'],
+          received: rangeKey,
+        });
+      }
+
+      // Validate no index projections are keys.
+      if (projections)
+        for (const projection of projections)
           if (
-            ![data.hashKey, data.rangeKey, ...generatedProperties].includes(
-              component,
-            ) &&
-            !typedElements.includes(component)
+            [hashKey, rangeKey, ...shardedKeys, ...unshardedKeys].includes(
+              projection,
+            )
           )
             ctx.addIssue({
-              code: z.ZodIssueCode.invalid_enum_value,
-              options: typedElements,
-              path: [
-                'entities',
-                entityToken,
-                'indexes',
-                indexKey,
-                'components',
-              ],
-              received: component,
+              code: z.ZodIssueCode.custom,
+              message: 'index projection is a key',
+              params: { projection },
+              path: ['indexes', indexKey, 'projections'],
             });
+    }
 
-        // validate no index projections are index components, hashKey, or rangeKey
-        if (projections)
-          for (const projection of projections) {
-            if (
-              [data.hashKey, data.rangeKey, hashKey, rangeKey].includes(
-                projection,
-              )
-            )
-              ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                message:
-                  'index projection is an index component, hash key, or range key',
-                path: [
-                  'entities',
-                  entityToken,
-                  'indexes',
-                  indexKey,
-                  'projections',
-                ],
-              });
-          }
-      }
+    // validate entities
+    for (const [
+      entityToken,
+      { timestampProperty, uniqueProperty },
+    ] of Object.entries(data.entities)) {
+      // validate timestampProperty is a transcoded property.
+      if (!transcodedProperties.includes(timestampProperty))
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_enum_value,
+          options: transcodedProperties,
+          path: ['entities', entityToken, 'timestampProperty'],
+          received: timestampProperty,
+        });
+
+      // validate uniqueProperty is a transcoded property.
+      if (!transcodedProperties.includes(uniqueProperty))
+        ctx.addIssue({
+          code: z.ZodIssueCode.invalid_enum_value,
+          options: transcodedProperties,
+          path: ['entities', entityToken, 'uniqueProperty'],
+          received: uniqueProperty,
+        });
     }
   });
 
