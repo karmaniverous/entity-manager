@@ -14,4 +14,5 @@ export type EntityItem<
 > = Partial<
   FlattenEntityMap<M> &
     Record<HashKey | RangeKey | ShardedKeys | UnshardedKeys, string>
->;
+> &
+  Record<string, unknown>;

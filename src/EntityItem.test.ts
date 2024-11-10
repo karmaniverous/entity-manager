@@ -6,10 +6,16 @@ import type {
   MyUnshardedKeys,
 } from './Config.test';
 import type { EntityItem } from './EntityItem';
-import type { Unwrap } from './Unwrap';
 
-export type MyEntityItem = Unwrap<
-  EntityItem<MyEntityMap, MyHashKey, MyRangeKey, MyShardedKeys, MyUnshardedKeys>
+export type MyEntityItem = EntityItem<
+  MyEntityMap,
+  MyHashKey,
+  MyRangeKey,
+  MyShardedKeys,
+  MyUnshardedKeys
 >;
 
 export type keys = keyof MyEntityItem;
+
+// Support undefined properties.
+export const item: MyEntityItem = { userId: 'abc', foo: 'bar' };

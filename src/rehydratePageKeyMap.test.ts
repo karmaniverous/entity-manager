@@ -141,7 +141,7 @@ describe('rehydratePageKeyMep', function () {
     const beneficiaryCreatedIndexComponents = getIndexComponents(
       entityManager,
       'beneficiaryCreated',
-    ) as (keyof Item)[];
+    );
 
     pageKeyMap = {
       beneficiaryCreated: zipToObject(

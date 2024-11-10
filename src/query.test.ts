@@ -26,12 +26,12 @@ describe('query', function () {
     const firstNameIndexComponents = getIndexComponents(
       entityManager,
       'firstName',
-    ) as (keyof Item)[];
+    );
 
     const lastNameIndexComponents = getIndexComponents(
       entityManager,
       'lastName',
-    ) as (keyof Item)[];
+    );
 
     lastNameQuery = async (shardedKey, pageKey, pageSize) =>
       await mockDb.query({
