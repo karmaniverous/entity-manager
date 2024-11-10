@@ -11,28 +11,7 @@ interface BazBarEntityMap extends EntityMap {
   foo: { bar: string; baz: number };
 }
 
-const defaultTestConfig = {
-  entities: {
-    foo: {
-      timestampProperty: 'baz',
-      uniqueProperty: 'bar',
-    },
-  },
-  generatedProperties: {
-    sharded: {
-      shardedProperty: ['bar'],
-    },
-    unsharded: {
-      unshardedProperty: ['baz'],
-    },
-  },
-  hashKey: 'hashKey',
-  propertyTranscodes: { bar: 'string', baz: 'int' },
-  rangeKey: 'rangeKey',
-  transcodes: defaultTranscodes,
-};
-
-let testConfig = defaultTestConfig as Config<
+let testConfig: Config<
   BazBarEntityMap,
   MyHashKey,
   MyRangeKey,
@@ -43,14 +22,26 @@ let testConfig = defaultTestConfig as Config<
 
 describe('Config', function () {
   beforeEach(function () {
-    testConfig = defaultTestConfig as Config<
-      BazBarEntityMap,
-      MyHashKey,
-      MyRangeKey,
-      'shardedProperty',
-      'unshardedProperty',
-      'bar' | 'baz'
-    >;
+    testConfig = {
+      entities: {
+        foo: {
+          timestampProperty: 'baz',
+          uniqueProperty: 'bar',
+        },
+      },
+      generatedProperties: {
+        sharded: {
+          shardedProperty: ['bar'],
+        },
+        unsharded: {
+          unshardedProperty: ['baz'],
+        },
+      },
+      hashKey: 'hashKey',
+      propertyTranscodes: { bar: 'string', baz: 'int' },
+      rangeKey: 'rangeKey',
+      transcodes: defaultTranscodes,
+    };
   });
 
   it('should apply config defaults', function () {
@@ -65,7 +56,10 @@ describe('Config', function () {
     expect(parsedConfig).to.deep.include({
       entities: {},
       generatedKeyDelimiter: '|',
-      generatedProperties: {},
+      generatedProperties: {
+        sharded: {},
+        unsharded: {},
+      },
       generatedValueDelimiter: '#',
       indexes: {},
       propertyTranscodes: {},
@@ -158,7 +152,7 @@ describe('Config', function () {
     };
 
     expect(() => configSchema.parse(testConfig)).to.throw(
-      'index projection is an index component, hash key, or range key',
+      'index projection is a key',
     );
   });
 
@@ -172,7 +166,7 @@ describe('Config', function () {
     };
 
     expect(() => configSchema.parse(testConfig)).to.throw(
-      'index projection is an index component, hash key, or range key',
+      'index projection is a key',
     );
   });
 
@@ -186,7 +180,7 @@ describe('Config', function () {
     };
 
     expect(() => configSchema.parse(testConfig)).to.throw(
-      'index projection is an index component, hash key, or range key',
+      'index projection is a key',
     );
   });
 

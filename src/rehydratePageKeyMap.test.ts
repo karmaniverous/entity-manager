@@ -2,7 +2,7 @@ import { type DefaultTranscodeMap } from '@karmaniverous/entity-tools';
 import { expect } from 'chai';
 import { pick, zipToObject } from 'radash';
 
-import { day, entityManager, now, type UserItem } from '../test/config';
+import { day, entityManager, type Item, now } from '../test/config';
 import { getUsers } from '../test/users';
 import { addKeys } from './addKeys';
 import { decodeGeneratedProperty } from './decodeGeneratedProperty';
@@ -13,11 +13,11 @@ import { type PageKeyMap } from './PageKeyMap';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
 
 describe('rehydratePageKeyMep', function () {
-  let item0, item1, item2, item3: Partial<UserItem>;
-  let pageKeyMap: PageKeyMap<UserItem, DefaultTranscodeMap>;
+  let item0, item1, item2, item3: Item;
+  let pageKeyMap: PageKeyMap<Item, DefaultTranscodeMap>;
 
   beforeEach(function () {
-    [item0, item1, item2, item3] = getUsers(4) as Partial<UserItem>[];
+    [item0, item1, item2, item3] = getUsers(4) as Item[];
 
     item0.hashKey2 = 'user!0';
     item1.hashKey2 = 'user!1';
@@ -31,15 +31,13 @@ describe('rehydratePageKeyMep', function () {
 
     const firstNameIndexComponents = getIndexComponents(
       entityManager,
-      'user',
       'firstName',
-    ) as (keyof UserItem)[];
+    ) as (keyof Item)[];
 
     const lastNameIndexComponents = getIndexComponents(
       entityManager,
-      'user',
       'lastName',
-    ) as (keyof UserItem)[];
+    ) as (keyof Item)[];
 
     pageKeyMap = {
       firstName: {
@@ -136,15 +134,14 @@ describe('rehydratePageKeyMep', function () {
   });
 
   it('should rehydrate complex alternate hash key index', function () {
-    const items = (getUsers(21) as Partial<UserItem>[]).map((item) =>
+    const items = (getUsers(21) as Item[]).map((item) =>
       addKeys(entityManager, 'user', item),
     );
 
     const beneficiaryCreatedIndexComponents = getIndexComponents(
       entityManager,
-      'user',
       'beneficiaryCreated',
-    ) as (keyof UserItem)[];
+    ) as (keyof Item)[];
 
     pageKeyMap = {
       beneficiaryCreated: zipToObject(
@@ -160,7 +157,7 @@ describe('rehydratePageKeyMep', function () {
           pick(
             {
               ...items[i],
-              ...decodeGeneratedProperty(entityManager, 'user', beneficiaryPK),
+              ...decodeGeneratedProperty(entityManager, beneficiaryPK),
               beneficiaryPK,
             },
             beneficiaryCreatedIndexComponents,

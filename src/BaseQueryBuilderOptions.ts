@@ -1,11 +1,11 @@
 import type {
+  EntityMap,
   Exactify,
-  PropertiesOfType,
+  TranscodableProperties,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
 import { BaseEntityClient } from './BaseEntityClient';
-import type { EntityMap } from './Config';
 import { EntityManager } from './EntityManager';
 
 /**
@@ -14,24 +14,34 @@ import { EntityManager } from './EntityManager';
  * @category QueryBuilder
  */
 export interface BaseQueryBuilderOptions<
-  EntityClient extends BaseEntityClient,
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
+  EntityClient extends BaseEntityClient,
 > {
   /** {@link BaseEntityClient | `EntityClient`} instance. */
   entityClient: EntityClient;
 
   /** {@link EntityManager | `EntityManager`} instance. */
-  entityManager: EntityManager<M, HashKey, RangeKey, T>;
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >;
 
   /** Entity token. */
-  entityToken: EntityToken;
+  entityToken: keyof Exactify<M> & string;
 
   /** Hash key token. */
-  hashKeyToken: PropertiesOfType<M[EntityToken], never> | HashKey;
+  hashKeyToken: HashKey | ShardedKeys;
 
   /** Dehydrated page key map. */
   pageKeyMap?: string;

@@ -1,16 +1,22 @@
-import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
+import type {
+  EntityMap,
+  Exactify,
+  TranscodableProperties,
+  TranscodeMap,
+} from '@karmaniverous/entity-tools';
 import { cluster, mapValues, range, unique, zipToObject } from 'radash';
 
-import type { EntityMap, ItemMap } from './Config';
 import { decodeGeneratedProperty } from './decodeGeneratedProperty';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
+import type { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
 import { getHashKeySpace } from './getHashKeySpace';
 import { getIndexComponents } from './getIndexComponents';
 import type { PageKeyMap } from './PageKeyMap';
 import { rehydrateIndexItem } from './rehydrateIndexItem';
 import { updateItemRangeKey } from './updateItemRangeKey';
-import { validateEntityIndexToken } from './validateEntityIndexToken';
+import { validateEntityToken } from './validateEntityToken';
+import { validateIndexToken } from './validateIndexToken';
 
 /**
  * Rehydrate an array of dehydrated page keys into a {@link PageKeyMap | `PageKeyMap`} object.
@@ -18,8 +24,8 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * Reverses the {@link EntityManager.dehydratePageKeyMap | `dehydratePageKeyMap`} method.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
- * @param indexTokens - Array of {@link ConfigEntity.indexes | `entityManager.config.entities.<entityToken>.indexes`} keys used as keys of the original {@link PageKeyMap | `PageKeyMap`}.
+ * @param entityToken - {@link Config.entities | `entityManager.config.entities`} key.
+ * @param indexTokens - Array of {@link Config.indexes | `entityManager.config.indexes`} keys used as keys of the original {@link PageKeyMap | `PageKeyMap`}.
  * @param item - Partial item object sufficiently populated to generate index hash keys.
  * @param dehydrated - Array of dehydrated page keys or undefined if new query.
  * @param timestampFrom - Lower timestanp limit used to generate the original {@link PageKeyMap | `PageKeyMap`}. Defaults to `0`.
@@ -34,31 +40,43 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * @throws `Error` if `dehydrated` has invalid length.
  */
 export function rehydratePageKeyMap<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: EntityToken,
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >,
+  entityToken: keyof Exactify<M> & string,
   indexTokens: string[],
-  item: Partial<Item>,
+  item: Item,
   dehydrated: string[] | undefined,
   timestampFrom = 0,
   timestampTo = Date.now(),
-): [string, PageKeyMap<Item, T>] {
+): [HashKey, PageKeyMap<Item, T>] {
   try {
+    // Validate params.
+    validateEntityToken(entityManager, entityToken);
+
     // Validate indexTokens populated.
     if (!indexTokens.length) throw new Error('indexTokens empty');
 
     // Validate indexTokens exist.
     const hashKeys = unique(
       indexTokens.map((indexToken) => {
-        validateEntityIndexToken(entityManager, entityToken, indexToken);
-        return entityManager.config.entities[entityToken].indexes[indexToken]
-          .hashKey;
+        validateIndexToken(entityManager, indexToken);
+        return entityManager.config.indexes[indexToken].hashKey as HashKey;
       }),
     );
 
@@ -67,9 +85,7 @@ export function rehydratePageKeyMap<
 
     const [hashKeyToken] = hashKeys;
 
-    indexTokens.map((index) =>
-      validateEntityIndexToken(entityManager, entityToken, index),
-    );
+    indexTokens.map((index) => validateIndexToken(entityManager, index));
 
     // Shortcut empty dehydrated.
     if (dehydrated && !dehydrated.length) return [hashKeyToken, {}];
@@ -92,14 +108,19 @@ export function rehydratePageKeyMap<
       throw new Error('dehydrated length mismatch');
 
     // Rehydrate pageKeys.
+    const uniqueProperty = entityManager.config.entities[entityToken]
+      .uniqueProperty as TranscodedProperties;
+
+    const { sharded, unsharded } = entityManager.config.generatedProperties;
+
     const rehydrated = mapValues(
       zipToObject(indexTokens, cluster(dehydrated, hashKeySpace.length)),
       (dehydratedIndexPageKeyMaps, index) =>
         zipToObject(hashKeySpace, (hashKey, i) => {
           if (!dehydratedIndexPageKeyMaps[i]) return;
 
-          let pageKeyItem = {
-            ...decodeGeneratedProperty(entityManager, entityToken, hashKey),
+          let pageKeyItem: Item = {
+            ...decodeGeneratedProperty(entityManager, hashKey),
             ...rehydrateIndexItem(
               entityManager,
               entityToken,
@@ -115,22 +136,19 @@ export function rehydratePageKeyMap<
           );
 
           return zipToObject(
-            getIndexComponents(entityManager, entityToken, index),
+            getIndexComponents(entityManager, index),
             (component) =>
-              entityManager.config.entities[entityToken].generated[component]
-                ? encodeGeneratedProperty(
-                    entityManager,
-                    entityToken,
-                    component,
-                    pageKeyItem,
-                  )!
-                : pageKeyItem[
-                    component as keyof ItemMap<
-                      M,
-                      HashKey,
-                      RangeKey
-                    >[EntityToken]
-                  ],
+              component === entityManager.config.rangeKey
+                ? [uniqueProperty, pageKeyItem[uniqueProperty]].join(
+                    entityManager.config.generatedValueDelimiter,
+                  )
+                : component in sharded || component in unsharded
+                  ? encodeGeneratedProperty(
+                      entityManager,
+                      component as ShardedKeys | UnshardedKeys,
+                      pageKeyItem,
+                    )!
+                  : pageKeyItem[component],
           );
         }),
     );

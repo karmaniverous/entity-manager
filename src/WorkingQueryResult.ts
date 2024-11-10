@@ -1,22 +1,19 @@
-import type {
-  DefaultTranscodeMap,
-  Exactify,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
+import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
 
-import type { EntityMap, ItemMap } from './Config';
+import { EntityItem } from './EntityItem';
 import type { PageKeyMap } from './PageKeyMap';
 
 /**
  * A QueryResult object with rehydrated pageKeyMap.
  */
 export interface WorkingQueryResult<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
-  T extends TranscodeMap = DefaultTranscodeMap,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  T extends TranscodeMap,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 > {
   /** The returned records. */
   items: Item[];

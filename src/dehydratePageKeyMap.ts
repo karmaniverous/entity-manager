@@ -1,12 +1,17 @@
-import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
+import type {
+  EntityMap,
+  Exactify,
+  TranscodableProperties,
+  TranscodeMap,
+} from '@karmaniverous/entity-tools';
 
-import type { EntityMap, ItemMap } from './Config';
 import { decodeGeneratedProperty } from './decodeGeneratedProperty';
 import { dehydrateIndexItem } from './dehydrateIndexItem';
+import type { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
 import type { PageKeyMap } from './PageKeyMap';
-import { validateEntityIndexToken } from './validateEntityIndexToken';
 import { validateEntityToken } from './validateEntityToken';
+import { validateIndexToken } from './validateIndexToken';
 
 /**
  * Dehydrate a {@link PageKeyMap | `PageKeyMap`} object into an array of dehydrated page keys.
@@ -14,7 +19,7 @@ import { validateEntityToken } from './validateEntityToken';
  * Reverses {@link EntityManager.rehydratePageKeyMap | `rehydratePageKeyMap`}.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
+ * @param entityToken - {@link Config.entities | `entityManager.config.entities`} key.
  * @param pageKeyMap - {@link PageKeyMap | `PageKeyMap`} object to dehydrate.
  *
  * @returns  Array of dehydrated page keys.
@@ -28,15 +33,25 @@ import { validateEntityToken } from './validateEntityToken';
  * An empty returned array indicates all page keys are `undefined`.
  */
 export function dehydratePageKeyMap<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: EntityToken,
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >,
+  entityToken: keyof Exactify<M> & string,
   pageKeyMap: PageKeyMap<Item, T>,
 ): string[] {
   try {
@@ -58,9 +73,7 @@ export function dehydratePageKeyMap<
 
     // Extract, sort & validate indexs.
     const indexes = Object.keys(pageKeyMap).sort();
-    indexes.map((index) =>
-      validateEntityIndexToken(entityManager, entityToken, index),
-    );
+    indexes.map((index) => validateIndexToken(entityManager, index));
 
     // Extract & sort hash keys.
     const hashKeys = Object.keys(pageKeyMap[indexes[0]]);
@@ -77,25 +90,24 @@ export function dehydratePageKeyMap<
         }
 
         // Compose item from page key
-        const item = Object.entries(pageKeyMap[index][hashKey]).reduce<
-          Partial<ItemMap<M, HashKey, RangeKey>[EntityToken]>
-        >((item, [property, value]) => {
-          if (
-            property in entityManager.config.entities[entityToken].generated ||
-            property === entityManager.config.rangeKey
-          )
-            Object.assign(
-              item,
-              decodeGeneratedProperty(
-                entityManager,
-                entityToken,
-                value as string,
-              ),
-            );
-          else Object.assign(item, { [property]: value });
+        const item = Object.entries(pageKeyMap[index][hashKey]).reduce(
+          (item, [property, value]) => {
+            if (
+              property === entityManager.config.rangeKey ||
+              property in entityManager.config.generatedProperties.sharded ||
+              property in entityManager.config.generatedProperties.unsharded
+            )
+              Object.assign(
+                item,
+                decodeGeneratedProperty(entityManager, value as string),
+              );
+            else Object.assign(item, { [property]: value });
 
-          return item;
-        }, {});
+            return item;
+          },
+          // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter
+          {} as Item,
+        );
 
         // Dehydrate index from item.
         dehydrated.push(

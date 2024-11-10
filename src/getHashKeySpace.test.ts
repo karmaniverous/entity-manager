@@ -72,8 +72,9 @@ describe('getHashKeySpace', function () {
 
   it('should fail on unsharded hash key token', function () {
     expect(() =>
+      // @ts-expect-error Argument of type '"firstNameRK"' is not assignable to parameter of type '"hashKey2" | MyShardedKeys'.
       getHashKeySpace(entityManager, 'user', 'firstNameRK', {}, now, Infinity),
-    ).to.throw('entity generated property not sharded');
+    ).to.throw('generated property not sharded');
   });
 
   it('should fail on unsupported hash key token', function () {

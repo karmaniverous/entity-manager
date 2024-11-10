@@ -1,13 +1,13 @@
 import { expect } from 'chai';
 
-import { entityManager, type UserItem } from '../test/config';
+import { entityManager, type Item } from '../test/config';
 import { getUsers } from '../test/users';
 import { addKeys } from './addKeys';
 import { removeKeys } from './removeKeys';
 
 describe('removeKeys', function () {
   it('should strip item generated properties', function () {
-    const [item] = getUsers() as UserItem[];
+    const [item] = getUsers() as Item[];
 
     removeKeys(entityManager, 'user', addKeys(entityManager, 'user', item));
 

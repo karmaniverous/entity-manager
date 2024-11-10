@@ -21,6 +21,6 @@ import type { ShardQueryResult } from './ShardQueryResult';
  */
 export type ShardQueryFunction<Item extends Entity> = (
   hashKey: string,
-  pageKey?: Partial<Item>,
+  pageKey?: Item,
   pageSize?: number,
 ) => Promise<ShardQueryResult<Item>>;

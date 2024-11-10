@@ -1,15 +1,16 @@
-import type { Exactify } from '@karmaniverous/entity-tools';
+import type { EntityMap } from '@karmaniverous/entity-tools';
 
-import type { EntityMap, ItemMap } from './Config';
+import type { EntityItem } from './EntityItem';
 import type { QueryOptions } from './QueryOptions';
 
 export type QueryBuilderQueryOptions<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 > = Omit<
-  QueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
+  QueryOptions<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys, Item>,
   'entityToken' | 'pageKeyMap' | 'shardQueryMap'
 >;

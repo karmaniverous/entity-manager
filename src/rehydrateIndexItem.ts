@@ -1,14 +1,20 @@
-import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
+import type {
+  EntityMap,
+  Exactify,
+  TranscodableProperties,
+  TranscodeMap,
+} from '@karmaniverous/entity-tools';
 import { shake, zipToObject } from 'radash';
 
-import type { EntityMap, ItemMap } from './Config';
-import { decodeEntityElement } from './decodeEntityElement';
+import { decodeElement } from './decodeElement';
+import type { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
 import { unwrapIndex } from './unwrapIndex';
-import { validateEntityIndexToken } from './validateEntityIndexToken';
+import { validateEntityToken } from './validateEntityToken';
+import { validateIndexToken } from './validateIndexToken';
 
 /**
- * Convert a delimited string into a partial {@link ItemMap | `ItemMap`} object representing the ungenerated component elements of a Config entity index.
+ * Convert a delimited string into an {@link EntityItem | `EntityItem`} object representing the ungenerated component elements of a Config entity index, minus its hash key.
  *
  * @remarks
  * Reverses {@link EntityManager.dehydrateIndexItem | `dehydrateIndexItem`}.
@@ -16,42 +22,53 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * {@link EntityManager.dehydrateIndexItem | `dehydrateIndexItem`} alphebetically sorts unwrapped index elements during the dehydration process. This method assumes delimited element values are presented in the same order.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
- * @param indexToken - {@link ConfigEntity.indexes | `entityManager.config.entities.<entityToken>.indexes`} key.
+ * @param entityToken - {@link Config.entities | `entityManager.config.entities`} key.
+ * @param indexToken - {@link Config.indexes | `entityManager.config.indexes`} key.
  * @param dehydrated - Dehydrated index value.
  *
- * @returns Partial {@link ItemMap | `ItemMap`} object containing rehydrated index component elements.
+ * @returns {@link EntityItem | `EntityItem`} object containing rehydrated index component elements.
  *
  * @throws `Error` if `entityToken` is invalid.
  * @throws `Error` if `indexToken` is invalid.
  */
 export function rehydrateIndexItem<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: EntityToken,
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >,
+  entityToken: keyof Exactify<M> & string,
   indexToken: string,
   dehydrated: string,
-): Partial<Item> {
+): Item {
   try {
-    const { generatedKeyDelimiter } = entityManager.config;
-
     // Validate params.
-    validateEntityIndexToken(entityManager, entityToken, indexToken);
+    validateEntityToken(entityManager, entityToken);
+    validateIndexToken(entityManager, indexToken);
 
     // Unwrap index elements.
-    const { hashKey } =
-      entityManager.config.entities[entityToken].indexes[indexToken];
+    const { hashKey } = entityManager.config.indexes[indexToken];
+
     const elements = unwrapIndex(entityManager, entityToken, indexToken, [
       hashKey,
     ]);
 
     // Split dehydrated value & validate.
+    const { generatedKeyDelimiter } = entityManager.config;
+
     const values = dehydrated.split(generatedKeyDelimiter);
 
     if (elements.length !== values.length)
@@ -62,10 +79,10 @@ export function rehydrateIndexItem<
       zipToObject(
         elements,
         values.map((value, i) =>
-          decodeEntityElement(entityManager, entityToken, elements[i], value),
+          decodeElement(entityManager, elements[i], value),
         ),
       ),
-    ) as Partial<Item>;
+    ) as Item;
 
     entityManager.logger.debug('rehydrated index', {
       entityToken,

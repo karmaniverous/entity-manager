@@ -1,13 +1,14 @@
 import {
-  type Exactify,
+  type EntityMap,
   sort,
+  type TranscodableProperties,
   type TranscodeMap,
 } from '@karmaniverous/entity-tools';
 import lzString from 'lz-string';
 import { isInt, parallel, unique } from 'radash';
 
-import type { EntityMap, ItemMap } from './Config';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
+import type { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
 import type { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
@@ -23,7 +24,7 @@ const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
  * @remarks
  * The provided {@link ShardQueryFunction | `ShardQueryFunction`} performs the actual query of individual data pages on individual shards. This function is presumed to express provider-specific query logic, including any necessary indexing or search constraints.
  *
- * Individual shard query results will be combined, deduped by {@link ConfigEntity.uniqueProperty} property value, and sorted by {@link QueryOptions.sortOrder | `sortOrder`}.
+ * Individual shard query results will be combined, deduped by {@link Config.uniqueProperty} property value, and sorted by {@link QueryOptions.sortOrder | `sortOrder`}.
  *
  * In queries on sharded data, expect the leading and trailing edges of returned data pages to interleave somewhat with preceding & following pages.
  *
@@ -37,16 +38,28 @@ const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
  * @throws Error if {@link QueryOptions.pageKeyMap | `pageKeyMap`} keys do not match {@link QueryOptions.shardQueryMap | `shardQueryMap`} keys.
  */
 export async function query<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  options: QueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
-): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >,
+  options: QueryOptions<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys, Item>,
+): Promise<
+  QueryResult<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys, Item>
+> {
   try {
     // Get defaults.
     const { defaultLimit, defaultPageSize } =
@@ -100,7 +113,15 @@ export async function query<
     let workingResult = {
       items: [],
       pageKeyMap: rehydratedPageKeyMap,
-    } as WorkingQueryResult<Item, EntityToken, M, HashKey, RangeKey>;
+    } as WorkingQueryResult<
+      M,
+      HashKey,
+      RangeKey,
+      ShardedKeys,
+      UnshardedKeys,
+      T,
+      Item
+    >;
 
     do {
       // TODO: This loop will blow up as shards scale, since at a minimum it will return shardCount * pageSize
@@ -137,7 +158,15 @@ export async function query<
 
       // Reduce shardQueryResults & updateworkingRresult.
       workingResult = shardQueryResults.reduce<
-        WorkingQueryResult<Item, EntityToken, M, HashKey, RangeKey>
+        WorkingQueryResult<
+          M,
+          HashKey,
+          RangeKey,
+          ShardedKeys,
+          UnshardedKeys,
+          T,
+          Item
+        >
       >(({ items, pageKeyMap }, { indexToken, queryResult, hashKey }) => {
         Object.assign(rehydratedPageKeyMap[indexToken], {
           [hashKey]: queryResult.pageKey,
@@ -181,7 +210,7 @@ export async function query<
           ),
         ),
       ),
-    } as QueryResult<Item, EntityToken, M, HashKey, RangeKey>;
+    } as QueryResult<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys, Item>;
 
     entityManager.logger.debug('queried entityToken across shards', {
       options,

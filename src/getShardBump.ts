@@ -13,7 +13,7 @@ import { validateEntityToken } from './validateEntityToken';
  * Get first entity shard bump before timestamp.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+ * @param entityToken - {@link Config.entities | `this.config.entities`} key.
  * @param timestamp - Timestamp in milliseconds.
  *
  * @returns {@link ShardBump | `ShardBump`} object.

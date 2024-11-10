@@ -1,4 +1,5 @@
 import type {
+  DefaultTranscodeMap,
   EntityMap,
   Exactify,
   TranscodableProperties,
@@ -6,8 +7,8 @@ import type {
 } from '@karmaniverous/entity-tools';
 
 import { addKeys } from './addKeys';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { Config } from './Config';
+import type { EntityItem } from './EntityItem';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
@@ -27,7 +28,7 @@ export class EntityManager<
   ShardedKeys extends string,
   UnshardedKeys extends string,
   TranscodedProperties extends TranscodableProperties<M, T>,
-  T extends TranscodeMap,
+  T extends TranscodeMap = DefaultTranscodeMap,
 > {
   #config: ParsedConfig;
   readonly logger: Pick<Console, 'debug' | 'error'>;
@@ -73,10 +74,10 @@ export class EntityManager<
   }
 
   /**
-   * Update generated properties, hash key, and range key on an {@link ItemMap | `ItemMap`} object.
+   * Update generated properties, hash key, and range key on an {@link EntityItem | `EntityItem`} object.
    *
-   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
-   * @param item - {@link ItemMap | `ItemMap`} object.
+   * @param entityToken - {@link Config | `Config`} `entities` key.
+   * @param item - {@link EntityItem | `EntityItem`} object.
    * @param overwrite - Overwrite existing properties (default `false`).
    *
    * @returns Shallow clone of `item` with updated properties.
@@ -84,30 +85,28 @@ export class EntityManager<
    * @throws `Error` if `entityToken` is invalid.
    */
   addKeys<
-    Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-    EntityToken extends keyof Exactify<M> & string,
+    Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
   >(
-    entityToken: EntityToken,
-    item: Partial<Item>,
+    entityToken: keyof Exactify<M> & string,
+    item: Item,
     overwrite = false,
-  ): Partial<Item> {
+  ): Item {
     return addKeys(this, entityToken, item, overwrite);
   }
 
   /**
-   * Strips generated properties, hash key, and range key from an {@link ItemMap | `ItemMap`} object.
+   * Strips generated properties, hash key, and range key from an {@link EntityItem | `EntityItem`} object.
    *
-   * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
-   * @param item - {@link ItemMap | `ItemMap`} object.
+   * @param entityToken - {@link Config | `Config`} `entities` key.
+   * @param item - {@link EntityItem | `EntityItem`} object.
    *
    * @returns Shallow clone of `item` without generated properties, hash key or range key.
    *
    * @throws `Error` if `entityToken` is invalid.
    */
   removeKeys<
-    Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-    EntityToken extends keyof Exactify<M> & string,
-  >(entityToken: EntityToken, item: Partial<Item>): Partial<Item> {
+    Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
+  >(entityToken: keyof Exactify<M> & string, item: Item): Item {
     return removeKeys(this, entityToken, item);
   }
 
@@ -117,7 +116,7 @@ export class EntityManager<
    * @remarks
    * The provided `shardQueryMap` performs the actual query of individual data pages on individual index/shard combinations.
    *
-   * Individual shard query results will be combined, deduped by {@link ConfigEntity.uniqueProperty} property value, and sorted by {@link QueryOptions.sortOrder | `sortOrder`}.
+   * Individual shard query results will be combined, deduped by {@link Config | `Config`} `uniqueProperty` value, and sorted by {@link QueryOptions.sortOrder | `sortOrder`}.
    *
    * In queries on sharded data, expect the leading and trailing edges of returned data pages to interleave somewhat with preceding & following pages.
    *
@@ -127,14 +126,22 @@ export class EntityManager<
    *
    * @returns {@link QueryResult} object.
    *
-   * @throws Error if {@link QueryOptions.shardQueryMapBuilder | `shardQueryMapBuilder`} `pageKeyMap` keys do not match its `shardQueryMap` keys.
+   * @throws Error if `options` {@link QueryOptions.pageKeyMap | `pageKeyMap`} `pageKeyMap` keys do not match {@link QueryOptions.shardQueryMap | `shardQueryMap`} keys.
    */
   async query<
-    Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-    EntityToken extends keyof Exactify<M> & string,
+    Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
   >(
-    options: QueryOptions<Item, EntityToken, M, HashKey, RangeKey>,
-  ): Promise<QueryResult<Item, EntityToken, M, HashKey, RangeKey>> {
+    options: QueryOptions<
+      M,
+      HashKey,
+      RangeKey,
+      ShardedKeys,
+      UnshardedKeys,
+      Item
+    >,
+  ): Promise<
+    QueryResult<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys, Item>
+  > {
     return await query(this, options);
   }
 }

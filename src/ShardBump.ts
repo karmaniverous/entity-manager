@@ -1,5 +1,5 @@
 /**
- * Defines a single time period in an {@link Entity | `Entity`} sharding strategy.
+ * Defines a single time period in an entity sharding strategy.
  *
  * @category Config
  * @protected
@@ -8,7 +8,7 @@ export interface ShardBump {
   /**
    * The timestamp marking the beginning of the time period. Must be a non-negative integer.
    *
-   * This value must be unique across all {@link ShardBump | `ShardBumps`} for the {@link Entity | `Entity`}.
+   * This value must be unique across all {@link ShardBump | `ShardBumps`} for the entity.
    */
   timestamp: number;
 

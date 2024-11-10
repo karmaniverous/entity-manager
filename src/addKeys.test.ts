@@ -1,12 +1,12 @@
 import { expect } from 'chai';
 
-import { entityManager, type UserItem } from '../test/config';
+import { entityManager, type Item } from '../test/config';
 import { getUsers } from '../test/users';
 import { addKeys } from './addKeys';
 
 describe('addKeys', function () {
   it('should add item generated properties', function () {
-    let [item] = getUsers() as Partial<UserItem>[];
+    let [item] = getUsers() as Item[];
 
     item = addKeys(entityManager, 'user', item);
 
@@ -18,7 +18,7 @@ describe('addKeys', function () {
   });
 
   it('should not overwrite item generated properties', function () {
-    const [item] = getUsers() as UserItem[];
+    const [item] = getUsers() as Item[];
 
     const newItem = addKeys(entityManager, 'user', {
       ...item,
@@ -29,7 +29,7 @@ describe('addKeys', function () {
   });
 
   it('should overwrite item generated properties', function () {
-    const [item] = getUsers() as UserItem[];
+    const [item] = getUsers() as Item[];
 
     const newItem = addKeys(
       entityManager,

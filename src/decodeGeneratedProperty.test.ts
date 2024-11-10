@@ -5,25 +5,25 @@ import { decodeGeneratedProperty } from './decodeGeneratedProperty';
 
 describe('decodeGeneratedProperty', function () {
   it('should decode empty string to empty object', function () {
-    const decoded = decodeGeneratedProperty(entityManager, 'user', '');
+    const decoded = decodeGeneratedProperty(entityManager, '');
 
     expect(decoded).to.deep.equal({});
   });
 
   it('should fail on no value delimiters', function () {
-    expect(() =>
-      decodeGeneratedProperty(entityManager, 'user', 'abc'),
-    ).to.throw('invalid generated property value');
+    expect(() => decodeGeneratedProperty(entityManager, 'abc')).to.throw(
+      'invalid generated property value',
+    );
   });
 
   it('should fail on too many value delimiters', function () {
     expect(() =>
-      decodeGeneratedProperty(entityManager, 'user', 'abc#def#ghi'),
+      decodeGeneratedProperty(entityManager, 'abc#def#ghi'),
     ).to.throw('invalid generated property value');
   });
 
   it('should decode hash key', function () {
-    const decoded = decodeGeneratedProperty(entityManager, 'user', 'user!q');
+    const decoded = decodeGeneratedProperty(entityManager, 'user!q');
 
     expect(decoded).to.deep.equal({ hashKey2: 'user!q' });
   });
@@ -31,7 +31,6 @@ describe('decodeGeneratedProperty', function () {
   it('should decode generated property', function () {
     const decoded = decodeGeneratedProperty(
       entityManager,
-      'user',
       'firstNameCanonical#lilian|lastNameCanonical#fahey',
     );
 
@@ -44,7 +43,6 @@ describe('decodeGeneratedProperty', function () {
   it('should decode generated property with hash key', function () {
     const decoded = decodeGeneratedProperty(
       entityManager,
-      'user',
       'user!q|firstNameCanonical#lilian|lastNameCanonical#fahey',
     );
 
@@ -59,7 +57,6 @@ describe('decodeGeneratedProperty', function () {
     expect(() =>
       decodeGeneratedProperty(
         entityManager,
-        'user',
         'firstNameCanonical#lilian|user!q|lastNameCanonical#fahey',
       ),
     ).to.throw('invalid generated property value');

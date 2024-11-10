@@ -7,6 +7,7 @@
       "DefaultTranscodeMap": "https://docs.karmanivero.us/entity-tools/interfaces/entity_tools.DefaultTranscodeMap.html",
       "defaultTranscodes": "https://docs.karmanivero.us/entity-tools/variables/entity_tools.defaultTranscodes.html",
       "Entity": "https://docs.karmanivero.us/entity-tools/types/entity_tools.Entity.html",
+      "EntityMap": "https://docs.karmanivero.us/entity-tools/types/entity_tools.EntityMap.html",
       "Exactify": "https://docs.karmanivero.us/entity-tools/types/entity_tools.Exactify.html",
       "isNil": "https://docs.karmanivero.us/entity-tools/functions/entity_tools.isNil.html",
       "Nil": "https://docs.karmanivero.us/entity-tools/types/entity_tools.Nil.html",

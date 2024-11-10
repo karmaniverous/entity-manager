@@ -3,40 +3,35 @@
 import { MockDb } from '@karmaniverous/mock-db';
 import { expect } from 'chai';
 
-import { config, day, now, type UserItem } from '../test/config';
+import { day, entityManager, type Item, now } from '../test/config';
 import { getUsers } from '../test/users';
 import { addKeys } from './addKeys';
-import { EntityManager } from './EntityManager';
 import { getIndexComponents } from './getIndexComponents';
 import { query } from './query';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 
-const entityManager = new EntityManager(config);
-
 describe('query', function () {
-  let users: UserItem[];
-  let mockDb: MockDb<UserItem>;
-  let lastNameQuery: ShardQueryFunction<UserItem>;
-  let firstNameQuery: ShardQueryFunction<UserItem>;
+  let users: Item[];
+  let mockDb: MockDb<Item>;
+  let lastNameQuery: ShardQueryFunction<Item>;
+  let firstNameQuery: ShardQueryFunction<Item>;
 
   before(function () {
     users = getUsers(1000, 0, 2).map((user) =>
-      addKeys(entityManager, 'user', user as UserItem),
-    ) as UserItem[];
+      addKeys(entityManager, 'user', user as Item),
+    );
 
     mockDb = new MockDb(users);
 
     const firstNameIndexComponents = getIndexComponents(
       entityManager,
-      'user',
       'firstName',
-    ) as (keyof UserItem)[];
+    ) as (keyof Item)[];
 
     const lastNameIndexComponents = getIndexComponents(
       entityManager,
-      'user',
       'lastName',
-    ) as (keyof UserItem)[];
+    ) as (keyof Item)[];
 
     lastNameQuery = async (shardedKey, pageKey, pageSize) =>
       await mockDb.query({

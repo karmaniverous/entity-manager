@@ -4,17 +4,12 @@ import { normstr } from '@karmaniverous/string-utilities';
 
 export interface User extends Entity {
   beneficiaryId: string;
-  beneficiaryPK?: never;
   created: number;
   firstNameCanonical: string;
-  firstNameRK?: never;
   lastNameCanonical: string;
-  lastNameRK?: never;
   phone?: string;
-  phoneRK?: never;
   updated: number;
   userId: string;
-  userPK?: never;
 }
 
 export const getUsers = (count = 1, daysFromNow = 0, forDays = 1) => {

@@ -2,7 +2,7 @@ import { type DefaultTranscodeMap } from '@karmaniverous/entity-tools';
 import { expect } from 'chai';
 import { mapValues, pick } from 'radash';
 
-import { entityManager, type UserItem } from '../test/config';
+import { entityManager, type Item } from '../test/config';
 import { getUsers } from '../test/users';
 import { dehydratedPattern } from '../test/util';
 import { addKeys } from './addKeys';
@@ -11,11 +11,11 @@ import { getIndexComponents } from './getIndexComponents';
 import { type PageKeyMap } from './PageKeyMap';
 
 describe('dehydratePageKeyMap', function () {
-  let item: Partial<UserItem>;
-  let item0: Partial<UserItem>;
-  let item1: Partial<UserItem>;
+  let item: Item;
+  let item0: Item;
+  let item1: Item;
 
-  let pageKeyMap: PageKeyMap<UserItem, DefaultTranscodeMap>;
+  let pageKeyMap: PageKeyMap<Item, DefaultTranscodeMap>;
 
   beforeEach(function () {
     [item, item0, item1] = getUsers(3);
@@ -33,15 +33,13 @@ describe('dehydratePageKeyMap', function () {
     beforeEach(function () {
       const firstNameIndexComponents = getIndexComponents(
         entityManager,
-        'user',
         'firstName',
-      ) as (keyof UserItem)[];
+      ) as (keyof Item)[];
 
       const lastNameIndexComponents = getIndexComponents(
         entityManager,
-        'user',
         'lastName',
-      ) as (keyof UserItem)[];
+      ) as (keyof Item)[];
 
       pageKeyMap = {
         firstName: {
@@ -89,9 +87,8 @@ describe('dehydratePageKeyMap', function () {
     beforeEach(function () {
       const userCreatedIndexComponents = getIndexComponents(
         entityManager,
-        'user',
         'userCreated',
-      ) as (keyof UserItem)[];
+      ) as (keyof Item)[];
 
       pageKeyMap = {
         userCreated: {

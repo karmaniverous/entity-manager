@@ -1,6 +1,5 @@
 import {
   type EntityMap,
-  type Exactify,
   isNil,
   type TranscodableProperties,
   type TranscodeMap,
@@ -8,20 +7,18 @@ import {
 
 import type { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
-import { validateEntityGeneratedProperty } from './validateEntityGeneratedProperty';
+import { validateGeneratedProperty } from './validateGeneratedProperty';
 
 /**
- * Encode a generated property value. Returns a string or undefined if atomicity requirement not met.
+ * Encode a generated property value. Returns a string or undefined if atomicity requirement of sharded properties not met.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param entityToken - `entityManager.config.entities` key.
- * @param property - {@link ConfigEntityGenerated | `entityManager.config.entities.<entityToken>.generated`} key.
+ * @param property - {@link Config.generatedProperties | Generated property} key.
  * @param item - Partial {@link ItemMap | `ItemMap`} object.
  *
  * @returns Encoded generated property value.
  *
- * @throws `Error` if `entityToken` is invalid.
- * @throws `Error` if `property` is invalid.
+ * @throws `Error` if `property` is not a {@link Config.generatedProperties | generated property}.
  */
 export function encodeGeneratedProperty<
   M extends EntityMap,
@@ -42,13 +39,12 @@ export function encodeGeneratedProperty<
     TranscodedProperties,
     T
   >,
-  entityToken: keyof Exactify<M> & string,
   property: ShardedKeys | UnshardedKeys,
-  item: Partial<Item>,
+  item: Item,
 ): string | undefined {
   try {
     // Validate params.
-    validateEntityGeneratedProperty(entityManager, entityToken, property);
+    validateGeneratedProperty(entityManager, property);
 
     const sharded =
       property in entityManager.config.generatedProperties.sharded;
@@ -64,7 +60,7 @@ export function encodeGeneratedProperty<
       item[element as keyof Item],
     ]);
 
-    // Validate atomicity requirement.
+    // Return undefined if sharded & atomicity requirement fails.
     if (sharded && elementMap.some(([, value]) => isNil(value))) return;
 
     // Encode property value.
@@ -78,7 +74,6 @@ export function encodeGeneratedProperty<
     ].join(entityManager.config.generatedKeyDelimiter);
 
     entityManager.logger.debug('encoded generated property', {
-      entityToken,
       property,
       item,
       encoded,
@@ -88,7 +83,6 @@ export function encodeGeneratedProperty<
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, {
-        entityToken,
         property,
         item,
       });

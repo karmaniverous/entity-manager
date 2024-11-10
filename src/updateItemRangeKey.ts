@@ -14,14 +14,14 @@ import { validateEntityToken } from './validateEntityToken';
  * Update the range key on a partial {@link ItemMap | `ItemMap`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+ * @param entityToken - {@link Config.entities | `this.config.entities`} key.
  * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param overwrite - Overwrite existing {@link ConfigKeys.rangeKey | `this.config.rangeKey`} property value (default `false`).
  *
  * @returns Shallow clone of `item` with updated range key.
  *
  * @throws `Error` if `entityToken` is invalid.
- * @throws `Error` if `item` {@link ConfigEntity.uniqueProperty | `this.config.entities<entityToken>.uniqueProperty`} property value is missing.
+ * @throws `Error` if `item` {@link Config.uniqueProperty | `this.config.entities<entityToken>.uniqueProperty`} property value is missing.
  */
 export function updateItemRangeKey<
   M extends EntityMap,

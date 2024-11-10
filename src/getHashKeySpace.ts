@@ -1,18 +1,23 @@
-import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
+import type {
+  EntityMap,
+  Exactify,
+  TranscodableProperties,
+  TranscodeMap,
+} from '@karmaniverous/entity-tools';
 import { range } from 'radash';
 
-import type { EntityMap, ItemMap } from './Config';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
+import type { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
-import { validateEntityGeneratedProperty } from './validateEntityGeneratedProperty';
+import { validateGeneratedProperty } from './validateGeneratedProperty';
 
 /**
  * Return an array of {@link ConfigKeys.hashKey | `entityManager.config.hashKey`} property values covering the shard space bounded by `timestampFrom` & `timestampTo`.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
- * @param hashKeyToken - {@link ParsedConfig | `entityManager.config.hashKey`} or {@link ParsedConfig | `entityManager.config.entities.<entityToken>.generated`} key. If a generated property, must be shardable.
- * @param item - Partial {@link ItemMap | `ItemMap[EntityToken]`} object. Must include all properties required to generate the hash key space.
+ * @param entityToken - {@link Config.entities | `entityManager.config.entities`} key.
+ * @param hashKeyToken - {@link ParsedConfig | `entityManager.config.hashKey`} or {@link ParsedConfig | `entityManager.config.generatedProperties.sharded`} key.
+ * @param item - {@link EntityItem | `EntityItem`} object. Must include all properties required to generate the hash key space.
  * @param timestampFrom - Lower timestanp limit. Defaults to `0`.
  * @param timestampTo - Upper timestamp limit. Defaults to `Date.now()`.
  *
@@ -21,27 +26,36 @@ import { validateEntityGeneratedProperty } from './validateEntityGeneratedProper
  * @throws `Error` if `entityToken` is invalid.
  */
 export function getHashKeySpace<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: EntityToken,
-  hashKeyToken: string,
-  item: Partial<Item>,
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >,
+  entityToken: keyof Exactify<M> & string,
+  hashKeyToken: HashKey | ShardedKeys,
+  item: Item,
   timestampFrom = 0,
   timestampTo = Date.now(),
 ): string[] {
   try {
     // Validate hashKeyToken is either the global hash key or a sharded generated property.
     if (hashKeyToken !== entityManager.config.hashKey)
-      validateEntityGeneratedProperty(
+      validateGeneratedProperty(
         entityManager,
-        entityToken,
-        hashKeyToken,
+        hashKeyToken as ShardedKeys,
         true,
       );
 
@@ -75,8 +89,7 @@ export function getHashKeySpace<
         if (hashKeyToken !== entityManager.config.hashKey)
           hashKey = encodeGeneratedProperty(
             entityManager,
-            entityToken,
-            hashKeyToken,
+            hashKeyToken as ShardedKeys,
             {
               ...item,
               [entityManager.config.hashKey]: hashKey,

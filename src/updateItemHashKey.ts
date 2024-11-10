@@ -16,7 +16,7 @@ import { validateEntityToken } from './validateEntityToken';
  * Update the hash key on a partial {@link ItemMap | `ItemMap`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
+ * @param entityToken - {@link Config.entities | `this.config.entities`} key.
  * @param item - Partial {@link ItemMap | `ItemMap`} object.
  * @param overwrite - Overwrite existing {@link ConfigKeys.hashKey | `this.config.hashKey`} property value (default `false`).
  *

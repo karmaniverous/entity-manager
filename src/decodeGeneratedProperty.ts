@@ -1,34 +1,46 @@
-import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
+import type {
+  EntityMap,
+  TranscodableProperties,
+  TranscodeMap,
+} from '@karmaniverous/entity-tools';
 import { objectify } from 'radash';
 
-import type { EntityMap, ItemMap } from './Config';
-import { decodeEntityElement } from './decodeEntityElement';
+import { decodeElement } from './decodeElement';
+import { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
-import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Decode a generated property value. Returns a partial ItemMap.
+ * Decode a generated property value. Returns an {@link EntityItem | `EntityItem`}.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param entityToken - `entityManager.config.entities` key.
  * @param encoded - Encoded generated property value.
  *
- * @returns Partial {@link ItemMap | `ItemMap`} object with updated properties decoded from `encoded`.
+ * @returns {@link EntityItem | `EntityItem`} object with updated properties decoded from `encoded`.
  *
  * @throws `Error` if `entityToken` is invalid.
  */
 export function decodeGeneratedProperty<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: EntityToken,
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >,
   encoded: string,
-): Partial<Item> {
+): Item {
   try {
     const {
       generatedKeyDelimiter,
@@ -37,11 +49,8 @@ export function decodeGeneratedProperty<
       shardKeyDelimiter,
     } = entityManager.config;
 
-    // Validate params.
-    validateEntityToken(entityManager, entityToken);
-
     // Handle degenerate case.
-    if (!encoded) return {};
+    if (!encoded) return {} as Item;
 
     // Split encoded into keys.
     const keys = encoded.split(generatedKeyDelimiter);
@@ -68,25 +77,19 @@ export function decodeGeneratedProperty<
         values,
         ([key]) => key,
         ([key, value]) =>
-          decodeEntityElement(
-            entityManager,
-            entityToken,
-            key as keyof Item & string,
-            value,
-          ),
+          decodeElement(entityManager, key as TranscodedProperties, value),
       ),
     );
 
     entityManager.logger.debug('decoded generated property', {
-      entityToken,
       encoded,
       decoded,
     });
 
-    return decoded as Partial<Item>;
+    return decoded as Item;
   } catch (error) {
     if (error instanceof Error)
-      entityManager.logger.error(error.message, { entityToken, encoded });
+      entityManager.logger.error(error.message, { encoded });
 
     throw error;
   }

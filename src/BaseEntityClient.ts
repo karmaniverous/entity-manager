@@ -14,7 +14,7 @@ export abstract class BaseEntityClient {
   /**
    * DynamoDB EntityClient constructor.
    *
-   * @param options - {@link EntityClientOptions | `EntityClientOptions`} object.
+   * @param options - {@link BaseEntityClientOptions | `BaseEntityClientOptions`} object.
    */
   constructor(options: BaseEntityClientOptions) {
     const { batchProcessOptions = {}, logger = console } = options;

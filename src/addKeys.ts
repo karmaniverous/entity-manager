@@ -1,24 +1,24 @@
 import {
-  EntityMap,
+  type EntityMap,
   type Exactify,
   isNil,
-  TranscodableProperties,
+  type TranscodableProperties,
   type TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
+import type { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
 import { updateItemHashKey } from './updateItemHashKey';
 import { updateItemRangeKey } from './updateItemRangeKey';
 import { validateEntityToken } from './validateEntityToken';
-import { EntityItem } from './EntityItem';
 
 /**
- * Update generated properties, hash key, and range key on an {@link ItemMap | `ItemMap`} object.
+ * Update generated properties, hash key, and range key on an {@link EntityItem | `EntityItem`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param entityToken - {@link ConfigKeys.entities | `this.config.entities`} key.
- * @param item - {@link ItemMap | `ItemMap`} object.
+ * @param entityToken - {@link ConfigEntity.uniqueProperty | `this.config.entities`} key.
+ * @param item - {@link EntityItem | `EntityItem`} object.
  * @param overwrite - Overwrite existing properties (default `false`).
  *
  * @returns Shallow clone of `item` with updated properties.
@@ -69,12 +69,13 @@ export function addKeys<
     );
 
     // Update generated properties.
-    for (const property in entityManager.config.generatedProperties) {
+    const { sharded, unsharded } = entityManager.config.generatedProperties;
+
+    for (const property in { ...sharded, ...unsharded }) {
       if (overwrite || isNil(item[property as keyof Item])) {
         const encoded = encodeGeneratedProperty(
           entityManager,
-          entityToken,
-          property,
+          property as ShardedKeys | UnshardedKeys,
           newItem,
         );
 

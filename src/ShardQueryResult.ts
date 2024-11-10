@@ -15,5 +15,5 @@ export interface ShardQueryResult<Item extends Entity> {
   items: Item[];
 
   /** The page key for the next query on this shard. */
-  pageKey?: Partial<Item>;
+  pageKey?: Item;
 }

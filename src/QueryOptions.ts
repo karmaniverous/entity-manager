@@ -1,29 +1,34 @@
-import type { Exactify, SortOrder } from '@karmaniverous/entity-tools';
+import type {
+  EntityMap,
+  Exactify,
+  SortOrder,
+} from '@karmaniverous/entity-tools';
 
-import type { EntityMap, ItemMap } from './Config';
+import type { EntityItem } from './EntityItem';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { EntityManager } from './EntityManager';
-import { ShardQueryMap } from './ShardQueryMap';
+import type { ShardQueryMap } from './ShardQueryMap';
 
 /**
- * Options passed to the {@link query | `query`} function.
+ * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
  *
  * @category Query
  */
 export interface QueryOptions<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 > {
-  /** Identifies the entity to be queried. Key of {@link Config | `EntityManager.config.entities`}. */
-  entityToken: EntityToken;
+  /** Identifies the entity to be queried. Key of {@link Config | `Config`} `entities`. */
+  entityToken: keyof Exactify<M> & string;
 
   /**
    * Partial item object sufficiently populated to generate index hash keys.
    */
-  item: Partial<Item>;
+  item: Item;
 
   /**
    * The target maximum number of records to be returned by the query across

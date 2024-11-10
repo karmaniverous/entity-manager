@@ -115,10 +115,13 @@ export const configSchema = z
       )
       .optional()
       .default({}),
-    generatedProperties: z.object({
-      sharded: z.record(componentArray).optional().default({}),
-      unsharded: z.record(componentArray).optional().default({}),
-    }),
+    generatedProperties: z
+      .object({
+        sharded: z.record(componentArray).optional().default({}),
+        unsharded: z.record(componentArray).optional().default({}),
+      })
+      .optional()
+      .default({ sharded: {}, unsharded: {} }),
     hashKey: z.string(),
     indexes: z
       .record(
@@ -313,8 +316,12 @@ export const configSchema = z
         });
       }
 
-      // Validate range key is unsharded.
-      if (![data.rangeKey, ...unshardedKeys].includes(rangeKey)) {
+      // Validate range key is unsharded or transcodable.
+      if (
+        ![data.rangeKey, ...unshardedKeys, ...transcodedProperties].includes(
+          rangeKey,
+        )
+      ) {
         ctx.addIssue({
           code: z.ZodIssueCode.invalid_enum_value,
           options: [data.rangeKey, ...unshardedKeys],
@@ -327,9 +334,14 @@ export const configSchema = z
       if (projections)
         for (const projection of projections)
           if (
-            [hashKey, rangeKey, ...shardedKeys, ...unshardedKeys].includes(
-              projection,
-            )
+            [
+              data.hashKey,
+              data.rangeKey,
+              hashKey,
+              rangeKey,
+              ...shardedKeys,
+              ...unshardedKeys,
+            ].includes(projection)
           )
             ctx.addIssue({
               code: z.ZodIssueCode.custom,

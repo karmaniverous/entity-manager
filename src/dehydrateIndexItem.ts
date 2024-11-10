@@ -1,13 +1,19 @@
-import type { Exactify, TranscodeMap } from '@karmaniverous/entity-tools';
+import type {
+  EntityMap,
+  Exactify,
+  TranscodableProperties,
+  TranscodeMap,
+} from '@karmaniverous/entity-tools';
 
-import type { EntityMap, ItemMap } from './Config';
-import { encodeEntityElement } from './encodeEntityElement';
+import { encodeElement } from './encodeElement';
+import type { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
 import { unwrapIndex } from './unwrapIndex';
-import { validateEntityIndexToken } from './validateEntityIndexToken';
+import { validateEntityToken } from './validateEntityToken';
+import { validateIndexToken } from './validateIndexToken';
 
 /**
- * Condense a partial {@link ItemMap | `ItemMap`} object into a delimited string representing the deduped, sorted, ungenerated component elements of an {@link ConfigEntity.indexes | Entity index}.
+ * Condense an {@link EntityItem | `EntityItem`} into a delimited string representing the deduped, sorted, ungenerated component elements of an {@link Config.indexes | index}, leaving out those of the index hash key.
  *
  * @remarks
  * Reverses {@link EntityManager.rehydrateIndexItem | `rehydrateIndexItem`}.
@@ -20,49 +26,57 @@ import { validateEntityIndexToken } from './validateEntityIndexToken';
  * `item` must be populated with all required index component elements!
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param entityToken - {@link ConfigKeys.entities | `entityManager.config.entities`} key.
- * @param indexToken - {@link ConfigEntity.indexes | `entityManager.config.entities.<entityToken>.indexes`} key.
- * @param item - Partial {@link ItemMap | `ItemMap`} object.
+ * @param entityToken - {@link Config.entities | `entityManager.config.entities`} key.
+ * @param indexToken - {@link ConfigEntity.indexes | `entityManager.config.indexes`} key.
+ * @param item - {@link EntityItem | `EntityItem`} object.
  *
  * @returns Dehydrated index value.
  *
- * @throws `Error` if `entityToken` is invalid.
  * @throws `Error` if `indexToken` is invalid.
  */
 export function dehydrateIndexItem<
-  Item extends ItemMap<M, HashKey, RangeKey>[EntityToken],
-  EntityToken extends keyof Exactify<M> & string,
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
+  ShardedKeys extends string,
+  UnshardedKeys extends string,
+  TranscodedProperties extends TranscodableProperties<M, T>,
   T extends TranscodeMap,
+  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(
-  entityManager: EntityManager<M, HashKey, RangeKey, T>,
-  entityToken: EntityToken,
+  entityManager: EntityManager<
+    M,
+    HashKey,
+    RangeKey,
+    ShardedKeys,
+    UnshardedKeys,
+    TranscodedProperties,
+    T
+  >,
+  entityToken: keyof Exactify<M> & string,
   indexToken: string,
-  item: Partial<Item> | undefined,
+  item: Item | undefined,
 ): string {
   try {
-    const { generatedKeyDelimiter } = entityManager.config;
-
     // Validate params.
-    validateEntityIndexToken(entityManager, entityToken, indexToken);
+    validateEntityToken(entityManager, entityToken);
+    validateIndexToken(entityManager, indexToken);
 
     // Handle degenerate case.
     if (!item) return '';
 
     // Unwrap index elements.
-    const { hashKey } =
-      entityManager.config.entities[entityToken].indexes[indexToken];
+    const { hashKey } = entityManager.config.indexes[indexToken];
+
     const elements = unwrapIndex(entityManager, entityToken, indexToken, [
       hashKey,
     ]);
 
     // Join index element values.
+    const { generatedKeyDelimiter } = entityManager.config;
+
     const dehydrated = elements
-      .map((element) =>
-        encodeEntityElement(entityManager, entityToken, element, item),
-      )
+      .map((element) => encodeElement(entityManager, element, item))
       .join(generatedKeyDelimiter);
 
     entityManager.logger.debug('dehydrated index', {

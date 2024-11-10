@@ -3,22 +3,18 @@ import type {
   TranscodableProperties,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
-import { unique } from 'radash';
 
 import { EntityManager } from './EntityManager';
-import { validateIndexToken } from './validateIndexToken';
 
 /**
- * Get the index components of an entity index. Adds the hash and range keys to the index components.
+ * Validate that an entity index is defined in EntityManager config.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param indexToken - {@link Config.indexes | `entityManager.config.indexes`} key.
  *
- * @returns Array of index components.
- *
  * @throws `Error` if `indexToken` is invalid.
  */
-export function getIndexComponents<
+export function validateIndexToken<
   M extends EntityMap,
   HashKey extends string,
   RangeKey extends string,
@@ -37,18 +33,7 @@ export function getIndexComponents<
     T
   >,
   indexToken: string,
-): (HashKey | RangeKey | ShardedKeys | UnshardedKeys | TranscodedProperties)[] {
-  validateIndexToken(entityManager, indexToken);
-
-  const { hashKey, rangeKey, indexes } = entityManager.config;
-  const { hashKey: indexHashKey, rangeKey: indexRangeKey } =
-    indexes[indexToken];
-
-  return unique([hashKey, rangeKey, indexHashKey, indexRangeKey]) as (
-    | HashKey
-    | RangeKey
-    | ShardedKeys
-    | UnshardedKeys
-    | TranscodedProperties
-  )[];
+): void {
+  if (!(indexToken in entityManager.config.indexes))
+    throw new Error('invalid index token');
 }
