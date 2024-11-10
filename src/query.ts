@@ -1,14 +1,11 @@
-import {
-  type EntityMap,
-  sort,
-  type TranscodeMap,
-} from '@karmaniverous/entity-tools';
+import { sort } from '@karmaniverous/entity-tools';
 import lzString from 'lz-string';
 import { isInt, parallel, unique } from 'radash';
 
+import type { BaseConfigMap } from './BaseConfigMap';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
 import type { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager';
 import type { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
@@ -36,29 +33,10 @@ const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
  *
  * @throws Error if {@link QueryOptions.pageKeyMap | `pageKeyMap`} keys do not match {@link QueryOptions.shardQueryMap | `shardQueryMap`} keys.
  */
-export async function query<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  options: QueryOptions<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys, Item>,
-): Promise<
-  QueryResult<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys, Item>
-> {
+export async function query<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  options: QueryOptions<C>,
+): Promise<QueryResult<C>> {
   try {
     // Get defaults.
     const { defaultLimit, defaultPageSize } =
@@ -112,15 +90,7 @@ export async function query<
     let workingResult = {
       items: [],
       pageKeyMap: rehydratedPageKeyMap,
-    } as WorkingQueryResult<
-      M,
-      HashKey,
-      RangeKey,
-      ShardedKeys,
-      UnshardedKeys,
-      T,
-      Item
-    >;
+    } as WorkingQueryResult<C>;
 
     do {
       // TODO: This loop will blow up as shards scale, since at a minimum it will return shardCount * pageSize
@@ -139,11 +109,11 @@ export async function query<
               hashKey,
               pageKey,
             ]),
-        ) as [string, string, Item | undefined][],
+        ) as [string, string, EntityItem<C> | undefined][],
         async ([indexToken, hashKey, pageKey]: [
           string,
           string,
-          Item | undefined,
+          EntityItem<C> | undefined,
         ]) => ({
           indexToken,
           queryResult: await shardQueryMap[indexToken](
@@ -156,26 +126,19 @@ export async function query<
       );
 
       // Reduce shardQueryResults & updateworkingRresult.
-      workingResult = shardQueryResults.reduce<
-        WorkingQueryResult<
-          M,
-          HashKey,
-          RangeKey,
-          ShardedKeys,
-          UnshardedKeys,
-          T,
-          Item
-        >
-      >(({ items, pageKeyMap }, { indexToken, queryResult, hashKey }) => {
-        Object.assign(rehydratedPageKeyMap[indexToken], {
-          [hashKey]: queryResult.pageKey,
-        });
+      workingResult = shardQueryResults.reduce<WorkingQueryResult<C>>(
+        ({ items, pageKeyMap }, { indexToken, queryResult, hashKey }) => {
+          Object.assign(rehydratedPageKeyMap[indexToken], {
+            [hashKey]: queryResult.pageKey,
+          });
 
-        return {
-          items: [...items, ...queryResult.items],
-          pageKeyMap,
-        };
-      }, workingResult);
+          return {
+            items: [...items, ...queryResult.items],
+            pageKeyMap,
+          };
+        },
+        workingResult,
+      );
     } while (
       // Repeat while pages remain & limit is not reached.
       Object.values(workingResult.pageKeyMap).some((indexPageKeys) =>
@@ -190,7 +153,7 @@ export async function query<
         (
           item[
             entityManager.config.entities[entityToken]
-              .uniqueProperty as keyof Item
+              .uniqueProperty as keyof EntityItem<C>
           ] as string | number
         ).toString(),
       ),
@@ -209,7 +172,7 @@ export async function query<
           ),
         ),
       ),
-    } as QueryResult<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys, Item>;
+    } as QueryResult<C>;
 
     entityManager.logger.debug('queried entityToken across shards', {
       options,

@@ -1,11 +1,8 @@
-import {
-  type EntityMap,
-  isNil,
-  type TranscodeMap,
-} from '@karmaniverous/entity-tools';
+import { isNil } from '@karmaniverous/entity-tools';
 
+import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager';
 import { validateGeneratedProperty } from './validateGeneratedProperty';
 
 /**
@@ -19,27 +16,10 @@ import { validateGeneratedProperty } from './validateGeneratedProperty';
  *
  * @throws `Error` if `property` is not a {@link Config.generatedProperties | generated property}.
  */
-export function encodeGeneratedProperty<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  property: ShardedKeys | UnshardedKeys,
-  item: Item,
+export function encodeGeneratedProperty<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  property: C['ShardedKeys'] | C['UnshardedKeys'],
+  item: EntityItem<C>,
 ): string | undefined {
   try {
     // Validate params.
@@ -56,7 +36,7 @@ export function encodeGeneratedProperty<
     // Map elements to [element, value] pairs.
     const elementMap = elements.map((element) => [
       element,
-      item[element as keyof Item],
+      item[element as keyof EntityItem<C>],
     ]);
 
     // Return undefined if sharded & atomicity requirement fails.
@@ -64,7 +44,9 @@ export function encodeGeneratedProperty<
 
     // Encode property value.
     const encoded = [
-      ...(sharded ? [item[entityManager.config.hashKey as keyof Item]] : []),
+      ...(sharded
+        ? [item[entityManager.config.hashKey as keyof EntityItem<C>]]
+        : []),
       ...elementMap.map(([element, value]) =>
         [element, (value ?? '').toString()].join(
           entityManager.config.generatedValueDelimiter,

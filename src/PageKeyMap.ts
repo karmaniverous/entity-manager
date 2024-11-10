@@ -1,7 +1,7 @@
-import type {
-  PartialTranscodable,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
+import type { PartialTranscodable } from '@karmaniverous/entity-tools';
+
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityItem } from './EntityItem';
 
 /**
  * A two-layer map of page keys, used to query the next page of data across a set of indexes and on each shard of a given hash key.
@@ -15,7 +15,10 @@ import type {
  * @typeParam Item - The item type being queried. This will geerally be an {@link ItemMap | `ItemMap`} object.
  * @typeParam T - The {@link TranscodeMap | `TranscodeMap`} identifying property types that can be indexed.
  */
-export type PageKeyMap<
-  Item extends Record<string, unknown>,
-  T extends TranscodeMap,
-> = Record<string, Record<string, PartialTranscodable<Item, T> | undefined>>;
+export type PageKeyMap<C extends BaseConfigMap> = Record<
+  string,
+  Record<
+    string,
+    PartialTranscodable<EntityItem<C>, C['TranscodeMap']> | undefined
+  >
+>;

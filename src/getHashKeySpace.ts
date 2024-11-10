@@ -1,13 +1,10 @@
-import type {
-  EntityMap,
-  Exactify,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
 import { range } from 'radash';
 
+import type { BaseConfigMap } from './BaseConfigMap';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import type { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
 import { validateGeneratedProperty } from './validateGeneratedProperty';
 
 /**
@@ -24,28 +21,11 @@ import { validateGeneratedProperty } from './validateGeneratedProperty';
  *
  * @throws `Error` if `entityToken` is invalid.
  */
-export function getHashKeySpace<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  entityToken: keyof Exactify<M> & string,
-  hashKeyToken: HashKey | ShardedKeys,
-  item: Item,
+export function getHashKeySpace<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  entityToken: EntityToken<C>,
+  hashKeyToken: C['HashKey'] | C['ShardedKeys'],
+  item: EntityItem<C>,
   timestampFrom = 0,
   timestampTo = Date.now(),
 ): string[] {
@@ -54,7 +34,7 @@ export function getHashKeySpace<
     if (hashKeyToken !== entityManager.config.hashKey)
       validateGeneratedProperty(
         entityManager,
-        hashKeyToken as ShardedKeys,
+        hashKeyToken as C['ShardedKeys'],
         true,
       );
 
@@ -88,7 +68,7 @@ export function getHashKeySpace<
         if (hashKeyToken !== entityManager.config.hashKey)
           hashKey = encodeGeneratedProperty(
             entityManager,
-            hashKeyToken as ShardedKeys,
+            hashKeyToken as C['ShardedKeys'],
             {
               ...item,
               [entityManager.config.hashKey]: hashKey,

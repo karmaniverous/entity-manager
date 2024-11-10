@@ -1,12 +1,8 @@
-import type {
-  EntityMap,
-  Exactify,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
-
+import type { BaseConfigMap } from './BaseConfigMap';
 import { encodeElement } from './encodeElement';
 import type { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
 import { unwrapIndex } from './unwrapIndex';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
@@ -33,28 +29,11 @@ import { validateIndexToken } from './validateIndexToken';
  *
  * @throws `Error` if `indexToken` is invalid.
  */
-export function dehydrateIndexItem<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  entityToken: keyof Exactify<M> & string,
+export function dehydrateIndexItem<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  entityToken: EntityToken<C>,
   indexToken: string,
-  item: Item | undefined,
+  item: EntityItem<C> | undefined,
 ): string {
   try {
     // Validate params.

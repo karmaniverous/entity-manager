@@ -1,18 +1,17 @@
-import type { EntityMap, FlattenEntityMap } from '@karmaniverous/entity-tools';
+import type { FlattenEntityMap } from '@karmaniverous/entity-tools';
+
+import type { BaseConfigMap } from './BaseConfigMap';
 
 /**
- * Extracts a database-facing partial item type from an {@link EntityMap} and generated properties, all of which are rendered as `string` values.
+ * Extracts a database-facing partial item type from a {@link BaseConfigMap | `ConfigMap`}.
  *
  * @category Entities
  */
-export type EntityItem<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-> = Partial<
-  FlattenEntityMap<M> &
-    Record<HashKey | RangeKey | ShardedKeys | UnshardedKeys, string>
+export type EntityItem<C extends BaseConfigMap> = Partial<
+  FlattenEntityMap<C['EntityMap']> &
+    Record<
+      C['HashKey'] | C['RangeKey'] | C['ShardedKeys'] | C['UnshardedKeys'],
+      string
+    >
 > &
   Record<string, unknown>;

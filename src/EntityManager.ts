@@ -1,13 +1,8 @@
-import type {
-  DefaultTranscodeMap,
-  EntityMap,
-  Exactify,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
-
 import { addKeys } from './addKeys';
+import type { BaseConfigMap } from './BaseConfigMap';
 import type { Config } from './Config';
 import type { EntityItem } from './EntityItem';
+import type { EntityToken } from './EntityToken';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
@@ -20,15 +15,7 @@ import { removeKeys } from './removeKeys';
  *
  * @category Entity Manager
  */
-export class EntityManager<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap = DefaultTranscodeMap,
-> {
+export class EntityManager<C extends BaseConfigMap> {
   #config: ParsedConfig;
   readonly logger: Pick<Console, 'debug' | 'error'>;
 
@@ -39,15 +26,7 @@ export class EntityManager<
    * @param logger - Logger object (defaults to `console`, must support `debug` & `error` methods).
    */
   constructor(
-    config: Config<
-      M,
-      HashKey,
-      RangeKey,
-      ShardedKeys,
-      UnshardedKeys,
-      TranscodedProperties,
-      T
-    >,
+    config: Config<C>,
     logger: Pick<Console, 'debug' | 'error'> = console,
   ) {
     this.#config = configSchema.parse(config);
@@ -83,13 +62,11 @@ export class EntityManager<
    *
    * @throws `Error` if `entityToken` is invalid.
    */
-  addKeys<
-    Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
-  >(
-    entityToken: keyof Exactify<M> & string,
-    item: Item,
+  addKeys(
+    entityToken: EntityToken<C>,
+    item: EntityItem<C>,
     overwrite = false,
-  ): Item {
+  ): EntityItem<C> {
     return addKeys(this, entityToken, item, overwrite);
   }
 
@@ -103,9 +80,7 @@ export class EntityManager<
    *
    * @throws `Error` if `entityToken` is invalid.
    */
-  removeKeys<
-    Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
-  >(entityToken: keyof Exactify<M> & string, item: Item): Item {
+  removeKeys(entityToken: EntityToken<C>, item: EntityItem<C>): EntityItem<C> {
     return removeKeys(this, entityToken, item);
   }
 
@@ -127,20 +102,7 @@ export class EntityManager<
    *
    * @throws Error if `options` {@link QueryOptions.pageKeyMap | `pageKeyMap`} `pageKeyMap` keys do not match {@link QueryOptions.shardQueryMap | `shardQueryMap`} keys.
    */
-  async query<
-    Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
-  >(
-    options: QueryOptions<
-      M,
-      HashKey,
-      RangeKey,
-      ShardedKeys,
-      UnshardedKeys,
-      Item
-    >,
-  ): Promise<
-    QueryResult<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys, Item>
-  > {
+  async query(options: QueryOptions<C>): Promise<QueryResult<C>> {
     return await query(this, options);
   }
 }

@@ -1,19 +1,7 @@
-import type {
-  MyEntityMap,
-  MyHashKey,
-  MyRangeKey,
-  MyShardedKeys,
-  MyUnshardedKeys,
-} from './Config.test';
+import type { MyConfigMap } from './Config.test';
 import type { EntityItem } from './EntityItem';
 
-export type MyEntityItem = EntityItem<
-  MyEntityMap,
-  MyHashKey,
-  MyRangeKey,
-  MyShardedKeys,
-  MyUnshardedKeys
->;
+export type MyEntityItem = EntityItem<MyConfigMap>;
 
 export type keys = keyof MyEntityItem;
 

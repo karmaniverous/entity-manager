@@ -1,9 +1,9 @@
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
 import { objectify } from 'radash';
 
+import type { BaseConfigMap } from './BaseConfigMap';
 import { decodeElement } from './decodeElement';
-import { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { EntityItem } from './EntityItem';
+import type { EntityManager } from './EntityManager';
 
 /**
  * Decode a generated property value. Returns an {@link EntityItem | `EntityItem`}.
@@ -16,27 +16,10 @@ import { EntityManager } from './EntityManager';
  *
  * @throws `Error` if `entityToken` is invalid.
  */
-export function decodeGeneratedProperty<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
+export function decodeGeneratedProperty<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
   encoded: string,
-): Item {
+): EntityItem<C> {
   try {
     const {
       generatedKeyDelimiter,
@@ -46,7 +29,7 @@ export function decodeGeneratedProperty<
     } = entityManager.config;
 
     // Handle degenerate case.
-    if (!encoded) return {} as Item;
+    if (!encoded) return {} as EntityItem<C>;
 
     // Split encoded into keys.
     const keys = encoded.split(generatedKeyDelimiter);
@@ -73,7 +56,7 @@ export function decodeGeneratedProperty<
         values,
         ([key]) => key,
         ([key, value]) =>
-          decodeElement(entityManager, key as TranscodedProperties, value),
+          decodeElement(entityManager, key as C['TranscodedProperties'], value),
       ),
     );
 
@@ -82,7 +65,7 @@ export function decodeGeneratedProperty<
       decoded,
     });
 
-    return decoded as Item;
+    return decoded as EntityItem<C>;
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, { encoded });

@@ -1,14 +1,10 @@
-import type {
-  EntityMap,
-  Exactify,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
 import { mapValues } from 'radash';
 
-import { BaseEntityClient } from './BaseEntityClient';
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { BaseEntityClient } from './BaseEntityClient';
 import type { BaseQueryBuilderOptions } from './BaseQueryBuilderOptions';
-import type { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
 import type { QueryBuilderQueryOptions } from './QueryBuilderQueryOptions';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 import type { ShardQueryMap } from './ShardQueryMap';
@@ -19,36 +15,21 @@ import type { ShardQueryMap } from './ShardQueryMap';
  * @category QueryBuilder
  */
 export abstract class BaseQueryBuilder<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
-  IndexParams,
+  C extends BaseConfigMap,
   EntityClient extends BaseEntityClient,
+  IndexParams,
 > {
   /** {@link BaseEntityClient | `EntityClient`} instance. */
   public readonly entityClient: EntityClient;
 
   /** {@link EntityManager | `EntityManager`} instance. */
-  public readonly entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >;
+  public readonly entityManager: EntityManager<C>;
 
   /** Entity token. */
-  public readonly entityToken: keyof Exactify<M> & string;
+  public readonly entityToken: EntityToken<C>;
 
   /** Hash key token. */
-  public readonly hashKeyToken: HashKey | ShardedKeys;
+  public readonly hashKeyToken: C['HashKey'] | C['ShardedKeys'];
 
   /** Dehydrated page key map. */
   public readonly pageKeyMap?: string;
@@ -61,18 +42,7 @@ export abstract class BaseQueryBuilder<
   readonly indexParamsMap: Record<string, IndexParams> = {};
 
   /** BaseQueryBuilder constructor. */
-  constructor(
-    options: BaseQueryBuilderOptions<
-      M,
-      HashKey,
-      RangeKey,
-      ShardedKeys,
-      UnshardedKeys,
-      TranscodedProperties,
-      T,
-      EntityClient
-    >,
-  ) {
+  constructor(options: BaseQueryBuilderOptions<C, EntityClient>) {
     const {
       entityClient,
       entityManager,
@@ -90,33 +60,24 @@ export abstract class BaseQueryBuilder<
 
   protected abstract getShardQueryFunction(
     indexToken: string,
-  ): ShardQueryFunction<Item>;
+  ): ShardQueryFunction<C>;
 
   /**
    * Builds a {@link ShardQueryMap | `ShardQueryMap`} object.
    *
    * @returns - The {@link ShardQueryMap | `ShardQueryMap`} object.
    */
-  build(): ShardQueryMap<Item> {
+  build(): ShardQueryMap<C> {
     return mapValues(this.indexParamsMap, (indexConfig, indexToken) =>
       this.getShardQueryFunction(indexToken),
     );
   }
 
-  async query(
-    options: QueryBuilderQueryOptions<
-      M,
-      HashKey,
-      RangeKey,
-      ShardedKeys,
-      UnshardedKeys,
-      Item
-    >,
-  ) {
+  async query(options: QueryBuilderQueryOptions<C>) {
     const { entityManager, entityToken, pageKeyMap } = this;
     const shardQueryMap = this.build();
 
-    return await entityManager.query<Item>({
+    return await entityManager.query({
       ...options,
       entityToken,
       pageKeyMap,

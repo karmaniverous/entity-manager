@@ -1,11 +1,7 @@
-import type {
-  EntityMap,
-  Exactify,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
-
+import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
@@ -19,42 +15,25 @@ import { validateEntityToken } from './validateEntityToken';
  *
  * @throws `Error` if `entityToken` is invalid.
  */
-export function removeKeys<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  entityToken: keyof Exactify<M> & string,
-  item: Item,
-): Item {
+export function removeKeys<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  entityToken: EntityToken<C>,
+  item: EntityItem<C>,
+): EntityItem<C> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
 
     // Delete hash & range keys.
     const newItem = { ...item };
-    delete newItem[entityManager.config.hashKey as keyof Item];
-    delete newItem[entityManager.config.rangeKey as keyof Item];
+    delete newItem[entityManager.config.hashKey as keyof EntityItem<C>];
+    delete newItem[entityManager.config.rangeKey as keyof EntityItem<C>];
 
     // Delete generated properties.
     const { sharded, unsharded } = entityManager.config.generatedProperties;
 
     for (const property in { ...sharded, ...unsharded })
-      delete newItem[property as keyof Item];
+      delete newItem[property as keyof EntityItem<C>];
 
     entityManager.logger.debug('stripped entity item generated properties', {
       entityToken,

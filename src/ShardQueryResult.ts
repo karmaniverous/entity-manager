@@ -1,19 +1,18 @@
-import type { Entity } from '@karmaniverous/entity-tools';
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityItem } from './EntityItem';
 
 /**
  * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
  *
- * @typeParam Item - The {@link Item | `Item`} type being queried. 
-
-* @category Query
+ * @category Query
  */
-export interface ShardQueryResult<Item extends Entity> {
+export interface ShardQueryResult<C extends BaseConfigMap> {
   /** The number of records returned. */
   count: number;
 
   /** The returned records. */
-  items: Item[];
+  items: EntityItem<C>[];
 
   /** The page key for the next query on this shard. */
-  pageKey?: Item;
+  pageKey?: EntityItem<C>;
 }

@@ -1,103 +1,90 @@
 import type {
-  DefaultTranscodeMap,
-  EntityMap,
   Exactify,
   FlattenEntityMap,
-  MutuallyExclusive,
   PropertiesOfType,
   TranscodableProperties,
-  TranscodeMap,
   Transcodes,
 } from '@karmaniverous/entity-tools';
 
+import type { BaseConfigMap } from './BaseConfigMap';
 import type { ConditionalProperty } from './ConditionalProperty';
 import type { ShardBump } from './ShardBump';
 
-export type Config<
-  M extends EntityMap = EntityMap,
-  HashKey extends string = 'hashKey',
-  RangeKey extends string = 'rangeKey',
-  ShardedKeys extends string = never,
-  UnshardedKeys extends string = never,
-  TranscodedProperties extends string = never,
-  T extends TranscodeMap = DefaultTranscodeMap,
-> =
-  MutuallyExclusive<
-    [HashKey, RangeKey, ShardedKeys, UnshardedKeys, keyof FlattenEntityMap<M>]
-  > extends true
-    ? ConditionalProperty<
-        'entities',
-        keyof Exactify<M>,
-        {
-          [E in keyof Exactify<M>]: {
-            defaultLimit?: number;
-            defaultPageSize?: number;
-            shardBumps?: ShardBump[];
-            timestampProperty: TranscodedProperties &
-              PropertiesOfType<M[E], number> &
-              TranscodableProperties<M, T>;
-            uniqueProperty: TranscodedProperties &
-              keyof M[E] &
-              TranscodableProperties<M, T>;
-          };
-        }
-      > &
-        ConditionalProperty<
-          'generatedProperties',
-          ShardedKeys | UnshardedKeys,
-          ConditionalProperty<
-            'sharded',
-            ShardedKeys,
-            Record<
-              ShardedKeys,
-              (TranscodedProperties & TranscodableProperties<M, T>)[]
-            >
-          > &
-            ConditionalProperty<
-              'unsharded',
-              UnshardedKeys,
-              Record<
-                UnshardedKeys,
-                (TranscodedProperties & TranscodableProperties<M, T>)[]
-              >
-            >
-        > &
-        ConditionalProperty<
-          'propertyTranscodes',
-          TranscodedProperties & TranscodableProperties<M, T>,
-          {
-            [P in TranscodedProperties &
-              TranscodableProperties<M, T>]: PropertiesOfType<
-              T,
-              FlattenEntityMap<M>[P]
-            >;
-          }
-        > &
-        ConditionalProperty<'transcodes', keyof T, Transcodes<T>> & {
-          generatedKeyDelimiter?: string;
-          generatedValueDelimiter?: string;
-          hashKey: HashKey;
-          indexes?: Record<
-            string,
-            {
-              hashKey: HashKey | ShardedKeys;
-              rangeKey:
-                | RangeKey
-                | UnshardedKeys
-                | (TranscodedProperties & TranscodableProperties<M, T>);
-              projections?: string[];
-            }
-          >;
-          rangeKey: RangeKey;
-          shardKeyDelimiter?: string;
-          throttle?: number;
-        }
-    : MutuallyExclusive<
-        [
-          HashKey,
-          RangeKey,
-          ShardedKeys,
-          UnshardedKeys,
-          keyof FlattenEntityMap<M>,
-        ]
+export type Config<C extends BaseConfigMap> = ConditionalProperty<
+  'entities',
+  keyof Exactify<C['EntityMap']>,
+  {
+    [E in keyof Exactify<C['EntityMap']>]: {
+      defaultLimit?: number;
+      defaultPageSize?: number;
+      shardBumps?: ShardBump[];
+      timestampProperty: C['TranscodedProperties'] &
+        PropertiesOfType<C['EntityMap'][E], number> &
+        TranscodableProperties<C['EntityMap'], C['TranscodeMap']>;
+      uniqueProperty: C['TranscodedProperties'] &
+        keyof C['EntityMap'][E] &
+        TranscodableProperties<C['EntityMap'], C['TranscodeMap']>;
+    };
+  }
+> &
+  ConditionalProperty<
+    'generatedProperties',
+    C['ShardedKeys'] | C['UnshardedKeys'],
+    ConditionalProperty<
+      'sharded',
+      C['ShardedKeys'],
+      Record<
+        C['ShardedKeys'],
+        (C['TranscodedProperties'] &
+          TranscodableProperties<C['EntityMap'], C['TranscodeMap']>)[]
+      >
+    > &
+      ConditionalProperty<
+        'unsharded',
+        C['UnshardedKeys'],
+        Record<
+          C['UnshardedKeys'],
+          (C['TranscodedProperties'] &
+            TranscodableProperties<C['EntityMap'], C['TranscodeMap']>)[]
+        >
+      >
+  > &
+  ConditionalProperty<
+    'propertyTranscodes',
+    C['TranscodedProperties'] &
+      TranscodableProperties<C['EntityMap'], C['TranscodeMap']>,
+    {
+      [P in C['TranscodedProperties'] &
+        TranscodableProperties<
+          C['EntityMap'],
+          C['TranscodeMap']
+        >]: PropertiesOfType<
+        C['TranscodeMap'],
+        FlattenEntityMap<C['EntityMap']>[P]
       >;
+    }
+  > &
+  ConditionalProperty<
+    'transcodes',
+    keyof C['TranscodeMap'],
+    Transcodes<C['TranscodeMap']>
+  > & {
+    generatedKeyDelimiter?: string;
+    generatedValueDelimiter?: string;
+    hashKey: C['HashKey'];
+    indexes?: Record<
+      string,
+      {
+        hashKey: C['HashKey'] | C['ShardedKeys'];
+        rangeKey:
+          | C['RangeKey']
+          | C['UnshardedKeys']
+          | (C['TranscodedProperties'] &
+              TranscodableProperties<C['EntityMap'], C['TranscodeMap']>);
+        projections?: string[];
+      }
+    >;
+    rangeKey: C['RangeKey'];
+    shardKeyDelimiter?: string;
+    throttle?: number;
+  };

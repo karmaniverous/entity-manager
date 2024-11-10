@@ -4,6 +4,7 @@ import {
   type EntityMap,
 } from '@karmaniverous/entity-tools';
 
+import type { ConfigMap } from '../src/ConfigMap';
 import type { EntityItem } from '../src/EntityItem';
 import { EntityManager } from '../src/EntityManager';
 import type { User } from './users';
@@ -36,14 +37,16 @@ type MyTranscodedProperties =
   | 'updated'
   | 'userId';
 
-export const entityManager = new EntityManager<
-  MyEntityMap,
-  MyHashKey,
-  MyRangeKey,
-  MyShardedKeys,
-  MyUnshardedKeys,
-  MyTranscodedProperties
->({
+type MyConfigMap = ConfigMap<{
+  EntityMap: MyEntityMap;
+  HashKey: MyHashKey;
+  RangeKey: MyRangeKey;
+  ShardedKeys: MyShardedKeys;
+  UnshardedKeys: MyUnshardedKeys;
+  TranscodedProperties: MyTranscodedProperties;
+}>;
+
+export const entityManager = new EntityManager<MyConfigMap>({
   entities: {
     email: {
       timestampProperty: 'created',
@@ -93,10 +96,4 @@ export const entityManager = new EntityManager<
   transcodes: defaultTranscodes,
 });
 
-export type Item = EntityItem<
-  MyEntityMap,
-  MyHashKey,
-  MyRangeKey,
-  MyShardedKeys,
-  MyUnshardedKeys
->;
+export type Item = EntityItem<MyConfigMap>;

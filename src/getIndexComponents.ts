@@ -1,7 +1,7 @@
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
 import { unique } from 'radash';
 
-import { EntityManager } from './EntityManager';
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityManager } from './EntityManager';
 import { validateIndexToken } from './validateIndexToken';
 
 /**
@@ -14,26 +14,16 @@ import { validateIndexToken } from './validateIndexToken';
  *
  * @throws `Error` if `indexToken` is invalid.
  */
-export function getIndexComponents<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
+export function getIndexComponents<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
   indexToken: string,
-): (HashKey | RangeKey | ShardedKeys | UnshardedKeys | TranscodedProperties)[] {
+): (
+  | C['HashKey']
+  | C['RangeKey']
+  | C['ShardedKeys']
+  | C['UnshardedKeys']
+  | C['TranscodedProperties']
+)[] {
   validateIndexToken(entityManager, indexToken);
 
   const { hashKey, rangeKey, indexes } = entityManager.config;
@@ -41,10 +31,10 @@ export function getIndexComponents<
     indexes[indexToken];
 
   return unique([hashKey, rangeKey, indexHashKey, indexRangeKey]) as (
-    | HashKey
-    | RangeKey
-    | ShardedKeys
-    | UnshardedKeys
-    | TranscodedProperties
+    | C['HashKey']
+    | C['RangeKey']
+    | C['ShardedKeys']
+    | C['UnshardedKeys']
+    | C['TranscodedProperties']
   )[];
 }

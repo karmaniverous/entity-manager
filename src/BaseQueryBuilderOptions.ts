@@ -1,11 +1,7 @@
-import type {
-  EntityMap,
-  Exactify,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
-
-import { BaseEntityClient } from './BaseEntityClient';
-import { EntityManager } from './EntityManager';
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { BaseEntityClient } from './BaseEntityClient';
+import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
 
 /**
  * Constructor options for {@link BaseQueryBuilder | `BaseQueryBuilder`}.
@@ -13,34 +9,20 @@ import { EntityManager } from './EntityManager';
  * @category QueryBuilder
  */
 export interface BaseQueryBuilderOptions<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
+  C extends BaseConfigMap,
   EntityClient extends BaseEntityClient,
 > {
   /** {@link BaseEntityClient | `EntityClient`} instance. */
   entityClient: EntityClient;
 
   /** {@link EntityManager | `EntityManager`} instance. */
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >;
+  entityManager: EntityManager<C>;
 
   /** Entity token. */
-  entityToken: keyof Exactify<M> & string;
+  entityToken: EntityToken<C>;
 
   /** Hash key token. */
-  hashKeyToken: HashKey | ShardedKeys;
+  hashKeyToken: C['HashKey'] | C['ShardedKeys'];
 
   /** Dehydrated page key map. */
   pageKeyMap?: string;

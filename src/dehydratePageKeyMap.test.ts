@@ -1,4 +1,3 @@
-import { type DefaultTranscodeMap } from '@karmaniverous/entity-tools';
 import { expect } from 'chai';
 import { mapValues, pick } from 'radash';
 
@@ -6,16 +5,17 @@ import { entityManager, type Item } from '../test/config';
 import { getUsers } from '../test/users';
 import { dehydratedPattern } from '../test/util';
 import { addKeys } from './addKeys';
+import type { MyConfigMap } from './Config.test';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
 import { getIndexComponents } from './getIndexComponents';
-import { type PageKeyMap } from './PageKeyMap';
+import type { PageKeyMap } from './PageKeyMap';
 
 describe('dehydratePageKeyMap', function () {
   let item: Item;
   let item0: Item;
   let item1: Item;
 
-  let pageKeyMap: PageKeyMap<Item, DefaultTranscodeMap>;
+  let pageKeyMap: PageKeyMap<MyConfigMap>;
 
   beforeEach(function () {
     [item, item0, item1] = getUsers(3);

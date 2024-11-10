@@ -1,8 +1,7 @@
-import type { Entity } from '@karmaniverous/entity-tools';
-
+import type { BaseConfigMap } from './BaseConfigMap';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 
-export type ShardQueryMap<Item extends Entity> = Record<
+export type ShardQueryMap<C extends BaseConfigMap> = Record<
   string,
-  ShardQueryFunction<Item>
+  ShardQueryFunction<C>
 >;

@@ -1,10 +1,7 @@
-import {
-  defaultTranscodes,
-  type Entity,
-  type EntityMap,
-} from '@karmaniverous/entity-tools';
+import { defaultTranscodes, type Entity } from '@karmaniverous/entity-tools';
 
 import { type Config } from './Config';
+import type { ConfigMap } from './ConfigMap';
 
 export interface Email extends Entity {
   created: number;
@@ -25,34 +22,28 @@ export interface User extends Entity {
   userId: string;
 }
 
-export interface MyEntityMap extends EntityMap {
-  email: Email;
-  user: User;
-}
-
-export type MyHashKey = 'hashKey';
-export type MyRangeKey = 'rangeKey';
-export type MyShardedKeys = 'beneficiaryHashKey' | 'userHashKey';
-export type MyUnshardedKeys = 'firstNameRangeKey' | 'lastNameRangeKey';
-export type MyTranscodedProperties =
-  | 'beneficiaryId'
-  | 'created'
-  | 'email'
-  | 'firstNameCanonical'
-  | 'lastNameCanonical'
-  | 'phone'
-  | 'updated'
-  | 'userId';
+export type MyConfigMap = ConfigMap<{
+  EntityMap: {
+    email: Email;
+    user: User;
+  };
+  HashKey: 'hashKey';
+  RangeKey: 'rangeKey';
+  ShardedKeys: 'beneficiaryHashKey' | 'userHashKey';
+  UnshardedKeys: 'firstNameRangeKey' | 'lastNameRangeKey';
+  TranscodedProperties:
+    | 'beneficiaryId'
+    | 'created'
+    | 'email'
+    | 'firstNameCanonical'
+    | 'lastNameCanonical'
+    | 'phone'
+    | 'updated'
+    | 'userId';
+}>;
 
 // Create config directly.
-export const myConfig: Config<
-  MyEntityMap,
-  MyHashKey,
-  MyRangeKey,
-  MyShardedKeys,
-  MyUnshardedKeys,
-  MyTranscodedProperties
-> = {
+export const myConfig: Config<MyConfigMap> = {
   entities: {
     email: {
       timestampProperty: 'created',

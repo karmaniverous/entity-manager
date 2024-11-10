@@ -1,6 +1,5 @@
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
-
-import { EntityManager } from './EntityManager';
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityManager } from './EntityManager';
 
 /**
  * Validate that a property is defined as an {@link EntityManager | `EntityManager`} {@link Config.propertyTranscodes | transcoded property}.
@@ -10,25 +9,9 @@ import { EntityManager } from './EntityManager';
  *
  * @throws `Error` if `property` is not a {@link Config.propertyTranscodes | transcoded property}.
  */
-export function validateTranscodedProperty<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  property: TranscodedProperties,
+export function validateTranscodedProperty<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  property: C['TranscodedProperties'],
 ): void {
   if (!(property in entityManager.config.propertyTranscodes))
     throw new Error('invalid transcoded property');

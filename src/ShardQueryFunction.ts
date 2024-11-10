@@ -1,5 +1,5 @@
-import type { Entity } from '@karmaniverous/entity-tools';
-
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityItem } from './EntityItem';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { EntityManager } from './EntityManager';
 import type { ShardQueryResult } from './ShardQueryResult';
@@ -19,8 +19,8 @@ import type { ShardQueryResult } from './ShardQueryResult';
  *
  * @category Query
  */
-export type ShardQueryFunction<Item extends Entity> = (
+export type ShardQueryFunction<C extends BaseConfigMap> = (
   hashKey: string,
-  pageKey?: Item,
+  pageKey?: EntityItem<C>,
   pageSize?: number,
-) => Promise<ShardQueryResult<Item>>;
+) => Promise<ShardQueryResult<C>>;

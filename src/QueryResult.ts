@@ -1,6 +1,5 @@
-import type { EntityMap } from '@karmaniverous/entity-tools';
-
-import { EntityItem } from './EntityItem';
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityItem } from './EntityItem';
 
 /**
  * A result returned by a query across multiple shards, where each shard may
@@ -8,19 +7,12 @@ import { EntityItem } from './EntityItem';
  *
  * @category Query
  */
-export interface QueryResult<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
-> {
+export interface QueryResult<C extends BaseConfigMap> {
   /** Total number of records returned across all shards. */
   count: number;
 
   /** The returned records. */
-  items: Item[];
+  items: EntityItem<C>[];
 
   /**
    * A compressed, two-layer map of page keys, used to query the next page of

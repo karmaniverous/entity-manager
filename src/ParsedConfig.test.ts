@@ -4,7 +4,7 @@ import { defaultTranscodes, type EntityMap } from '@karmaniverous/entity-tools';
 import { expect } from 'chai';
 
 import type { Config } from './Config';
-import type { MyHashKey, MyRangeKey } from './Config.test';
+import type { ConfigMap } from './ConfigMap';
 import { configSchema } from './ParsedConfig';
 
 interface BazBarEntityMap extends EntityMap {
@@ -12,12 +12,14 @@ interface BazBarEntityMap extends EntityMap {
 }
 
 let testConfig: Config<
-  BazBarEntityMap,
-  MyHashKey,
-  MyRangeKey,
-  'shardedProperty',
-  'unshardedProperty',
-  'bar' | 'baz'
+  ConfigMap<{
+    EntityMap: BazBarEntityMap;
+    HashKey: 'hashKey';
+    RangeKey: 'rangeKey';
+    ShardedKeys: 'shardedProperty';
+    UnshardedKeys: 'unshardedProperty';
+    TranscodedProperties: 'bar' | 'baz';
+  }>
 >;
 
 describe('Config', function () {
@@ -45,7 +47,9 @@ describe('Config', function () {
   });
 
   it('should apply config defaults', function () {
-    const config: Config = {
+    const config: Config<
+      ConfigMap<{ HashKey: 'hashKey'; RangeKey: 'rangeKey' }>
+    > = {
       hashKey: 'hashKey',
       rangeKey: 'rangeKey',
       transcodes: defaultTranscodes,

@@ -25,6 +25,7 @@ export default tseslint.config(
       tsdoc: tsDocPlugin,
     },
     rules: {
+      '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-confusing-void-expression': 'off',
       '@typescript-eslint/no-dynamic-delete': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',

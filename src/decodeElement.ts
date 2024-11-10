@@ -1,7 +1,6 @@
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
-
-import { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityItem } from './EntityItem';
+import type { EntityManager } from './EntityManager';
 import { validateTranscodedProperty } from './validateTranscodedProperty';
 
 /**
@@ -19,28 +18,11 @@ import { validateTranscodedProperty } from './validateTranscodedProperty';
  *
  * @throws `Error` if `entityToken` is invalid.
  */
-export function decodeElement<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  element: TranscodedProperties,
+export function decodeElement<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  element: C['TranscodedProperties'],
   value: string | undefined,
-): Item[TranscodedProperties] | undefined {
+): EntityItem<C>[C['TranscodedProperties']] | undefined {
   try {
     // Validate params.
     validateTranscodedProperty(entityManager, element);
@@ -51,7 +33,7 @@ export function decodeElement<
 
     const decoded = transcodes[propertyTranscodes[element]].decode(
       value,
-    ) as Item[TranscodedProperties];
+    ) as EntityItem<C>[C['TranscodedProperties']];
 
     entityManager.logger.debug('decoded entity element', {
       element,

@@ -1,6 +1,5 @@
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
-
-import { EntityManager } from './EntityManager';
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityManager } from './EntityManager';
 
 /**
  * Validate that a property is defined as an {@link EntityManager | `EntityManager`} {@link Config.generatedProperties | generated property}.
@@ -12,25 +11,9 @@ import { EntityManager } from './EntityManager';
  * @throws `Error` if `property` is not a {@link Config.generatedProperties | generated property}.
  * @throws `Error` if `sharded` is specified & does not match {@link Config.generatedProperties | generated property} type.
  */
-export function validateGeneratedProperty<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  property: ShardedKeys | UnshardedKeys,
+export function validateGeneratedProperty<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  property: C['ShardedKeys'] | C['UnshardedKeys'],
   isSharded?: boolean,
 ): void {
   const { sharded, unsharded } = entityManager.config.generatedProperties;

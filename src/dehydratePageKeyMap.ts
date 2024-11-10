@@ -1,13 +1,9 @@
-import type {
-  EntityMap,
-  Exactify,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
-
+import type { BaseConfigMap } from './BaseConfigMap';
 import { decodeGeneratedProperty } from './decodeGeneratedProperty';
 import { dehydrateIndexItem } from './dehydrateIndexItem';
 import type { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
 import type { PageKeyMap } from './PageKeyMap';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
@@ -31,27 +27,10 @@ import { validateIndexToken } from './validateIndexToken';
  *
  * An empty returned array indicates all page keys are `undefined`.
  */
-export function dehydratePageKeyMap<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  entityToken: keyof Exactify<M> & string,
-  pageKeyMap: PageKeyMap<Item, T>,
+export function dehydratePageKeyMap<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  entityToken: EntityToken<C>,
+  pageKeyMap: PageKeyMap<C>,
 ): string[] {
   try {
     // Validate params.
@@ -105,7 +84,7 @@ export function dehydratePageKeyMap<
             return item;
           },
           // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter
-          {} as Item,
+          {} as EntityItem<C>,
         );
 
         // Dehydrate index from item.

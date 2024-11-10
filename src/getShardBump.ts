@@ -1,10 +1,6 @@
-import type {
-  EntityMap,
-  Exactify,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
-
-import { EntityManager } from './EntityManager';
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
 import type { ShardBump } from './ShardBump';
 import { validateEntityToken } from './validateEntityToken';
 
@@ -19,25 +15,9 @@ import { validateEntityToken } from './validateEntityToken';
  *
  * @throws `Error` if `entityToken` is invalid.
  */
-export function getShardBump<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  entityToken: keyof Exactify<M> & string,
+export function getShardBump<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  entityToken: EntityToken<C>,
   timestamp: number,
 ): ShardBump {
   // Validate params.

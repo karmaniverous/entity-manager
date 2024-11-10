@@ -1,7 +1,6 @@
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
-
+import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager';
 
 /**
  * Encode an {@link EntityItem | `EntityItem`} generated property element or ungenerated index component using the associated {@link Transcodes | Transcodes} `encode` function.
@@ -18,27 +17,10 @@ import { EntityManager } from './EntityManager';
  *
  * @throws `Error` if `entityToken` is invalid.
  */
-export function encodeElement<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  element: HashKey | RangeKey | TranscodedProperties,
-  item: Item,
+export function encodeElement<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  element: C['HashKey'] | C['RangeKey'] | C['TranscodedProperties'],
+  item: EntityItem<C>,
 ): string | undefined {
   try {
     const { hashKey, rangeKey, propertyTranscodes, transcodes } =

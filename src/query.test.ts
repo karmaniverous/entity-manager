@@ -6,6 +6,7 @@ import { expect } from 'chai';
 import { day, entityManager, type Item, now } from '../test/config';
 import { getUsers } from '../test/users';
 import { addKeys } from './addKeys';
+import type { MyConfigMap } from './Config.test';
 import { getIndexComponents } from './getIndexComponents';
 import { query } from './query';
 import type { ShardQueryFunction } from './ShardQueryFunction';
@@ -13,8 +14,8 @@ import type { ShardQueryFunction } from './ShardQueryFunction';
 describe('query', function () {
   let users: Item[];
   let mockDb: MockDb<Item>;
-  let lastNameQuery: ShardQueryFunction<Item>;
-  let firstNameQuery: ShardQueryFunction<Item>;
+  let lastNameQuery: ShardQueryFunction<MyConfigMap>;
+  let firstNameQuery: ShardQueryFunction<MyConfigMap>;
 
   before(function () {
     users = getUsers(1000, 0, 2).map((user) =>

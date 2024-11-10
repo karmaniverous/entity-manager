@@ -1,13 +1,10 @@
-import type {
-  EntityMap,
-  Exactify,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
 import { shake, zipToObject } from 'radash';
 
+import type { BaseConfigMap } from './BaseConfigMap';
 import { decodeElement } from './decodeElement';
 import type { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
 import { unwrapIndex } from './unwrapIndex';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
@@ -30,29 +27,12 @@ import { validateIndexToken } from './validateIndexToken';
  * @throws `Error` if `entityToken` is invalid.
  * @throws `Error` if `indexToken` is invalid.
  */
-export function rehydrateIndexItem<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  entityToken: keyof Exactify<M> & string,
+export function rehydrateIndexItem<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  entityToken: EntityToken<C>,
   indexToken: string,
   dehydrated: string,
-): Item {
+): EntityItem<C> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -81,7 +61,7 @@ export function rehydrateIndexItem<
           decodeElement(entityManager, elements[i], value),
         ),
       ),
-    ) as Item;
+    ) as EntityItem<C>;
 
     entityManager.logger.debug('rehydrated index', {
       entityToken,

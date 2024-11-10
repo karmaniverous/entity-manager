@@ -1,13 +1,10 @@
-import {
-  type EntityMap,
-  type Exactify,
-  isNil,
-  type TranscodeMap,
-} from '@karmaniverous/entity-tools';
+import { isNil } from '@karmaniverous/entity-tools';
 import stringHash from 'string-hash';
 
+import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
-import { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
 import { getShardBump } from './getShardBump';
 import { validateEntityToken } from './validateEntityToken';
 
@@ -23,35 +20,21 @@ import { validateEntityToken } from './validateEntityToken';
  *
  * @throws `Error` if `entityToken` is invalid.
  */
-export function updateItemHashKey<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  entityToken: keyof Exactify<M> & string,
-  item: Item,
+export function updateItemHashKey<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  entityToken: EntityToken<C>,
+  item: EntityItem<C>,
   overwrite = false,
-): Item {
+): EntityItem<C> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
 
     // Return current item if hashKey exists and overwrite is false.
-    if (item[entityManager.config.hashKey as keyof Item] && !overwrite) {
+    if (
+      item[entityManager.config.hashKey as keyof EntityItem<C>] &&
+      !overwrite
+    ) {
       entityManager.logger.debug(
         'did not overwrite existing entity item hash key',
         {
@@ -66,7 +49,8 @@ export function updateItemHashKey<
 
     // Get item timestamp property & validate.
     const timestamp: number = item[
-      entityManager.config.entities[entityToken].timestampProperty as keyof Item
+      entityManager.config.entities[entityToken]
+        .timestampProperty as keyof EntityItem<C>
     ] as unknown as number;
 
     if (isNil(timestamp)) throw new Error(`missing item timestamp property`);
@@ -88,7 +72,7 @@ export function updateItemHashKey<
       const uniqueId =
         item[
           entityManager.config.entities[entityToken]
-            .uniqueProperty as keyof Item
+            .uniqueProperty as keyof EntityItem<C>
         ];
 
       if (isNil(uniqueId)) throw new Error(`missing item unique property`);

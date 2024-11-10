@@ -1,12 +1,10 @@
-import type {
-  EntityMap,
-  Exactify,
-  SortOrder,
-} from '@karmaniverous/entity-tools';
+import type { SortOrder } from '@karmaniverous/entity-tools';
 
+import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
 import type { ShardQueryMap } from './ShardQueryMap';
 
 /**
@@ -14,21 +12,14 @@ import type { ShardQueryMap } from './ShardQueryMap';
  *
  * @category Query
  */
-export interface QueryOptions<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
-> {
+export interface QueryOptions<C extends BaseConfigMap> {
   /** Identifies the entity to be queried. Key of {@link Config | `Config`} `entities`. */
-  entityToken: keyof Exactify<M> & string;
+  entityToken: EntityToken<C>;
 
   /**
    * Partial item object sufficiently populated to generate index hash keys.
    */
-  item: Item;
+  item: EntityItem<C>;
 
   /**
    * The target maximum number of records to be returned by the query across
@@ -64,12 +55,12 @@ export interface QueryOptions<
    * page key, e.g. to match the same string against `firstName` and `lastName`
    * properties without performing a table scan for either.
    */
-  shardQueryMap: ShardQueryMap<Item>;
+  shardQueryMap: ShardQueryMap<C>;
 
   /**
    * A {@link SortOrder | `SortOrder`} object specifying the sort order of the result set. Defaults to `[]`.
    */
-  sortOrder?: SortOrder<Item>;
+  sortOrder?: SortOrder<EntityItem<C>>;
 
   /**
    * Lower limit to query shard space.

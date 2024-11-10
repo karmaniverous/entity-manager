@@ -1,11 +1,8 @@
-import type {
-  EntityMap,
-  Exactify,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
 import { unique } from 'radash';
 
-import { EntityManager } from './EntityManager';
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
 import { getIndexComponents } from './getIndexComponents';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
@@ -23,28 +20,12 @@ import { validateIndexToken } from './validateIndexToken';
  * @throws `Error` if `entityToken` is invalid.
  * @throws `Error` if `indexToken` is invalid.
  */
-export function unwrapIndex<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
-  entityToken: keyof Exactify<M> & string,
+export function unwrapIndex<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
+  entityToken: EntityToken<C>,
   indexToken: string,
   omit: string[] = [],
-): TranscodedProperties[] {
+): C['TranscodedProperties'][] {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -68,7 +49,7 @@ export function unwrapIndex<
         )
         .flat()
         .filter((element) => !omit.includes(element)),
-    ).sort() as TranscodedProperties[];
+    ).sort() as C['TranscodedProperties'][];
 
     entityManager.logger.debug('unwrapped index', {
       entityToken,

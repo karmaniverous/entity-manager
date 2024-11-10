@@ -1,6 +1,5 @@
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
-
-import { EntityManager } from './EntityManager';
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityManager } from './EntityManager';
 
 /**
  * Validate that an entity index is defined in EntityManager config.
@@ -10,24 +9,8 @@ import { EntityManager } from './EntityManager';
  *
  * @throws `Error` if `indexToken` is invalid.
  */
-export function validateIndexToken<
-  M extends EntityMap,
-  HashKey extends string,
-  RangeKey extends string,
-  ShardedKeys extends string,
-  UnshardedKeys extends string,
-  TranscodedProperties extends string,
-  T extends TranscodeMap,
->(
-  entityManager: EntityManager<
-    M,
-    HashKey,
-    RangeKey,
-    ShardedKeys,
-    UnshardedKeys,
-    TranscodedProperties,
-    T
-  >,
+export function validateIndexToken<C extends BaseConfigMap>(
+  entityManager: EntityManager<C>,
   indexToken: string,
 ): void {
   if (!(indexToken in entityManager.config.indexes))
