@@ -19,7 +19,7 @@ export type Config<
   RangeKey extends string = 'rangeKey',
   ShardedKeys extends string = never,
   UnshardedKeys extends string = never,
-  TranscodedProperties extends TranscodableProperties<M, T> = never,
+  TranscodedProperties extends string = never,
   T extends TranscodeMap = DefaultTranscodeMap,
 > =
   MutuallyExclusive<
@@ -34,8 +34,11 @@ export type Config<
             defaultPageSize?: number;
             shardBumps?: ShardBump[];
             timestampProperty: TranscodedProperties &
-              PropertiesOfType<M[E], number>;
-            uniqueProperty: TranscodedProperties & keyof M[E];
+              PropertiesOfType<M[E], number> &
+              TranscodableProperties<M, T>;
+            uniqueProperty: TranscodedProperties &
+              keyof M[E] &
+              TranscodableProperties<M, T>;
           };
         }
       > &
@@ -45,19 +48,26 @@ export type Config<
           ConditionalProperty<
             'sharded',
             ShardedKeys,
-            Record<ShardedKeys, TranscodedProperties[]>
+            Record<
+              ShardedKeys,
+              (TranscodedProperties & TranscodableProperties<M, T>)[]
+            >
           > &
             ConditionalProperty<
               'unsharded',
               UnshardedKeys,
-              Record<UnshardedKeys, TranscodedProperties[]>
+              Record<
+                UnshardedKeys,
+                (TranscodedProperties & TranscodableProperties<M, T>)[]
+              >
             >
         > &
         ConditionalProperty<
           'propertyTranscodes',
-          TranscodedProperties,
+          TranscodedProperties & TranscodableProperties<M, T>,
           {
-            [P in TranscodedProperties]: PropertiesOfType<
+            [P in TranscodedProperties &
+              TranscodableProperties<M, T>]: PropertiesOfType<
               T,
               FlattenEntityMap<M>[P]
             >;
@@ -71,7 +81,10 @@ export type Config<
             string,
             {
               hashKey: HashKey | ShardedKeys;
-              rangeKey: RangeKey | UnshardedKeys | TranscodedProperties;
+              rangeKey:
+                | RangeKey
+                | UnshardedKeys
+                | (TranscodedProperties & TranscodableProperties<M, T>);
               projections?: string[];
             }
           >;
