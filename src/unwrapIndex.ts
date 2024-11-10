@@ -1,7 +1,6 @@
 import type {
   EntityMap,
   Exactify,
-  TranscodableProperties,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 import { unique } from 'radash';
@@ -30,7 +29,7 @@ export function unwrapIndex<
   RangeKey extends string,
   ShardedKeys extends string,
   UnshardedKeys extends string,
-  TranscodedProperties extends TranscodableProperties<M, T>,
+  TranscodedProperties extends string,
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<

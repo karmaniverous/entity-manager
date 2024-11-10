@@ -1,7 +1,6 @@
 import type {
   EntityMap,
   Exactify,
-  TranscodableProperties,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 import { mapValues } from 'radash';
@@ -25,7 +24,7 @@ export abstract class BaseQueryBuilder<
   RangeKey extends string,
   ShardedKeys extends string,
   UnshardedKeys extends string,
-  TranscodedProperties extends TranscodableProperties<M, T>,
+  TranscodedProperties extends string,
   T extends TranscodeMap,
   Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
   IndexParams,

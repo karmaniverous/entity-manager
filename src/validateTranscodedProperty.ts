@@ -1,8 +1,4 @@
-import type {
-  EntityMap,
-  TranscodableProperties,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
+import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import { EntityManager } from './EntityManager';
 
@@ -20,7 +16,7 @@ export function validateTranscodedProperty<
   RangeKey extends string,
   ShardedKeys extends string,
   UnshardedKeys extends string,
-  TranscodedProperties extends TranscodableProperties<M, T>,
+  TranscodedProperties extends string,
   T extends TranscodeMap,
 >(
   entityManager: EntityManager<

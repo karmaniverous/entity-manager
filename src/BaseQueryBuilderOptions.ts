@@ -1,7 +1,6 @@
 import type {
   EntityMap,
   Exactify,
-  TranscodableProperties,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
@@ -19,7 +18,7 @@ export interface BaseQueryBuilderOptions<
   RangeKey extends string,
   ShardedKeys extends string,
   UnshardedKeys extends string,
-  TranscodedProperties extends TranscodableProperties<M, T>,
+  TranscodedProperties extends string,
   T extends TranscodeMap,
   EntityClient extends BaseEntityClient,
 > {

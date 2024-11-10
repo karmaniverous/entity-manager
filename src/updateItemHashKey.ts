@@ -2,7 +2,6 @@ import {
   type EntityMap,
   type Exactify,
   isNil,
-  type TranscodableProperties,
   type TranscodeMap,
 } from '@karmaniverous/entity-tools';
 import stringHash from 'string-hash';
@@ -30,7 +29,7 @@ export function updateItemHashKey<
   RangeKey extends string,
   ShardedKeys extends string,
   UnshardedKeys extends string,
-  TranscodedProperties extends TranscodableProperties<M, T>,
+  TranscodedProperties extends string,
   T extends TranscodeMap,
   Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(

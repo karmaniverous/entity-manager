@@ -2,7 +2,6 @@ import type {
   DefaultTranscodeMap,
   EntityMap,
   Exactify,
-  TranscodableProperties,
   TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
@@ -27,7 +26,7 @@ export class EntityManager<
   RangeKey extends string,
   ShardedKeys extends string,
   UnshardedKeys extends string,
-  TranscodedProperties extends TranscodableProperties<M, T>,
+  TranscodedProperties extends string,
   T extends TranscodeMap = DefaultTranscodeMap,
 > {
   #config: ParsedConfig;

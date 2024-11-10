@@ -1,7 +1,6 @@
 import {
   type EntityMap,
   isNil,
-  type TranscodableProperties,
   type TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
@@ -26,7 +25,7 @@ export function encodeGeneratedProperty<
   RangeKey extends string,
   ShardedKeys extends string,
   UnshardedKeys extends string,
-  TranscodedProperties extends TranscodableProperties<M, T>,
+  TranscodedProperties extends string,
   T extends TranscodeMap,
   Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(

@@ -1,8 +1,4 @@
-import type {
-  EntityMap,
-  TranscodableProperties,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
+import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
 import { objectify } from 'radash';
 
 import { decodeElement } from './decodeElement';
@@ -26,7 +22,7 @@ export function decodeGeneratedProperty<
   RangeKey extends string,
   ShardedKeys extends string,
   UnshardedKeys extends string,
-  TranscodedProperties extends TranscodableProperties<M, T>,
+  TranscodedProperties extends string,
   T extends TranscodeMap,
   Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(

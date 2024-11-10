@@ -1,8 +1,4 @@
-import type {
-  EntityMap,
-  TranscodableProperties,
-  TranscodeMap,
-} from '@karmaniverous/entity-tools';
+import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import { EntityItem } from './EntityItem';
 import { EntityManager } from './EntityManager';
@@ -29,7 +25,7 @@ export function decodeElement<
   RangeKey extends string,
   ShardedKeys extends string,
   UnshardedKeys extends string,
-  TranscodedProperties extends TranscodableProperties<M, T>,
+  TranscodedProperties extends string,
   T extends TranscodeMap,
   Item extends EntityItem<M, HashKey, RangeKey, ShardedKeys, UnshardedKeys>,
 >(
