@@ -3,6 +3,7 @@ import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
+import type { PageKey } from './PageKey';
 
 /**
  * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
@@ -20,5 +21,5 @@ export interface ShardQueryResult<C extends BaseConfigMap> {
   items: EntityItem<C>[];
 
   /** The page key for the next query on this shard. */
-  pageKey?: EntityItem<C>;
+  pageKey?: PageKey<C>;
 }
