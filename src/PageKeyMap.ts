@@ -1,5 +1,5 @@
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
+import type { PageKey } from './PageKey';
 
 /**
  * A two-layer map of page keys, used to query the next page of data across a set of indexes and on each shard of a given hash key.
@@ -17,16 +17,5 @@ import type { EntityItem } from './EntityItem';
  */
 export type PageKeyMap<C extends BaseConfigMap> = Record<
   string,
-  Record<
-    string,
-    | Pick<
-        EntityItem<C>,
-        | C['HashKey']
-        | C['RangeKey']
-        | C['ShardedKeys']
-        | C['UnshardedKeys']
-        | C['TranscodedProperties']
-      >
-    | undefined
-  >
+  Record<string, PageKey<C> | undefined>
 >;

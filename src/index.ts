@@ -11,6 +11,7 @@ export type { ConfigMap } from './ConfigMap';
 export type { EntityItem } from './EntityItem';
 export { EntityManager } from './EntityManager';
 export type { EntityToken } from './EntityToken';
+export type { PageKey } from './PageKey';
 export type { ParsedConfig } from './ParsedConfig';
 export type { QueryBuilderQueryOptions } from './QueryBuilderQueryOptions';
 export type { QueryOptions } from './QueryOptions';
