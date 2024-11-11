@@ -3,15 +3,21 @@
   "defaultCategory": "Entity Manager",
   "entryPoints": ["./src/index.ts"],
   "externalSymbolLinkMappings": {
+    "@karmaniverous/batch-process": {
+      "BatchProcessOptions": "https://docs.karmanivero.us/batch-process/interfaces/batch_process.BatchProcessOptions.html"
+    },
     "@karmaniverous/entity-tools": {
+      "ConditionalProperty": "https://docs.karmanivero.us/entity-tools/interfaces/entity_tools.ConditionalProperty.html",
       "DefaultTranscodeMap": "https://docs.karmanivero.us/entity-tools/interfaces/entity_tools.DefaultTranscodeMap.html",
       "defaultTranscodes": "https://docs.karmanivero.us/entity-tools/variables/entity_tools.defaultTranscodes.html",
       "Entity": "https://docs.karmanivero.us/entity-tools/types/entity_tools.Entity.html",
       "EntityMap": "https://docs.karmanivero.us/entity-tools/types/entity_tools.EntityMap.html",
       "Exactify": "https://docs.karmanivero.us/entity-tools/types/entity_tools.Exactify.html",
+      "FlattenEntityMap": "https://docs.karmanivero.us/entity-tools/types/entity_tools.FlattenEntityMap.html",
       "isNil": "https://docs.karmanivero.us/entity-tools/functions/entity_tools.isNil.html",
+      "MutuallyExclusive": "https://docs.karmanivero.us/entity-tools/types/entity_tools.MutuallyExclusive.html",
       "Nil": "https://docs.karmanivero.us/entity-tools/types/entity_tools.Nil.html",
-      "PartialTranscodable": "https://docs.karmanivero.us/entity-tools/types/entity_tools.PartialTranscodable.html",
+      "NotNever": "https://docs.karmanivero.us/entity-tools/types/entity_tools.NotNever.html",
       "PropertiesNotOfType": "https://docs.karmanivero.us/entity-tools/types/entity_tools.PropertiesNotOfType.html",
       "PropertiesOfType": "https://docs.karmanivero.us/entity-tools/types/entity_tools.PropertiesOfType.html",
       "SortOrder": "https://docs.karmanivero.us/entity-tools/types/entity_tools.SortOrder.html",
