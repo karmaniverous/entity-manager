@@ -23,7 +23,7 @@ import { removeKeys } from './removeKeys';
  *
  * @category EntityManager
  */
-export class EntityManager<C extends BaseConfigMap = BaseConfigMap> {
+export class EntityManager<C extends BaseConfigMap> {
   #config: ParsedConfig;
   readonly logger: Pick<Console, 'debug' | 'error'>;
 
