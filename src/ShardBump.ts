@@ -1,7 +1,7 @@
 /**
  * Defines a single time period in an entity sharding strategy.
  *
- * @category Config
+ * @category EntityManager
  * @protected
  */
 export interface ShardBump {

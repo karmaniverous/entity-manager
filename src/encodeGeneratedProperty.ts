@@ -28,16 +28,12 @@ export function encodeGeneratedProperty<C extends BaseConfigMap>(
     const sharded =
       property in entityManager.config.generatedProperties.sharded;
 
-    const elements =
-      entityManager.config.generatedProperties[
-        sharded ? 'sharded' : 'unsharded'
-      ][property];
+    const elements = entityManager.config.generatedProperties[
+      sharded ? 'sharded' : 'unsharded'
+    ][property] as C['TranscodedProperties'][];
 
     // Map elements to [element, value] pairs.
-    const elementMap = elements.map((element) => [
-      element,
-      item[element as keyof EntityItem<C>],
-    ]);
+    const elementMap = elements.map((element) => [element, item[element]]);
 
     // Return undefined if sharded & atomicity requirement fails.
     if (sharded && elementMap.some(([, value]) => isNil(value))) return;

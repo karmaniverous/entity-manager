@@ -27,8 +27,6 @@ export type MyConfigMap = ConfigMap<{
     email: Email;
     user: User;
   };
-  HashKey: 'hashKey';
-  RangeKey: 'rangeKey';
   ShardedKeys: 'beneficiaryHashKey' | 'userHashKey';
   UnshardedKeys: 'firstNameRangeKey' | 'lastNameRangeKey';
   TranscodedProperties:

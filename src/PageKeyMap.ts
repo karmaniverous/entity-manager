@@ -1,5 +1,3 @@
-import type { PartialTranscodable } from '@karmaniverous/entity-tools';
-
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
 
@@ -12,13 +10,23 @@ import type { EntityItem } from './EntityItem';
  *
  * The values of the inner object are the page key objects returned by the previous database query on the related index & shard. An `undefined` value indicates that there are no more pages to query for that index & shard.
  *
- * @typeParam Item - The item type being queried. This will geerally be an {@link ItemMap | `ItemMap`} object.
- * @typeParam T - The {@link TranscodeMap | `TranscodeMap`} identifying property types that can be indexed.
+ * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeMap | `TranscodeMap`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ *
+ * @category QueryBuilder
+ * @protected
  */
 export type PageKeyMap<C extends BaseConfigMap> = Record<
   string,
   Record<
     string,
-    PartialTranscodable<EntityItem<C>, C['TranscodeMap']> | undefined
+    | Pick<
+        EntityItem<C>,
+        | C['HashKey']
+        | C['RangeKey']
+        | C['ShardedKeys']
+        | C['UnshardedKeys']
+        | C['TranscodedProperties']
+      >
+    | undefined
   >
 >;

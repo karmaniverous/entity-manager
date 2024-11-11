@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
+
 import { addKeys } from './addKeys';
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { Config } from './Config';
@@ -13,9 +16,14 @@ import { removeKeys } from './removeKeys';
  * The EntityManager class applies a configuration-driven sharded data model &
  * query strategy to NoSql data.
  *
- * @category Entity Manager
+ * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines the configuration's {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeMap | `TranscodeMap`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ *
+ * @remarks
+ * While the {@link EntityManager.query | `query`} method is `public`, normally it should not be called directly. The `query` method is used by a platform-specific {@link BaseQueryBuilder.query | `QueryBuilder.query`} method to provide a fluent query API.
+ *
+ * @category EntityManager
  */
-export class EntityManager<C extends BaseConfigMap> {
+export class EntityManager<C extends BaseConfigMap = BaseConfigMap> {
   #config: ParsedConfig;
   readonly logger: Pick<Console, 'debug' | 'error'>;
 
@@ -96,11 +104,15 @@ export class EntityManager<C extends BaseConfigMap> {
    *
    * Unsharded query results should sort & page as expected.
    *
+   * **Normally this method should not be called directly!** It is used by a platform-specific {@link BaseQueryBuilder.query | `QueryBuilder.query`} method to provide a fluent query API.
+   *
    * @param options - {@link QueryOptions | `QueryOptions`} object.
    *
    * @returns {@link QueryResult} object.
    *
    * @throws Error if `options` {@link QueryOptions.pageKeyMap | `pageKeyMap`} `pageKeyMap` keys do not match {@link QueryOptions.shardQueryMap | `shardQueryMap`} keys.
+   *
+   * @protected
    */
   async query(options: QueryOptions<C>): Promise<QueryResult<C>> {
     return await query(this, options);

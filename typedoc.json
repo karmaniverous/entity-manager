@@ -56,7 +56,6 @@
   "searchInDocuments": true,
   "titleLink": "https://github.com/karmaniverous/entity-manager",
   "visibilityFilters": {
-    "external": false,
     "protected": false
   }
 }

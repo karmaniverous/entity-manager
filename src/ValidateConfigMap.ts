@@ -1,32 +1,44 @@
 import type {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  EntityMap,
   FlattenEntityMap,
   MutuallyExclusive,
   NotNever,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  TranscodeMap,
 } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 
-export type ValidateConfigMap<M extends BaseConfigMap> =
+/**
+ * Validates a type derived from {@link BaseConfigMap | `BaseConfigMap`} to ensure HashKey and RangeKey are both defined and that all sets of special keys are mutually exclusive.
+ *
+ * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeMap | `TranscodeMap`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ *
+ * @category EntityManager
+ * @protected
+ */
+export type ValidateConfigMap<C extends BaseConfigMap> =
   MutuallyExclusive<
     [
-      M['HashKey'],
-      M['RangeKey'],
-      M['ShardedKeys'],
-      M['UnshardedKeys'],
-      keyof FlattenEntityMap<M['EntityMap']>,
+      C['HashKey'],
+      C['RangeKey'],
+      C['ShardedKeys'],
+      C['UnshardedKeys'],
+      keyof FlattenEntityMap<C['EntityMap']>,
     ]
   > extends true
-    ? NotNever<M, ['HashKey' | 'RangeKey']> extends true
-      ? M
-      : Exclude<NotNever<M, ['HashKey' | 'RangeKey']>, true>
+    ? NotNever<C, ['HashKey' | 'RangeKey']> extends true
+      ? C
+      : Exclude<NotNever<C, ['HashKey' | 'RangeKey']>, true>
     : Exclude<
         MutuallyExclusive<
           [
-            M['HashKey'],
-            M['RangeKey'],
-            M['ShardedKeys'],
-            M['UnshardedKeys'],
-            keyof FlattenEntityMap<M['EntityMap']>,
+            C['HashKey'],
+            C['RangeKey'],
+            C['ShardedKeys'],
+            C['UnshardedKeys'],
+            keyof FlattenEntityMap<C['EntityMap']>,
           ]
         >,
         true

@@ -4,6 +4,11 @@ import type { PageKeyMap } from './PageKeyMap';
 
 /**
  * A QueryResult object with rehydrated pageKeyMap.
+ *
+ * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeMap | `TranscodeMap`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ *
+ * @category QueryBuilder
+ * @protected
  */
 export interface WorkingQueryResult<C extends BaseConfigMap> {
   /** The returned records. */

@@ -1,4 +1,10 @@
-import type { SortOrder } from '@karmaniverous/entity-tools';
+import type {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  EntityMap,
+  SortOrder,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  TranscodeMap,
+} from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
@@ -10,7 +16,10 @@ import type { ShardQueryMap } from './ShardQueryMap';
 /**
  * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
  *
- * @category Query
+ * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeMap | `TranscodeMap`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ *
+ * @category EntityManager
+ * @protected
  */
 export interface QueryOptions<C extends BaseConfigMap> {
   /** Identifies the entity to be queried. Key of {@link Config | `Config`} `entities`. */
