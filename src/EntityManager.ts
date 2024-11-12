@@ -7,6 +7,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import type { Config } from './Config';
 import type { EntityItem } from './EntityItem';
 import type { EntityKey } from './EntityKey';
+import type { EntityRecord } from './EntityRecord';
 import type { EntityToken } from './EntityToken';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 import { query } from './query';
@@ -76,7 +77,7 @@ export class EntityManager<C extends BaseConfigMap> {
     entityToken: EntityToken<C>,
     item: EntityItem<C>,
     overwrite = false,
-  ): EntityItem<C> {
+  ): EntityRecord<C> {
     return addKeys(this, entityToken, item, overwrite);
   }
 
@@ -115,7 +116,10 @@ export class EntityManager<C extends BaseConfigMap> {
    *
    * @throws `Error` if `entityToken` is invalid.
    */
-  removeKeys(entityToken: EntityToken<C>, item: EntityItem<C>): EntityItem<C> {
+  removeKeys(
+    entityToken: EntityToken<C>,
+    item: EntityRecord<C>,
+  ): EntityItem<C> {
     return removeKeys(this, entityToken, item);
   }
 

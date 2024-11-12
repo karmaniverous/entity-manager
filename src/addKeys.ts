@@ -4,6 +4,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
+import type { EntityRecord } from './EntityRecord';
 import type { EntityToken } from './EntityToken';
 import { updateItemHashKey } from './updateItemHashKey';
 import { updateItemRangeKey } from './updateItemRangeKey';
@@ -26,7 +27,7 @@ export function addKeys<C extends BaseConfigMap>(
   entityToken: EntityToken<C>,
   item: EntityItem<C>,
   overwrite = false,
-): EntityItem<C> {
+): EntityRecord<C> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -70,7 +71,7 @@ export function addKeys<C extends BaseConfigMap>(
       newItem,
     });
 
-    return newItem;
+    return newItem as EntityRecord<C>;
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, {

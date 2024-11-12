@@ -1,6 +1,7 @@
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
+import type { EntityRecord } from './EntityRecord';
 import type { EntityToken } from './EntityToken';
 import { validateEntityToken } from './validateEntityToken';
 
@@ -18,7 +19,7 @@ import { validateEntityToken } from './validateEntityToken';
 export function removeKeys<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   entityToken: EntityToken<C>,
-  item: EntityItem<C>,
+  item: EntityRecord<C>,
 ): EntityItem<C> {
   try {
     // Validate params.
