@@ -13,23 +13,31 @@ import type { EntityManager } from './EntityManager';
  * @category EntityClient
  */
 export abstract class BaseEntityClient<C extends BaseConfigMap> {
+  /** Default batch process options. */
   readonly batchProcessOptions: NonNullable<
-    BaseEntityClientOptions['batchProcessOptions']
+    BaseEntityClientOptions<C>['batchProcessOptions']
   >;
-  readonly logger: NonNullable<BaseEntityClientOptions['logger']>;
+
+  /** {@link EntityManager | `EntityManager`} instance. */
+  readonly entityManager: EntityManager<C>;
+
+  /** Injected logger object. Must support `debug` and `error` methods. Default: `console` */
+  readonly logger: NonNullable<BaseEntityClientOptions<C>['logger']>;
 
   /**
    * DynamoDB EntityClient constructor.
    *
    * @param options - {@link BaseEntityClientOptions | `BaseEntityClientOptions`} object.
    */
-  constructor(
-    readonly entityManager: EntityManager<C>,
-    options: BaseEntityClientOptions = {},
-  ) {
-    const { batchProcessOptions = {}, logger = console } = options;
+  constructor(options: BaseEntityClientOptions<C>) {
+    const {
+      batchProcessOptions = {},
+      entityManager,
+      logger = console,
+    } = options;
 
     this.batchProcessOptions = batchProcessOptions;
+    this.entityManager = entityManager;
     this.logger = logger;
   }
 }

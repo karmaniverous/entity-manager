@@ -2,6 +2,9 @@ import type { BatchProcessOptions } from '@karmaniverous/batch-process';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
 
+import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityManager } from './EntityManager';
+
 /**
  * Base EntityClient options.
  *
@@ -9,12 +12,15 @@ import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
  *
  * @category EntityClient
  */
-export interface BaseEntityClientOptions {
+export interface BaseEntityClientOptions<C extends BaseConfigMap> {
   /** Default batch process options. */
   batchProcessOptions?: Omit<
     BatchProcessOptions<unknown, unknown>,
     'batchHandler' | 'unprocessedItemExtractor'
   >;
+
+  /** {@link EntityManager | `EntityManager`} instance. */
+  entityManager: EntityManager<C>;
 
   /** Injected logger object. Must support `debug` and `error` methods. Default: `console` */
   logger?: Pick<Console, 'debug' | 'error'>;
