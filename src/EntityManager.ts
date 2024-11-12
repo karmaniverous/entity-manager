@@ -1,10 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
+import { pick } from 'radash';
 
 import { addKeys } from './addKeys';
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { Config } from './Config';
 import type { EntityItem } from './EntityItem';
+import type { EntityKey } from './EntityKey';
 import type { EntityToken } from './EntityToken';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 import { query } from './query';
@@ -76,6 +78,31 @@ export class EntityManager<C extends BaseConfigMap> {
     overwrite = false,
   ): EntityItem<C> {
     return addKeys(this, entityToken, item, overwrite);
+  }
+
+  /**
+   * Convert an {@link EntityItem | `EntityItem`} into an {@link EntityKey | `EntityKey`}.
+   *
+   * @param entityToken - {@link Config | `Config`} `entities` key.
+   * @param item - {@link EntityItem | `EntityItem`} object.
+   * @param overwrite - Overwrite existing properties (default `false`).
+   *
+   * @returns {@link EntityKey | `EntityKey`} extracted from shallow clone of `item` with updated properties.
+   *
+   * @throws `Error` if `entityToken` is invalid.
+   */
+  getPrimaryKey(
+    entityToken: EntityToken<C>,
+    item: EntityItem<C>,
+    overwrite = false,
+  ): EntityKey<C> {
+    const { hashKey, rangeKey } = this.config;
+    return pick(
+      !overwrite && item[hashKey] && item[rangeKey]
+        ? item
+        : addKeys(this, entityToken, item, overwrite),
+      [this.config.hashKey, this.config.rangeKey],
+    ) as unknown as EntityKey<C>;
   }
 
   /**
