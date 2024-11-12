@@ -5,7 +5,6 @@ import { mapValues } from 'radash';
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { BaseEntityClient } from './BaseEntityClient';
 import type { BaseQueryBuilderOptions } from './BaseQueryBuilderOptions';
-import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import type { QueryBuilderQueryOptions } from './QueryBuilderQueryOptions';
 import type { ShardQueryFunction } from './ShardQueryFunction';
@@ -22,23 +21,20 @@ import type { ShardQueryMap } from './ShardQueryMap';
  */
 export abstract class BaseQueryBuilder<
   C extends BaseConfigMap,
-  EntityClient extends BaseEntityClient,
+  EntityClient extends BaseEntityClient<C>,
   IndexParams,
 > {
   /** {@link BaseEntityClient | `EntityClient`} instance. */
-  public readonly entityClient: EntityClient;
-
-  /** {@link EntityManager | `EntityManager`} instance. */
-  public readonly entityManager: EntityManager<C>;
+  readonly entityClient: EntityClient;
 
   /** Entity token. */
-  public readonly entityToken: EntityToken<C>;
+  readonly entityToken: EntityToken<C>;
 
   /** Hash key token. */
-  public readonly hashKeyToken: C['HashKey'] | C['ShardedKeys'];
+  readonly hashKeyToken: C['HashKey'] | C['ShardedKeys'];
 
   /** Dehydrated page key map. */
-  public readonly pageKeyMap?: string;
+  readonly pageKeyMap?: string;
 
   /**
    * Maps `indexToken` values to database platform-specific query parameters.
@@ -49,16 +45,9 @@ export abstract class BaseQueryBuilder<
 
   /** BaseQueryBuilder constructor. */
   constructor(options: BaseQueryBuilderOptions<C, EntityClient>) {
-    const {
-      entityClient,
-      entityManager,
-      entityToken,
-      hashKeyToken,
-      pageKeyMap,
-    } = options;
+    const { entityClient, entityToken, hashKeyToken, pageKeyMap } = options;
 
     this.entityClient = entityClient;
-    this.entityManager = entityManager;
     this.entityToken = entityToken;
     this.hashKeyToken = hashKeyToken;
     this.pageKeyMap = pageKeyMap;
@@ -80,7 +69,11 @@ export abstract class BaseQueryBuilder<
   }
 
   async query(options: QueryBuilderQueryOptions<C>) {
-    const { entityManager, entityToken, pageKeyMap } = this;
+    const {
+      entityClient: { entityManager },
+      entityToken,
+      pageKeyMap,
+    } = this;
     const shardQueryMap = this.build();
 
     return await entityManager.query({

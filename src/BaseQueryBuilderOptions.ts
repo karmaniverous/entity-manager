@@ -3,7 +3,6 @@ import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { BaseEntityClient } from './BaseEntityClient';
-import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 
 /**
@@ -16,13 +15,10 @@ import type { EntityToken } from './EntityToken';
  */
 export interface BaseQueryBuilderOptions<
   C extends BaseConfigMap,
-  EntityClient extends BaseEntityClient,
+  EntityClient extends BaseEntityClient<C>,
 > {
   /** {@link BaseEntityClient | `EntityClient`} instance. */
   entityClient: EntityClient;
-
-  /** {@link EntityManager | `EntityManager`} instance. */
-  entityManager: EntityManager<C>;
 
   /** Entity token. */
   entityToken: EntityToken<C>;

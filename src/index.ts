@@ -9,7 +9,6 @@ export type { BaseQueryBuilderOptions } from './BaseQueryBuilderOptions';
 export type { Config } from './Config';
 export type { ConfigMap } from './ConfigMap';
 export type { EntityItem } from './EntityItem';
-export type { EntityItemize } from './EntityItemize';
 export { EntityManager } from './EntityManager';
 export type { EntityToken } from './EntityToken';
 export type { PageKey } from './PageKey';
