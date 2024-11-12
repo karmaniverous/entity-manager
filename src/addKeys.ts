@@ -18,7 +18,7 @@ import { validateEntityToken } from './validateEntityToken';
  * @param item - {@link EntityItem | `EntityItem`} object.
  * @param overwrite - Overwrite existing properties (default `false`).
  *
- * @returns Shallow clone of `item` with updated properties.
+ * @returns {@link EntityRecord | `EntityRecord`} object with updated properties.
  *
  * @throws `Error` if `entityToken` is invalid.
  */

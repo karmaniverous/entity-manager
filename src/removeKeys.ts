@@ -6,13 +6,13 @@ import type { EntityToken } from './EntityToken';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Strips generated properties, hash key, and range key from an {@link ItemMap | `ItemMap`} object.
+ * Strips generated properties, hash key, and range key from an {@link EntityRecord | `EntityRecord`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param entityToken - {@link Config.entities | `entityManager.config.entities`} key.
- * @param item - {@link ItemMap | `ItemMap`} object.
+ * @param item - {@link EntityRecord | `EntityRecord`} object.
  *
- * @returns Shallow clone of `item` without generated properties, hash key or range key.
+ * @returns {@link EntityItem | `EntityItem`} with generated properties, hash key & range key removed.
  *
  * @throws `Error` if `entityToken` is invalid.
  */

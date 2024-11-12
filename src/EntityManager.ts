@@ -69,7 +69,7 @@ export class EntityManager<C extends BaseConfigMap> {
    * @param item - {@link EntityItem | `EntityItem`} object.
    * @param overwrite - Overwrite existing properties (default `false`).
    *
-   * @returns Shallow clone of `item` with updated properties.
+   * @returns {@link EntityRecord | `EntityRecord`} object with updated properties.
    *
    * @throws `Error` if `entityToken` is invalid.
    */
@@ -107,12 +107,12 @@ export class EntityManager<C extends BaseConfigMap> {
   }
 
   /**
-   * Strips generated properties, hash key, and range key from an {@link EntityItem | `EntityItem`} object.
+   * Strips generated properties, hash key, and range key from an {@link EntityRecord | `EntityRecord`} object.
    *
    * @param entityToken - {@link Config | `Config`} `entities` key.
-   * @param item - {@link EntityItem | `EntityItem`} object.
+   * @param item - {@link EntityRecord | `EntityRecord`} object.
    *
-   * @returns Shallow clone of `item` without generated properties, hash key or range key.
+   * @returns {@link EntityItem | `EntityItem`} with generated properties, hash key & range key removed.
    *
    * @throws `Error` if `entityToken` is invalid.
    */
