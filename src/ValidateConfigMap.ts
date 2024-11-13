@@ -1,11 +1,11 @@
 import type {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  EntityMap,
+  EntityMap, // imported to support API docs
   FlattenEntityMap,
   MutuallyExclusive,
   NotNever,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  TranscodeMap,
+  TranscodeMap, // imported to support API docs
 } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';

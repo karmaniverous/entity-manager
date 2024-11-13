@@ -1,6 +1,6 @@
 import type { BatchProcessOptions } from '@karmaniverous/batch-process';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
+import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools'; // imported to support API docs
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityManager } from './EntityManager';

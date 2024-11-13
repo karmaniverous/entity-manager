@@ -1,13 +1,13 @@
 import type {
   ConditionalProperty,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  EntityMap,
+  EntityMap, // imported to support API docs
   Exactify,
   FlattenEntityMap,
   PropertiesOfType,
   TranscodableProperties,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  TranscodeMap,
+  TranscodeMap, // imported to support API docs
   Transcodes,
 } from '@karmaniverous/entity-tools';
 

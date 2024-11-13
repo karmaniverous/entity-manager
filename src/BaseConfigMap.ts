@@ -1,7 +1,7 @@
 import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { ConfigMap } from './ConfigMap';
+import type { ConfigMap } from './ConfigMap'; // imported to support API docs
 
 /**
  * Default type parameter for {@link ConfigMap | `ConfigMap`}.

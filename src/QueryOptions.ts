@@ -1,15 +1,15 @@
 import type {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  EntityMap,
+  EntityMap, // imported to support API docs
   SortOrder,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  TranscodeMap,
+  TranscodeMap, // imported to support API docs
 } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager'; // imported to support API docs
 import type { EntityToken } from './EntityToken';
 import type { ShardQueryMap } from './ShardQueryMap';
 

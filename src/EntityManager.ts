@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
+import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools'; // imported to support API docs
 import { pick } from 'radash';
 
 import { addKeys } from './addKeys';

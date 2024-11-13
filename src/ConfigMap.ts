@@ -1,9 +1,9 @@
 import type {
   DefaultTranscodeMap,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  EntityMap,
+  EntityMap, // imported to support API docs
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  TranscodeMap,
+  TranscodeMap, // imported to support API docs
 } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';

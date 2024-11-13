@@ -1,9 +1,9 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
+import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools'; // imported to support API docs
 
 import type { BaseConfigMap } from './BaseConfigMap';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { EntityManager } from './EntityManager';
+import type { EntityManager } from './EntityManager'; // imported to support API docs
 import type { PageKey } from './PageKey';
 import type { ShardQueryResult } from './ShardQueryResult';
 
