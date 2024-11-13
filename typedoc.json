@@ -46,7 +46,8 @@
   "plugin": [
     "typedoc-plugin-mdn-links",
     "typedoc-plugin-replace-text",
-    "typedoc-plugin-zod"
+    "typedoc-plugin-zod",
+    "@karmaniverous/typedoc-plugin-sitemap"
   ],
   "projectDocuments": ["./CHANGELOG.md"],
   "replaceText": {
@@ -60,6 +61,9 @@
   },
   "searchInComments": true,
   "searchInDocuments": true,
+  "sitemap": {
+    "baseUrl": "https://docs.karmanivero.us/entity-manager"
+  },
   "titleLink": "https://github.com/karmaniverous/entity-manager",
   "visibilityFilters": {
     "protected": false
