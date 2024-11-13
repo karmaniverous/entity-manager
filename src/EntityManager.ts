@@ -147,14 +147,18 @@ export class EntityManager<C extends BaseConfigMap> {
    *
    * @param hashKeyToken - Index hash key.
    * @param rangeKeyToken - Index range key.
+   * @param suppressError - Suppress error if no match found.
    *
    * @returns  Index token if found.
+   *
+   * @throws `Error` if no match found and `suppressError` is not `true`.
    */
   findIndexToken(
     hashKeyToken: string,
     rangeKeyToken: string,
+    suppressError?: boolean,
   ): string | undefined {
-    return findIndexToken(this, hashKeyToken, rangeKeyToken);
+    return findIndexToken(this, hashKeyToken, rangeKeyToken, suppressError);
   }
 
   /**

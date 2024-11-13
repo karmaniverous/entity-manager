@@ -14,8 +14,18 @@ describe('findIndexToken', function () {
     expect(indexToken).to.equal('beneficiaryCreated');
   });
 
-  it('returns undefined for nonexistent index', function () {
-    const indexToken = findIndexToken(entityManager, 'hashKey2', 'rangeKey');
+  it('fails for nonexistent index', function () {
+    expect(() => findIndexToken(entityManager, 'hashKey2', 'rangeKey')).to
+      .throw;
+  });
+
+  it('returns undefined for nonexistent index if error suppressed', function () {
+    const indexToken = findIndexToken(
+      entityManager,
+      'hashKey2',
+      'rangeKey',
+      true,
+    );
 
     expect(indexToken).to.be.undefined;
   });
