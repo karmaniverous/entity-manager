@@ -9,6 +9,7 @@ import type { EntityItem } from './EntityItem';
 import type { EntityKey } from './EntityKey';
 import type { EntityRecord } from './EntityRecord';
 import type { EntityToken } from './EntityToken';
+import { findIndexToken } from './findIndexToken';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
@@ -121,6 +122,24 @@ export class EntityManager<C extends BaseConfigMap> {
     item: EntityRecord<C>,
   ): EntityItem<C> {
     return removeKeys(this, entityToken, item);
+  }
+
+  /**
+   * Find an index token in a {@link Config | `Config`} object based on the index `hashKey` and `rangeKey`.
+   *
+   * @param hashKeyToken - Index hash key.
+   * @param rangeKeyToken - Index range key.
+   *
+   * @returns  Index token if found.
+   */
+  findIndexToken(
+    hashKeyToken: C['HashKey'] | C['ShardedKeys'],
+    rangeKeyToken:
+      | C['RangeKey']
+      | C['UnshardedKeys']
+      | C['TranscodedProperties'],
+  ): string | undefined {
+    return findIndexToken(this, hashKeyToken, rangeKeyToken);
   }
 
   /**

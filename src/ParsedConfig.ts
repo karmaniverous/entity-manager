@@ -303,6 +303,7 @@ export const configSchema = z
           });
 
     // Validate indexes.
+    // TODO: Vaidate no two indexes have the same hashKey & rangeKey.
     for (const [indexKey, { hashKey, rangeKey, projections }] of Object.entries(
       data.indexes,
     )) {
