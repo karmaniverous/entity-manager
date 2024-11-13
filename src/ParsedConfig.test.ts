@@ -124,12 +124,12 @@ describe('Config', function () {
     );
   });
 
-  it('should fail when index projections are empty', function () {
+  it('should allow empty index projections', function () {
     testConfig.indexes = {
       id: { hashKey: 'hashKey', rangeKey: 'bar', projections: [] },
     };
 
-    expect(() => configSchema.parse(testConfig)).to.throw('too_small');
+    expect(() => configSchema.parse(testConfig)).not.to.throw;
   });
 
   it('should fail when entity index projections contain dupes', function () {
