@@ -5,6 +5,7 @@ import { pick } from 'radash';
 import { addKeys } from './addKeys';
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { Config } from './Config';
+import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import type { EntityItem } from './EntityItem';
 import type { EntityKey } from './EntityKey';
 import type { EntityRecord } from './EntityRecord';
@@ -61,6 +62,23 @@ export class EntityManager<C extends BaseConfigMap> {
    */
   set config(value) {
     this.#config = configSchema.parse(value);
+  }
+
+  /**
+   * Encode a generated property value. Returns a string or undefined if atomicity requirement of sharded properties not met.
+   *
+   * @param property - {@link Config.generatedProperties | Generated property} key.
+   * @param item - Partial {@link ItemMap | `ItemMap`} object.
+   *
+   * @returns Encoded generated property value.
+   *
+   * @throws `Error` if `property` is not a {@link Config.generatedProperties | generated property}.
+   */
+  encodeGeneratedProperty<C extends BaseConfigMap>(
+    property: C['ShardedKeys'] | C['UnshardedKeys'],
+    item: EntityItem<C>,
+  ): string | undefined {
+    return encodeGeneratedProperty(this, property, item);
   }
 
   /**
@@ -133,11 +151,8 @@ export class EntityManager<C extends BaseConfigMap> {
    * @returns  Index token if found.
    */
   findIndexToken(
-    hashKeyToken: C['HashKey'] | C['ShardedKeys'],
-    rangeKeyToken:
-      | C['RangeKey']
-      | C['UnshardedKeys']
-      | C['TranscodedProperties'],
+    hashKeyToken: string,
+    rangeKeyToken: string,
   ): string | undefined {
     return findIndexToken(this, hashKeyToken, rangeKeyToken);
   }

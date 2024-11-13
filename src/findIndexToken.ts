@@ -12,8 +12,8 @@ import type { EntityManager } from './EntityManager';
  */
 export function findIndexToken<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
-  hashKeyToken: C['HashKey'] | C['ShardedKeys'],
-  rangeKeyToken: C['RangeKey'] | C['UnshardedKeys'] | C['TranscodedProperties'],
+  hashKeyToken: string,
+  rangeKeyToken: string,
 ): string | undefined {
   return Object.entries(entityManager.config.indexes).find(
     ([, index]) =>
