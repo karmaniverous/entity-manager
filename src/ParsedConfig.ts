@@ -128,7 +128,10 @@ export const configSchema = z
         z.object({
           hashKey: z.string().min(1),
           rangeKey: z.string().min(1),
-          projections: componentArray.optional(),
+          projections: z
+            .array(z.string().min(1))
+            .superRefine(validateArrayUnique)
+            .optional(),
         }),
       )
       .optional()
