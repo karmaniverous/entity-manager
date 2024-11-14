@@ -1,6 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools'; // imported to support API docs
-import { pick } from 'radash';
 
 import { addKeys } from './addKeys';
 import type { BaseConfigMap } from './BaseConfigMap';
@@ -11,6 +10,7 @@ import type { EntityKey } from './EntityKey';
 import type { EntityRecord } from './EntityRecord';
 import type { EntityToken } from './EntityToken';
 import { findIndexToken } from './findIndexToken';
+import { getPrimaryKey } from './getPrimaryKey';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
@@ -93,13 +93,44 @@ export class EntityManager<C extends BaseConfigMap> {
    * @returns {@link EntityRecord | `EntityRecord`} object with updated properties.
    *
    * @throws `Error` if `entityToken` is invalid.
+   *
+   * @overload
    */
   addKeys(
     entityToken: EntityToken<C>,
     item: EntityItem<C>,
+    overwrite?: boolean,
+  ): EntityRecord<C>;
+
+  /**
+   * Update generated properties, hash key, and range key on an array of {@link EntityItem | `EntityItem`} objects.
+   *
+   * @param entityToken - {@link Config | `Config`} `entities` key.
+   * @param items - Array of {@link EntityItem | `EntityItem`} objects.
+   * @param overwrite - Overwrite existing properties (default `false`).
+   *
+   * @returns An array of {@link EntityRecord | `EntityRecord`} objects with updated properties.
+   *
+   * @throws `Error` if `entityToken` is invalid.
+   *
+   * @overload
+   */
+  addKeys(
+    entityToken: EntityToken<C>,
+    item: EntityItem<C>[],
+    overwrite?: boolean,
+  ): EntityRecord<C>[];
+
+  addKeys(
+    entityToken: EntityToken<C>,
+    i: EntityItem<C> | EntityItem<C>[],
     overwrite = false,
-  ): EntityRecord<C> {
-    return addKeys(this, entityToken, item, overwrite);
+  ): EntityRecord<C> | EntityRecord<C>[] {
+    if (Array.isArray(i)) {
+      return i.map((item) => addKeys(this, entityToken, item, overwrite));
+    }
+
+    return addKeys(this, entityToken, i, overwrite);
   }
 
   /**
@@ -112,19 +143,44 @@ export class EntityManager<C extends BaseConfigMap> {
    * @returns {@link EntityKey | `EntityKey`} extracted from shallow clone of `item` with updated properties.
    *
    * @throws `Error` if `entityToken` is invalid.
+   *
+   * @overload
    */
   getPrimaryKey(
     entityToken: EntityToken<C>,
     item: EntityItem<C>,
+    overwrite?: boolean,
+  ): EntityKey<C>;
+
+  /**
+   * Convert an array of {@link EntityItem | `EntityItem`} objects into {@link EntityKey | `EntityKey`} objects.
+   *
+   * @param entityToken - {@link Config | `Config`} `entities` key.
+   * @param items - Array of {@link EntityItem | `EntityItem`} objects.
+   * @param overwrite - Overwrite existing properties (default `false`).
+   *
+   * @returns An array of {@link EntityKey | `EntityKey`} objects extracted from shallow clone of each `item` with updated properties.
+   *
+   * @throws `Error` if `entityToken` is invalid.
+   *
+   * @overload
+   */
+  getPrimaryKey(
+    entityToken: EntityToken<C>,
+    items: EntityItem<C>[],
+    overwrite?: boolean,
+  ): EntityKey<C>[];
+
+  getPrimaryKey(
+    entityToken: EntityToken<C>,
+    i: EntityItem<C> | EntityItem<C>[],
     overwrite = false,
-  ): EntityKey<C> {
-    const { hashKey, rangeKey } = this.config;
-    return pick(
-      !overwrite && item[hashKey] && item[rangeKey]
-        ? item
-        : addKeys(this, entityToken, item, overwrite),
-      [this.config.hashKey, this.config.rangeKey],
-    ) as unknown as EntityKey<C>;
+  ): EntityKey<C> | EntityKey<C>[] {
+    if (Array.isArray(i)) {
+      return i.map((item) => getPrimaryKey(this, entityToken, item, overwrite));
+    }
+
+    return getPrimaryKey(this, entityToken, i, overwrite);
   }
 
   /**
@@ -136,12 +192,37 @@ export class EntityManager<C extends BaseConfigMap> {
    * @returns {@link EntityItem | `EntityItem`} with generated properties, hash key & range key removed.
    *
    * @throws `Error` if `entityToken` is invalid.
+   *
+   * @overload
+   */
+  removeKeys(entityToken: EntityToken<C>, item: EntityRecord<C>): EntityItem<C>;
+
+  /**
+   * Strips generated properties, hash key, and range key from an array of {@link EntityRecord | `EntityRecord`} objects.
+   *
+   * @param entityToken - {@link Config | `Config`} `entities` key.
+   * @param items - Array of {@link EntityRecord | `EntityRecord`} objects.
+   *
+   * @returns Array of {@link EntityItem | `EntityItem`} objects with generated properties, hash key & range key removed.
+   *
+   * @throws `Error` if `entityToken` is invalid.
+   *
+   * @overload
    */
   removeKeys(
     entityToken: EntityToken<C>,
-    item: EntityRecord<C>,
-  ): EntityItem<C> {
-    return removeKeys(this, entityToken, item);
+    items: EntityRecord<C>[],
+  ): EntityItem<C>[];
+
+  removeKeys(
+    entityToken: EntityToken<C>,
+    i: EntityRecord<C> | EntityRecord<C>[],
+  ): EntityItem<C> | EntityItem<C>[] {
+    if (Array.isArray(i)) {
+      return i.map((item) => removeKeys(this, entityToken, item));
+    }
+
+    return removeKeys(this, entityToken, i);
   }
 
   /**
