@@ -4,9 +4,9 @@ import {
   type EntityMap,
 } from '@karmaniverous/entity-tools';
 
-import type { ConfigMap } from '../src/ConfigMap';
-import type { EntityItem } from '../src/EntityItem';
-import { EntityManager } from '../src/EntityManager';
+import type { ConfigMap } from '../src/EntityManager/ConfigMap';
+import type { EntityItem } from '../src/EntityManager/EntityItem';
+import { EntityManager } from '../src/EntityManager/EntityManager';
 import type { User } from './users';
 
 export const now = Date.now();

@@ -5,7 +5,7 @@
   },
   "dependencies": {
     "@karmaniverous/batch-process": "^0.1.0",
-    "@karmaniverous/entity-tools": "^0.6.6",
+    "@karmaniverous/entity-tools": "^0.6.8",
     "@karmaniverous/string-utilities": "^0.2.1",
     "lz-string": "^1.5.0",
     "radash": "^12.1.0",
