@@ -9,11 +9,11 @@ import { getShardBump } from './getShardBump';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Update the hash key on a partial {@link ItemMap | `ItemMap`} object.
+ * Update the hash key on an partial {@link EntityItem | `EntityItem`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param entityToken - {@link Config.entities | `this.config.entities`} key.
- * @param item - Partial {@link ItemMap | `ItemMap`} object.
+ * @param item - {@link EntityItem | `EntityItem`} object.
  * @param overwrite - Overwrite existing {@link ConfigKeys.hashKey | `this.config.hashKey`} property value (default `false`).
  *
  * @returns Shallow clone of `item` with updated hash key.

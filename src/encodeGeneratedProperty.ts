@@ -10,7 +10,7 @@ import { validateGeneratedProperty } from './validateGeneratedProperty';
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param property - {@link Config.generatedProperties | Generated property} key.
- * @param item - Partial {@link ItemMap | `ItemMap`} object.
+ * @param item - {@link EntityItem | `EntityItem`} object.
  *
  * @returns Encoded generated property value.
  *

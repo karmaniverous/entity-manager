@@ -11,7 +11,7 @@ import type { EntityManager } from './EntityManager';
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param element - The {@link Entity | `Entity`} generated property element or ungenerated index component to encode.
- * @param item - Partial {@link ItemMap | `ItemMap`} object.
+ * @param item - {@link EntityItem | `EntityItem`} object.
  *
  * @returns Encoded value.
  *

@@ -68,7 +68,7 @@ export class EntityManager<C extends BaseConfigMap> {
    * Encode a generated property value. Returns a string or undefined if atomicity requirement of sharded properties not met.
    *
    * @param property - {@link Config.generatedProperties | Generated property} key.
-   * @param item - Partial {@link ItemMap | `ItemMap`} object.
+   * @param item - {@link EntityItem | `EntityItem`} object.
    *
    * @returns Encoded generated property value.
    *

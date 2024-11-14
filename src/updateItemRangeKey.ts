@@ -7,11 +7,11 @@ import type { EntityToken } from './EntityToken';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Update the range key on a partial {@link ItemMap | `ItemMap`} object.
+ * Update the range key on an {@link EntityItem | `EntityItem`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param entityToken - {@link Config.entities | `this.config.entities`} key.
- * @param item - Partial {@link ItemMap | `ItemMap`} object.
+ * @param item - {@link EntityItem | `EntityItem`} object.
  * @param overwrite - Overwrite existing {@link ConfigKeys.rangeKey | `this.config.rangeKey`} property value (default `false`).
  *
  * @returns Shallow clone of `item` with updated range key.
