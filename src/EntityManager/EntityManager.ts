@@ -30,6 +30,8 @@ import { removeKeys } from './removeKeys';
  */
 export class EntityManager<C extends BaseConfigMap> {
   #config: ParsedConfig;
+
+  /** Logger object (defaults to `console`, must support `debug` & `error` methods). */
   readonly logger: Pick<Console, 'debug' | 'error'>;
 
   /**
