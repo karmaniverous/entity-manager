@@ -2,110 +2,110 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/modules.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/index.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/documents/CHANGELOG.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/modules/index.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/classes/index.BaseEntityClient.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/classes/index.BaseQueryBuilder.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/classes/index.EntityManager.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/interfaces/index.BaseConfigMap.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/interfaces/index.BaseEntityClientOptions.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/interfaces/index.BaseQueryBuilderOptions.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/interfaces/index.QueryOptions.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/interfaces/index.QueryResult.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/interfaces/index.ShardBump.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/interfaces/index.ShardQueryResult.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.Config.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.ConfigMap.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.EntityItem.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.EntityKey.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.EntityRecord.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.EntityToken.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.PageKey.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.ParsedConfig.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.QueryBuilderQueryOptions.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.ShardQueryFunction.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.ShardQueryMap.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/types/index.ValidateConfigMap.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 	<url>
 		<loc>https://docs.karmanivero.us/entity-manager/variables/index.configSchema.html</loc>
-		<lastmod>2024-11-14T11:49:06.043Z</lastmod>
+		<lastmod>2025-07-07T10:21:05.454Z</lastmod>
 	</url>
 </urlset>
