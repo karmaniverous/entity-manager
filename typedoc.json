@@ -7,7 +7,7 @@
       "BatchProcessOptions": "https://docs.karmanivero.us/batch-process/interfaces/batch_process.BatchProcessOptions.html"
     },
     "@karmaniverous/entity-tools": {
-      "ConditionalProperty": "https://docs.karmanivero.us/entity-tools/interfaces/entity_tools.ConditionalProperty.html",
+      "ConditionalProperty": "https://docs.karmanivero.us/entity-tools/types/entity_tools.ConditionalProperty.html",
       "DefaultTranscodeMap": "https://docs.karmanivero.us/entity-tools/interfaces/entity_tools.DefaultTranscodeMap.html",
       "defaultTranscodes": "https://docs.karmanivero.us/entity-tools/variables/entity_tools.defaultTranscodes.html",
       "Entity": "https://docs.karmanivero.us/entity-tools/types/entity_tools.Entity.html",
