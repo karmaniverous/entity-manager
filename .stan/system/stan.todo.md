@@ -86,3 +86,10 @@
     - Avoided unnecessary `String()` conversion in encodeGeneratedProperty by using a template literal (no-unnecessary-type-conversion).
     - Added a targeted disable for dynamic delete in removeKeys loop (consistent with existing targeted disables).
   - Re-ran lint: typed-lint now applies to tests without requiring an eslint-specific tsconfig.
+
+- TS: fix TS2769 on ParsedConfig transcodes default
+  - Relaxed Zod schema function shapes to `z.custom<unknown>` for `encode` and
+    `decode`, avoiding contravariance issues with narrower parameter types in
+    `defaultTranscodes`. Keeps runtime validation (function check) while
+    preserving consumer DX and fixing typecheck/docs/build errors.
+- ESLint: silenced remaining dynamic-delete in removeKeys generated props loop.

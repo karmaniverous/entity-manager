@@ -138,13 +138,10 @@ export const configSchema = z
         z
           .object({
             // Accept function shapes without relying on z.function()
-            // to avoid TS inference conflicts across Zod versions.
-            encode: z.custom<(value: unknown) => string>(
-              (fn) => typeof fn === 'function',
-            ),
-            decode: z.custom<(value: string) => unknown>(
-              (fn) => typeof fn === 'function',
-            ),
+            // to avoid TS inference conflicts across Zod versions and
+            // to remain compatible with narrower parameter types.
+            encode: z.custom<unknown>((fn) => typeof fn === 'function'),
+            decode: z.custom<unknown>((fn) => typeof fn === 'function'),
           })
           .strict(),
       )
