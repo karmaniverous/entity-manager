@@ -96,4 +96,8 @@
   - Refactored removeKeys to build a Set of keys to strip and reconstruct
     the item via Object.entries + filter, avoiding the delete operator for
     hashKey, rangeKey, and generated properties. This satisfies
-    @typescript-eslint/no-dynamic-delete without disables.
+    @typescript-eslint/no-dynamic-delete without disables.
+
+- Docs: fix TypeDoc @param name mismatch
+  - Updated JSDoc on EntityManager.addKeys and getPrimaryKey array overloads
+    to use `@param item` (matches parameter name), clearing the warning.
