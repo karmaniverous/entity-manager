@@ -77,7 +77,7 @@ export function updateItemHashKey<C extends BaseConfigMap>(
 
       if (isNil(uniqueId)) throw new Error(`missing item unique property`);
 
-      hashKey += (stringHash(uniqueId.toString()) % (chars * radix))
+      hashKey += (stringHash(uniqueId) % (chars * radix))
         .toString(radix)
         .padStart(chars, '0');
     }

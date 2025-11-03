@@ -60,7 +60,9 @@ export function addKeys<C extends BaseConfigMap>(
         );
 
         if (encoded) Object.assign(newItem, { [property]: encoded });
-        else delete newItem[property as keyof EntityItem<C>];
+        else
+          // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+          delete newItem[property as keyof EntityItem<C>];
       }
     }
 

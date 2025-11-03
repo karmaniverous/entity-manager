@@ -66,4 +66,14 @@
 
 - Lint/Knip: guard upstream crash and cleanup
   - Disable @typescript-eslint/unified-signatures; update knip.json to remove
-    redundant ignores and ignore expected anchors/type-only file.
+    redundant ignores and ignore expected anchors/type-only file.
+
+- Zod (no deprecated APIs) & ESLint fixes
+  - Removed all uses of deprecated `.safe()` and `ZodIssueCode.*`; switched to
+    `.int()` and string-literal `"custom"` codes in ParsedConfig.
+  - Avoided deprecated `z.function` completely; function shapes validated with
+    z.custom guards.
+  - Type-safe transcode encode/decode invocation; removed unnecessary .toString().
+  - ESLint: limit type-aware linting to src/config files (tests excluded);
+    provided TS parser for eslint.config.ts; silenced dynamic delete at exact
+    sites; fixed logger typing in tests.

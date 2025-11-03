@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { readFileSync } from 'node:fs';
 
 import aliasPlugin, { Alias } from '@rollup/plugin-alias';
@@ -67,7 +68,13 @@ const config: RollupOptions[] = [
   // Type definitions output.
   {
     ...commonInputOptions,
-    plugins: [...(commonInputOptions.plugins ?? []), dtsPlugin()],
+    // Rebuild plugin list locally to avoid spreading a possibly non-iterable
+    // InputPluginOption union (fixes TS2488 in typed builds).
+    plugins: [
+      aliasPlugin({ entries: commonAliases }),
+      ...commonPlugins,
+      dtsPlugin(),
+    ],
     output: [
       {
         extend: true,

@@ -27,7 +27,9 @@ export function removeKeys<C extends BaseConfigMap>(
 
     // Delete hash & range keys.
     const newItem = { ...item };
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete newItem[entityManager.config.hashKey as keyof EntityItem<C>];
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete newItem[entityManager.config.rangeKey as keyof EntityItem<C>];
 
     // Delete generated properties.

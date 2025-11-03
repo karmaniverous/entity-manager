@@ -16,7 +16,7 @@ const validateArrayUnique = <T>(
   for (const [element, count] of Object.entries(counts)) {
     if (count > 1)
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: `duplicate array element`,
         params: { element },
         path,
@@ -34,7 +34,7 @@ const validateKeysExclusive = (
 
   if (intersection.length)
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: 'custom',
       message: `${label} key collision: ${intersection.toString()}`,
     });
 };
@@ -51,25 +51,13 @@ export const configSchema = z
         z.string(),
         z
           .object({
-            defaultLimit: z
-              .number()
-              .int()
-              .positive()
-              .safe()
-              .optional()
-              .default(10),
-            defaultPageSize: z
-              .number()
-              .int()
-              .positive()
-              .safe()
-              .optional()
-              .default(10),
+            defaultLimit: z.number().int().positive().optional().default(10),
+            defaultPageSize: z.number().int().positive().optional().default(10),
             shardBumps: z
               .array(
                 z
                   .object({
-                    timestamp: z.number().nonnegative().safe(),
+                    timestamp: z.number().int().nonnegative(),
                     charBits: z.number().int().min(1).max(5),
                     chars: z.number().int().min(0).max(40),
                   })
@@ -103,7 +91,7 @@ export const configSchema = z
                   for (let i = 1; i < val.length; i++)
                     if (val[i].chars <= val[i - 1].chars)
                       ctx.addIssue({
-                        code: z.ZodIssueCode.custom,
+                        code: 'custom',
                         message: `shardBump chars do not monotonically increase at timestamp ${val[i].timestamp.toString()}`,
                         path: [i],
                       });
@@ -143,7 +131,7 @@ export const configSchema = z
     propertyTranscodes: z.record(z.string(), z.string()).optional().default({}),
     rangeKey: z.string(),
     shardKeyDelimiter: z.string().regex(/\W+/).optional().default('!'),
-    throttle: z.number().int().positive().safe().optional().default(10),
+    throttle: z.number().int().positive().optional().default(10),
     transcodes: z
       .record(
         z.string(),
@@ -168,7 +156,7 @@ export const configSchema = z
     // validate no generated key delimiter collision
     if (data.generatedKeyDelimiter.includes(data.generatedValueDelimiter))
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'generatedKeyDelimiter contains generatedValueDelimiter',
         params: {
           generatedKeyDelimiter: data.generatedKeyDelimiter,
@@ -179,7 +167,7 @@ export const configSchema = z
 
     if (data.generatedKeyDelimiter.includes(data.shardKeyDelimiter))
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'generatedKeyDelimiter contains shardKeyDelimiter',
         params: {
           generatedKeyDelimiter: data.generatedKeyDelimiter,
@@ -191,7 +179,7 @@ export const configSchema = z
     // validate no generated value delimiter collision
     if (data.generatedValueDelimiter.includes(data.generatedKeyDelimiter))
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'generatedValueDelimiter contains generatedKeyDelimiter',
         params: {
           generatedValueDelimiter: data.generatedValueDelimiter,
@@ -202,7 +190,7 @@ export const configSchema = z
 
     if (data.generatedValueDelimiter.includes(data.shardKeyDelimiter))
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'generatedValueDelimiter contains shardKeyDelimiter',
         params: {
           generatedValueDelimiter: data.generatedValueDelimiter,
@@ -214,7 +202,7 @@ export const configSchema = z
     // validate no shard key delimiter collision
     if (data.shardKeyDelimiter.includes(data.generatedKeyDelimiter))
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'shardKeyDelimiter contains generatedKeyDelimiter',
         params: {
           generatedKeyDelimiter: data.generatedKeyDelimiter,
@@ -225,7 +213,7 @@ export const configSchema = z
 
     if (data.shardKeyDelimiter.includes(data.generatedValueDelimiter))
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         message: 'shardKeyDelimiter contains generatedValueDelimiter',
         params: {
           generatedValueDelimiter: data.generatedValueDelimiter,
@@ -282,7 +270,7 @@ export const configSchema = z
     for (const [property, transcode] of Object.entries(data.propertyTranscodes))
       if (!transcodes.includes(transcode))
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: `propertyTranscodes['${property}'] references unknown transcode '${transcode}'`,
           path: ['propertyTranscodes', property],
         });
@@ -294,7 +282,7 @@ export const configSchema = z
       for (const element of elements)
         if (!transcodedProperties.includes(element))
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: 'custom',
             message: `generatedProperties.sharded['${property}'] contains non-transcoded element '${element}'`,
             path: ['generatedProperties', 'sharded', property],
           });
@@ -306,7 +294,7 @@ export const configSchema = z
       for (const element of elements)
         if (!transcodedProperties.includes(element))
           ctx.addIssue({
-            code: z.ZodIssueCode.custom,
+            code: 'custom',
             message: `generatedProperties.unsharded['${property}'] contains non-transcoded element '${element}'`,
             path: ['generatedProperties', 'unsharded', property],
           });
@@ -319,7 +307,7 @@ export const configSchema = z
       // Validate hash key is sharded.
       if (![data.hashKey, ...shardedKeys].includes(hashKey)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: `index '${indexKey}' hashKey '${hashKey}' must be one of [${[
             data.hashKey,
             ...shardedKeys,
@@ -335,7 +323,7 @@ export const configSchema = z
         )
       ) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: `index '${indexKey}' rangeKey '${rangeKey}' must be one of [${[
             data.rangeKey,
             ...unshardedKeys,
@@ -359,7 +347,7 @@ export const configSchema = z
             ].includes(projection)
           )
             ctx.addIssue({
-              code: z.ZodIssueCode.custom,
+              code: 'custom',
               message: 'index projection is a key',
               params: { projection },
               path: ['indexes', indexKey, 'projections'],
@@ -374,7 +362,7 @@ export const configSchema = z
       // validate timestampProperty is a transcoded property.
       if (!transcodedProperties.includes(timestampProperty))
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: `entities['${entityToken}'].timestampProperty '${timestampProperty}' must be one of [${transcodedProperties.join(', ')}]`,
           path: ['entities', entityToken, 'timestampProperty'],
         });
@@ -382,7 +370,7 @@ export const configSchema = z
       // validate uniqueProperty is a transcoded property.
       if (!transcodedProperties.includes(uniqueProperty))
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           message: `entities['${entityToken}'].uniqueProperty '${uniqueProperty}' must be one of [${transcodedProperties.join(', ')}]`,
           path: ['entities', entityToken, 'uniqueProperty'],
         });
