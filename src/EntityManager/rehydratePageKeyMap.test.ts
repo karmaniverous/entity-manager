@@ -1,5 +1,5 @@
-import { expect } from 'chai';
 import { pick, zipToObject } from 'radash';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { day, entityManager, type Item, now } from '../../test/config';
 import { getUsers } from '../../test/users';

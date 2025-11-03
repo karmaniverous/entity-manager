@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 
 import { day, entityManager, now } from '../../test/config';
 import { getHashKeySpace } from './getHashKeySpace';

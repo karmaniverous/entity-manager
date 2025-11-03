@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 
 import { entityManager } from '../../test/config';
 import { getIndexComponents } from './getIndexComponents';

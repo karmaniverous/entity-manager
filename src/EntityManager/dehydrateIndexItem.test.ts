@@ -1,4 +1,4 @@
-import { expect } from 'chai';
+import { describe, expect, it } from 'vitest';
 
 import { entityManager, type Item } from '../../test/config';
 import { getUsers } from '../../test/users';

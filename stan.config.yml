@@ -1,0 +1,33 @@
+stan-core:
+  stanPath: .stan
+  excludes:
+    - CHANGELOG.md
+    - docs
+    - package-lock.json
+  imports:
+    entity-tools:
+      - ../entity-tools/.stan/system/stan.requirements.md
+      - ../entity-tools/.stan/system/stan.todo.md
+      - ../entity-tools/dist/index.d.ts
+      - ../entity-tools/.stan/interop/entity-manager/**
+    mock-db:
+      - ../mock-db/.stan/system/stan.requirements.md
+      - ../mock-db/.stan/system/stan.todo.md
+      - ../mock-db/dist/index.d.ts
+      - ../mock-db/.stan/interop/entity-manager/**
+stan-cli:
+  cliDefaults:
+    run:
+      facets: true
+      plan: false
+      sequential: true
+  patchOpenCommand: code -g {file}
+  scripts:
+    typecheck: npm run typecheck
+    lint: npm run lint:fix
+    test: npm run test
+    build: cross-env NO_COLOR=1 npm run build
+    docs:
+      script: npm run docs -- --emit none
+      warnPattern: \\[warning\\]
+    knip: npm run knip

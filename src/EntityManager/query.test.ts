@@ -1,7 +1,5 @@
-/* eslint-env mocha */
-
 import { MockDb } from '@karmaniverous/mock-db';
-import { expect } from 'chai';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import { day, entityManager, type Item, now } from '../../test/config';
 import { getUsers } from '../../test/users';
@@ -17,7 +15,7 @@ describe('query', function () {
   let lastNameQuery: ShardQueryFunction<MyConfigMap>;
   let firstNameQuery: ShardQueryFunction<MyConfigMap>;
 
-  before(function () {
+  beforeAll(function () {
     users = getUsers(1000, 0, 2).map((user) =>
       addKeys(entityManager, 'user', user as Item),
     );
