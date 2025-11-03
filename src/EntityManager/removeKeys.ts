@@ -25,18 +25,26 @@ export function removeKeys<C extends BaseConfigMap>(
     // Validate params.
     validateEntityToken(entityManager, entityToken);
 
-    // Delete hash & range keys.
-    const newItem = { ...item };
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete newItem[entityManager.config.hashKey as keyof EntityItem<C>];
-    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-    delete newItem[entityManager.config.rangeKey as keyof EntityItem<C>];
+    // Build a set of keys to strip (hash, range, and all generated properties).
+    const {
+      hashKey,
+      rangeKey,
+      generatedProperties: { sharded, unsharded },
+    } = entityManager.config;
 
-    // Delete generated properties.
-    const { sharded, unsharded } = entityManager.config.generatedProperties;
+    const keysToStrip = new Set<string>([
+      hashKey,
+      rangeKey,
+      ...Object.keys(sharded),
+      ...Object.keys(unsharded),
+    ]);
 
-    for (const property in { ...sharded, ...unsharded })
-      delete newItem[property as keyof EntityItem<C>];
+    // Create a shallow copy of item omitting the keys above (no delete operator).
+    const newItem = Object.fromEntries(
+      Object.entries(item as Record<string, unknown>).filter(
+        ([key]) => !keysToStrip.has(key),
+      ),
+    ) as EntityItem<C>;
 
     entityManager.logger.debug('stripped entity item generated properties', {
       entityToken,

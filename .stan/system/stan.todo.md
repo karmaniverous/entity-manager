@@ -92,4 +92,8 @@
     `decode`, avoiding contravariance issues with narrower parameter types in
     `defaultTranscodes`. Keeps runtime validation (function check) while
     preserving consumer DX and fixing typecheck/docs/build errors.
-- ESLint: silenced remaining dynamic-delete in removeKeys generated props loop.
+- ESLint: remove dynamic-delete usage in removeKeys
+  - Refactored removeKeys to build a Set of keys to strip and reconstruct
+    the item via Object.entries + filter, avoiding the delete operator for
+    hashKey, rangeKey, and generated properties. This satisfies
+    @typescript-eslint/no-dynamic-delete without disables.
