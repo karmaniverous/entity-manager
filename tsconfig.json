@@ -18,8 +18,7 @@
     "coverage/",
     "dist/",
     "docs/",
-    "tests/**",
-    "src/**/*.test.ts"
+    "tests/**"
   ],
   "include": [
     "src/**/*.ts",

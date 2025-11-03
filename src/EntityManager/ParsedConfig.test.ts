@@ -1,5 +1,5 @@
 import { defaultTranscodes, type EntityMap } from '@karmaniverous/entity-tools';
-import { describe, it, beforeEach, expect } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import type { Config } from './Config';
 import type { ConfigMap } from './ConfigMap';

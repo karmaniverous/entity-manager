@@ -68,6 +68,7 @@ export default defineConfig([
     files: ['eslint.config.ts'],
     extends: [eslint.configs.recommended, prettierPlugin],
     languageOptions: {
+      parser: tseslint.parser,
       parserOptions: {
         tsconfigRootDir: import.meta.dirname,
       },

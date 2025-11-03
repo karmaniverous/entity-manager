@@ -7,7 +7,8 @@ import { addKeys } from './addKeys';
 import type { MyConfigMap } from './Config.types';
 import { getIndexComponents } from './getIndexComponents';
 import { query } from './query';
-import type { ShardQueryFunction } from './ShardQueryFunction';
+import type { ShardQueryFunction } from './ShardQueryFunction';
+
 describe('query', function () {
   let users: Item[];
   let mockDb: MockDb<Item>;

@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { entityManager, type Item } from '../../test/config';
-
 import { getUsers } from '../../test/users';
-
 import { addKeys } from './addKeys';
-
 import { removeKeys } from './removeKeys';
 
 describe('removeKeys', function () {
@@ -25,4 +22,3 @@ describe('removeKeys', function () {
     expect(item).not.to.haveOwnProperty('phoneRK');
   });
 });
-

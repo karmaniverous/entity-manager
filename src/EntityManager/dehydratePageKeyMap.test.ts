@@ -8,7 +8,8 @@ import { addKeys } from './addKeys';
 import type { MyConfigMap } from './Config.types';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
 import { getIndexComponents } from './getIndexComponents';
-import type { PageKeyMap } from './PageKeyMap';
+import type { PageKeyMap } from './PageKeyMap';
+
 describe('dehydratePageKeyMap', function () {
   let item: Item;
   let item0: Item;

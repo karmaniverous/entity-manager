@@ -44,7 +44,7 @@ export function encodeGeneratedProperty<C extends BaseConfigMap>(
         ? [item[entityManager.config.hashKey as keyof EntityItem<C>]]
         : []),
       ...elementMap.map(([element, value]) =>
-        [element, String(value ?? '')].join(
+        [element, `${value ?? ''}`].join(
           entityManager.config.generatedValueDelimiter,
         ),
       ),

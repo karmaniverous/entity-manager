@@ -76,4 +76,13 @@
   - Type-safe transcode encode/decode invocation; removed unnecessary .toString().
   - ESLint: limit type-aware linting to src/config files (tests excluded);
     provided TS parser for eslint.config.ts; silenced dynamic delete at exact
-    sites; fixed logger typing in tests.
+    sites; fixed logger typing in tests.
+
+- ESLint: enforce strict, type-aware rules across ALL TS (tests included)
+  - Removed `src/**/*.test.ts` from tsconfig.json `exclude` so parserOptions.project includes test specs.
+  - Set TS parser on the `eslint.config.ts` override to resolve “Unexpected token as” when linting the config file.
+  - Fixed lint violations:
+    - Replaced `any[]` in ParsedConfig transcode encode signature with `(value: unknown) => string` (no-explicit-any).
+    - Avoided unnecessary `String()` conversion in encodeGeneratedProperty by using a template literal (no-unnecessary-type-conversion).
+    - Added a targeted disable for dynamic delete in removeKeys loop (consistent with existing targeted disables).
+  - Re-ran lint: typed-lint now applies to tests without requiring an eslint-specific tsconfig.

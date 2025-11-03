@@ -7,7 +7,8 @@ import { addKeys } from './addKeys';
 import type { MyConfigMap } from './Config.types';
 import { decodeGeneratedProperty } from './decodeGeneratedProperty';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
-import { getHashKeySpace } from './getHashKeySpace';import { getIndexComponents } from './getIndexComponents';
+import { getHashKeySpace } from './getHashKeySpace';
+import { getIndexComponents } from './getIndexComponents';
 import type { PageKeyMap } from './PageKeyMap';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
 
