@@ -28,3 +28,14 @@
   - Removed Mocha/NYC/Chai and related types/plugins from devDependencies.
   - Updated knip configuration (removed Mocha section; ignored tsd test dir).
   - Kept build/docs scripts unchanged; no source logic changes in this pass.
+
+- Zod v4 migration (no deprecated APIs):
+  - Updated ParsedConfig schema to Zod v4: z.record(key, value) everywhere.
+  - Switched to z.function(argsTuple, returnType) for encode/decode shapes.
+  - Replaced ZodIssueCode.invalid_enum_value with invalid_value.
+  - This restores correct typing of config entities/indexes and removes
+    “unknown” index errors across helpers (decode/encode/dehydrate, etc.).
+
+- ESLint coverage of config file:
+  - Keep strict, type-aware rules across source and tests.
+  - Lint eslint.config.ts under recommended + Prettier/import-sort/TSDoc to avoid a known upstream crash in @typescript-eslint/unified-signatures.

@@ -28,6 +28,12 @@ export default defineConfig([
   },
   // Base + strict type-checked rules
   {
+    files: [
+      'src/**/*.ts',
+      'test/**/*.ts',
+      'rollup.config.ts',
+      'vitest.config.ts',
+    ],
     extends: [
       eslint.configs.recommended,
       ...tseslint.configs.strictTypeChecked,
@@ -56,6 +62,28 @@ export default defineConfig([
       'tsdoc/syntax': 'warn',
     },
   },
+  // Lint the config itself without type-aware rules to avoid upstream rule crash
+  {
+    files: ['eslint.config.ts'],
+    extends: [eslint.configs.recommended, prettierPlugin],
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    plugins: {
+      'simple-import-sort': simpleImportSortPlugin,
+      tsdoc: tsDocPlugin,
+      prettier: prettierEslintPlugin,
+    },
+    rules: {
+      'prettier/prettier': 'error',
+      'simple-import-sort/imports': 'error',
+      'simple-import-sort/exports': 'error',
+      'tsdoc/syntax': 'warn',
+      'no-unused-vars': 'off',
+    },
+  },
   // Vitest rules and globals for test files
   {
     files: ['**/*.test.ts'],
@@ -68,4 +96,4 @@ export default defineConfig([
       'vitest/valid-expect': 'off',
     },
   },
-]);
+]);

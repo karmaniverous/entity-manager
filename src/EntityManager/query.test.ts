@@ -4,11 +4,10 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { day, entityManager, type Item, now } from '../../test/config';
 import { getUsers } from '../../test/users';
 import { addKeys } from './addKeys';
-import type { MyConfigMap } from './Config.test';
+import type { MyConfigMap } from './Config.types';
 import { getIndexComponents } from './getIndexComponents';
 import { query } from './query';
-import type { ShardQueryFunction } from './ShardQueryFunction';
-
+import type { ShardQueryFunction } from './ShardQueryFunction';
 describe('query', function () {
   let users: Item[];
   let mockDb: MockDb<Item>;

@@ -1,7 +1,5 @@
-/* eslint-env mocha */
-
 import { defaultTranscodes, type EntityMap } from '@karmaniverous/entity-tools';
-import { expect } from 'chai';
+import { describe, it, beforeEach, expect } from 'vitest';
 
 import type { Config } from './Config';
 import type { ConfigMap } from './ConfigMap';

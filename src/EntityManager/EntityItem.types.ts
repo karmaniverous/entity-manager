@@ -1,4 +1,4 @@
-import type { MyConfigMap } from './Config.test';
+import type { MyConfigMap } from './Config.types';
 import type { EntityItem } from './EntityItem';
 
 export type MyEntityItem = EntityItem<MyConfigMap>;

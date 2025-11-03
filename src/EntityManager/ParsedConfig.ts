@@ -48,6 +48,7 @@ export const configSchema = z
   .object({
     entities: z
       .record(
+        z.string(),
         z
           .object({
             defaultLimit: z
@@ -117,14 +118,15 @@ export const configSchema = z
       .default({}),
     generatedProperties: z
       .object({
-        sharded: z.record(componentArray).optional().default({}),
-        unsharded: z.record(componentArray).optional().default({}),
+        sharded: z.record(z.string(), componentArray).optional().default({}),
+        unsharded: z.record(z.string(), componentArray).optional().default({}),
       })
       .optional()
       .default({ sharded: {}, unsharded: {} }),
     hashKey: z.string(),
     indexes: z
       .record(
+        z.string(),
         z.object({
           hashKey: z.string().min(1),
           rangeKey: z.string().min(1),
@@ -138,16 +140,18 @@ export const configSchema = z
       .default({}),
     generatedKeyDelimiter: z.string().regex(/\W+/).optional().default('|'),
     generatedValueDelimiter: z.string().regex(/\W+/).optional().default('#'),
-    propertyTranscodes: z.record(z.string()).optional().default({}),
+    propertyTranscodes: z.record(z.string(), z.string()).optional().default({}),
     rangeKey: z.string(),
     shardKeyDelimiter: z.string().regex(/\W+/).optional().default('!'),
     throttle: z.number().int().positive().safe().optional().default(10),
     transcodes: z
       .record(
+        z.string(),
         z
           .object({
-            encode: z.function().args(z.any()).returns(z.string()),
-            decode: z.function().args(z.string()).returns(z.any()),
+            // Zod v4: function(argsTuple, returnType)
+            encode: z.function(z.tuple([z.any()]), z.string()),
+            decode: z.function(z.tuple([z.string()]), z.any()),
           })
           .strict(),
       )
@@ -273,7 +277,7 @@ export const configSchema = z
     for (const [property, transcode] of Object.entries(data.propertyTranscodes))
       if (!transcodes.includes(transcode))
         ctx.addIssue({
-          code: z.ZodIssueCode.invalid_enum_value,
+          code: z.ZodIssueCode.invalid_value,
           options: transcodes,
           path: ['propertyTranscodes', property],
           received: transcode,
@@ -286,7 +290,7 @@ export const configSchema = z
       for (const element of elements)
         if (!transcodedProperties.includes(element))
           ctx.addIssue({
-            code: z.ZodIssueCode.invalid_enum_value,
+            code: z.ZodIssueCode.invalid_value,
             options: transcodedProperties,
             received: element,
             path: ['generatedProperties', 'sharded', property],
@@ -299,7 +303,7 @@ export const configSchema = z
       for (const element of elements)
         if (!transcodedProperties.includes(element))
           ctx.addIssue({
-            code: z.ZodIssueCode.invalid_enum_value,
+            code: z.ZodIssueCode.invalid_value,
             options: transcodedProperties,
             received: element,
             path: ['generatedProperties', 'unsharded', property],
@@ -313,7 +317,7 @@ export const configSchema = z
       // Validate hash key is sharded.
       if (![data.hashKey, ...shardedKeys].includes(hashKey)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.invalid_enum_value,
+          code: z.ZodIssueCode.invalid_value,
           options: [data.hashKey, ...shardedKeys],
           path: ['indexes', indexKey, 'hashKey'],
           received: hashKey,
@@ -327,7 +331,7 @@ export const configSchema = z
         )
       ) {
         ctx.addIssue({
-          code: z.ZodIssueCode.invalid_enum_value,
+          code: z.ZodIssueCode.invalid_value,
           options: [data.rangeKey, ...unshardedKeys],
           path: ['indexes', indexKey, 'rangeKey'],
           received: rangeKey,
@@ -363,7 +367,7 @@ export const configSchema = z
       // validate timestampProperty is a transcoded property.
       if (!transcodedProperties.includes(timestampProperty))
         ctx.addIssue({
-          code: z.ZodIssueCode.invalid_enum_value,
+          code: z.ZodIssueCode.invalid_value,
           options: transcodedProperties,
           path: ['entities', entityToken, 'timestampProperty'],
           received: timestampProperty,
@@ -372,7 +376,7 @@ export const configSchema = z
       // validate uniqueProperty is a transcoded property.
       if (!transcodedProperties.includes(uniqueProperty))
         ctx.addIssue({
-          code: z.ZodIssueCode.invalid_enum_value,
+          code: z.ZodIssueCode.invalid_value,
           options: transcodedProperties,
           path: ['entities', entityToken, 'uniqueProperty'],
           received: uniqueProperty,
