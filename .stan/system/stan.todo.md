@@ -39,3 +39,12 @@
 - ESLint coverage of config file:
   - Keep strict, type-aware rules across source and tests.
   - Lint eslint.config.ts under recommended + Prettier/import-sort/TSDoc to avoid a known upstream crash in @typescript-eslint/unified-signatures.
+
+- Tests: reduce console verbosity
+  - Injected a no-op logger for `EntityManager` in test/config.ts to suppress
+    noisy `logger.debug` output during Vitest runs while preserving errors via
+    `console.error`. This cuts multi‑MB test logs to a minimal, readable output.
+
+- Tests: make error logs opt-in
+  - logger.error in test/config.ts now only emits when VERBOSE_TEST is set;
+    default runs are quiet even for expected-throw tests.

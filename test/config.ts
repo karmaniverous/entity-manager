@@ -46,6 +46,16 @@ type MyConfigMap = ConfigMap<{
   TranscodedProperties: MyTranscodedProperties;
 }>;
 
+// Silence verbose debug logging in tests. Keep error logs behind an opt-in
+// env var to avoid noisy stderr by default. Set VERBOSE_TEST=1 to re-enable.
+export const testLogger: Pick<Console, 'debug' | 'error'> = {
+  debug: () => undefined,
+  error: (...args: any[]) => {
+    if (process.env.VERBOSE_TEST) console.error(...args);
+  },
+};
+
+
 export const entityManager = new EntityManager<MyConfigMap>({
   entities: {
     email: {
@@ -94,6 +104,6 @@ export const entityManager = new EntityManager<MyConfigMap>({
   },
   rangeKey: 'rangeKey',
   transcodes: defaultTranscodes,
-});
+}, testLogger);
 
 export type Item = EntityItem<MyConfigMap>;
