@@ -51,7 +51,9 @@ export function dehydratePageKeyMap<C extends BaseConfigMap>(
 
     // Extract, sort & validate indexs.
     const indexes = Object.keys(pageKeyMap).sort();
-    indexes.map((index) => validateIndexToken(entityManager, index));
+    indexes.map((index) => {
+      validateIndexToken(entityManager, index);
+    });
 
     // Extract & sort hash keys.
     const hashKeys = Object.keys(pageKeyMap[indexes[0]]);

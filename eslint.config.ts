@@ -60,6 +60,7 @@ export default defineConfig([
       'simple-import-sort/imports': 'error',
       'simple-import-sort/exports': 'error',
       'tsdoc/syntax': 'warn',
+      '@typescript-eslint/unified-signatures': 'off',
     },
   },
   // Lint the config itself without type-aware rules to avoid upstream rule crash

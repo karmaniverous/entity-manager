@@ -31,9 +31,11 @@ export function encodeElement<C extends BaseConfigMap>(
     if (value === undefined || [hashKey, rangeKey].includes(element))
       return value;
 
-    const encoded =
-      transcodes[propertyTranscodes[element]].encode(item[element]) ||
-      undefined;
+    const encodeFn = transcodes[propertyTranscodes[element]].encode as (
+      v: unknown,
+    ) => string;
+
+    const encoded = encodeFn(item[element] as unknown) || undefined;
 
     entityManager.logger.debug('encoded entity element', {
       element,

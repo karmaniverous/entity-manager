@@ -47,4 +47,23 @@
 
 - Tests: make error logs opt-in
   - logger.error in test/config.ts now only emits when VERBOSE_TEST is set;
-    default runs are quiet even for expected-throw tests.
+    default runs are quiet even for expected-throw tests.
+
+- Zod v4 typing fixes & TS errors
+  - Replaced z.function usages in ParsedConfig with tolerant z.custom function
+    checks for transcodes.encode/decode to avoid TS2554 and inference issues.
+  - Switched addIssue calls with invalid_value to custom messages compatible
+    with Zod v4 typing.
+  - Adjusted encodeElement/decodeElement to cast encode/decode functions,
+    fixing TS2554/TS2322.
+
+- Tests: update Zod v4 message expectations
+  - ParsedConfig.test.ts assertions now match "Too small/Too big" messages.
+
+- Build: fix Rollup JSON import assertion & DTS plugins
+  - Remove `assert { type: 'json' }` and read package.json via fs; flatten DTS
+    plugins array to avoid nested arrays.
+
+- Lint/Knip: guard upstream crash and cleanup
+  - Disable @typescript-eslint/unified-signatures; update knip.json to remove
+    redundant ignores and ignore expected anchors/type-only file.

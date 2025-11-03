@@ -55,55 +55,57 @@ export const testLogger: Pick<Console, 'debug' | 'error'> = {
   },
 };
 
-
-export const entityManager = new EntityManager<MyConfigMap>({
-  entities: {
-    email: {
-      timestampProperty: 'created',
-      uniqueProperty: 'email',
+export const entityManager = new EntityManager<MyConfigMap>(
+  {
+    entities: {
+      email: {
+        timestampProperty: 'created',
+        uniqueProperty: 'email',
+      },
+      user: {
+        shardBumps: [
+          { timestamp: now + day, charBits: 2, chars: 1 },
+          { timestamp: now + day * 2, charBits: 2, chars: 2 },
+        ],
+        timestampProperty: 'created',
+        uniqueProperty: 'userId',
+      },
     },
-    user: {
-      shardBumps: [
-        { timestamp: now + day, charBits: 2, chars: 1 },
-        { timestamp: now + day * 2, charBits: 2, chars: 2 },
-      ],
-      timestampProperty: 'created',
-      uniqueProperty: 'userId',
+    generatedProperties: {
+      sharded: {
+        beneficiaryPK: ['beneficiaryId'],
+        userPK: ['userId'],
+      },
+      unsharded: {
+        firstNameRK: ['firstNameCanonical', 'lastNameCanonical'],
+        lastNameRK: ['lastNameCanonical', 'firstNameCanonical'],
+        phoneRK: ['phone', 'created'],
+      },
     },
-  },
-  generatedProperties: {
-    sharded: {
-      beneficiaryPK: ['beneficiaryId'],
-      userPK: ['userId'],
+    hashKey: 'hashKey2',
+    indexes: {
+      beneficiaryCreated: { hashKey: 'beneficiaryPK', rangeKey: 'created' },
+      created: { hashKey: 'hashKey2', rangeKey: 'created' },
+      firstName: { hashKey: 'hashKey2', rangeKey: 'firstNameRK' },
+      lastName: { hashKey: 'hashKey2', rangeKey: 'lastNameRK' },
+      phone: { hashKey: 'hashKey2', rangeKey: 'phone' },
+      updated: { hashKey: 'hashKey2', rangeKey: 'updated' },
+      userCreated: { hashKey: 'userPK', rangeKey: 'created' },
     },
-    unsharded: {
-      firstNameRK: ['firstNameCanonical', 'lastNameCanonical'],
-      lastNameRK: ['lastNameCanonical', 'firstNameCanonical'],
-      phoneRK: ['phone', 'created'],
+    propertyTranscodes: {
+      beneficiaryId: 'string',
+      created: 'timestamp',
+      email: 'string',
+      firstNameCanonical: 'string',
+      lastNameCanonical: 'string',
+      phone: 'string',
+      updated: 'timestamp',
+      userId: 'string',
     },
+    rangeKey: 'rangeKey',
+    transcodes: defaultTranscodes,
   },
-  hashKey: 'hashKey2',
-  indexes: {
-    beneficiaryCreated: { hashKey: 'beneficiaryPK', rangeKey: 'created' },
-    created: { hashKey: 'hashKey2', rangeKey: 'created' },
-    firstName: { hashKey: 'hashKey2', rangeKey: 'firstNameRK' },
-    lastName: { hashKey: 'hashKey2', rangeKey: 'lastNameRK' },
-    phone: { hashKey: 'hashKey2', rangeKey: 'phone' },
-    updated: { hashKey: 'hashKey2', rangeKey: 'updated' },
-    userCreated: { hashKey: 'userPK', rangeKey: 'created' },
-  },
-  propertyTranscodes: {
-    beneficiaryId: 'string',
-    created: 'timestamp',
-    email: 'string',
-    firstNameCanonical: 'string',
-    lastNameCanonical: 'string',
-    phone: 'string',
-    updated: 'timestamp',
-    userId: 'string',
-  },
-  rangeKey: 'rangeKey',
-  transcodes: defaultTranscodes,
-}, testLogger);
+  testLogger,
+);
 
 export type Item = EntityItem<MyConfigMap>;

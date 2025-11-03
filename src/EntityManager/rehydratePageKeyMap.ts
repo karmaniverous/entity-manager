@@ -64,7 +64,9 @@ export function rehydratePageKeyMap<C extends BaseConfigMap>(
 
     const [hashKeyToken] = hashKeys;
 
-    indexTokens.map((index) => validateIndexToken(entityManager, index));
+    indexTokens.map((index) => {
+      validateIndexToken(entityManager, index);
+    });
 
     // Shortcut empty dehydrated.
     if (dehydrated && !dehydrated.length) return [hashKeyToken, {}];

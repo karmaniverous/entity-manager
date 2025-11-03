@@ -149,9 +149,14 @@ export const configSchema = z
         z.string(),
         z
           .object({
-            // Zod v4: function(argsTuple, returnType)
-            encode: z.function(z.tuple([z.any()]), z.string()),
-            decode: z.function(z.tuple([z.string()]), z.any()),
+            // Accept function shapes without relying on z.function()
+            // to avoid TS inference conflicts across Zod versions.
+            encode: z.custom<(...args: any[]) => string>(
+              (fn) => typeof fn === 'function',
+            ),
+            decode: z.custom<(value: string) => unknown>(
+              (fn) => typeof fn === 'function',
+            ),
           })
           .strict(),
       )
@@ -277,10 +282,9 @@ export const configSchema = z
     for (const [property, transcode] of Object.entries(data.propertyTranscodes))
       if (!transcodes.includes(transcode))
         ctx.addIssue({
-          code: z.ZodIssueCode.invalid_value,
-          options: transcodes,
+          code: z.ZodIssueCode.custom,
+          message: `propertyTranscodes['${property}'] references unknown transcode '${transcode}'`,
           path: ['propertyTranscodes', property],
-          received: transcode,
         });
 
     // Validate all sharded property elements are transcoded properties.
@@ -290,9 +294,8 @@ export const configSchema = z
       for (const element of elements)
         if (!transcodedProperties.includes(element))
           ctx.addIssue({
-            code: z.ZodIssueCode.invalid_value,
-            options: transcodedProperties,
-            received: element,
+            code: z.ZodIssueCode.custom,
+            message: `generatedProperties.sharded['${property}'] contains non-transcoded element '${element}'`,
             path: ['generatedProperties', 'sharded', property],
           });
 
@@ -303,9 +306,8 @@ export const configSchema = z
       for (const element of elements)
         if (!transcodedProperties.includes(element))
           ctx.addIssue({
-            code: z.ZodIssueCode.invalid_value,
-            options: transcodedProperties,
-            received: element,
+            code: z.ZodIssueCode.custom,
+            message: `generatedProperties.unsharded['${property}'] contains non-transcoded element '${element}'`,
             path: ['generatedProperties', 'unsharded', property],
           });
 
@@ -317,10 +319,12 @@ export const configSchema = z
       // Validate hash key is sharded.
       if (![data.hashKey, ...shardedKeys].includes(hashKey)) {
         ctx.addIssue({
-          code: z.ZodIssueCode.invalid_value,
-          options: [data.hashKey, ...shardedKeys],
+          code: z.ZodIssueCode.custom,
+          message: `index '${indexKey}' hashKey '${hashKey}' must be one of [${[
+            data.hashKey,
+            ...shardedKeys,
+          ].join(', ')}]`,
           path: ['indexes', indexKey, 'hashKey'],
-          received: hashKey,
         });
       }
 
@@ -331,10 +335,13 @@ export const configSchema = z
         )
       ) {
         ctx.addIssue({
-          code: z.ZodIssueCode.invalid_value,
-          options: [data.rangeKey, ...unshardedKeys],
+          code: z.ZodIssueCode.custom,
+          message: `index '${indexKey}' rangeKey '${rangeKey}' must be one of [${[
+            data.rangeKey,
+            ...unshardedKeys,
+            ...transcodedProperties,
+          ].join(', ')}]`,
           path: ['indexes', indexKey, 'rangeKey'],
-          received: rangeKey,
         });
       }
 
@@ -367,19 +374,17 @@ export const configSchema = z
       // validate timestampProperty is a transcoded property.
       if (!transcodedProperties.includes(timestampProperty))
         ctx.addIssue({
-          code: z.ZodIssueCode.invalid_value,
-          options: transcodedProperties,
+          code: z.ZodIssueCode.custom,
+          message: `entities['${entityToken}'].timestampProperty '${timestampProperty}' must be one of [${transcodedProperties.join(', ')}]`,
           path: ['entities', entityToken, 'timestampProperty'],
-          received: timestampProperty,
         });
 
       // validate uniqueProperty is a transcoded property.
       if (!transcodedProperties.includes(uniqueProperty))
         ctx.addIssue({
-          code: z.ZodIssueCode.invalid_value,
-          options: transcodedProperties,
+          code: z.ZodIssueCode.custom,
+          message: `entities['${entityToken}'].uniqueProperty '${uniqueProperty}' must be one of [${transcodedProperties.join(', ')}]`,
           path: ['entities', entityToken, 'uniqueProperty'],
-          received: uniqueProperty,
         });
     }
   });

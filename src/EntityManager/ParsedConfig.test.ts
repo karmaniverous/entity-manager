@@ -220,7 +220,7 @@ describe('Config', function () {
     ];
 
     expect(() => configSchema.parse(testConfig)).to.throw(
-      'Number must be greater than or equal to 0',
+      'Too small: expected number to be >=0',
     );
   });
 
@@ -230,7 +230,7 @@ describe('Config', function () {
     ];
 
     expect(() => configSchema.parse(testConfig)).to.throw(
-      'Number must be less than or equal to 40',
+      'Too big: expected number to be <=40',
     );
   });
 

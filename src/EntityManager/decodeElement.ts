@@ -31,9 +31,11 @@ export function decodeElement<C extends BaseConfigMap>(
 
     const { propertyTranscodes, transcodes } = entityManager.config;
 
-    const decoded = transcodes[propertyTranscodes[element]].decode(
-      value,
-    ) as EntityItem<C>[C['TranscodedProperties']];
+    const decodeFn = transcodes[propertyTranscodes[element]].decode as (
+      v: string,
+    ) => unknown;
+
+    const decoded = decodeFn(value) as EntityItem<C>[C['TranscodedProperties']];
 
     entityManager.logger.debug('decoded entity element', {
       element,

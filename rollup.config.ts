@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import aliasPlugin, { Alias } from '@rollup/plugin-alias';
 import commonjsPlugin from '@rollup/plugin-commonjs';
 import jsonPlugin from '@rollup/plugin-json';
@@ -7,7 +9,9 @@ import typescriptPlugin from '@rollup/plugin-typescript';
 import type { InputOptions, RollupOptions } from 'rollup';
 import dtsPlugin from 'rollup-plugin-dts';
 
-import pkg from './package.json' assert { type: 'json' };
+const pkg = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
+);
 
 const outputPath = `dist`;
 
@@ -63,7 +67,7 @@ const config: RollupOptions[] = [
   // Type definitions output.
   {
     ...commonInputOptions,
-    plugins: [commonInputOptions.plugins, dtsPlugin()],
+    plugins: [...(commonInputOptions.plugins ?? []), dtsPlugin()],
     output: [
       {
         extend: true,
