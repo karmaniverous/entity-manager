@@ -13,3 +13,7 @@
     ensuring all placeholders are utilized for multi-character shard keys.
   - Added a unit test that verifies suffix selection spans the full shard space
     for chars > 1 by comparing against an expected base-radix suffix.
+
+- Requirements: create authoritative stan.requirements.md
+  - Extracted and formalized current implementation behavior (global config model,
+    delimiters, sharding, page-key dehydration/rehydration, query orchestration).
