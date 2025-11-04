@@ -111,3 +111,9 @@
   - Updated typecheck script to run `tsd test/types` explicitly so the suite
     is discovered reliably while retaining tsd.config.json path mapping to src.
 
+- Types: consolidate tsd tests and resolve issues
+  - Merged basic.test-d.ts into entity-manager-types.test-d.ts and removed the
+    former. Switched imports to `../../src/index.ts` so Rollup build does not
+    attempt to resolve the package name during compilation. Removed async from
+    the shardQueryFn and marked parameters as used to satisfy ESLint. Restored
+    `typecheck` to `tsc && tsd` to rely on tsd.config.json discovery.

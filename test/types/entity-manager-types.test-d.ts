@@ -1,3 +1,6 @@
+import type { Entity } from '@karmaniverous/entity-tools';
+import { expectAssignable, expectNotAssignable, expectType } from 'tsd';
+
 import type {
   BaseConfigMap,
   ConfigMap,
@@ -12,10 +15,10 @@ import type {
   ShardQueryFunction,
   ShardQueryMap,
   ShardQueryResult,
-} from '@karmaniverous/entity-manager';
-import type { Entity } from '@karmaniverous/entity-tools';
-import { expectAssignable, expectNotAssignable, expectType } from 'tsd';
+} from '../../src/index.ts';
 
+// BaseConfigMap availability/shape
+expectType<BaseConfigMap>({} as BaseConfigMap);
 // Define a minimal EntityMap for testing.
 interface Email extends Entity {
   created: number;
@@ -85,14 +88,18 @@ const pageKeyOk: PageKey<MyConfigMap> = { rangeKey: 'userId#u' };
 expectAssignable<PageKey<MyConfigMap>>(pageKeyOk);
 
 // ShardQueryFunction — provider-agnostic query of a single shard.
-const shardQueryFn: ShardQueryFunction<MyConfigMap> = async (
+const shardQueryFn: ShardQueryFunction<MyConfigMap> = (
   hashKey: string,
-  pageKey,
-  pageSize,
+  pageKey?: PageKey<MyConfigMap>,
+  pageSize?: number,
 ) => {
+  // satisfy ESLint no-unused-vars in type tests
+  void hashKey;
+  void pageKey;
+  void pageSize;
   const items: EntityItem<MyConfigMap>[] = [];
   const res: ShardQueryResult<MyConfigMap> = { count: 0, items, pageKey };
-  return res;
+  return Promise.resolve(res);
 };
 
 // ShardQueryMap — map index token -> shard query fn.

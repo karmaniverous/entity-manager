@@ -1,6 +1,6 @@
 {
   "entry": ["src/**/index.ts"],
-  "ignoreDependencies": ["auto-changelog", "cross-env"],
+  "ignoreDependencies": ["cross-env"],
   "project": ["*/**", "!docs/**"],
   "ignore": [
     "test/types/**",
