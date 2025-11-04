@@ -68,6 +68,9 @@ export function updateItemHashKey<C extends BaseConfigMap>(
       // Radix is the numerical base of the shardKey.
       const radix = 2 ** charBits;
 
+      // Compute the full shard space for this bump. Use radix ** chars to ensure
+      // all placeholders are utilized (e.g., chars=2, charBits=2 => 16 combos).
+      const space = radix ** chars;
       // Get item unique property & validate.
       const uniqueId =
         item[
@@ -77,7 +80,7 @@ export function updateItemHashKey<C extends BaseConfigMap>(
 
       if (isNil(uniqueId)) throw new Error(`missing item unique property`);
 
-      hashKey += (stringHash(uniqueId) % (chars * radix))
+      hashKey += (stringHash(uniqueId) % space)
         .toString(radix)
         .padStart(chars, '0');
     }

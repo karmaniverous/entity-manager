@@ -1,3 +1,4 @@
+import stringHash from 'string-hash';
 import { describe, expect, it } from 'vitest';
 
 import { day, entityManager, type Item, now } from '../../test/config';
@@ -41,5 +42,37 @@ describe('updateItemHashKey', function () {
     item = updateItemHashKey(entityManager, 'user', item, true);
 
     expect(item.hashKey2?.length).to.equal(7);
+  });
+
+  it('should use full shard space for multi-character shard keys', function () {
+    // Target a shard bump with chars=2, charBits=2
+    // (configured at now + day * 2 in test/config.ts).
+    const radix = 2 ** 2; // 4
+    const chars = 2;
+    const space = radix ** chars; // 16 combinations (00..33 in base 4)
+
+    // Find a userId whose hash mod space lands in the upper half (>= 8),
+    // which would be unreachable if the modulus mistakenly used (chars * radix).
+    let chosenId: string | undefined;
+    let expectedSuffix = '';
+
+    for (let i = 0; i < 2000; i++) {
+      const candidate = `user-${String(i)}`;
+      const mod = stringHash(candidate) % space;
+      if (mod >= 8) {
+        chosenId = candidate;
+        expectedSuffix = mod.toString(radix).padStart(chars, '0');
+        break;
+      }
+    }
+
+    expect(chosenId, 'failed to find a suitable candidate userId').to.be.ok;
+
+    const [item] = getUsers() as Partial<Item>[];
+    item.userId = chosenId!;
+    item.created = now + day * 2; // pick the bump with chars=2
+
+    const updated = updateItemHashKey(entityManager, 'user', item);
+    expect(updated.hashKey2?.endsWith(expectedSuffix)).to.be.true;
   });
 });
