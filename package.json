@@ -116,15 +116,15 @@
   },
   "scripts": {
     "build": "rimraf dist && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
+    "changelog": "auto-changelog",
     "docs": "typedoc",
     "knip": "knip",
     "lint": "eslint .",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "npm run lint -- --fix .",
     "release": "dotenvx run -f .env.local -- release-it",
-    "release:pre": "dotenvx run -f .env.local -- release-it --no-git.requireBranch --github.prerelease --preRelease",
-    "test": "vitest run --coverage",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "type:test": "tsd"
+    "release:pre": "npm run release -- --no-git.requireBranch --github.prerelease --preRelease",
+    "test": "vitest --run --silent",
+    "typecheck": "tsc && tsd test/types"
   },
   "type": "module",
   "types": "dist/index.d.ts",

@@ -21,7 +21,7 @@
   - Lint scripts updated to cover entire repo (not just src).
 
 - tsd integration for type tests.
-  - Added tsd devDependency, tsd.config.json and a basic test in tests/types/.
+  - Added tsd devDependency, tsd.config.json and a basic test in test/types/.
   - Provided separate npm script `type:test` to run tsd.
 
 - Tooling cleanup.
@@ -100,4 +100,14 @@
 
 - Docs: fix TypeDoc @param name mismatch
   - Updated JSDoc on EntityManager.addKeys and getPrimaryKey array overloads
-    to use `@param item` (matches parameter name), clearing the warning.
+    to use `@param item` (matches parameter name), clearing the warning.
+
+- Docs: clear remaining TypeDoc warning on getPrimaryKey
+  - Corrected second overload JSDoc to use `@param items` to match the parameter name.
+
+- Types: add tsd tests for core exported types
+  - Added tests under test/types exercising ConfigMap, EntityItem/Key/Record,
+    EntityToken, PageKey, QueryOptions/Result, and shard-related types.
+  - Updated typecheck script to run `tsd test/types` explicitly so the suite
+    is discovered reliably while retaining tsd.config.json path mapping to src.
+

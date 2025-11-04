@@ -1,12 +1,9 @@
 {
   "entry": ["src/**/index.ts"],
-  "ignoreDependencies": [
-    "auto-changelog",
-    "cross-env"
-  ],
+  "ignoreDependencies": ["auto-changelog", "cross-env"],
   "project": ["*/**", "!docs/**"],
   "ignore": [
-    "tests/types/**",
+    "test/types/**",
     ".stan/imports/**",
     "src/EntityManager/EntityItem.types.ts"
   ],
@@ -15,3 +12,4 @@
     "types": "off"
   }
 }
+

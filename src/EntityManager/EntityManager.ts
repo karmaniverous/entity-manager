@@ -156,7 +156,7 @@ export class EntityManager<C extends BaseConfigMap> {
    * Convert an array of {@link EntityItem | `EntityItem`} objects into {@link EntityKey | `EntityKey`} objects.
    *
    * @param entityToken - {@link Config | `Config`} `entities` key.
-   * @param item - Array of {@link EntityItem | `EntityItem`} objects.
+   * @param items - Array of {@link EntityItem | `EntityItem`} objects.
    * @param overwrite - Overwrite existing properties (default `false`).
    *
    * @returns An array of {@link EntityKey | `EntityKey`} objects extracted from shallow clone of each `item` with updated properties.
