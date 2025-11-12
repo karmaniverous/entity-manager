@@ -8,6 +8,17 @@
 
 ## Completed (recent)
 
+- Shard-space narrowing based on uniqueProperty presence
+  - getHashKeySpace now automatically constrains to exactly one shard suffix
+    per bump when the item's uniqueProperty is present (non-null/undefined),
+    for both global and sharded hash keys. Otherwise it enumerates the full
+    shard space (unchanged).
+  - Alternate sharded keys still require appropriate elements; missing
+    elements continue to throw via encodeGeneratedProperty.
+  - Note: pagination requires consistent presence/absence of uniqueProperty
+    across pages; otherwise dehydrated/rehydrated page-key lengths will
+    mismatch by design.
+
 - Sharding: use full shard space per bump in hash key assignment
   - Fixed updateItemHashKey to use modulus (radix \*_ chars) instead of (chars _ radix),
     ensuring all placeholders are utilized for multi-character shard keys.

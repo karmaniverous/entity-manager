@@ -1,4 +1,5 @@
 import { range } from 'radash';
+import stringHash from 'string-hash';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
@@ -40,6 +41,12 @@ export function getHashKeySpace<C extends BaseConfigMap>(
 
     const { shardBumps } = entityManager.config.entities[entityToken];
 
+    // Detect presence of the entity's unique property on the item.
+    const uniqueProp =
+      entityManager.config.entities[entityToken].uniqueProperty;
+
+    const uniqueValue = item[uniqueProp as keyof EntityItem<C>];
+
     const hashKeySpace = shardBumps
       // Filter shard bumps by timestamp range.
       .filter(
@@ -52,11 +59,22 @@ export function getHashKeySpace<C extends BaseConfigMap>(
       .flatMap(({ charBits, chars }) => {
         const radix = 2 ** charBits;
 
-        return chars
-          ? [...range(0, radix ** chars - 1)].map((char) =>
-              char.toString(radix).padStart(chars, '0'),
-            )
-          : '';
+        // If the item's unique property is present, deterministically
+        // compute exactly one shard suffix for this bump. Otherwise,
+        // enumerate the full shard space for the bump.
+        if (chars) {
+          if (uniqueValue) {
+            const space = radix ** chars;
+            const mod = stringHash(uniqueValue) % space;
+            return mod.toString(radix).padStart(chars, '0');
+          }
+
+          return [...range(0, radix ** chars - 1)].map((char) =>
+            char.toString(radix).padStart(chars, '0'),
+          );
+        }
+
+        return '';
       })
       // Map shard keys to hash keys.
       .map((shardKey) => {

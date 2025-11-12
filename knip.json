@@ -1,15 +1,14 @@
 {
   "entry": ["src/**/index.ts"],
-  "ignoreDependencies": ["cross-env"],
-  "project": ["*/**", "!docs/**"],
   "ignore": [
     "test/types/**",
     ".stan/imports/**",
     "src/EntityManager/EntityItem.types.ts"
   ],
+  "ignoreDependencies": ["cross-env"],
+  "project": ["*/**", "!docs/**"],
   "rules": {
     "exports": "off",
     "types": "off"
   }
 }
-

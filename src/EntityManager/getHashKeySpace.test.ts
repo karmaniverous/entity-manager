@@ -56,7 +56,7 @@ describe('getHashKeySpace', function () {
     expect(hashKeySpace.length).to.equal(0);
   });
 
-  it('should get full alternate hash key space', function () {
+  it('should get constrained alternate hash key space when unique provided', function () {
     const hashKeySpace = getHashKeySpace(
       entityManager,
       'user',
@@ -66,8 +66,23 @@ describe('getHashKeySpace', function () {
       Infinity,
     );
 
-    expect(hashKeySpace.length).to.equal(21);
+    // Constrained to one suffix per bump → 3 bumps
+    expect(hashKeySpace.length).to.equal(3);
     expect(hashKeySpace[0]).to.equal('user!|userId#123');
+  });
+
+  it('should get constrained global hash key space when unique provided', function () {
+    const hashKeySpace = getHashKeySpace(
+      entityManager,
+      'user',
+      'hashKey2',
+      { userId: 'abc' },
+      now,
+      Infinity,
+    );
+
+    // Constrained to one suffix per bump → 3 bumps
+    expect(hashKeySpace.length).to.equal(3);
   });
 
   it('should fail on unsharded hash key token', function () {
