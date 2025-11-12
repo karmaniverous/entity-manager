@@ -6,7 +6,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
 import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
-import type { QueryOptions } from './QueryOptions';
+import { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
 import type { WorkingQueryResult } from './WorkingQueryResult';

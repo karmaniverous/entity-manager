@@ -8,6 +8,19 @@
 
 ## Completed (recent)
 
+- EntityManager.getPrimaryKey returns arrays and supports no-timestamp items
+  - Changed getPrimaryKey to always return EntityKey[].
+  - If overwrite=false and both hashKey and rangeKey are present on the item,
+    return that single pair.
+  - Otherwise, compute rangeKey; when timestampProperty is present, compute a
+    single hashKey and return one key. When timestampProperty is missing, enumerate
+    the hash-key space across all shard bumps (0..Infinity) and return one key per
+    bump (uniqueProperty present narrows to one suffix per bump).
+  - For array inputs, results are flattened into a single list.
+  - Added unit tests: single item (timestamp/no timestamp), array flattening,
+    honoring pre-populated keys with overwrite=false, and throwing when unique
+    property is missing.
+
 - Shard-space narrowing based on uniqueProperty presence
   - getHashKeySpace now automatically constrains to exactly one shard suffix
     per bump when the item's uniqueProperty is present (non-null/undefined),
