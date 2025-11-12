@@ -20,10 +20,11 @@
   - Added unit tests: single item (timestamp/no timestamp), array flattening,
     honoring pre-populated keys with overwrite=false, and throwing when unique
     property is missing.
+  - Amendment: Fixed test typing by using static keys (`hashKey2`, `rangeKey`)
+    instead of dynamic string indexing to satisfy TS7053 and ESLint rules.
 
 - Shard-space narrowing based on uniqueProperty presence
-  - getHashKeySpace now automatically constrains to exactly one shard suffix
-    per bump when the item's uniqueProperty is present (non-null/undefined),
+  - getHashKeySpace now automatically constrains to exactly one shard suffix    per bump when the item's uniqueProperty is present (non-null/undefined),
     for both global and sharded hash keys. Otherwise it enumerates the full
     shard space (unchanged).
   - Alternate sharded keys still require appropriate elements; missing

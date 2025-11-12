@@ -12,8 +12,7 @@ describe('getPrimaryKey (always returns array)', function () {
     expect(keys.length).to.equal(3);
 
     // rangeKey should match uniqueProperty#value
-    const { rangeKey } = entityManager.config;
-    expect(keys.every((k) => k[rangeKey].startsWith('userId#'))).to.be.true;
+    expect(keys.every((k) => k.rangeKey.startsWith('userId#'))).to.be.true;
   });
 
   it('returns a single key when timestamp is present', function () {
@@ -47,8 +46,8 @@ describe('getPrimaryKey (always returns array)', function () {
 
     const keys = entityManager.getPrimaryKey('user', item, false);
     expect(keys.length).to.equal(1);
-    expect(keys[0][hashKey]).to.equal('user!0');
-    expect(keys[0][rangeKey]).to.equal('userId#abc');
+    expect(keys[0].hashKey2).to.equal('user!0');
+    expect(keys[0].rangeKey).to.equal('userId#abc');
   });
 
   it('throws when uniqueProperty is missing', function () {
