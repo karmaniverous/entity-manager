@@ -192,8 +192,17 @@ const user = {
 // Add hashKey, rangeKey, and generated properties
 const record = manager.addKeys('user', user); // returns EntityRecord<...>
 
-// Get just the primary key
-const keyOnly = manager.getPrimaryKey('user', user); // { hashKey, rangeKey }
+// Get one or more primary keys for an item
+// - If the timestampProperty is present, you'll usually get exactly one key.
+// - If the timestampProperty is missing but uniqueProperty is present,
+//   you'll get one key per shard bump (deterministic suffix per bump).
+const keys = manager.getPrimaryKey('user', user); // EntityKey[]
+
+// Example: reading by unique id when timestamp is unknown
+// (keys may include multiple candidates — one per bump):
+// const keys = manager.getPrimaryKey('user', { userId: 'u123' });
+// const { Items } = await entityClient.getItems(keys);
+// const found = Items[0];
 
 // Remove generated keys from a stored record
 const pruned = manager.removeKeys('user', record);
