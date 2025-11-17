@@ -53,6 +53,18 @@ export type IndexRangeKeyOf<CF, IT extends string> = CF extends {
     : never
   : never;
 
+/**
+ * Derive the union of index token names from a values-first config literal.
+ *
+ * When CF carries an `indexes` object with preserved literal keys (prefer `as const`),
+ * this helper captures the index token union. Falls back to `string` if absent.
+ */
+export type IndexTokensOf<CF> = CF extends { indexes?: infer I }
+  ? I extends Record<string, unknown>
+    ? keyof I & string
+    : string
+  : string;
+
 export type HasIndexFor<CF, IT extends string> = CF extends {
   indexes?: infer I;
 }

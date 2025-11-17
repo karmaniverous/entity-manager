@@ -190,4 +190,9 @@
     TranscodedProperties. Return type unchanged. No runtime changes.
 
 - Lint fix — unwrapIndex ET generic
-  - Removed unused ET type parameter from unwrapIndex to satisfy @typescript-eslint/no-unnecessary-type-parameters. No runtime changes.
+  - Removed unused ET type parameter from unwrapIndex to satisfy @typescript-eslint/no-unnecessary-type-parameters. No runtime changes.
+
+- DX sugar — derive ITS from CF.indexes
+  - Added IndexTokensOf<CF> helper to capture index token unions from values-first
+    config literals.
+  - Added QueryOptionsByCF type alias that plugs IndexTokensOf<CF> into QueryOptions to derive ITS automatically (no runtime changes).

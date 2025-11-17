@@ -10,6 +10,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { EntityManager } from './EntityManager'; // imported to support API docs
 import type { EntityToken } from './EntityToken';
+import type { IndexTokensOf } from './PageKey';
 import type { ShardQueryMap } from './ShardQueryMap';
 import type { EntityItemByToken } from './TokenAware';
 
@@ -108,3 +109,18 @@ export interface QueryOptions<
    */
   throttle?: number;
 }
+
+/**
+ * Convenience alias for QueryOptions that derives ITS (index token subset)
+ * directly from a values-first config literal CF when it carries `indexes`.
+ *
+ * - If CF has `indexes`, ITS becomes the union of its keys.
+ * - Otherwise, ITS defaults to `string`.
+ *
+ * This is optional DX sugar; it does not change runtime behavior.
+ */
+export type QueryOptionsByCF<
+  CC extends BaseConfigMap,
+  ET extends EntityToken<CC> = EntityToken<CC>,
+  CF = unknown,
+> = QueryOptions<CC, ET, IndexTokensOf<CF>, CF>;
