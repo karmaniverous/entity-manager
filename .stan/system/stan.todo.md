@@ -182,4 +182,9 @@
 
 - Helper typing — CF/IT-aware getIndexComponents
   - getIndexComponents now returns IndexComponentTokens<CC, CF, IT>[] so callers
-    can opt into CF-index-based narrowing at the type level. No runtime changes.
+    can opt into CF-index-based narrowing at the type level. No runtime changes.
+
+- Helper typing — CF/IT-aware unwrapIndex
+  - Threaded ET/IT/CF generics through unwrapIndex; narrowed indexToken via IT.
+  - Typed omit parameter to accept IndexComponentTokens<CC, CF, IT> and
+    TranscodedProperties. Return type unchanged. No runtime changes.

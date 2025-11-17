@@ -4,6 +4,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import { getIndexComponents } from './getIndexComponents';
+import type { IndexComponentTokens } from './PageKey';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
 
@@ -20,11 +21,16 @@ import { validateIndexToken } from './validateIndexToken';
  * @throws `Error` if `entityToken` is invalid.
  * @throws `Error` if `indexToken` is invalid.
  */
-export function unwrapIndex<C extends BaseConfigMap>(
+export function unwrapIndex<
+  C extends BaseConfigMap,
+  ET extends EntityToken<C>,
+  IT extends string = string,
+  CF = unknown,
+>(
   entityManager: EntityManager<C>,
-  entityToken: EntityToken<C>,
-  indexToken: string,
-  omit: string[] = [],
+  entityToken: ET,
+  indexToken: IT,
+  omit: (IndexComponentTokens<C, CF, IT> | C['TranscodedProperties'])[] = [],
 ): C['TranscodedProperties'][] {
   try {
     // Validate params.
@@ -34,7 +40,7 @@ export function unwrapIndex<C extends BaseConfigMap>(
     const { sharded, unsharded } = entityManager.config.generatedProperties;
 
     const unwrapped = unique(
-      getIndexComponents(entityManager, indexToken)
+      getIndexComponents<C, IT, CF>(entityManager, indexToken)
         .filter((component) => !omit.includes(component))
         .map((component) =>
           component === entityManager.config.hashKey
