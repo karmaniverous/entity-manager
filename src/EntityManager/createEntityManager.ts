@@ -110,6 +110,7 @@ export function createEntityManager<
   // remains authoritative at construction time.
   // Optional dev guardrail: cross-check entitiesSchema keys vs config.entities keys.
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (config && 'entitiesSchema' in config && config.entitiesSchema) {
       const schemaKeys = Object.keys(
         (config as { entitiesSchema?: Record<string, unknown> })

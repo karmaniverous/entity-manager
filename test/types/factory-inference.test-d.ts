@@ -51,8 +51,8 @@ const rec = manager.addKeys('user', {
   firstNameCanonical: 'a',
   lastNameCanonical: 'b',
 });
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-expectType<EntityRecord<any>>(rec);
+// width-compatible assertion
+expectAssignable<EntityRecord<any>>(rec);
 // getPrimaryKey returns keys
 const keys = manager.getPrimaryKey('user', {
   userId: 'u1',
@@ -60,5 +60,5 @@ const keys = manager.getPrimaryKey('user', {
 expectType<Record<'hashKey2' | 'rangeKey', string>[]>(keys);
 // removeKeys returns item-facing
 const item = manager.removeKeys('user', rec);
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-expectType<EntityItem<any>>(item);
+// width-compatible assertion
+expectAssignable<EntityItem<any>>(item);

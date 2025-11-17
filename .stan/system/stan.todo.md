@@ -103,3 +103,7 @@
   - Fixed PageKeyMapByIndexSet indexing and typed loops to satisfy TS.
   - Suppressed unused placeholder generic warnings per plan (placeholders retained for Step 3 follow-through).
 
+- Amended: placeholder generics + tsd width checks
+  - Suppressed @typescript-eslint/no-unused-vars for ITS in QueryResult.ts (file-scope) per “leave placeholders” plan.
+  - createEntityManager dev guard kept; silenced no-unnecessary-condition for best-effort mismatch warning.
+  - Adjusted tsd factory-inference assertions to expectAssignable for EntityRecord<any> and EntityItem<any> to avoid width errors while placeholders remain.
