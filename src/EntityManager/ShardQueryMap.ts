@@ -11,7 +11,11 @@ import type { ShardQueryFunction } from './ShardQueryFunction';
  * @typeParam CC - {@link ConfigMap | `ConfigMap`}.
  * @typeParam ET - Entity token narrowing the function item types.
  * @typeParam ITS - Index token subset (inferred from object keys).
- * @typeParam CF - Optional values-first config literal type for narrowing.
+ * @typeParam CF - Optional values-first config literal type for narrowing. When
+ *                 provided and it carries an `indexes` object with preserved
+ *                 literal keys (prefer `as const` at call sites), the map keys
+ *                 are constrained to that set. Excess keys are rejected by
+ *                 excess property checks on object literals.
  *
  * @category EntityManager
  * @protected
@@ -21,4 +25,13 @@ export type ShardQueryMap<
   ET extends EntityToken<CC>,
   ITS extends string,
   CF = unknown,
-> = Record<ITS, ShardQueryFunction<CC, ET, ITS, CF>>;
+> = CF extends { indexes?: infer I }
+  ? I extends Record<string, unknown>
+    ? // Constrain keys to CF.indexes when present; extra keys are rejected by
+      // excess property checks. Each value’s IT is also narrowed accordingly.
+      Record<
+        ITS & (keyof I & string),
+        ShardQueryFunction<CC, ET, ITS & (keyof I & string), CF>
+      >
+    : Record<ITS, ShardQueryFunction<CC, ET, ITS, CF>>
+  : Record<ITS, ShardQueryFunction<CC, ET, ITS, CF>>;

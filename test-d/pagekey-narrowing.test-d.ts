@@ -5,6 +5,7 @@ import type {
   ConfigMap,
   PageKeyByIndex,
   ShardQueryFunction,
+  ShardQueryMap,
 } from '../src/index.ts';
 
 // Minimal entity shapes for testing.
@@ -95,3 +96,19 @@ type SQFLast = ShardQueryFunction<MyConfigMap, 'user', 'lastName', CF>;
 const sqfLast: SQFLast = (_hashKey, pageKey) => {
   return Promise.resolve({ count: 0, items: [], pageKey });
 };
+
+// ShardQueryMap keys should be constrained by CF.indexes when CF is provided.
+// Good: key matches CF.indexes ('firstName').
+const goodMap: ShardQueryMap<MyConfigMap, 'user', 'firstName', CF> = {
+  firstName: sqfFirst,
+};
+
+// Bad: 'unknownKey' is not present in CF.indexes; excess property rejected.
+// @ts-expect-error - 'unknownKey' is not a valid index token per CF.indexes
+const badMap: ShardQueryMap<
+  MyConfigMap,
+  'user',
+  'firstName' | 'unknownKey',
+  CF
+> = { firstName: sqfFirst, unknownKey: sqfFirst };
+

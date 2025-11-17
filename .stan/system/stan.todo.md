@@ -154,4 +154,9 @@
 
 - DX: Silence IDE TS squiggles in tsd tests
   - Replaced expectError(...) assertions in test-d/pagekey-narrowing.test-d.ts with @ts-expect-error comments.
-  - VS Code no longer flags expected errors when files are opened, while tsd still enforces them (unused @ts-expect-error fails).
+  - VS Code no longer flags expected errors when files are opened, while tsd still enforces them (unused @ts-expect-error fails).
+
+- CF-indexes constraint on ShardQueryMap keys
+  - ShardQueryMap now constrains map keys to CF.indexes when a values-first
+    config literal (with `indexes`) is provided. Excess keys rejected by
+    excess property checks. Added tsd negative case.
