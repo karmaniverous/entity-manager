@@ -29,7 +29,9 @@ export type PageKey<CC extends BaseConfigMap> = Pick<
  * trigger TS2536. They guard presence and key membership before extracting
  * literal types when available.
  */
-type IndexHashKeyOf<CF, IT extends string> = CF extends { indexes?: infer I }
+export type IndexHashKeyOf<CF, IT extends string> = CF extends {
+  indexes?: infer I;
+}
   ? I extends Record<string, unknown>
     ? IT extends keyof I
       ? I[IT] extends { hashKey: infer HK }
@@ -39,7 +41,9 @@ type IndexHashKeyOf<CF, IT extends string> = CF extends { indexes?: infer I }
     : never
   : never;
 
-type IndexRangeKeyOf<CF, IT extends string> = CF extends { indexes?: infer I }
+export type IndexRangeKeyOf<CF, IT extends string> = CF extends {
+  indexes?: infer I;
+}
   ? I extends Record<string, unknown>
     ? IT extends keyof I
       ? I[IT] extends { rangeKey: infer RK }
@@ -49,7 +53,9 @@ type IndexRangeKeyOf<CF, IT extends string> = CF extends { indexes?: infer I }
     : never
   : never;
 
-type HasIndexFor<CF, IT extends string> = CF extends { indexes?: infer I }
+export type HasIndexFor<CF, IT extends string> = CF extends {
+  indexes?: infer I;
+}
   ? I extends Record<string, unknown>
     ? IT extends keyof I
       ? true

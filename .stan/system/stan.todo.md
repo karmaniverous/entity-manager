@@ -135,4 +135,8 @@
 
 - Docs warnings fix (TypeDoc)
   - Exported IndexComponentTokens so it’s included and linked in docs (referenced by PageKeyByIndex).
-  - Removes the final “referenced but not included” warning without affecting runtime.
+  - Removes the final “referenced but not included” warning without affecting runtime.
+
+- Docs warnings fix (TypeDoc)
+  - Exported HasIndexFor, IndexHashKeyOf, and IndexRangeKeyOf in PageKey.ts so all helpers referenced by IndexComponentTokens are included and linked.
+  - No runtime changes; keeps docs clean.
