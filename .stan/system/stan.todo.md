@@ -174,4 +174,8 @@
 
 - Test type alignment (query.test.ts)
   - Exported MyConfigMap from test/config and updated src/EntityManager/query.test.ts
-    to import it, aligning the test generics with the actual entityManager config.
+    to import it, aligning the test generics with the actual entityManager config.
+
+- Test typing — explicit ShardQueryMap for union ITS
+  - Declared typed ShardQueryMap variables (single and multi-index) and used them
+    instead of object literals so ITS infers as 'lastName' | 'firstName'.

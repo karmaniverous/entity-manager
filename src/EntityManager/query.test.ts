@@ -14,12 +14,15 @@ import { getIndexComponents } from './getIndexComponents';
 import type { PageKey } from './PageKey';
 import { query } from './query';
 import type { ShardQueryFunction } from './ShardQueryFunction';
+import type { ShardQueryMap } from './ShardQueryMap';
 
 describe('query', function () {
   let users: Item[];
   let mockDb: MockDb<Item>;
   let lastNameQuery: ShardQueryFunction<MyConfigMap, 'user', 'lastName'>;
   let firstNameQuery: ShardQueryFunction<MyConfigMap, 'user', 'firstName'>;
+  let mapLN: ShardQueryMap<MyConfigMap, 'user', 'lastName'>;
+  let mapBoth: ShardQueryMap<MyConfigMap, 'user', 'lastName' | 'firstName'>;
 
   beforeAll(function () {
     users = getUsers(1000, 0, 2).map((user) =>
@@ -65,13 +68,17 @@ describe('query', function () {
         pageKey,
         sortOrder: [{ property: 'firstNameCanonical' }],
       });
+
+    // Typed shard query maps (single and multi-index)
+    mapLN = { lastName: lastNameQuery };
+    mapBoth = { lastName: lastNameQuery, firstName: firstNameQuery };
   });
 
   it('simple query', async function () {
     let result = await query(entityManager, {
       entityToken: 'user',
       item: {},
-      shardQueryMap: { lastName: lastNameQuery },
+      shardQueryMap: mapLN,
     });
 
     expect(result.count).to.equal(
@@ -82,7 +89,7 @@ describe('query', function () {
       entityToken: 'user',
       item: {},
       pageKeyMap: result.pageKeyMap,
-      shardQueryMap: { lastName: lastNameQuery },
+      shardQueryMap: mapLN,
     });
 
     expect(result.count).to.equal(
@@ -94,7 +101,7 @@ describe('query', function () {
     let result = await query(entityManager, {
       entityToken: 'user',
       item: {},
-      shardQueryMap: { lastName: lastNameQuery },
+      shardQueryMap: mapLN,
       timestampFrom: now,
       timestampTo: now + day,
     });
@@ -107,7 +114,7 @@ describe('query', function () {
       entityToken: 'user',
       item: {},
       pageKeyMap: result.pageKeyMap,
-      shardQueryMap: { lastName: lastNameQuery },
+      shardQueryMap: mapLN,
       timestampFrom: now,
       timestampTo: now + day,
     });
@@ -121,7 +128,7 @@ describe('query', function () {
     let result = await query(entityManager, {
       entityToken: 'user',
       item: {},
-      shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      shardQueryMap: mapBoth,
     });
 
     expect(result.count).to.be.greaterThan(
@@ -132,7 +139,7 @@ describe('query', function () {
       entityToken: 'user',
       item: {},
       pageKeyMap: result.pageKeyMap,
-      shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      shardQueryMap: mapBoth,
     });
 
     expect(result.count).to.be.greaterThan(
@@ -144,7 +151,7 @@ describe('query', function () {
     let result = await query(entityManager, {
       entityToken: 'user',
       item: {},
-      shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      shardQueryMap: mapBoth,
       timestampFrom: now,
       timestampTo: now + day,
     });
@@ -157,7 +164,7 @@ describe('query', function () {
       entityToken: 'user',
       item: {},
       pageKeyMap: result.pageKeyMap,
-      shardQueryMap: { lastName: lastNameQuery, firstName: firstNameQuery },
+      shardQueryMap: mapBoth,
       sortOrder: [
         { property: 'lastNameCanonical', desc: true },
         { property: 'firstNameCanonical' },
