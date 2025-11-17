@@ -1,6 +1,7 @@
 import type {
   ConditionalProperty,
-  EntityMap,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  EntityMap, // imported to support API docs
   Exactify,
   FlattenEntityMap,
   PropertiesOfType,
@@ -16,7 +17,7 @@ import type { ShardBump } from './ShardBump';
 /**
  * Configuration object for an {@link EntityManager | `EntityManager`} instance.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines the configuration's {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeMap | `TranscodeMap`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines the configuration's {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityManager
  */
@@ -47,7 +48,7 @@ export type Config<C extends BaseConfigMap = BaseConfigMap> =
         Record<
           C['ShardedKeys'],
           (C['TranscodedProperties'] &
-            TranscodableProperties<C['EntityMap'], C['TranscodeMap']>)[]
+            TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>)[]
         >
       > &
         ConditionalProperty<
@@ -56,15 +57,14 @@ export type Config<C extends BaseConfigMap = BaseConfigMap> =
           Record<
             C['UnshardedKeys'],
             (C['TranscodedProperties'] &
-              TranscodableProperties<C['EntityMap'], C['TranscodeMap']>)[]
+              TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>)[]
           >
         >
     > &
     ConditionalProperty<
       'propertyTranscodes',
       C['TranscodedProperties'] &
-        TranscodableProperties<C['EntityMap'], C['TranscodeMap']>,
-        TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>
+        TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>,
       {
         [P in C['TranscodedProperties'] &
           TranscodableProperties<
@@ -92,7 +92,7 @@ export type Config<C extends BaseConfigMap = BaseConfigMap> =
             | C['RangeKey']
             | C['UnshardedKeys']
             | (C['TranscodedProperties'] &
-                TranscodableProperties<C['EntityMap'], C['TranscodeMap']>);
+                TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>);
           projections?: string[];
         }
       >;

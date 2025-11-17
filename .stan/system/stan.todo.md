@@ -58,3 +58,4 @@
   - Updated BaseConfigMap to expose TranscodeRegistry instead of TranscodeMap in the base configuration map and updated all dependent generic references (e.g., C['TranscodeRegistry']).
   - Updated doc-only imports across BaseEntityClient, BaseQueryBuilder, and EntityManager modules to reference TranscodeRegistry.
   - Acceptance: typecheck/build/docs green with zero runtime changes.
+  - Amended: finalized the rename by correcting the Config<C> type in src/EntityManager/Config.ts and updating typedoc externalSymbolLinkMappings (DefaultTranscodeRegistry/TranscodeRegistry). This resolves TS parse errors and docs linkage issues so typecheck/build/docs pass.
