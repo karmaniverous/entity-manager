@@ -2,7 +2,7 @@ import type {
   DefaultTranscodeRegistry,
   EntityMap,
 } from '@karmaniverous/entity-tools';
-import type { infer as zInfer, ZodTypeAny } from 'zod';
+import type { infer as zInfer, ZodType } from 'zod';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { Config } from './Config';
@@ -31,7 +31,7 @@ export interface ConfigInput {
   /**
    * Optional Zod schemas for per-entity domain shapes (non-generated fields only).
    */
-  entitiesSchema?: Record<string, ZodTypeAny>;
+  entitiesSchema?: Record<string, ZodType>;
   generatedKeyDelimiter?: string;
   generatedValueDelimiter?: string;
   shardKeyDelimiter?: string;
@@ -67,7 +67,7 @@ type TranscodedPropertiesFrom<CC> = CC extends { propertyTranscodes?: infer PT }
 export type EntitiesFromSchema<CC> = CC extends {
   entitiesSchema?: infer S;
 }
-  ? S extends Record<string, ZodTypeAny>
+  ? S extends Record<string, ZodType>
     ? { [K in keyof S & string]: zInfer<S[K]> } & EntityMap
     : EntityMap
   : EntityMap;
