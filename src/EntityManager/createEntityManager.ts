@@ -61,6 +61,7 @@ type TranscodedPropertiesFrom<CC> = CC extends { propertyTranscodes?: infer PT }
  * information. For now it defaults to an empty map, which remains safe and
  * non-breaking for values-first workflows.
  */
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 export type MinimalEntityMapFrom<CC> = Record<string, never> & EntityMap;
 
 /**

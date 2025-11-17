@@ -12,7 +12,7 @@ export type EntityOfToken<
 
 /**
  * EntityItemByToken — database-facing partial item narrowed to a specific entity token.
- * Mirrors EntityItem<CC> with the entity surface restricted to EntityOfToken<CC, ET>.
+ * Mirrors `EntityItem<CC>` with the entity surface restricted to `EntityOfToken<CC, ET>`.
  */
 export type EntityItemByToken<
   CC extends BaseConfigMap,
