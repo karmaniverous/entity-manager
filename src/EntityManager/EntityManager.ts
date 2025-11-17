@@ -268,9 +268,9 @@ export class EntityManager<CC extends BaseConfigMap> {
    *
    * @protected
    */
-  async query<ET extends ETToken<CC>, ITS extends string>(
-    options: QueryOptions<CC, ET, ITS>,
+  async query<ET extends ETToken<CC>, ITS extends string, CF = unknown>(
+    options: QueryOptions<CC, ET, ITS, CF>,
   ): Promise<QueryResult<CC, ET, ITS>> {
-    return await query<CC, ET, ITS>(this, options);
+    return await query<CC, ET, ITS, CF>(this, options);
   }
 }

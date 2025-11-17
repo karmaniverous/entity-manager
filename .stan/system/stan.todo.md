@@ -145,4 +145,9 @@
   - Added CF generic to QueryOptions and threaded through EntityManager.query,
     rehydratePageKeyMap/dehydratePageKeyMap, ShardQueryFunction/Result/Map,
     and BaseQueryBuilder (class + QueryBuilderQueryOptions).
-  - No runtime changes; preserves default unknown for backwards compatibility.
+  - No runtime changes; preserves default unknown for backwards compatibility.
+
+- EntityManager.query CF generic
+  - Added CF parameter to EntityManager.query signature and forwarded to the internal
+    query() function. Aligns with BaseQueryBuilder and QueryOptions CF threading.
+  - Fixes TS2558 from generic arity mismatch.
