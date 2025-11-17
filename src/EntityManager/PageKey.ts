@@ -57,7 +57,11 @@ type HasIndexFor<CF, IT extends string> = CF extends { indexes?: infer I }
     : false
   : false;
 
-type IndexComponentTokens<CC extends BaseConfigMap, CF, IT extends string> =
+export type IndexComponentTokens<
+  CC extends BaseConfigMap,
+  CF,
+  IT extends string,
+> =
   HasIndexFor<CF, IT> extends true
     ?
         | CC['HashKey']

@@ -131,4 +131,8 @@
 - PKBI CF indexing fix
   - Reworked PageKeyByIndex helpers to guard access to CF.indexes[IT] and extract literals via conditional types (avoids TS2536).
   - Silenced placeholder ET generic lint locally in PageKeyByIndex for consistency with plan.
-  - No runtime changes; build/docs/typecheck now clean.
+  - No runtime changes; build/docs/typecheck now clean.
+
+- Docs warnings fix (TypeDoc)
+  - Exported IndexComponentTokens so it’s included and linked in docs (referenced by PageKeyByIndex).
+  - Removes the final “referenced but not included” warning without affecting runtime.
