@@ -39,6 +39,7 @@ export function rehydratePageKeyMap<
   C extends BaseConfigMap,
   ET extends EntityToken<C>,
   ITS extends string,
+  CF = unknown,
 >(
   entityManager: EntityManager<C>,
   entityToken: ET,
@@ -47,7 +48,7 @@ export function rehydratePageKeyMap<
   dehydrated: string[] | undefined,
   timestampFrom = 0,
   timestampTo = Date.now(),
-): [C['HashKey'], PageKeyMapByIndexSet<C, ET, ITS>] {
+): [C['HashKey'], PageKeyMapByIndexSet<C, ET, ITS, CF>] {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -74,7 +75,10 @@ export function rehydratePageKeyMap<
 
     // Shortcut empty dehydrated.
     if (dehydrated && !dehydrated.length)
-      return [hashKeyToken, {} as unknown as PageKeyMapByIndexSet<C, ET, ITS>];
+      return [
+        hashKeyToken,
+        {} as unknown as PageKeyMapByIndexSet<C, ET, ITS, CF>,
+      ];
 
     // Get hash key space.
     const hashKeySpace = getHashKeySpace(
@@ -146,7 +150,7 @@ export function rehydratePageKeyMap<
       rehydrated,
     });
 
-    return [hashKeyToken, rehydrated as PageKeyMapByIndexSet<C, ET, ITS>];
+    return [hashKeyToken, rehydrated as PageKeyMapByIndexSet<C, ET, ITS, CF>];
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, {

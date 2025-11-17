@@ -39,9 +39,10 @@ export async function query<
   C extends BaseConfigMap,
   ET extends EntityToken<C>,
   ITS extends string,
+  CF = unknown,
 >(
   entityManager: EntityManager<C>,
-  options: QueryOptions<C, ET, ITS>,
+  options: QueryOptions<C, ET, ITS, CF>,
 ): Promise<QueryResult<C, ET, ITS>> {
   try {
     // Get defaults.
@@ -73,7 +74,8 @@ export async function query<
     const [hashKeyToken, rehydratedPageKeyMap] = rehydratePageKeyMap<
       C,
       ET,
-      ITS
+      ITS,
+      CF
     >(
       entityManager,
       entityToken,
@@ -110,10 +112,14 @@ export async function query<
       // TODO: Test for invalid characters (path delimiters) in index keys & shard key values.
 
       // Build typed tasks (indexToken, hashKey, pageKey).
-      const tasks: [ITS, string, PageKeyByIndex<C, ET, ITS> | undefined][] = [];
+      const tasks: [ITS, string, PageKeyByIndex<C, ET, ITS, CF> | undefined][] =
+        [];
       for (const [indexToken, indexPageKeys] of Object.entries(
         rehydratedPageKeyMap,
-      ) as [ITS, Record<string, PageKeyByIndex<C, ET, ITS> | undefined>][]) {
+      ) as [
+        ITS,
+        Record<string, PageKeyByIndex<C, ET, ITS, CF> | undefined>,
+      ][]) {
         for (const [hashKey, pk] of Object.entries(indexPageKeys)) {
           tasks.push([indexToken, hashKey, pk]);
         }
@@ -126,7 +132,7 @@ export async function query<
         async ([indexToken, hashKey, pageKey]: [
           ITS,
           string,
-          PageKeyByIndex<C, ET, ITS> | undefined,
+          PageKeyByIndex<C, ET, ITS, CF> | undefined,
         ]) => ({
           indexToken,
           queryResult: await shardQueryMap[indexToken](
@@ -187,7 +193,7 @@ export async function query<
       items: workingResult.items,
       pageKeyMap: compressToEncodedURIComponent(
         JSON.stringify(
-          dehydratePageKeyMap<C, ET, ITS>(
+          dehydratePageKeyMap<C, ET, ITS, CF>(
             entityManager,
             entityToken,
             workingResult.pageKeyMap,

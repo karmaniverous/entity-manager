@@ -19,6 +19,7 @@ import type { EntityItemByToken } from './TokenAware';
  * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  * @typeParam ET - Entity token narrowing the item types.
  * @typeParam ITS - Index token subset (inferred from shardQueryMap keys).
+ * @typeParam CF - Optional values-first config literal type used for index-aware narrowing.
  *
  * @category EntityManager
  * @protected
@@ -27,6 +28,7 @@ export interface QueryOptions<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC> = EntityToken<CC>,
   ITS extends string = string,
+  CF = unknown,
 > {
   /** Identifies the entity to be queried. Key of {@link Config | `Config`} `entities`. */
   entityToken: ET;
@@ -70,7 +72,7 @@ export interface QueryOptions<
    * page key, e.g. to match the same string against `firstName` and `lastName`
    * properties without performing a table scan for either.
    */
-  shardQueryMap: ShardQueryMap<CC, ET, ITS>;
+  shardQueryMap: ShardQueryMap<CC, ET, ITS, CF>;
 
   /**
    * A {@link SortOrder | `SortOrder`} object specifying the sort order of the result set. Defaults to `[]`.

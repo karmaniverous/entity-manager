@@ -12,7 +12,10 @@ import type { BaseConfigMap, QueryOptions } from '../EntityManager';
  *
  * @category QueryBuilder
  */
-export type QueryBuilderQueryOptions<CC extends BaseConfigMap> = Omit<
-  QueryOptions<CC>,
+export type QueryBuilderQueryOptions<
+  CC extends BaseConfigMap,
+  CF = unknown,
+> = Omit<
+  QueryOptions<CC, never, string, CF>,
   'entityToken' | 'pageKeyMap' | 'shardQueryMap'
 >;

@@ -139,4 +139,10 @@
 
 - Docs warnings fix (TypeDoc)
   - Exported HasIndexFor, IndexHashKeyOf, and IndexRangeKeyOf in PageKey.ts so all helpers referenced by IndexComponentTokens are included and linked.
-  - No runtime changes; keeps docs clean.
+  - No runtime changes; keeps docs clean.
+
+- CF threading in query pipeline
+  - Added CF generic to QueryOptions and threaded through EntityManager.query,
+    rehydratePageKeyMap/dehydratePageKeyMap, ShardQueryFunction/Result/Map,
+    and BaseQueryBuilder (class + QueryBuilderQueryOptions).
+  - No runtime changes; preserves default unknown for backwards compatibility.

@@ -30,10 +30,11 @@ export function dehydratePageKeyMap<
   C extends BaseConfigMap,
   ET extends EntityToken<C>,
   ITS extends string,
+  CF = unknown,
 >(
   entityManager: EntityManager<C>,
   entityToken: ET,
-  pageKeyMap: PageKeyMapByIndexSet<C, ET, ITS>,
+  pageKeyMap: PageKeyMapByIndexSet<C, ET, ITS, CF>,
 ): string[] {
   try {
     // Validate params.
