@@ -108,9 +108,9 @@ const goodMap: ShardQueryMap<MyConfigMap, 'user', 'firstName', CF> = {
 declare function acceptMap(
   m: ShardQueryMap<MyConfigMap, 'user', 'firstName', CF>,
 ): void;
-// @ts-expect-error - 'unknownKey' is not a valid index token per CF.indexes
 acceptMap({
   firstName: sqfFirst,
+  // @ts-expect-error - 'unknownKey' is not a valid index token per CF.indexes
   unknownKey: sqfFirst,
 });
 

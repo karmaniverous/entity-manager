@@ -165,3 +165,5 @@
   - Reworked ShardQueryMap negative case to call a typed helper so the error
     is emitted at the call, avoiding an unused @ts-expect-error directive.
 
+- TSD fix — move directive to property line
+  - Placed @ts-expect-error directly on the offending object property to ensure it’s consumed; removed the unused directive above the call.
