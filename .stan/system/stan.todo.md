@@ -1,44 +1,60 @@
 # Development Plan
 
-## Next up
+## Next up (in priority order)
 
-- Verify CI picks up Vitest coverage artifacts (html/lcov) as expected.
-- Review and prune any lingering Mocha/NYC references in docs or scripts.
-- Optionally expand tsd tests to cover key exported types and generics.
+- Step 1 — Align with entity-tools rename (types only; mechanical)
+  - Replace all type-only imports:
+    - TranscodeMap → TranscodeRegistry
+    - DefaultTranscodeMap → DefaultTranscodeRegistry
+  - Files: BaseEntityClient/_, BaseQueryBuilder/_, and all EntityManager/\* references surfaced by TS2724.
+  - Update typedoc externalSymbolLinkMappings to reference TranscodeRegistry/DefaultTranscodeRegistry.
+  - Acceptance: typecheck, build, and docs succeed with zero runtime changes.
 
-## Completed (recent)
+- Step 2 — Introduce values-first factory and adopt strict acronyms (type parameter names only)
+  - Add createEntityManager<const CC extends ConfigInput, EM extends EntityMap = MinimalEntityMapFrom<CC>>(config: CC, logger?).
+  - Capture tokens/index names from the config value (CC). Zod parsing remains; intersect parsed output with captured CC types at the type level.
+  - Adopt strict capitalized type-parameter acronyms across public APIs:
+    - EM, E, ET, EOT, TR, TN, CC, HKT, RKT, SGKT, UGKT, PT, IT, ITS, EIBT, ERBT, PKBI, PKMBIS, SQFBI, QO, QR, PK, V.
+  - Keep existing constructor temporarily (non-preferred) to ease the transition, but switch docs/examples to the factory.
+  - Acceptance: code compiles; no behavior change; public templates use the agreed acronyms.
 
-- EntityManager.getPrimaryKey returns arrays and supports no-timestamp items
-  - Changed getPrimaryKey to always return EntityKey[].
-  - If overwrite=false and both hashKey and rangeKey are present on the item,
-    return that single pair.
-  - Otherwise, compute rangeKey; when timestampProperty is present, compute a
-    single hashKey and return one key. When timestampProperty is missing, enumerate
-    the hash-key space across all shard bumps (0..Infinity) and return one key per
-    bump (uniqueProperty present narrows to one suffix per bump).
-  - For array inputs, results are flattened into a single list.
-  - Added unit tests: single item (timestamp/no timestamp), array flattening,
-    honoring pre-populated keys with overwrite=false, and throwing when unique
-    property is missing.
-  - Amendment: Fixed test typing by using static keys (`hashKey2`, `rangeKey`)
-    instead of dynamic string indexing to satisfy TS7053 and ESLint rules.
+- Step 3 — Token- and index-aware typing (inference-first; no explicit generics at call sites)
+  - Items/records:
+    - EIBT<CC, EM, ET>, ERBT<CC, EM, ET>.
+  - Core methods:
+    - addKeys/removeKeys/getPrimaryKey — accept ET and infer types from parameters; return types narrowed to ET.
+  - Low-level helpers:
+    - getIndexComponents, unwrapIndex, encodeElement, decodeElement, dehydrateIndexItem, rehydrateIndexItem, dehydratePageKeyMap, rehydratePageKeyMap — thread ET and IT.
+    - decodeGeneratedProperty requires (entityToken: ET, encoded) and returns EIBT<…>.
+  - Query:
+    - PKBI, PKMBIS, SQFBI, QO, QR with ET/ITS inference.
+    - ITS inferred from shardQueryMap literal keys; ET inferred from options.entityToken.
+  - IndexTokenByEntity:
+    - Compute per CC (and EM when provided): global HKT → all; sharded generated → entity must carry elements; RKT → entity has uniqueProperty; unsharded generated → entity carries elements; scalar PT → entity has property and it is mapped in propertyTranscodes.
+  - Acceptance: unit tests still pass; tsd tests added to assert type narrowing; no runtime behavior changes.
 
-- Shard-space narrowing based on uniqueProperty presence
-  - getHashKeySpace now automatically constrains to exactly one shard suffix    per bump when the item's uniqueProperty is present (non-null/undefined),
-    for both global and sharded hash keys. Otherwise it enumerates the full
-    shard space (unchanged).
-  - Alternate sharded keys still require appropriate elements; missing
-    elements continue to throw via encodeGeneratedProperty.
-  - Note: pagination requires consistent presence/absence of uniqueProperty
-    across pages; otherwise dehydrated/rehydrated page-key lengths will
-    mismatch by design.
+- Step 4 — Documentation and examples (DX)
+  - Update README and API docs to:
+    - Prefer the factory (values-first) + “satisfies/as const” guidance.
+    - Demonstrate token-aware add/remove/keys and index-aware page keys, with inference across values (no explicit generics).
+  - Provide concise usage snippets for PageKey typing by index; sorting with defineSortOrder<E> (entity-tools); and config authoring patterns.
 
-- Sharding: use full shard space per bump in hash key assignment
-  - Fixed updateItemHashKey to use modulus (radix \*_ chars) instead of (chars _ radix),
-    ensuring all placeholders are utilized for multi-character shard keys.
-  - Added a unit test that verifies suffix selection spans the full shard space
-    for chars > 1 by comparing against an expected base-radix suffix.
+- Step 5 — Type tests and guardrails
+  - Add tsd tests covering:
+    - createEntityManager inference from a literal value (CC capture).
+    - Narrowing of addKeys/removeKeys/getPrimaryKey by ET.
+    - Query typing: ET and ITS inferred from options values (entityToken and shardQueryMap keys).
+    - Low-level helpers produce ET/IT-typed results.
+  - Optional: add a simple CI check or script to scan generated d.ts and assert template parameter names follow the strict acronym dictionary.
 
-- Requirements: create authoritative stan.requirements.md
-  - Extracted and formalized current implementation behavior (global config model,
-    delimiters, sharding, page-key dehydration/rehydration, query orchestration).
+- Step 6 — Release and coordination
+  - Bump version with release notes summarizing:
+    - values-first factory, strict acronyms, token/index-aware typing, decodeGeneratedProperty requiring ET.
+  - Open/refresh the interop note for entity-client-dynamodb (provisional) and proceed with its refactor:
+    - QueryBuilder<CC, EM, ET, ITS> adopting SQFBI, QO, QR; typed page keys per index (PKBI/PKMBIS).
+    - Add typed overloads for getItems returning ERBT<CC, EM, ET>[] keyed by ET (retain broad fallback).
+  - Update entity-manager-demo after client integration.
+
+## Completed (append-only)
+
+**CRITICAL: This list is append-only; do not edit items! Place most recent entries at the BOTTOM of the list. When pruning, remove older entries from the top.**
