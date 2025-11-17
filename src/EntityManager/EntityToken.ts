@@ -11,12 +11,12 @@ import type { BaseConfigMap } from './BaseConfigMap';
 /**
  * Extracts entity tokens from a {@link ConfigMap | `ConfigMap`}.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityManager
  * @protected
  */
-export type EntityToken<C extends BaseConfigMap> = keyof Exactify<
-  C['EntityMap']
+export type EntityToken<CC extends BaseConfigMap> = keyof Exactify<
+  CC['EntityMap']
 > &
   string;

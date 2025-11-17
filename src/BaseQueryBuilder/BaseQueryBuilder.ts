@@ -15,25 +15,25 @@ import type { QueryBuilderQueryOptions } from './QueryBuilderQueryOptions';
 /**
  * Abstract base class supporting a fluent API for building a {@link ShardQueryMap | `ShardQueryMap`} using a database client.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  * @typeParam EntityClient - {@link BaseEntityClient | `BaseEntityClient`} derived class instance.
  * @typeParam IndexParams - Database platform-specific, index-specific query parameters.
  *
  * @category QueryBuilder
  */
 export abstract class BaseQueryBuilder<
-  C extends BaseConfigMap,
-  EntityClient extends BaseEntityClient<C>,
+  CC extends BaseConfigMap,
+  EntityClient extends BaseEntityClient<CC>,
   IndexParams,
 > {
   /** {@link BaseEntityClient | `EntityClient`} instance. */
   readonly entityClient: EntityClient;
 
   /** Entity token. */
-  readonly entityToken: EntityToken<C>;
+  readonly entityToken: EntityToken<CC>;
 
   /** Hash key token. */
-  readonly hashKeyToken: C['HashKey'] | C['ShardedKeys'];
+  readonly hashKeyToken: CC['HashKey'] | CC['ShardedKeys'];
 
   /** Dehydrated page key map. */
   readonly pageKeyMap?: string;
@@ -46,7 +46,7 @@ export abstract class BaseQueryBuilder<
   readonly indexParamsMap: Record<string, IndexParams> = {};
 
   /** BaseQueryBuilder constructor. */
-  constructor(options: BaseQueryBuilderOptions<C, EntityClient>) {
+  constructor(options: BaseQueryBuilderOptions<CC, EntityClient>) {
     const { entityClient, entityToken, hashKeyToken, pageKeyMap } = options;
 
     this.entityClient = entityClient;
@@ -57,20 +57,20 @@ export abstract class BaseQueryBuilder<
 
   protected abstract getShardQueryFunction(
     indexToken: string,
-  ): ShardQueryFunction<C>;
+  ): ShardQueryFunction<CC>;
 
   /**
    * Builds a {@link ShardQueryMap | `ShardQueryMap`} object.
    *
    * @returns - The {@link ShardQueryMap | `ShardQueryMap`} object.
    */
-  build(): ShardQueryMap<C> {
+  build(): ShardQueryMap<CC> {
     return mapValues(this.indexParamsMap, (indexConfig, indexToken) =>
       this.getShardQueryFunction(indexToken),
     );
   }
 
-  async query(options: QueryBuilderQueryOptions<C>) {
+  async query(options: QueryBuilderQueryOptions<CC>) {
     const {
       entityClient: { entityManager },
       entityToken,

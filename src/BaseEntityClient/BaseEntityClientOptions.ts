@@ -7,11 +7,11 @@ import type { BaseConfigMap, EntityManager } from '../EntityManager';
 /**
  * Base EntityClient options.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityClient
  */
-export interface BaseEntityClientOptions<C extends BaseConfigMap> {
+export interface BaseEntityClientOptions<CC extends BaseConfigMap> {
   /** Default batch process options. */
   batchProcessOptions?: Omit<
     BatchProcessOptions<unknown, unknown>,
@@ -19,7 +19,7 @@ export interface BaseEntityClientOptions<C extends BaseConfigMap> {
   >;
 
   /** {@link EntityManager | `EntityManager`} instance. */
-  entityManager: EntityManager<C>;
+  entityManager: EntityManager<CC>;
 
   /** Injected logger object. Must support `debug` and `error` methods. Default: `console` */
   logger?: Pick<Console, 'debug' | 'error'>;

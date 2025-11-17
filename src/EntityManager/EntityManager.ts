@@ -21,14 +21,14 @@ import { removeKeys } from './removeKeys';
  * The EntityManager class applies a configuration-driven sharded data model &
  * query strategy to NoSql data.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines the configuration's {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines the configuration's {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @remarks
  * While the {@link EntityManager.query | `query`} method is `public`, normally it should not be called directly. The `query` method is used by a platform-specific {@link BaseQueryBuilder.query | `QueryBuilder.query`} method to provide a fluent query API.
  *
  * @category EntityManager
  */
-export class EntityManager<C extends BaseConfigMap> {
+export class EntityManager<CC extends BaseConfigMap> {
   #config: ParsedConfig;
 
   /** Logger object (defaults to `console`, must support `debug` & `error` methods). */
@@ -41,7 +41,7 @@ export class EntityManager<C extends BaseConfigMap> {
    * @param logger - Logger object (defaults to `console`, must support `debug` & `error` methods).
    */
   constructor(
-    config: Config<C>,
+    config: Config<CC>,
     logger: Pick<Console, 'debug' | 'error'> = console,
   ) {
     this.#config = configSchema.parse(config);
@@ -76,11 +76,11 @@ export class EntityManager<C extends BaseConfigMap> {
    *
    * @throws `Error` if `property` is not a {@link Config | Config} `generatedProperties` key.
    */
-  encodeGeneratedProperty<C extends BaseConfigMap>(
-    property: C['ShardedKeys'] | C['UnshardedKeys'],
-    item: EntityItem<C>,
+  encodeGeneratedProperty(
+    property: CC['ShardedKeys'] | CC['UnshardedKeys'],
+    item: EntityItem<CC>,
   ): string | undefined {
-    return encodeGeneratedProperty(this, property, item);
+    return encodeGeneratedProperty(this, property as never, item as never);
   }
 
   /**
@@ -97,10 +97,10 @@ export class EntityManager<C extends BaseConfigMap> {
    * @overload
    */
   addKeys(
-    entityToken: EntityToken<C>,
-    item: EntityItem<C>,
+    entityToken: EntityToken<CC>,
+    item: EntityItem<CC>,
     overwrite?: boolean,
-  ): EntityRecord<C>;
+  ): EntityRecord<CC>;
 
   /**
    * Update generated properties, hash key, and range key on an array of {@link EntityItem | `EntityItem`} objects.
@@ -116,16 +116,16 @@ export class EntityManager<C extends BaseConfigMap> {
    * @overload
    */
   addKeys(
-    entityToken: EntityToken<C>,
-    item: EntityItem<C>[],
+    entityToken: EntityToken<CC>,
+    item: EntityItem<CC>[],
     overwrite?: boolean,
-  ): EntityRecord<C>[];
+  ): EntityRecord<CC>[];
 
   addKeys(
-    entityToken: EntityToken<C>,
-    i: EntityItem<C> | EntityItem<C>[],
+    entityToken: EntityToken<CC>,
+    i: EntityItem<CC> | EntityItem<CC>[],
     overwrite = false,
-  ): EntityRecord<C> | EntityRecord<C>[] {
+  ): EntityRecord<CC> | EntityRecord<CC>[] {
     if (Array.isArray(i)) {
       return i.map((item) => addKeys(this, entityToken, item, overwrite));
     }
@@ -146,20 +146,20 @@ export class EntityManager<C extends BaseConfigMap> {
    * @throws `Error` if `entityToken` is invalid.
    */
   getPrimaryKey(
-    entityToken: EntityToken<C>,
-    item: EntityItem<C>,
+    entityToken: EntityToken<CC>,
+    item: EntityItem<CC>,
     overwrite?: boolean,
-  ): EntityKey<C>[];
+  ): EntityKey<CC>[];
   getPrimaryKey(
-    entityToken: EntityToken<C>,
-    items: EntityItem<C>[],
+    entityToken: EntityToken<CC>,
+    items: EntityItem<CC>[],
     overwrite?: boolean,
-  ): EntityKey<C>[];
+  ): EntityKey<CC>[];
   getPrimaryKey(
-    entityToken: EntityToken<C>,
-    i: EntityItem<C> | EntityItem<C>[],
+    entityToken: EntityToken<CC>,
+    i: EntityItem<CC> | EntityItem<CC>[],
     overwrite = false,
-  ): EntityKey<C>[] {
+  ): EntityKey<CC>[] {
     if (Array.isArray(i)) {
       return i.flatMap((item) =>
         getPrimaryKey(this, entityToken, item, overwrite),
@@ -181,7 +181,10 @@ export class EntityManager<C extends BaseConfigMap> {
    *
    * @overload
    */
-  removeKeys(entityToken: EntityToken<C>, item: EntityRecord<C>): EntityItem<C>;
+  removeKeys(
+    entityToken: EntityToken<CC>,
+    item: EntityRecord<CC>,
+  ): EntityItem<CC>;
 
   /**
    * Strips generated properties, hash key, and range key from an array of {@link EntityRecord | `EntityRecord`} objects.
@@ -196,14 +199,14 @@ export class EntityManager<C extends BaseConfigMap> {
    * @overload
    */
   removeKeys(
-    entityToken: EntityToken<C>,
-    items: EntityRecord<C>[],
-  ): EntityItem<C>[];
+    entityToken: EntityToken<CC>,
+    items: EntityRecord<CC>[],
+  ): EntityItem<CC>[];
 
   removeKeys(
-    entityToken: EntityToken<C>,
-    i: EntityRecord<C> | EntityRecord<C>[],
-  ): EntityItem<C> | EntityItem<C>[] {
+    entityToken: EntityToken<CC>,
+    i: EntityRecord<CC> | EntityRecord<CC>[],
+  ): EntityItem<CC> | EntityItem<CC>[] {
     if (Array.isArray(i)) {
       return i.map((item) => removeKeys(this, entityToken, item));
     }
@@ -252,7 +255,7 @@ export class EntityManager<C extends BaseConfigMap> {
    *
    * @protected
    */
-  async query(options: QueryOptions<C>): Promise<QueryResult<C>> {
+  async query(options: QueryOptions<CC>): Promise<QueryResult<CC>> {
     return await query(this, options);
   }
 }

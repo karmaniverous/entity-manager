@@ -16,19 +16,19 @@ import type { ShardQueryMap } from './ShardQueryMap';
 /**
  * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityManager
  * @protected
  */
-export interface QueryOptions<C extends BaseConfigMap> {
+export interface QueryOptions<CC extends BaseConfigMap> {
   /** Identifies the entity to be queried. Key of {@link Config | `Config`} `entities`. */
-  entityToken: EntityToken<C>;
+  entityToken: EntityToken<CC>;
 
   /**
    * Partial item object sufficiently populated to generate index hash keys.
    */
-  item: EntityItem<C>;
+  item: EntityItem<CC>;
 
   /**
    * The target maximum number of records to be returned by the query across
@@ -64,12 +64,12 @@ export interface QueryOptions<C extends BaseConfigMap> {
    * page key, e.g. to match the same string against `firstName` and `lastName`
    * properties without performing a table scan for either.
    */
-  shardQueryMap: ShardQueryMap<C>;
+  shardQueryMap: ShardQueryMap<CC>;
 
   /**
    * A {@link SortOrder | `SortOrder`} object specifying the sort order of the result set. Defaults to `[]`.
    */
-  sortOrder?: SortOrder<EntityItem<C>>;
+  sortOrder?: SortOrder<EntityItem<CC>>;
 
   /**
    * Lower limit to query shard space.

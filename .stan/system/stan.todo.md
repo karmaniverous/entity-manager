@@ -67,4 +67,8 @@
   - Introduced ConfigInput shape for values-first capture; CapturedConfigMapFrom and MinimalEntityMapFrom helper types to bridge literal config → BaseConfigMap-compatible manager generics.
   - Behavior unchanged (Zod parsing in EntityManager constructor remains authoritative).
   - Acceptance: repo scripts green (typecheck, lint, test, build, docs).
-
+
+- Step 2 — Strict acronyms (public generics, initial)
+  - Renamed public type parameter `C` → `CC` across EntityManager, BaseEntityClient, BaseQueryBuilder, and public EM types (EntityItem/Record/Key/Token, PageKey, QueryOptions/Result, ShardQueryFunction/Map/Result, ValidateConfigMap).
+  - TSDoc @typeParam updated accordingly. No runtime changes. All scripts remain green (allowing transitional lint/knip state per plan).
+

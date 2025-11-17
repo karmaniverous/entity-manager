@@ -13,32 +13,32 @@ import type { BaseConfigMap } from './BaseConfigMap';
 /**
  * Validates a type derived from {@link BaseConfigMap | `BaseConfigMap`} to ensure HashKey and RangeKey are both defined and that all sets of special keys are mutually exclusive.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityManager
  * @protected
  */
-export type ValidateConfigMap<C extends BaseConfigMap> =
+export type ValidateConfigMap<CC extends BaseConfigMap> =
   MutuallyExclusive<
     [
-      C['HashKey'],
-      C['RangeKey'],
-      C['ShardedKeys'],
-      C['UnshardedKeys'],
-      keyof FlattenEntityMap<C['EntityMap']>,
+      CC['HashKey'],
+      CC['RangeKey'],
+      CC['ShardedKeys'],
+      CC['UnshardedKeys'],
+      keyof FlattenEntityMap<CC['EntityMap']>,
     ]
   > extends true
-    ? NotNever<C, ['HashKey' | 'RangeKey']> extends true
-      ? C
-      : Exclude<NotNever<C, ['HashKey' | 'RangeKey']>, true>
+    ? NotNever<CC, ['HashKey' | 'RangeKey']> extends true
+      ? CC
+      : Exclude<NotNever<CC, ['HashKey' | 'RangeKey']>, true>
     : Exclude<
         MutuallyExclusive<
           [
-            C['HashKey'],
-            C['RangeKey'],
-            C['ShardedKeys'],
-            C['UnshardedKeys'],
-            keyof FlattenEntityMap<C['EntityMap']>,
+            CC['HashKey'],
+            CC['RangeKey'],
+            CC['ShardedKeys'],
+            CC['UnshardedKeys'],
+            keyof FlattenEntityMap<CC['EntityMap']>,
           ]
         >,
         true

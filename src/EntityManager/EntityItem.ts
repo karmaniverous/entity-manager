@@ -11,15 +11,15 @@ import type { BaseConfigMap } from './BaseConfigMap';
 /**
  * Extracts a database-facing partial item type from a {@link BaseConfigMap | `ConfigMap`}.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityManager
  * @protected
  */
-export type EntityItem<C extends BaseConfigMap> = Partial<
-  FlattenEntityMap<C['EntityMap']> &
+export type EntityItem<CC extends BaseConfigMap> = Partial<
+  FlattenEntityMap<CC['EntityMap']> &
     Record<
-      C['HashKey'] | C['RangeKey'] | C['ShardedKeys'] | C['UnshardedKeys'],
+      CC['HashKey'] | CC['RangeKey'] | CC['ShardedKeys'] | CC['UnshardedKeys'],
       string
     >
 > &

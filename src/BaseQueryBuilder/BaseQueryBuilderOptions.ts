@@ -7,23 +7,23 @@ import type { BaseConfigMap, EntityToken } from '../EntityManager';
 /**
  * Constructor options for {@link BaseQueryBuilder | `BaseQueryBuilder`}.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  * @typeParam EntityClient - {@link BaseEntityClient | `BaseEntityClient`} derived class instance.
  *
  * @category QueryBuilder
  */
 export interface BaseQueryBuilderOptions<
-  C extends BaseConfigMap,
-  EntityClient extends BaseEntityClient<C>,
+  CC extends BaseConfigMap,
+  EntityClient extends BaseEntityClient<CC>,
 > {
   /** {@link BaseEntityClient | `EntityClient`} instance. */
   entityClient: EntityClient;
 
   /** Entity token. */
-  entityToken: EntityToken<C>;
+  entityToken: EntityToken<CC>;
 
   /** Hash key token. */
-  hashKeyToken: C['HashKey'] | C['ShardedKeys'];
+  hashKeyToken: CC['HashKey'] | CC['ShardedKeys'];
 
   /** Dehydrated page key map. */
   pageKeyMap?: string;

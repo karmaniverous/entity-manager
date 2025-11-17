@@ -7,16 +7,16 @@ import type { EntityItem } from './EntityItem';
 /**
  * A partial {@link EntityItem | `EntityItem`} restricted to keys defined in `C`.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category QueryBuilder
  * @protected
  */
-export type PageKey<C extends BaseConfigMap> = Pick<
-  EntityItem<C>,
-  | C['HashKey']
-  | C['RangeKey']
-  | C['ShardedKeys']
-  | C['UnshardedKeys']
-  | C['TranscodedProperties']
+export type PageKey<CC extends BaseConfigMap> = Pick<
+  EntityItem<CC>,
+  | CC['HashKey']
+  | CC['RangeKey']
+  | CC['ShardedKeys']
+  | CC['UnshardedKeys']
+  | CC['TranscodedProperties']
 >;

@@ -7,28 +7,28 @@ import type { BaseEntityClientOptions } from './BaseEntityClientOptions';
 /**
  * Base EntityClient class. Integrates {@link EntityManager | `EntityManager`} with injected logging & enhanced batch processing.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityClient
  */
-export abstract class BaseEntityClient<C extends BaseConfigMap> {
+export abstract class BaseEntityClient<CC extends BaseConfigMap> {
   /** Default batch process options. */
   readonly batchProcessOptions: NonNullable<
-    BaseEntityClientOptions<C>['batchProcessOptions']
+    BaseEntityClientOptions<CC>['batchProcessOptions']
   >;
 
   /** {@link EntityManager | `EntityManager`} instance. */
-  readonly entityManager: EntityManager<C>;
+  readonly entityManager: EntityManager<CC>;
 
   /** Injected logger object. Must support `debug` and `error` methods. Default: `console` */
-  readonly logger: NonNullable<BaseEntityClientOptions<C>['logger']>;
+  readonly logger: NonNullable<BaseEntityClientOptions<CC>['logger']>;
 
   /**
    * DynamoDB EntityClient constructor.
    *
    * @param options - {@link BaseEntityClientOptions | `BaseEntityClientOptions`} object.
    */
-  constructor(options: BaseEntityClientOptions<C>) {
+  constructor(options: BaseEntityClientOptions<CC>) {
     const {
       batchProcessOptions = {},
       entityManager,

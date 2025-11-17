@@ -8,18 +8,18 @@ import type { PageKey } from './PageKey';
 /**
  * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityManager
  * @protected
  */
-export interface ShardQueryResult<C extends BaseConfigMap> {
+export interface ShardQueryResult<CC extends BaseConfigMap> {
   /** The number of records returned. */
   count: number;
 
   /** The returned records. */
-  items: EntityItem<C>[];
+  items: EntityItem<CC>[];
 
   /** The page key for the next query on this shard. */
-  pageKey?: PageKey<C>;
+  pageKey?: PageKey<CC>;
 }
