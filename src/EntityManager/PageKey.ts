@@ -27,6 +27,10 @@ export type PageKey<CC extends BaseConfigMap> = Pick<
  */
 export type PageKeyByIndex<
   CC extends BaseConfigMap,
+  // TECHDEBT - Re-enable linting.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ET extends EntityToken<CC>,
+  // TECHDEBT - Re-enable linting.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   IT extends string = string,
 > = PageKey<CC>;

@@ -6,14 +6,15 @@ import { getUsers } from '../../test/users';
 import { addKeys } from './addKeys';
 import type { MyConfigMap } from './Config.types';
 import { getIndexComponents } from './getIndexComponents';
+import type { PageKey } from './PageKey';
 import { query } from './query';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 
 describe('query', function () {
   let users: Item[];
   let mockDb: MockDb<Item>;
-  let lastNameQuery: ShardQueryFunction<MyConfigMap>;
-  let firstNameQuery: ShardQueryFunction<MyConfigMap>;
+  let lastNameQuery: ShardQueryFunction<MyConfigMap, 'user', 'lastName'>;
+  let firstNameQuery: ShardQueryFunction<MyConfigMap, 'user', 'firstName'>;
 
   beforeAll(function () {
     users = getUsers(1000, 0, 2).map((user) =>
@@ -32,7 +33,11 @@ describe('query', function () {
       'lastName',
     );
 
-    lastNameQuery = async (shardedKey, pageKey, pageSize) =>
+    lastNameQuery = async (
+      shardedKey: string,
+      pageKey?: PageKey<MyConfigMap>,
+      pageSize?: number,
+    ) =>
       await mockDb.query({
         hashKey: 'hashKey2',
         hashValue: shardedKey,
@@ -42,7 +47,11 @@ describe('query', function () {
         sortOrder: [{ property: 'lastNameCanonical' }],
       });
 
-    firstNameQuery = async (shardedKey, pageKey, pageSize) =>
+    firstNameQuery = async (
+      shardedKey: string,
+      pageKey?: PageKey<MyConfigMap>,
+      pageSize?: number,
+    ) =>
       await mockDb.query({
         hashKey: 'hashKey2',
         hashValue: shardedKey,

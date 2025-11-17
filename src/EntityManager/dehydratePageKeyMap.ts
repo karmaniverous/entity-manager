@@ -4,10 +4,9 @@ import { dehydrateIndexItem } from './dehydrateIndexItem';
 import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
-import type { PageKeyMap, PageKeyMapByIndexSet } from './PageKeyMap';
+import type { PageKeyMapByIndexSet } from './PageKeyMap';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
-
 /**
  * Dehydrate a {@link PageKeyMap | `PageKeyMap`} object into an array of dehydrated page keys.
  *
@@ -54,9 +53,9 @@ export function dehydratePageKeyMap<
     }
 
     // Extract, sort & validate indexs.
-    const indexes = Object.keys(pageKeyMap).sort();
-    indexes.map((index) => {
-      validateIndexToken(entityManager, index);
+    const indexes = Object.keys(pageKeyMap).sort() as ITS[];
+    indexes.map((indexToken) => {
+      validateIndexToken(entityManager, indexToken);
     });
 
     // Extract & sort hash keys.
@@ -74,7 +73,8 @@ export function dehydratePageKeyMap<
         }
 
         // Compose item from page key
-        const item = Object.entries(pageKeyMap[index][hashKey]).reduce(
+        const pk = pageKeyMap[index][hashKey];
+        const item = Object.entries(pk).reduce(
           (item, [property, value]) => {
             if (
               property === entityManager.config.rangeKey ||

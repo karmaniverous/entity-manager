@@ -97,3 +97,9 @@
   - Updated existing type tests to the new generics for ShardQuery types and QueryOptions/Result.
   - Added factory-inference test asserting schema-first inference (entitiesSchema) and ET-narrowed addKeys/getPrimaryKey/removeKeys flows.
 
+- Amended: QueryBuilder generics and tests updated
+  - BaseQueryBuilder now threads ET/ITS through ShardQueryFunction/Map and build().
+  - query.test updated to specify ET/IT generics and annotate parameters.
+  - Fixed PageKeyMapByIndexSet indexing and typed loops to satisfy TS.
+  - Suppressed unused placeholder generic warnings per plan (placeholders retained for Step 3 follow-through).
+

@@ -4,13 +4,13 @@ import { isInt, parallel, unique } from 'radash';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
+import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import type { PageKeyByIndex } from './PageKey';
 import type { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
-import type { EntityItemByToken } from './TokenAware';
 import type { WorkingQueryResult } from './WorkingQueryResult';
 
 const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
@@ -78,7 +78,7 @@ export async function query<
       entityManager,
       entityToken,
       Object.keys(shardQueryMap) as ITS[],
-      item,
+      item as EntityItem<C>,
       pageKeyMap
         ? (JSON.parse(
             decompressFromEncodedURIComponent(pageKeyMap),
@@ -94,7 +94,7 @@ export async function query<
         count: 0,
         items: [],
         pageKeyMap: compressToEncodedURIComponent(JSON.stringify([])),
-      };
+      } as QueryResult<C, ET, ITS>;
 
     // Iterate search over pages.
     let workingResult = {
@@ -109,17 +109,20 @@ export async function query<
 
       // TODO: Test for invalid characters (path delimiters) in index keys & shard key values.
 
+      // Build typed tasks (indexToken, hashKey, pageKey).
+      const tasks: [ITS, string, PageKeyByIndex<C, ET, ITS> | undefined][] = [];
+      for (const [indexToken, indexPageKeys] of Object.entries(
+        rehydratedPageKeyMap,
+      ) as [ITS, Record<string, PageKeyByIndex<C, ET, ITS> | undefined>][]) {
+        for (const [hashKey, pk] of Object.entries(indexPageKeys)) {
+          tasks.push([indexToken, hashKey, pk]);
+        }
+      }
+
       // Query every shard on every index in pageKeyMap.
       const shardQueryResults = await parallel(
         throttle,
-        Object.entries(rehydratedPageKeyMap).flatMap(
-          ([indexToken, indexPageKeys]) =>
-            Object.entries(indexPageKeys).map(([hashKey, pageKey]) => [
-              indexToken,
-              hashKey,
-              pageKey,
-            ]),
-        ) as [ITS, string, PageKeyByIndex<C, ET, ITS> | undefined][],
+        tasks,
         async ([indexToken, hashKey, pageKey]: [
           ITS,
           string,
@@ -135,7 +138,7 @@ export async function query<
         }),
       );
 
-      // Reduce shardQueryResults & updateworkingRresult.
+      // Reduce shardQueryResults & update working result.
       workingResult = shardQueryResults.reduce<WorkingQueryResult<C, ET, ITS>>(
         ({ items, pageKeyMap }, { indexToken, queryResult, hashKey }) => {
           Object.assign(rehydratedPageKeyMap[indexToken], {
@@ -149,19 +152,28 @@ export async function query<
         },
         workingResult,
       );
-    } while (
+
       // Repeat while pages remain & limit is not reached.
-      Object.values(workingResult.pageKeyMap).some((indexPageKeys) =>
-        Object.values(indexPageKeys).some((pageKey) => pageKey !== undefined),
-      ) &&
-      workingResult.items.length < limit
-    );
+      let pagesRemain = false;
+      for (const idx of Object.keys(workingResult.pageKeyMap) as ITS[]) {
+        const inner = workingResult.pageKeyMap[idx];
+        for (const h of Object.keys(inner)) {
+          if (inner[h] !== undefined) {
+            pagesRemain = true;
+            break;
+          }
+        }
+        if (pagesRemain) break;
+      }
+
+      if (!pagesRemain) break;
+    } while (workingResult.items.length < limit);
 
     // Dedupe & sort working result.
     workingResult.items = sort(
-      unique(workingResult.items, (item) =>
+      unique(workingResult.items, (i) =>
         (
-          item[
+          i[
             entityManager.config.entities[entityToken]
               .uniqueProperty as keyof EntityItem<C>
           ] as string | number
@@ -182,7 +194,7 @@ export async function query<
           ),
         ),
       ),
-    } as QueryResult<C>;
+    } as QueryResult<C, ET, ITS>;
 
     entityManager.logger.debug('queried entityToken across shards', {
       options,
@@ -192,7 +204,7 @@ export async function query<
       result,
     });
 
-    return result as QueryResult<C, ET, ITS>;
+    return result;
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, options);

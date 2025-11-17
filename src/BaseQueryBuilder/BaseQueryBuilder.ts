@@ -25,6 +25,8 @@ export abstract class BaseQueryBuilder<
   CC extends BaseConfigMap,
   EntityClient extends BaseEntityClient<CC>,
   IndexParams,
+  ET extends EntityToken<CC> = EntityToken<CC>,
+  ITS extends string = string,
 > {
   /** {@link BaseEntityClient | `EntityClient`} instance. */
   readonly entityClient: EntityClient;
@@ -43,7 +45,10 @@ export abstract class BaseQueryBuilder<
    *
    * @protected
    */
-  readonly indexParamsMap: Record<string, IndexParams> = {};
+  readonly indexParamsMap: Record<ITS, IndexParams> = {} as Record<
+    ITS,
+    IndexParams
+  >;
 
   /** BaseQueryBuilder constructor. */
   constructor(options: BaseQueryBuilderOptions<CC, EntityClient>) {
@@ -56,18 +61,18 @@ export abstract class BaseQueryBuilder<
   }
 
   protected abstract getShardQueryFunction(
-    indexToken: string,
-  ): ShardQueryFunction<CC>;
+    indexToken: ITS,
+  ): ShardQueryFunction<CC, ET, ITS>;
 
   /**
    * Builds a {@link ShardQueryMap | `ShardQueryMap`} object.
    *
    * @returns - The {@link ShardQueryMap | `ShardQueryMap`} object.
    */
-  build(): ShardQueryMap<CC> {
-    return mapValues(this.indexParamsMap, (indexConfig, indexToken) =>
+  build(): ShardQueryMap<CC, ET, ITS> {
+    return mapValues(this.indexParamsMap, (_indexConfig, indexToken) =>
       this.getShardQueryFunction(indexToken),
-    );
+    ) as ShardQueryMap<CC, ET, ITS>;
   }
 
   async query(options: QueryBuilderQueryOptions<CC>) {
@@ -78,7 +83,7 @@ export abstract class BaseQueryBuilder<
     } = this;
     const shardQueryMap = this.build();
 
-    return await entityManager.query({
+    return await entityManager.query<ET, ITS>({
       ...options,
       entityToken,
       pageKeyMap,

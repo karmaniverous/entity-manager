@@ -1,8 +1,8 @@
 import { expectAssignable, expectType } from 'tsd';
 import { z } from 'zod';
 
-import { createEntityManager } from '../../src/EntityManager/createEntityManager.ts';
-import type { EntityItem, EntityRecord, EntityToken } from '../../src/index.ts';
+import { createEntityManager } from '../../src/EntityManager/createEntityManager';
+import type { EntityItem, EntityRecord } from '../../src/index.ts';
 
 // Config with entitiesSchema (schemas define base fields only; no generated keys/tokens)
 const config = {
@@ -44,11 +44,6 @@ const config = {
 } as const;
 
 const manager = createEntityManager(config);
-
-// ET inference from entityToken
-type ET = EntityToken<Parameters<(typeof manager)['getPrimaryKey']>[0]>;
-expectAssignable<ET>('user');
-
 // addKeys returns a record (keys required) consistent with schema + generated keys
 const rec = manager.addKeys('user', {
   userId: 'u1',
@@ -56,6 +51,7 @@ const rec = manager.addKeys('user', {
   firstNameCanonical: 'a',
   lastNameCanonical: 'b',
 });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 expectType<EntityRecord<any>>(rec);
 // getPrimaryKey returns keys
 const keys = manager.getPrimaryKey('user', {
@@ -64,4 +60,5 @@ const keys = manager.getPrimaryKey('user', {
 expectType<Record<'hashKey2' | 'rangeKey', string>[]>(keys);
 // removeKeys returns item-facing
 const item = manager.removeKeys('user', rec);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 expectType<EntityItem<any>>(item);

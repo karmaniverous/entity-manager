@@ -73,7 +73,8 @@ export function rehydratePageKeyMap<
     });
 
     // Shortcut empty dehydrated.
-    if (dehydrated && !dehydrated.length) return [hashKeyToken, {}];
+    if (dehydrated && !dehydrated.length)
+      return [hashKeyToken, {} as unknown as PageKeyMapByIndexSet<C, ET, ITS>];
 
     // Get hash key space.
     const hashKeySpace = getHashKeySpace(
