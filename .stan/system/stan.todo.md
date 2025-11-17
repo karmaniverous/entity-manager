@@ -178,4 +178,8 @@
 
 - Test typing — explicit ShardQueryMap for union ITS
   - Declared typed ShardQueryMap variables (single and multi-index) and used them
-    instead of object literals so ITS infers as 'lastName' | 'firstName'.
+    instead of object literals so ITS infers as 'lastName' | 'firstName'.
+
+- Helper typing — CF/IT-aware getIndexComponents
+  - getIndexComponents now returns IndexComponentTokens<CC, CF, IT>[] so callers
+    can opt into CF-index-based narrowing at the type level. No runtime changes.
