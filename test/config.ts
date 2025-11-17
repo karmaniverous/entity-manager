@@ -37,7 +37,7 @@ type MyTranscodedProperties =
   | 'updated'
   | 'userId';
 
-type MyConfigMap = ConfigMap<{
+export type MyConfigMap = ConfigMap<{
   EntityMap: MyEntityMap;
   HashKey: MyHashKey;
   RangeKey: MyRangeKey;

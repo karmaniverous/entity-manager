@@ -1,10 +1,15 @@
 import { MockDb } from '@karmaniverous/mock-db';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { day, entityManager, type Item, now } from '../../test/config';
+import {
+  day,
+  entityManager,
+  type Item,
+  type MyConfigMap,
+  now,
+} from '../../test/config';
 import { getUsers } from '../../test/users';
 import { addKeys } from './addKeys';
-import type { MyConfigMap } from './Config.types';
 import { getIndexComponents } from './getIndexComponents';
 import type { PageKey } from './PageKey';
 import { query } from './query';

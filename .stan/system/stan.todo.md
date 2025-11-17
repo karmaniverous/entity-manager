@@ -167,3 +167,11 @@
 
 - TSD fix — move directive to property line
   - Placed @ts-expect-error directly on the offending object property to ensure it’s consumed; removed the unused directive above the call.
+
+- CF-indexes constraint on ShardQueryFunction
+  - ShardQueryFunction now resolves to `never` when IT is not a key of CF.indexes
+    (when provided). Added tsd negative case to assert the constraint.
+
+- Test type alignment (query.test.ts)
+  - Exported MyConfigMap from test/config and updated src/EntityManager/query.test.ts
+    to import it, aligning the test generics with the actual entityManager config.

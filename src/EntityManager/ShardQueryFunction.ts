@@ -30,8 +30,26 @@ export type ShardQueryFunction<
   ET extends EntityToken<CC>,
   IT extends string,
   CF = unknown,
-> = (
-  hashKey: string,
-  pageKey?: PageKeyByIndex<CC, ET, IT, CF>,
-  pageSize?: number,
-) => Promise<ShardQueryResult<CC, ET, IT, CF>>;
+> =
+  // When CF carries an `indexes` map, only permit IT values that are keys of
+  // that map. Invalid IT resolves the type to `never`, producing a compile-time
+  // error at annotation sites.
+  CF extends { indexes?: infer I }
+    ? I extends Record<string, unknown>
+      ? IT extends keyof I & string
+        ? (
+            hashKey: string,
+            pageKey?: PageKeyByIndex<CC, ET, IT, CF>,
+            pageSize?: number,
+          ) => Promise<ShardQueryResult<CC, ET, IT, CF>>
+        : never
+      : (
+          hashKey: string,
+          pageKey?: PageKeyByIndex<CC, ET, IT, CF>,
+          pageSize?: number,
+        ) => Promise<ShardQueryResult<CC, ET, IT, CF>>
+    : (
+        hashKey: string,
+        pageKey?: PageKeyByIndex<CC, ET, IT, CF>,
+        pageSize?: number,
+      ) => Promise<ShardQueryResult<CC, ET, IT, CF>>;

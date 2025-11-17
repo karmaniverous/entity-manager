@@ -114,3 +114,9 @@ acceptMap({
   unknownKey: sqfFirst,
 });
 
+// ShardQueryFunction typed with a non-index IT should be rejected when CF.indexes is provided.
+// The type resolves to `never`, so this annotation must fail.
+// @ts-expect-error - 'unknownKey' is not a valid index token per CF.indexes
+const badSQF: ShardQueryFunction<MyConfigMap, 'user', 'unknownKey', CF> =
+  sqfFirst;
+
