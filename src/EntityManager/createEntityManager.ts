@@ -76,6 +76,17 @@ export type EntitiesFromSchema<CC> = CC extends {
   : EntityMap;
 
 /**
+ * Derive the union of index token names from a values-first config input.
+ *
+ * When the provided config literal carries an `indexes` object with preserved
+ * literal keys (prefer `as const` at call sites), this helper captures the
+ * index token union. Falls back to `string` if absent.
+ */
+export type IndexTokensFrom<CC> = CC extends { indexes?: infer I }
+  ? keyof I & string
+  : string;
+
+/**
  * Captures a BaseConfigMap-compatible type from a literal ConfigInput value
  * and an EntityMap (defaults to MinimalEntityMapFrom<CC>).
  */

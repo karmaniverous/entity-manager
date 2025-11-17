@@ -1,6 +1,7 @@
 export * from './BaseConfigMap';
 export * from './Config';
 export * from './ConfigMap';
+export * from './createEntityManager';
 export * from './EntityItem';
 export * from './EntityKey';
 export * from './EntityManager';

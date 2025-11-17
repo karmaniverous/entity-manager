@@ -4,7 +4,7 @@
 
 - Step 3 (follow-through) — refine index-aware typing
   - Tighten PKBI element typing per index (derive from captured config/indexes when available in values-first flow).
-  - Explore capturing index tokens from values-first config to constrain ITS beyond string.
+  - Explore capturing index tokens from values-first config to constrain ITS beyond string. (Initial helper added: IndexTokensFrom<CC>.)
   - Client integration: update entity-client-dynamodb QueryBuilder<CC, EM, ET, ITS> to adopt new SQFBI/QO/QR; typed page keys; typed getItems overloads keyed by ET.
   - Update entity-manager-demo to use entitiesSchema factory + token-aware calls.
   - Add README/API examples (defer content changes until after code settles per instruction).
@@ -107,3 +107,13 @@
   - Suppressed @typescript-eslint/no-unused-vars for ITS in QueryResult.ts (file-scope) per “leave placeholders” plan.
   - createEntityManager dev guard kept; silenced no-unnecessary-condition for best-effort mismatch warning.
   - Adjusted tsd factory-inference assertions to expectAssignable for EntityRecord<any> and EntityItem<any> to avoid width errors while placeholders remain.
+
+- Public export for values-first factory
+  - Re-exported createEntityManager from src/EntityManager/index.ts (and transitively from the package root).
+  - Resolves knip “unused file” flag on src/EntityManager/createEntityManager.ts by making it part of the public API surface.
+  - No runtime behavior changes.
+
+- Index token capture helper (values-first)
+  - Added IndexTokensFrom<CC> to createEntityManager.ts to capture the union of index tokens from a values-first ConfigInput (when keys are preserved via `as const`).
+  - Purely a typing affordance to support Step 3 follow‑through (tightening ITS); no runtime changes.
+  - Acronym lint CI deferred per guidance; implementation keeps template acronyms consistent.
