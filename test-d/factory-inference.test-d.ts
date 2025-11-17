@@ -1,7 +1,7 @@
 import { expectType } from 'tsd';
 import { z } from 'zod';
 
-import { createEntityManager } from '../../src/EntityManager/createEntityManager';
+import { createEntityManager } from '../src/EntityManager/createEntityManager';
 
 // Config with entitiesSchema (schemas define base fields only; no generated keys/tokens)
 const config = {

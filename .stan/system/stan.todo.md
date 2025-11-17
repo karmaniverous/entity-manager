@@ -150,4 +150,8 @@
 
 - TSD tests — CF-based PageKeyByIndex narrowing
   - Added pagekey-narrowing.test-d.ts to validate CF-driven narrowing for PageKeyByIndex and ShardQueryFunction pageKey parameter using values-first config with literal index keys.
-  - Confirms only the expected index components are permitted; improper keys produce type errors as intended.
+  - Confirms only the expected index components are permitted; improper keys produce type errors as intended.
+
+- DX: Silence IDE TS squiggles in tsd tests
+  - Replaced expectError(...) assertions in test-d/pagekey-narrowing.test-d.ts with @ts-expect-error comments.
+  - VS Code no longer flags expected errors when files are opened, while tsd still enforces them (unused @ts-expect-error fails).

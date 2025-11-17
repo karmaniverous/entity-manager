@@ -14,12 +14,7 @@
     "target": "ES2020",
     "tsBuildInfoFile": "./.tsbuildinfo"
   },
-  "exclude": [
-    "coverage/",
-    "dist/",
-    "docs/",
-    "tests/**"
-  ],
+  "exclude": ["coverage/", "dist/", "docs/", "test-d/"],
   "include": [
     "src/**/*.ts",
     "test/**/*.ts",
@@ -28,3 +23,4 @@
     "vitest.config.ts"
   ]
 }
+

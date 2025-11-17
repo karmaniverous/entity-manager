@@ -126,9 +126,6 @@
     "test": "vitest --run --silent",
     "typecheck": "tsc && tsd"
   },
-  "tsd": {
-    "directory": "test/types"
-  },
   "type": "module",
   "types": "dist/index.d.ts",
   "version": "6.14.3"
