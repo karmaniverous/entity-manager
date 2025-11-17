@@ -187,4 +187,7 @@
 - Helper typing — CF/IT-aware unwrapIndex
   - Threaded ET/IT/CF generics through unwrapIndex; narrowed indexToken via IT.
   - Typed omit parameter to accept IndexComponentTokens<CC, CF, IT> and
-    TranscodedProperties. Return type unchanged. No runtime changes.
+    TranscodedProperties. Return type unchanged. No runtime changes.
+
+- Lint fix — unwrapIndex ET generic
+  - Removed unused ET type parameter from unwrapIndex to satisfy @typescript-eslint/no-unnecessary-type-parameters. No runtime changes.

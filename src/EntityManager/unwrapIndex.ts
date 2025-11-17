@@ -23,12 +23,11 @@ import { validateIndexToken } from './validateIndexToken';
  */
 export function unwrapIndex<
   C extends BaseConfigMap,
-  ET extends EntityToken<C>,
   IT extends string = string,
   CF = unknown,
 >(
   entityManager: EntityManager<C>,
-  entityToken: ET,
+  entityToken: EntityToken<C>,
   indexToken: IT,
   omit: (IndexComponentTokens<C, CF, IT> | C['TranscodedProperties'])[] = [],
 ): C['TranscodedProperties'][] {
