@@ -2,32 +2,13 @@
 
 ## Next up (in priority order)
 
-- Step 3 (follow-through) — refine index-aware typing
-  - Tighten PKBI element typing per index (derive from captured config/indexes when available in values-first flow).
-  - Explore capturing index tokens from values-first config to constrain ITS beyond string. (Initial helper added: IndexTokensFrom<CC>.)
-  - Client integration: update entity-client-dynamodb QueryBuilder<CC, EM, ET, ITS> to adopt new SQFBI/QO/QR; typed page keys; typed getItems overloads keyed by ET.
-  - Update entity-manager-demo to use entitiesSchema factory + token-aware calls.
-  - Add README/API examples (defer content changes until after code settles per instruction).
-
-- Step 3 — Token- and index-aware typing (inference-first; no explicit generics at call sites)
-  - Items/records:
-    - EIBT<CC, EM, ET>, ERBT<CC, EM, ET>.
-  - Core methods:
-    - addKeys/removeKeys/getPrimaryKey — accept ET and infer types from parameters; return types narrowed to ET.
-  - Low-level helpers:
-    - getIndexComponents, unwrapIndex, encodeElement, decodeElement, dehydrateIndexItem, rehydrateIndexItem, dehydratePageKeyMap, rehydratePageKeyMap — thread ET and IT.
-    - decodeGeneratedProperty requires (entityToken: ET, encoded) and returns EIBT<…>.
-  - Query:
-    - PKBI, PKMBIS, SQFBI, QO, QR with ET/ITS inference.
-    - ITS inferred from shardQueryMap literal keys; ET inferred from options.entityToken.
-  - IndexTokenByEntity:
-    - Compute per CC (and EM when provided): global HKT → all; sharded generated → entity must carry elements; RKT → entity has uniqueProperty; unsharded generated → entity carries elements; scalar PT → entity has property and it is mapped in propertyTranscodes.
-  - Acceptance: unit tests still pass; tsd tests added to assert type narrowing; no runtime behavior changes.
+- Client integration: update entity-client-dynamodb QueryBuilder<CC, EM, ET, ITS> to adopt new SQFBI/QO/QR; typed page keys (PKBI/PKMBIS); add typed getItems overloads keyed by ET. Provide convenience helpers to build typed ShardQueryMap from config literals (CF-aware).
+- Update entity-manager-demo to use entitiesSchema factory + token-aware calls; refresh examples.
 
 - Step 4 — Documentation and examples (DX)
   - Update README and API docs to:
     - Prefer the factory (values-first) + “satisfies/as ~const” guidance.
-    - Demonstrate token-aware add/remove/keys and index-aware page keys, with inference across values (no explicit generics).
+    - Demonstrate token-aware add/remove/keys and index-aware page keys, with inference across values (no explicit generics). Include CF helpers (QueryOptionsByCF, ShardQueryMapByCF).
   - Provide concise usage snippets for PageKey typing by index; sorting with defineSortOrder<E> (entity-tools); and config authoring patterns.
 
 - Step 5 — Type tests and guardrails
@@ -195,4 +176,10 @@
 - DX sugar — derive ITS from CF.indexes
   - Added IndexTokensOf<CF> helper to capture index token unions from values-first
     config literals.
-  - Added QueryOptionsByCF type alias that plugs IndexTokensOf<CF> into QueryOptions to derive ITS automatically (no runtime changes).
+  - Added QueryOptionsByCF type alias that plugs IndexTokensOf<CF> into QueryOptions to derive ITS automatically (no runtime changes).
+
+- DX sugar — ShardQueryMapByCF
+  - Added ShardQueryMapByCF alias mirroring QueryOptionsByCF to derive ITS from CF.indexes for shardQueryMap typing (no runtime changes).
+
+- Docs — README DX rewrite
+  - Rewrote README with a values/schema-first focus; added CF-aware DX examples (QueryOptionsByCF, ShardQueryMapByCF). Preserved header/footer.
