@@ -3,6 +3,7 @@ import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
+import type { EntityToken } from './EntityToken';
 
 /**
  * A partial {@link EntityItem | `EntityItem`} restricted to keys defined in `C`.
@@ -20,3 +21,12 @@ export type PageKey<CC extends BaseConfigMap> = Pick<
   | CC['UnshardedKeys']
   | CC['TranscodedProperties']
 >;
+
+/**
+ * Page key typed for a specific index token (placeholder alias; refines as index typing evolves).
+ */
+export type PageKeyByIndex<
+  CC extends BaseConfigMap,
+  ET extends EntityToken<CC>,
+  IT extends string = string,
+> = PageKey<CC>;

@@ -2,13 +2,12 @@
 
 ## Next up (in priority order)
 
-- Step 2 — Introduce values-first factory and adopt strict acronyms (type parameter names only)
-  - Add createEntityManager<const CC extends ConfigInput, EM extends EntityMap = MinimalEntityMapFrom<CC>>(config: CC, logger?).
-  - Capture tokens/index names from the config value (CC). Zod parsing remains; intersect parsed output with captured CC types at the type level.
-  - Adopt strict capitalized type-parameter acronyms across public APIs:
-    - EM, E, ET, EOT, TR, TN, CC, HKT, RKT, SGKT, UGKT, PT, IT, ITS, EIBT, ERBT, PKBI, PKMBIS, SQFBI, QO, QR, PK, V.
-  - Keep existing constructor temporarily (non-preferred) to ease the transition, but switch docs/examples to the factory.
-  - Acceptance: code compiles; no behavior change; public templates use the agreed acronyms.
+- Step 3 (follow-through) — refine index-aware typing
+  - Tighten PKBI element typing per index (derive from captured config/indexes when available in values-first flow).
+  - Explore capturing index tokens from values-first config to constrain ITS beyond string.
+  - Client integration: update entity-client-dynamodb QueryBuilder<CC, EM, ET, ITS> to adopt new SQFBI/QO/QR; typed page keys; typed getItems overloads keyed by ET.
+  - Update entity-manager-demo to use entitiesSchema factory + token-aware calls.
+  - Add README/API examples (defer content changes until after code settles per instruction).
 
 - Step 3 — Token- and index-aware typing (inference-first; no explicit generics at call sites)
   - Items/records:
@@ -82,4 +81,19 @@
 - Overload cleanup (TS2394 fix)
   - Removed broad (non-generic) overloads for addKeys/getPrimaryKey/removeKeys.
   - Kept ET-aware overloads and matched implementation signatures to ET-aware forms.
-  - Resolves overload/implementation mismatch without introducing any “any” types.
+  - Resolves overload/implementation mismatch without introducing any “any” types.
+
+- Step 3 — Thread ET/ITS through query types and helpers (types only)
+  - Added ET/ITS generics to QueryOptions/QueryResult/ShardQueryFunction/ShardQueryResult/ShardQueryMap.
+  - Added PKBI/PKMBIS aliases: PageKeyByIndex and PageKeyMapByIndexSet, and threaded through dehydrate/rehydratePageKeyMap and WorkingQueryResult.
+  - Updated EntityManager.query signature to infer ET from options.entityToken and ITS from shardQueryMap keys.
+  - No runtime behavior changes.
+
+- TSDoc clarifications and optional guardrail
+  - Clarified TokenAware usage: schemas define only base (non-generated) fields; keys/tokens are layered by EM.
+  - createEntityManager: added best-effort dev warning (debug) when entitiesSchema keys mismatch config.entities keys.
+
+- Type tests (tsd) — inference checks
+  - Updated existing type tests to the new generics for ShardQuery types and QueryOptions/Result.
+  - Added factory-inference test asserting schema-first inference (entitiesSchema) and ET-narrowed addKeys/getPrimaryKey/removeKeys flows.
+

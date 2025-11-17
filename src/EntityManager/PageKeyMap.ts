@@ -1,5 +1,7 @@
 import type { BaseConfigMap } from './BaseConfigMap';
+import type { EntityToken } from './EntityToken';
 import type { PageKey } from './PageKey';
+import type { PageKeyByIndex } from './PageKey';
 
 /**
  * A two-layer map of page keys, used to query the next page of data across a set of indexes and on each shard of a given hash key.
@@ -19,3 +21,16 @@ export type PageKeyMap<C extends BaseConfigMap> = Record<
   string,
   Record<string, PageKey<C> | undefined>
 >;
+
+/**
+ * A two-layer map of page keys keyed by an index subset, with typed page keys.
+ *
+ * @typeParam CC - Config map.
+ * @typeParam ET - Entity token.
+ * @typeParam ITS - Index token subset.
+ */
+export type PageKeyMapByIndexSet<
+  CC extends BaseConfigMap,
+  ET extends EntityToken<CC>,
+  ITS extends string = string,
+> = Record<ITS, Record<string, PageKeyByIndex<CC, ET, ITS> | undefined>>;

@@ -4,7 +4,7 @@ import { dehydrateIndexItem } from './dehydrateIndexItem';
 import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
-import type { PageKeyMap } from './PageKeyMap';
+import type { PageKeyMap, PageKeyMapByIndexSet } from './PageKeyMap';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
 
@@ -27,10 +27,14 @@ import { validateIndexToken } from './validateIndexToken';
  *
  * An empty returned array indicates all page keys are `undefined`.
  */
-export function dehydratePageKeyMap<C extends BaseConfigMap>(
+export function dehydratePageKeyMap<
+  C extends BaseConfigMap,
+  ET extends EntityToken<C>,
+  ITS extends string,
+>(
   entityManager: EntityManager<C>,
-  entityToken: EntityToken<C>,
-  pageKeyMap: PageKeyMap<C>,
+  entityToken: ET,
+  pageKeyMap: PageKeyMapByIndexSet<C, ET, ITS>,
 ): string[] {
   try {
     // Validate params.

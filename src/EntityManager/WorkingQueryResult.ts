@@ -1,6 +1,7 @@
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
-import type { PageKeyMap } from './PageKeyMap';
+import type { EntityToken } from './EntityToken';
+import type { PageKeyMapByIndexSet } from './PageKeyMap';
+import type { EntityItemByToken } from './TokenAware';
 
 /**
  * A QueryResult object with rehydrated pageKeyMap.
@@ -10,13 +11,17 @@ import type { PageKeyMap } from './PageKeyMap';
  * @category QueryBuilder
  * @protected
  */
-export interface WorkingQueryResult<C extends BaseConfigMap> {
+export interface WorkingQueryResult<
+  C extends BaseConfigMap,
+  ET extends EntityToken<C>,
+  ITS extends string,
+> {
   /** The returned records. */
-  items: EntityItem<C>[];
+  items: EntityItemByToken<C, ET>[];
 
   /**
    * A compressed, two-layer map of page keys, used to query the next page of
    * data for a given sort key on each shard of a given hash key.
    */
-  pageKeyMap: PageKeyMap<C>;
+  pageKeyMap: PageKeyMapByIndexSet<C, ET, ITS>;
 }

@@ -9,6 +9,7 @@ import type { EntityItem } from './EntityItem';
 import type { EntityKey } from './EntityKey';
 import type { EntityRecord } from './EntityRecord';
 import type { EntityToken } from './EntityToken';
+import type { EntityToken as ETToken } from './EntityToken';
 import { findIndexToken } from './findIndexToken';
 import { getPrimaryKey } from './getPrimaryKey';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
@@ -267,7 +268,9 @@ export class EntityManager<CC extends BaseConfigMap> {
    *
    * @protected
    */
-  async query(options: QueryOptions<CC>): Promise<QueryResult<CC>> {
-    return await query(this, options);
+  async query<ET extends ETToken<CC>, ITS extends string>(
+    options: QueryOptions<CC, ET, ITS>,
+  ): Promise<QueryResult<CC, ET, ITS>> {
+    return await query<CC, ET, ITS>(this, options);
   }
 }

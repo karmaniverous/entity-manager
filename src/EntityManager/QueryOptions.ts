@@ -7,28 +7,34 @@ import type {
 } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { EntityManager } from './EntityManager'; // imported to support API docs
 import type { EntityToken } from './EntityToken';
 import type { ShardQueryMap } from './ShardQueryMap';
+import type { EntityItemByToken } from './TokenAware';
 
 /**
  * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
  *
  * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam ET - Entity token narrowing the item types.
+ * @typeParam ITS - Index token subset (inferred from shardQueryMap keys).
  *
  * @category EntityManager
  * @protected
  */
-export interface QueryOptions<CC extends BaseConfigMap> {
+export interface QueryOptions<
+  CC extends BaseConfigMap,
+  ET extends EntityToken<CC> = EntityToken<CC>,
+  ITS extends string = string,
+> {
   /** Identifies the entity to be queried. Key of {@link Config | `Config`} `entities`. */
-  entityToken: EntityToken<CC>;
+  entityToken: ET;
 
   /**
    * Partial item object sufficiently populated to generate index hash keys.
    */
-  item: EntityItem<CC>;
+  item: EntityItemByToken<CC, ET>;
 
   /**
    * The target maximum number of records to be returned by the query across
@@ -64,12 +70,12 @@ export interface QueryOptions<CC extends BaseConfigMap> {
    * page key, e.g. to match the same string against `firstName` and `lastName`
    * properties without performing a table scan for either.
    */
-  shardQueryMap: ShardQueryMap<CC>;
+  shardQueryMap: ShardQueryMap<CC, ET, ITS>;
 
   /**
    * A {@link SortOrder | `SortOrder`} object specifying the sort order of the result set. Defaults to `[]`.
    */
-  sortOrder?: SortOrder<EntityItem<CC>>;
+  sortOrder?: SortOrder<EntityItemByToken<CC, ET>>;
 
   /**
    * Lower limit to query shard space.

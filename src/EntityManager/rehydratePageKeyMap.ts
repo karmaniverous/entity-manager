@@ -8,7 +8,7 @@ import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import { getHashKeySpace } from './getHashKeySpace';
 import { getIndexComponents } from './getIndexComponents';
-import type { PageKeyMap } from './PageKeyMap';
+import type { PageKeyMapByIndexSet } from './PageKeyMap';
 import { rehydrateIndexItem } from './rehydrateIndexItem';
 import { updateItemRangeKey } from './updateItemRangeKey';
 import { validateEntityToken } from './validateEntityToken';
@@ -35,15 +35,19 @@ import { validateIndexToken } from './validateIndexToken';
  * @throws `Error` if `indexTokens` represent indexes with inconsistent hashKeys.
  * @throws `Error` if `dehydrated` has invalid length.
  */
-export function rehydratePageKeyMap<C extends BaseConfigMap>(
+export function rehydratePageKeyMap<
+  C extends BaseConfigMap,
+  ET extends EntityToken<C>,
+  ITS extends string,
+>(
   entityManager: EntityManager<C>,
-  entityToken: EntityToken<C>,
-  indexTokens: string[],
+  entityToken: ET,
+  indexTokens: ITS[],
   item: EntityItem<C>,
   dehydrated: string[] | undefined,
   timestampFrom = 0,
   timestampTo = Date.now(),
-): [C['HashKey'], PageKeyMap<C>] {
+): [C['HashKey'], PageKeyMapByIndexSet<C, ET, ITS>] {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -51,7 +55,7 @@ export function rehydratePageKeyMap<C extends BaseConfigMap>(
     // Validate indexTokens populated.
     if (!indexTokens.length) throw new Error('indexTokens empty');
 
-    // Validate indexTokens exist.
+    // Validate indexTokens exist and capture hashKeys.
     const hashKeys = unique(
       indexTokens.map((indexToken) => {
         validateIndexToken(entityManager, indexToken);
@@ -141,7 +145,7 @@ export function rehydratePageKeyMap<C extends BaseConfigMap>(
       rehydrated,
     });
 
-    return [hashKeyToken, rehydrated as PageKeyMap<C>];
+    return [hashKeyToken, rehydrated as PageKeyMapByIndexSet<C, ET, ITS>];
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, {

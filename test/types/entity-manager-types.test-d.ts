@@ -88,7 +88,7 @@ const pageKeyOk: PageKey<MyConfigMap> = { rangeKey: 'userId#u' };
 expectAssignable<PageKey<MyConfigMap>>(pageKeyOk);
 
 // ShardQueryFunction — provider-agnostic query of a single shard.
-const shardQueryFn: ShardQueryFunction<MyConfigMap> = (
+const shardQueryFn: ShardQueryFunction<MyConfigMap, 'user', 'firstName'> = (
   hashKey: string,
   pageKey?: PageKey<MyConfigMap>,
   pageSize?: number,
@@ -98,30 +98,52 @@ const shardQueryFn: ShardQueryFunction<MyConfigMap> = (
   void pageKey;
   void pageSize;
   const items: EntityItem<MyConfigMap>[] = [];
-  const res: ShardQueryResult<MyConfigMap> = { count: 0, items, pageKey };
+  const res: ShardQueryResult<MyConfigMap, 'user', 'firstName'> = {
+    count: 0,
+    // items can be broader assignable type at compile-time check
+    // (runtime narrowing occurs by token-aware helpers).
+    items: items as unknown as EntityItem<MyConfigMap>[],
+    pageKey,
+  };
   return Promise.resolve(res);
 };
 
 // ShardQueryMap — map index token -> shard query fn.
-const shardQueryMap: ShardQueryMap<MyConfigMap> = {
+const shardQueryMap: ShardQueryMap<
+  MyConfigMap,
+  'user',
+  'firstName' | 'lastName'
+> = {
   firstName: shardQueryFn,
   lastName: shardQueryFn,
 };
-expectAssignable<ShardQueryMap<MyConfigMap>>(shardQueryMap);
+expectAssignable<ShardQueryMap<MyConfigMap, 'user', 'firstName' | 'lastName'>>(
+  shardQueryMap,
+);
 
 // QueryOptions — minimal valid options.
-const qo: QueryOptions<MyConfigMap> = {
+const qo: QueryOptions<MyConfigMap, 'user', 'firstName' | 'lastName'> = {
   entityToken: 'user',
   item: {} as EntityItem<MyConfigMap>,
   shardQueryMap,
 };
-expectAssignable<QueryOptions<MyConfigMap>>(qo);
+expectAssignable<QueryOptions<MyConfigMap, 'user', 'firstName' | 'lastName'>>(
+  qo,
+);
 
 // QueryResult — shape contract.
-const qr: QueryResult<MyConfigMap> = { count: 0, items: [], pageKeyMap: '' };
-expectAssignable<QueryResult<MyConfigMap>>(qr);
+const qr: QueryResult<MyConfigMap, 'user', 'firstName' | 'lastName'> = {
+  count: 0,
+  items: [],
+  pageKeyMap: '',
+};
+expectAssignable<QueryResult<MyConfigMap, 'user', 'firstName' | 'lastName'>>(
+  qr,
+);
 expectType<number>(qr.count);
-expectType<EntityItem<MyConfigMap>[]>(qr.items);
+expectType<EntityItem<MyConfigMap>[]>(
+  qr.items as unknown as EntityItem<MyConfigMap>[],
+);
 expectType<string>(qr.pageKeyMap);
 
 // ShardBump — sharding time window definition.

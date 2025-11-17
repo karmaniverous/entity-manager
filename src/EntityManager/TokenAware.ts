@@ -13,6 +13,9 @@ export type EntityOfToken<
 /**
  * EntityItemByToken — database-facing partial item narrowed to a specific entity token.
  * Mirrors `EntityItem<CC>` with the entity surface restricted to `EntityOfToken<CC, ET>`.
+ *
+ * Note: If using createEntityManager with entitiesSchema, the schema must declare
+ * only base (non-generated) properties. Generated keys/tokens are layered by EntityManager.
  */
 export type EntityItemByToken<
   CC extends BaseConfigMap,

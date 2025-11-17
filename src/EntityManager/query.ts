@@ -4,11 +4,13 @@ import { isInt, parallel, unique } from 'radash';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
-import { QueryOptions } from './QueryOptions';
+import type { EntityToken } from './EntityToken';
+import type { PageKeyByIndex } from './PageKey';
+import type { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
+import type { EntityItemByToken } from './TokenAware';
 import type { WorkingQueryResult } from './WorkingQueryResult';
 
 const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
@@ -33,10 +35,14 @@ const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
  *
  * @throws Error if {@link QueryOptions.pageKeyMap | `pageKeyMap`} keys do not match {@link QueryOptions.shardQueryMap | `shardQueryMap`} keys.
  */
-export async function query<C extends BaseConfigMap>(
+export async function query<
+  C extends BaseConfigMap,
+  ET extends EntityToken<C>,
+  ITS extends string,
+>(
   entityManager: EntityManager<C>,
-  options: QueryOptions<C>,
-): Promise<QueryResult<C>> {
+  options: QueryOptions<C, ET, ITS>,
+): Promise<QueryResult<C, ET, ITS>> {
   try {
     // Get defaults.
     const { defaultLimit, defaultPageSize } =
@@ -64,10 +70,14 @@ export async function query<C extends BaseConfigMap>(
       throw new Error('pageSize must be a positive integer');
 
     // Rehydrate pageKeyMap.
-    const [hashKeyToken, rehydratedPageKeyMap] = rehydratePageKeyMap(
+    const [hashKeyToken, rehydratedPageKeyMap] = rehydratePageKeyMap<
+      C,
+      ET,
+      ITS
+    >(
       entityManager,
       entityToken,
-      Object.keys(shardQueryMap),
+      Object.keys(shardQueryMap) as ITS[],
       item,
       pageKeyMap
         ? (JSON.parse(
@@ -90,7 +100,7 @@ export async function query<C extends BaseConfigMap>(
     let workingResult = {
       items: [],
       pageKeyMap: rehydratedPageKeyMap,
-    } as WorkingQueryResult<C>;
+    } as WorkingQueryResult<C, ET, ITS>;
 
     do {
       // TODO: This loop will blow up as shards scale, since at a minimum it will return shardCount * pageSize
@@ -109,11 +119,11 @@ export async function query<C extends BaseConfigMap>(
               hashKey,
               pageKey,
             ]),
-        ) as [string, string, EntityItem<C> | undefined][],
+        ) as [ITS, string, PageKeyByIndex<C, ET, ITS> | undefined][],
         async ([indexToken, hashKey, pageKey]: [
+          ITS,
           string,
-          string,
-          EntityItem<C> | undefined,
+          PageKeyByIndex<C, ET, ITS> | undefined,
         ]) => ({
           indexToken,
           queryResult: await shardQueryMap[indexToken](
@@ -126,7 +136,7 @@ export async function query<C extends BaseConfigMap>(
       );
 
       // Reduce shardQueryResults & updateworkingRresult.
-      workingResult = shardQueryResults.reduce<WorkingQueryResult<C>>(
+      workingResult = shardQueryResults.reduce<WorkingQueryResult<C, ET, ITS>>(
         ({ items, pageKeyMap }, { indexToken, queryResult, hashKey }) => {
           Object.assign(rehydratedPageKeyMap[indexToken], {
             [hashKey]: queryResult.pageKey,
@@ -165,7 +175,7 @@ export async function query<C extends BaseConfigMap>(
       items: workingResult.items,
       pageKeyMap: compressToEncodedURIComponent(
         JSON.stringify(
-          dehydratePageKeyMap(
+          dehydratePageKeyMap<C, ET, ITS>(
             entityManager,
             entityToken,
             workingResult.pageKeyMap,
@@ -182,7 +192,7 @@ export async function query<C extends BaseConfigMap>(
       result,
     });
 
-    return result;
+    return result as QueryResult<C, ET, ITS>;
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, options);

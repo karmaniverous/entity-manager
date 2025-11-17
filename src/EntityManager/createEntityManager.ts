@@ -30,6 +30,9 @@ export interface ConfigInput {
   entities?: Record<string, unknown>;
   /**
    * Optional Zod schemas for per-entity domain shapes (non-generated fields only).
+   *
+   * Important: Schemas MUST declare only base (non-generated) properties. Do not include
+   * global keys (hashKey/rangeKey) or any generated tokens (sharded/unsharded).
    */
   entitiesSchema?: Record<string, ZodType>;
   generatedKeyDelimiter?: string;
@@ -105,6 +108,33 @@ export function createEntityManager<
 ): EntityManager<CapturedConfigMapFrom<CC, EM>> {
   // Cast to the existing Config<C> shape for runtime parsing; Zod validation
   // remains authoritative at construction time.
+  // Optional dev guardrail: cross-check entitiesSchema keys vs config.entities keys.
+  try {
+    if (config && 'entitiesSchema' in config && config.entitiesSchema) {
+      const schemaKeys = Object.keys(
+        (config as { entitiesSchema?: Record<string, unknown> })
+          .entitiesSchema ?? {},
+      );
+      const entitiesKeys = Object.keys(
+        (config as unknown as { entities?: Record<string, unknown> })
+          .entities ?? {},
+      );
+      const missingInEntities = schemaKeys.filter(
+        (k) => !entitiesKeys.includes(k),
+      );
+      const missingInSchema = entitiesKeys.filter(
+        (k) => !schemaKeys.includes(k),
+      );
+      if (missingInEntities.length || missingInSchema.length) {
+        logger.debug('entitiesSchema keys mismatch with config.entities', {
+          missingInEntities,
+          missingInSchema,
+        });
+      }
+    }
+  } catch {
+    // Best-effort warning only; never block construction.
+  }
   return new EntityManager(
     config as unknown as Config<CapturedConfigMapFrom<CC, EM>>,
     logger,

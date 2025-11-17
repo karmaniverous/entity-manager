@@ -2,24 +2,31 @@
 import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools'; // imported to support API docs
 
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
-import type { PageKey } from './PageKey';
+import type { EntityToken } from './EntityToken';
+import type { PageKeyByIndex } from './PageKey';
+import type { EntityItemByToken } from './TokenAware';
 
 /**
  * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
  *
- * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CC - {@link ConfigMap | `ConfigMap`}.
+ * @typeParam ET - Entity token narrowing the item type.
+ * @typeParam IT - Index token (for page key typing).
  *
  * @category EntityManager
  * @protected
  */
-export interface ShardQueryResult<CC extends BaseConfigMap> {
+export interface ShardQueryResult<
+  CC extends BaseConfigMap,
+  ET extends EntityToken<CC>,
+  IT extends string,
+> {
   /** The number of records returned. */
   count: number;
 
   /** The returned records. */
-  items: EntityItem<CC>[];
+  items: EntityItemByToken<CC, ET>[];
 
   /** The page key for the next query on this shard. */
-  pageKey?: PageKey<CC>;
+  pageKey?: PageKeyByIndex<CC, ET, IT>;
 }
