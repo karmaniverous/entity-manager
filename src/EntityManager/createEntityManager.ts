@@ -42,24 +42,30 @@ export interface ConfigInput {
   throttle?: number;
 }
 
-type HashKeyFrom<CC> = CC extends { hashKey: infer H } ? H & string : 'hashKey';
-type RangeKeyFrom<CC> = CC extends { rangeKey: infer R }
+export type HashKeyFrom<CC> = CC extends { hashKey: infer H }
+  ? H & string
+  : 'hashKey';
+export type RangeKeyFrom<CC> = CC extends { rangeKey: infer R }
   ? R & string
   : 'rangeKey';
 
-type ShardedKeysFrom<CC> = CC extends { generatedProperties?: infer GP }
+export type ShardedKeysFrom<CC> = CC extends { generatedProperties?: infer GP }
   ? GP extends { sharded?: infer S }
     ? keyof S & string
     : never
   : never;
 
-type UnshardedKeysFrom<CC> = CC extends { generatedProperties?: infer GP }
+export type UnshardedKeysFrom<CC> = CC extends {
+  generatedProperties?: infer GP;
+}
   ? GP extends { unsharded?: infer U }
     ? keyof U & string
     : never
   : never;
 
-type TranscodedPropertiesFrom<CC> = CC extends { propertyTranscodes?: infer PT }
+export type TranscodedPropertiesFrom<CC> = CC extends {
+  propertyTranscodes?: infer PT;
+}
   ? keyof PT & string
   : never;
 

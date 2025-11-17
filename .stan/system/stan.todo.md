@@ -117,3 +117,7 @@
   - Added IndexTokensFrom<CC> to createEntityManager.ts to capture the union of index tokens from a values-first ConfigInput (when keys are preserved via `as const`).
   - Purely a typing affordance to support Step 3 follow‑through (tightening ITS); no runtime changes.
   - Acronym lint CI deferred per guidance; implementation keeps template acronyms consistent.
+
+- Docs warnings fix (TypeDoc)
+  - Exported internal helper types (HashKeyFrom, RangeKeyFrom, ShardedKeysFrom, UnshardedKeysFrom, TranscodedPropertiesFrom) so TypeDoc can include and link them.
+  - Removes “referenced but not included” warnings without changing runtime behavior.
