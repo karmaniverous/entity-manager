@@ -50,6 +50,11 @@ Goals
 - Value-first helpers and patterns ensure literal keys are preserved across module boundaries (use “as const” and “satisfies”).
 - Runtime behavior remains unchanged: Zod-based validation persists; we intersect parsed configuration with captured literal types at the type level.
 
+Naming and acronym policy (hard rule)
+
+- Acronyms are reserved for type-parameter names only (e.g., CC, EM, ET, IT, ITS, EOT, EIBT, ERBT as template parameter identifiers).
+- Never export abbreviated type aliases. All exported types must be fully named (e.g., EntityOfToken, EntityItemByToken, EntityRecordByToken).
+
 Strict capitalized type-parameter dictionary (type parameters only; no alias exports)
 
 - EM — EntityMap
@@ -126,7 +131,7 @@ Inference-first API and typing (entity-manager)
   - rehydrateIndexItem<CC, EM, ET, IT>(…): EIBT<CC, EM, ET>
   - dehydratePageKeyMap<CC, EM, ET, ITS>(…): string[]
   - rehydratePageKeyMap<CC, EM, ET, ITS>(…): [HKT<CC>, PKMBIS<CC, EM, ET, ITS>]
-  - decodeGeneratedProperty<CC, EM, ET>(entityManager, entityToken: ET, encoded: string): EIBT<CC, EM, ET>
+  - decodeGeneratedProperty<CC, EM, ET>(entityManager, entityToken: ET, encoded: string): EntityItemByToken<CC, EM, ET>
     - Note: entityToken is required (no backward-compat constraint).
 - IndexTokenByEntity
   - Computed from CC (and optionally EM) using config semantics:

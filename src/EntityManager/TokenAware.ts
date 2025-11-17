@@ -4,23 +4,21 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityKey } from './EntityKey';
 import type { EntityToken } from './EntityToken';
 
-/**
- * Entity-of-token — resolves the concrete entity shape for a token ET.
- */
-export type EOT<
+/** EntityOfToken — resolves the concrete entity shape for a specific entity token. */
+export type EntityOfToken<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
 > = Exactify<CC['EntityMap']>[ET];
 
 /**
- * EntityItemByToken — database-facing partial item for a specific entity token.
- * Mirrors EntityItem<CC> but narrows the entity surface to the token.
+ * EntityItemByToken — database-facing partial item narrowed to a specific entity token.
+ * Mirrors EntityItem<CC> with the entity surface restricted to EntityOfToken<CC, ET>.
  */
-export type EIBT<
+export type EntityItemByToken<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
 > = Partial<
-  EOT<CC, ET> &
+  EntityOfToken<CC, ET> &
     Record<
       CC['HashKey'] | CC['RangeKey'] | CC['ShardedKeys'] | CC['UnshardedKeys'],
       string
@@ -28,13 +26,10 @@ export type EIBT<
 > &
   Record<string, unknown>;
 
-/**
- * EntityRecordByToken — database-facing record (keys required) for a token.
- */
-export type ERBT<CC extends BaseConfigMap, ET extends EntityToken<CC>> = EIBT<
-  CC,
-  ET
-> &
-  EntityKey<CC>;
+/** EntityRecordByToken — database-facing record (keys required) narrowed to a specific entity token. */
+export type EntityRecordByToken<
+  CC extends BaseConfigMap,
+  ET extends EntityToken<CC>,
+> = EntityItemByToken<CC, ET> & EntityKey<CC>;
 
 export {};

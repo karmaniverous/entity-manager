@@ -4,7 +4,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import { decodeElement } from './decodeElement';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
-import type { EIBT } from './TokenAware';
+import type { EntityItemByToken } from './TokenAware';
 
 /**
  * Decode a generated property value. Returns an {@link EntityItem | `EntityItem`}.
@@ -24,7 +24,7 @@ export function decodeGeneratedProperty<
   entityManager: EntityManager<CC>,
   entityToken: ET,
   encoded: string,
-): EIBT<CC, ET> {
+): EntityItemByToken<CC, ET> {
   try {
     const {
       generatedKeyDelimiter,
@@ -34,7 +34,7 @@ export function decodeGeneratedProperty<
     } = entityManager.config;
 
     // Handle degenerate case.
-    if (!encoded) return {} as EIBT<CC, ET>;
+    if (!encoded) return {} as EntityItemByToken<CC, ET>;
 
     // Split encoded into keys.
     const keys = encoded.split(generatedKeyDelimiter);
@@ -76,7 +76,7 @@ export function decodeGeneratedProperty<
 
     // entityToken used for typing only (ET-narrowed result).
     void entityToken;
-    return decoded as EIBT<CC, ET>;
+    return decoded as EntityItemByToken<CC, ET>;
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, { encoded });

@@ -157,7 +157,7 @@ describe('rehydratePageKeyMep', function () {
           pick(
             {
               ...items[i],
-              ...decodeGeneratedProperty(entityManager, beneficiaryPK),
+              ...decodeGeneratedProperty(entityManager, 'user', beneficiaryPK),
               beneficiaryPK,
             },
             beneficiaryCreatedIndexComponents,

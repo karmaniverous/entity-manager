@@ -16,7 +16,7 @@ import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
 import { removeKeys } from './removeKeys';
-import type { EIBT, ERBT } from './TokenAware';
+import type { EntityItemByToken, EntityRecordByToken } from './TokenAware';
 
 /**
  * The EntityManager class applies a configuration-driven sharded data model &
@@ -99,17 +99,17 @@ export class EntityManager<CC extends BaseConfigMap> {
    */
   addKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    item: EIBT<CC, ET>,
+    item: EntityItemByToken<CC, ET>,
     overwrite?: boolean,
-  ): ERBT<CC, ET>;
+  ): EntityRecordByToken<CC, ET>;
   /**
    * @overload
    */
   addKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    item: EIBT<CC, ET>[],
+    item: EntityItemByToken<CC, ET>[],
     overwrite?: boolean,
-  ): ERBT<CC, ET>[];
+  ): EntityRecordByToken<CC, ET>[];
   /**
    * @overload
    */
@@ -138,16 +138,28 @@ export class EntityManager<CC extends BaseConfigMap> {
     overwrite?: boolean,
   ): EntityRecord<CC>[];
 
-  addKeys(
-    entityToken: EntityToken<CC>,
-    i: EntityItem<CC> | EntityItem<CC>[],
+  addKeys<ET extends EntityToken<CC>>(
+    entityToken: ET,
+    i: EntityItemByToken<CC, ET> | EntityItemByToken<CC, ET>[],
     overwrite = false,
-  ): EntityRecord<CC> | EntityRecord<CC>[] {
+  ): EntityRecordByToken<CC, ET> | EntityRecordByToken<CC, ET>[] {
     if (Array.isArray(i)) {
-      return i.map((item) => addKeys(this, entityToken, item, overwrite));
+      return i.map((item) =>
+        addKeys(
+          this,
+          entityToken,
+          item as unknown as EntityItem<CC>,
+          overwrite,
+        ),
+      ) as unknown as EntityRecordByToken<CC, ET>[];
     }
 
-    return addKeys(this, entityToken, i, overwrite);
+    return addKeys(
+      this,
+      entityToken,
+      i as unknown as EntityItem<CC>,
+      overwrite,
+    ) as unknown as EntityRecordByToken<CC, ET>;
   }
 
   /**
@@ -164,7 +176,7 @@ export class EntityManager<CC extends BaseConfigMap> {
    */
   getPrimaryKey<ET extends EntityToken<CC>>(
     entityToken: ET,
-    item: EIBT<CC, ET>,
+    item: EntityItemByToken<CC, ET>,
     overwrite?: boolean,
   ): EntityKey<CC>[];
   /**
@@ -172,7 +184,7 @@ export class EntityManager<CC extends BaseConfigMap> {
    */
   getPrimaryKey<ET extends EntityToken<CC>>(
     entityToken: ET,
-    items: EIBT<CC, ET>[],
+    items: EntityItemByToken<CC, ET>[],
     overwrite?: boolean,
   ): EntityKey<CC>[];
   /**
@@ -188,18 +200,28 @@ export class EntityManager<CC extends BaseConfigMap> {
     items: EntityItem<CC>[],
     overwrite?: boolean,
   ): EntityKey<CC>[];
-  getPrimaryKey(
-    entityToken: EntityToken<CC>,
-    i: EntityItem<CC> | EntityItem<CC>[],
+  getPrimaryKey<ET extends EntityToken<CC>>(
+    entityToken: ET,
+    i: EntityItemByToken<CC, ET> | EntityItemByToken<CC, ET>[],
     overwrite = false,
   ): EntityKey<CC>[] {
     if (Array.isArray(i)) {
       return i.flatMap((item) =>
-        getPrimaryKey(this, entityToken, item, overwrite),
+        getPrimaryKey(
+          this,
+          entityToken,
+          item as unknown as EntityItem<CC>,
+          overwrite,
+        ),
       );
     }
 
-    return getPrimaryKey(this, entityToken, i, overwrite);
+    return getPrimaryKey(
+      this,
+      entityToken,
+      i as unknown as EntityItem<CC>,
+      overwrite,
+    );
   }
 
   /**
@@ -216,15 +238,15 @@ export class EntityManager<CC extends BaseConfigMap> {
    */
   removeKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    item: ERBT<CC, ET>,
-  ): EIBT<CC, ET>;
+    item: EntityRecordByToken<CC, ET>,
+  ): EntityItemByToken<CC, ET>;
   /**
    * @overload
    */
   removeKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    items: ERBT<CC, ET>[],
-  ): EIBT<CC, ET>[];
+    items: EntityRecordByToken<CC, ET>[],
+  ): EntityItemByToken<CC, ET>[];
   /**
    * @overload
    */
@@ -250,15 +272,21 @@ export class EntityManager<CC extends BaseConfigMap> {
     items: EntityRecord<CC>[],
   ): EntityItem<CC>[];
 
-  removeKeys(
-    entityToken: EntityToken<CC>,
-    i: EntityRecord<CC> | EntityRecord<CC>[],
-  ): EntityItem<CC> | EntityItem<CC>[] {
+  removeKeys<ET extends EntityToken<CC>>(
+    entityToken: ET,
+    i: EntityRecordByToken<CC, ET> | EntityRecordByToken<CC, ET>[],
+  ): EntityItemByToken<CC, ET> | EntityItemByToken<CC, ET>[] {
     if (Array.isArray(i)) {
-      return i.map((item) => removeKeys(this, entityToken, item));
+      return i.map((item) =>
+        removeKeys(this, entityToken, item as unknown as EntityRecord<CC>),
+      ) as unknown as EntityItemByToken<CC, ET>[];
     }
 
-    return removeKeys(this, entityToken, i);
+    return removeKeys(
+      this,
+      entityToken,
+      i as unknown as EntityRecord<CC>,
+    ) as unknown as EntityItemByToken<CC, ET>;
   }
 
   /**
