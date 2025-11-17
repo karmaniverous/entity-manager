@@ -20,6 +20,7 @@ import type { ShardQueryResult } from './ShardQueryResult';
  * @typeParam CC - {@link ConfigMap | `ConfigMap`}.
  * @typeParam ET - Entity token narrowing the item/record types.
  * @typeParam IT - Index token (inferred from shardQueryMap keys).
+ * @typeParam CF - Optional values-first config literal type for narrowing.
  *
  * @category EntityManager
  * @protected
@@ -28,8 +29,9 @@ export type ShardQueryFunction<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
   IT extends string,
+  CF = unknown,
 > = (
   hashKey: string,
-  pageKey?: PageKeyByIndex<CC, ET, IT>,
+  pageKey?: PageKeyByIndex<CC, ET, IT, CF>,
   pageSize?: number,
-) => Promise<ShardQueryResult<CC, ET, IT>>;
+) => Promise<ShardQueryResult<CC, ET, IT, CF>>;

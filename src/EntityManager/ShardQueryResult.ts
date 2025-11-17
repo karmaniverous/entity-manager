@@ -12,6 +12,7 @@ import type { EntityItemByToken } from './TokenAware';
  * @typeParam CC - {@link ConfigMap | `ConfigMap`}.
  * @typeParam ET - Entity token narrowing the item type.
  * @typeParam IT - Index token (for page key typing).
+ * @typeParam CF - Optional values-first config literal type for narrowing.
  *
  * @category EntityManager
  * @protected
@@ -20,6 +21,7 @@ export interface ShardQueryResult<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
   IT extends string,
+  CF = unknown,
 > {
   /** The number of records returned. */
   count: number;
@@ -28,5 +30,5 @@ export interface ShardQueryResult<
   items: EntityItemByToken<CC, ET>[];
 
   /** The page key for the next query on this shard. */
-  pageKey?: PageKeyByIndex<CC, ET, IT>;
+  pageKey?: PageKeyByIndex<CC, ET, IT, CF>;
 }

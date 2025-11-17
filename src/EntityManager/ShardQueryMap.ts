@@ -11,6 +11,7 @@ import type { ShardQueryFunction } from './ShardQueryFunction';
  * @typeParam CC - {@link ConfigMap | `ConfigMap`}.
  * @typeParam ET - Entity token narrowing the function item types.
  * @typeParam ITS - Index token subset (inferred from object keys).
+ * @typeParam CF - Optional values-first config literal type for narrowing.
  *
  * @category EntityManager
  * @protected
@@ -19,4 +20,5 @@ export type ShardQueryMap<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
   ITS extends string,
-> = Record<ITS, ShardQueryFunction<CC, ET, ITS>>;
+  CF = unknown,
+> = Record<ITS, ShardQueryFunction<CC, ET, ITS, CF>>;

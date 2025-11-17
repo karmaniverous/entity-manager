@@ -28,9 +28,11 @@ export type PageKeyMap<C extends BaseConfigMap> = Record<
  * @typeParam CC - Config map.
  * @typeParam ET - Entity token.
  * @typeParam ITS - Index token subset.
+ * @typeParam CF - Optional values-first config literal type for narrowing.
  */
 export type PageKeyMapByIndexSet<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
   ITS extends string = string,
-> = Record<ITS, Record<string, PageKeyByIndex<CC, ET, ITS> | undefined>>;
+  CF = unknown,
+> = Record<ITS, Record<string, PageKeyByIndex<CC, ET, ITS, CF> | undefined>>;

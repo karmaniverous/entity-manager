@@ -120,4 +120,10 @@
 
 - Docs warnings fix (TypeDoc)
   - Exported internal helper types (HashKeyFrom, RangeKeyFrom, ShardedKeysFrom, UnshardedKeysFrom, TranscodedPropertiesFrom) so TypeDoc can include and link them.
-  - Removes “referenced but not included” warnings without changing runtime behavior.
+  - Removes “referenced but not included” warnings without changing runtime behavior.
+
+- PKBI refinement (optional CF channel)
+  - PageKeyByIndex now accepts an optional CF (config-literal) type parameter.
+  - When CF carries `indexes`, PKBI narrows to the specific index components (global hash/range plus that index’s hashKey/rangeKey); otherwise falls back to broad PageKey.
+  - Threaded CF (defaulted to unknown) through PageKeyMapByIndexSet, ShardQueryFunction/Map/Result to enable downstream adoption without breaking existing code.
+  - No runtime behavior changes; tests unaffected.
