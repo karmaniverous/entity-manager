@@ -2,7 +2,11 @@ import { expectAssignable, expectType } from 'tsd';
 import { z } from 'zod';
 
 import { createEntityManager } from '../../src/EntityManager/createEntityManager';
-import type { EntityItem, EntityRecord } from '../../src/index.ts';
+import type {
+  BaseConfigMap,
+  EntityItem,
+  EntityRecord,
+} from '../../src/index.ts';
 
 // Config with entitiesSchema (schemas define base fields only; no generated keys/tokens)
 const config = {
@@ -52,7 +56,7 @@ const rec = manager.addKeys('user', {
   lastNameCanonical: 'b',
 });
 // width-compatible assertion
-expectAssignable<EntityRecord<any>>(rec);
+expectAssignable<EntityRecord<BaseConfigMap>>(rec);
 // getPrimaryKey returns keys
 const keys = manager.getPrimaryKey('user', {
   userId: 'u1',
@@ -61,4 +65,4 @@ expectType<Record<'hashKey2' | 'rangeKey', string>[]>(keys);
 // removeKeys returns item-facing
 const item = manager.removeKeys('user', rec);
 // width-compatible assertion
-expectAssignable<EntityItem<any>>(item);
+expectAssignable<EntityItem<BaseConfigMap>>(item);
