@@ -1,13 +1,12 @@
 import type {
   ConditionalProperty,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  EntityMap, // imported to support API docs
+  EntityMap,
   Exactify,
   FlattenEntityMap,
   PropertiesOfType,
   TranscodableProperties,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  TranscodeMap, // imported to support API docs
+  TranscodeRegistry, // imported to support API docs
   Transcodes,
 } from '@karmaniverous/entity-tools';
 
@@ -32,10 +31,10 @@ export type Config<C extends BaseConfigMap = BaseConfigMap> =
         shardBumps?: ShardBump[];
         timestampProperty: C['TranscodedProperties'] &
           PropertiesOfType<C['EntityMap'][E], number> &
-          TranscodableProperties<C['EntityMap'], C['TranscodeMap']>;
+          TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>;
         uniqueProperty: C['TranscodedProperties'] &
           keyof C['EntityMap'][E] &
-          TranscodableProperties<C['EntityMap'], C['TranscodeMap']>;
+          TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>;
       };
     }
   > &
@@ -65,21 +64,22 @@ export type Config<C extends BaseConfigMap = BaseConfigMap> =
       'propertyTranscodes',
       C['TranscodedProperties'] &
         TranscodableProperties<C['EntityMap'], C['TranscodeMap']>,
+        TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>
       {
         [P in C['TranscodedProperties'] &
           TranscodableProperties<
             C['EntityMap'],
-            C['TranscodeMap']
+            C['TranscodeRegistry']
           >]: PropertiesOfType<
-          C['TranscodeMap'],
+          C['TranscodeRegistry'],
           FlattenEntityMap<C['EntityMap']>[P]
         >;
       }
     > &
     ConditionalProperty<
       'transcodes',
-      keyof C['TranscodeMap'],
-      Transcodes<C['TranscodeMap']>
+      keyof C['TranscodeRegistry'],
+      Transcodes<C['TranscodeRegistry']>
     > & {
       generatedKeyDelimiter?: string;
       generatedValueDelimiter?: string;

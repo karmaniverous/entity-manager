@@ -3,7 +3,7 @@ import type {
   EntityMap, // imported to support API docs
   SortOrder,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  TranscodeMap, // imported to support API docs
+  TranscodeRegistry, // imported to support API docs
 } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';

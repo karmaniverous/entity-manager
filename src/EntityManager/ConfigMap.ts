@@ -1,9 +1,9 @@
 import type {
-  DefaultTranscodeMap,
+  DefaultTranscodeRegistry,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   EntityMap, // imported to support API docs
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  TranscodeMap, // imported to support API docs
+  TranscodeRegistry, // imported to support API docs
 } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
@@ -37,7 +37,7 @@ export type ConfigMap<
   TranscodedProperties: 'TranscodedProperties' extends keyof M
     ? NonNullable<M['TranscodedProperties']>
     : never;
-  TranscodeMap: 'TranscodeMap' extends keyof M
-    ? NonNullable<M['TranscodeMap']>
-    : DefaultTranscodeMap;
+  TranscodeRegistry: 'TranscodeRegistry' extends keyof M
+    ? NonNullable<M['TranscodeRegistry']>
+    : DefaultTranscodeRegistry;
 }>;

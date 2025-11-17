@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools'; // imported to support API docs
+import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools'; // imported to support API docs
 
 import type { BaseConfigMap } from './BaseConfigMap';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

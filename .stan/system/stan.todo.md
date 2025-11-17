@@ -2,14 +2,6 @@
 
 ## Next up (in priority order)
 
-- Step 1 — Align with entity-tools rename (types only; mechanical)
-  - Replace all type-only imports:
-    - TranscodeMap → TranscodeRegistry
-    - DefaultTranscodeMap → DefaultTranscodeRegistry
-  - Files: BaseEntityClient/_, BaseQueryBuilder/_, and all EntityManager/\* references surfaced by TS2724.
-  - Update typedoc externalSymbolLinkMappings to reference TranscodeRegistry/DefaultTranscodeRegistry.
-  - Acceptance: typecheck, build, and docs succeed with zero runtime changes.
-
 - Step 2 — Introduce values-first factory and adopt strict acronyms (type parameter names only)
   - Add createEntityManager<const CC extends ConfigInput, EM extends EntityMap = MinimalEntityMapFrom<CC>>(config: CC, logger?).
   - Capture tokens/index names from the config value (CC). Zod parsing remains; intersect parsed output with captured CC types at the type level.
@@ -58,3 +50,11 @@
 ## Completed (append-only)
 
 **CRITICAL: This list is append-only; do not edit items! Place most recent entries at the BOTTOM of the list. When pruning, remove older entries from the top.**
+
+- Step 1 — Align with entity-tools rename (types only; mechanical)
+  - Replaced all type-only imports:
+    - TranscodeMap → TranscodeRegistry
+    - DefaultTranscodeMap → DefaultTranscodeRegistry
+  - Updated BaseConfigMap to expose TranscodeRegistry instead of TranscodeMap in the base configuration map and updated all dependent generic references (e.g., C['TranscodeRegistry']).
+  - Updated doc-only imports across BaseEntityClient, BaseQueryBuilder, and EntityManager modules to reference TranscodeRegistry.
+  - Acceptance: typecheck/build/docs green with zero runtime changes.

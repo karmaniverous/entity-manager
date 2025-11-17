@@ -1,4 +1,4 @@
-import type { EntityMap, TranscodeMap } from '@karmaniverous/entity-tools';
+import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { ConfigMap } from './ConfigMap'; // imported to support API docs
@@ -15,5 +15,5 @@ export interface BaseConfigMap {
   ShardedKeys: string;
   UnshardedKeys: string;
   TranscodedProperties: string;
-  TranscodeMap: TranscodeMap;
+  TranscodeRegistry: TranscodeRegistry;
 }
