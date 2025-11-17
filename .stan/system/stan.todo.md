@@ -62,3 +62,9 @@
   - Amended: replaced remaining TSDoc references to TranscodeMap → TranscodeRegistry across BaseEntityClient, BaseQueryBuilder, and EntityManager public types (EntityItem/Record/Key/Token, PageKey, QueryOptions/Result, ShardQuery types, ValidateConfigMap). Resolves TypeDoc unresolved-link warnings.
   - Amended: fixed final TSDoc reference in BaseQueryBuilder generic param C (TranscodeMap → TranscodeRegistry) to clear the last TypeDoc warning.
 
+- Step 2 — Values-first factory (initial)
+  - Added createEntityManager<const CC extends ConfigInput, EM extends EntityMap = MinimalEntityMapFrom<CC>>(config, logger?) returning EntityManager<CapturedConfigMapFrom<CC, EM>>.
+  - Introduced ConfigInput shape for values-first capture; CapturedConfigMapFrom and MinimalEntityMapFrom helper types to bridge literal config → BaseConfigMap-compatible manager generics.
+  - Behavior unchanged (Zod parsing in EntityManager constructor remains authoritative).
+  - Acceptance: repo scripts green (typecheck, lint, test, build, docs).
+
