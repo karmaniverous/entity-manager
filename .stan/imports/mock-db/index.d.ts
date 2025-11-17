@@ -1,13 +1,13 @@
-import { Entity, TranscodeMap, DefaultTranscodeMap, TranscodableProperties, SortOrder } from '@karmaniverous/entity-tools';
-export { DefaultTranscodeMap, Entity, SortOrder, TranscodeMap } from '@karmaniverous/entity-tools';
+import { Entity, TranscodeRegistry, DefaultTranscodeRegistry, TranscodableProperties, SortOrder } from '@karmaniverous/entity-tools';
+export { DefaultTranscodeRegistry, Entity, SortOrder, TranscodeRegistry } from '@karmaniverous/entity-tools';
 
 /**
  * Options for `query` method.
  *
  * @typeParam E - {@link Entity | `Entity`} type.
- * @typeParam T - {@link TranscodeMap | `TranscodeMap`} indicating transcodable types. Defaults to {@link DefaultTranscodeMap | `DefaultTranscodeMap`}.
+ * @typeParam T - {@link TranscodeRegistry | `TranscodeRegistry`} indicating transcodable types. Defaults to {@link DefaultTranscodeRegistry | `DefaultTranscodeRegistry`}.
  */
-interface QueryOptions<E extends Entity, T extends TranscodeMap = DefaultTranscodeMap> {
+interface QueryOptions<E extends Entity, T extends TranscodeRegistry = DefaultTranscodeRegistry> {
     /**
      * If provided, only records that pass the filter will be returned.
      *
@@ -49,9 +49,9 @@ interface QueryOptions<E extends Entity, T extends TranscodeMap = DefaultTransco
  * Return type for {@link MockDb.query | `query`} method.
  *
  * @typeParam E - {@link Entity | `Entity`} type.
- * @typeParam T - {@link TranscodeMap | `TranscodeMap`} indicating transcodable types. Defaults to {@link DefaultTranscodeMap | `DefaultTranscodeMap`}.
+ * @typeParam T - {@link TranscodeRegistry | `TranscodeRegistry`} indicating transcodable types. Defaults to {@link DefaultTranscodeRegistry | `DefaultTranscodeRegistry`}.
  */
-interface QueryReturn<E extends Entity, T extends TranscodeMap = DefaultTranscodeMap> {
+interface QueryReturn<E extends Entity, T extends TranscodeRegistry = DefaultTranscodeRegistry> {
     /** Number of records returned in this result set, exclusive of other pages. */
     count: number;
     /** Records returned in this result set. */
@@ -65,7 +65,7 @@ interface QueryReturn<E extends Entity, T extends TranscodeMap = DefaultTranscod
  *
  *
  * @typeParam E - {@link Entity | `Entity`} type.
- * @typeParam T - {@link TranscodeMap | `TranscodeMap`} indicating transcodable types. Defaults to {@link DefaultTranscodeMap | `DefaultTranscodeMap`}.
+ * @typeParam T - {@link TranscodeRegistry | `TranscodeRegistry`} indicating transcodable types. Defaults to {@link DefaultTranscodeRegistry | `DefaultTranscodeRegistry`}.
  *
  * @remarks
  * This class is intended to replicate essential DynamoDB _behaviors_, not the
@@ -78,7 +78,7 @@ interface QueryReturn<E extends Entity, T extends TranscodeMap = DefaultTranscod
  * All methods can be run synchronously, or asynchronously with a normally-
  * distributed delay.
  */
-declare class MockDb<E extends Entity, T extends TranscodeMap = DefaultTranscodeMap> {
+declare class MockDb<E extends Entity, T extends TranscodeRegistry = DefaultTranscodeRegistry> {
     private data;
     private delayMean;
     private delayStd;
