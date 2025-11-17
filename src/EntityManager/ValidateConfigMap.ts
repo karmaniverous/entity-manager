@@ -13,7 +13,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 /**
  * Validates a type derived from {@link BaseConfigMap | `BaseConfigMap`} to ensure HashKey and RangeKey are both defined and that all sets of special keys are mutually exclusive.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeMap | `TranscodeMap`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityManager
  * @protected

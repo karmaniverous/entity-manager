@@ -10,7 +10,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import type { ValidateConfigMap } from './ValidateConfigMap';
 
 /**
- * Generates & validates the map defining defines an {@link EntityManager | `EntityManager`} configuration's {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeMap | `TranscodeMap`}.
+ * Generates & validates the map defining defines an {@link EntityManager | `EntityManager`} configuration's {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}.
  *
  * Unspecified properties will default to those defined in {@link BaseConfigMap | `BaseConfigMap`}.
  *

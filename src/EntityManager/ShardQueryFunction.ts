@@ -16,7 +16,7 @@ import type { ShardQueryResult } from './ShardQueryResult';
  * @param pageKey - The {@link PageKey | `PageKey`} returned by the previous query on this shard.
  * @param pageSize - The maximum number of items to return from this query.
  *
- * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeMap | `TranscodeMap`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam C - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityManager
  * @protected
