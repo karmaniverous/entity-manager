@@ -2,24 +2,29 @@ import { objectify } from 'radash';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import { decodeElement } from './decodeElement';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
+import type { EntityToken } from './EntityToken';
+import type { EIBT } from './TokenAware';
 
 /**
  * Decode a generated property value. Returns an {@link EntityItem | `EntityItem`}.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
- * @param entityToken - `entityManager.config.entities` key.
+ * @param entityToken - {@link Config.entities | `entityManager.config.entities`} key.
  * @param encoded - Encoded generated property value.
  *
  * @returns {@link EntityItem | `EntityItem`} object with updated properties decoded from `encoded`.
  *
  * @throws `Error` if `entityToken` is invalid.
  */
-export function decodeGeneratedProperty<C extends BaseConfigMap>(
-  entityManager: EntityManager<C>,
+export function decodeGeneratedProperty<
+  CC extends BaseConfigMap,
+  ET extends EntityToken<CC>,
+>(
+  entityManager: EntityManager<CC>,
+  entityToken: ET,
   encoded: string,
-): EntityItem<C> {
+): EIBT<CC, ET> {
   try {
     const {
       generatedKeyDelimiter,
@@ -29,7 +34,7 @@ export function decodeGeneratedProperty<C extends BaseConfigMap>(
     } = entityManager.config;
 
     // Handle degenerate case.
-    if (!encoded) return {} as EntityItem<C>;
+    if (!encoded) return {} as EIBT<CC, ET>;
 
     // Split encoded into keys.
     const keys = encoded.split(generatedKeyDelimiter);
@@ -56,7 +61,11 @@ export function decodeGeneratedProperty<C extends BaseConfigMap>(
         values,
         ([key]) => key,
         ([key, value]) =>
-          decodeElement(entityManager, key as C['TranscodedProperties'], value),
+          decodeElement(
+            entityManager,
+            key as CC['TranscodedProperties'],
+            value,
+          ),
       ),
     );
 
@@ -65,7 +74,9 @@ export function decodeGeneratedProperty<C extends BaseConfigMap>(
       decoded,
     });
 
-    return decoded as EntityItem<C>;
+    // entityToken used for typing only (ET-narrowed result).
+    void entityToken;
+    return decoded as EIBT<CC, ET>;
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, { encoded });

@@ -101,7 +101,7 @@ export function rehydratePageKeyMap<C extends BaseConfigMap>(
           if (!dehydratedIndexPageKeyMaps[i]) return;
 
           let pageKeyItem: EntityItem<C> = {
-            ...decodeGeneratedProperty(entityManager, hashKey),
+            ...decodeGeneratedProperty(entityManager, entityToken, hashKey),
             ...rehydrateIndexItem(
               entityManager,
               entityToken,

@@ -79,7 +79,11 @@ export function dehydratePageKeyMap<C extends BaseConfigMap>(
             )
               Object.assign(
                 item,
-                decodeGeneratedProperty(entityManager, value as string),
+                decodeGeneratedProperty(
+                  entityManager,
+                  entityToken,
+                  value as string,
+                ),
               );
             else Object.assign(item, { [property]: value });
 

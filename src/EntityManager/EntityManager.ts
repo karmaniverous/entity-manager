@@ -16,6 +16,7 @@ import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
 import { removeKeys } from './removeKeys';
+import type { EIBT, ERBT } from './TokenAware';
 
 /**
  * The EntityManager class applies a configuration-driven sharded data model &
@@ -96,6 +97,22 @@ export class EntityManager<CC extends BaseConfigMap> {
    *
    * @overload
    */
+  addKeys<ET extends EntityToken<CC>>(
+    entityToken: ET,
+    item: EIBT<CC, ET>,
+    overwrite?: boolean,
+  ): ERBT<CC, ET>;
+  /**
+   * @overload
+   */
+  addKeys<ET extends EntityToken<CC>>(
+    entityToken: ET,
+    item: EIBT<CC, ET>[],
+    overwrite?: boolean,
+  ): ERBT<CC, ET>[];
+  /**
+   * @overload
+   */
   addKeys(
     entityToken: EntityToken<CC>,
     item: EntityItem<CC>,
@@ -145,6 +162,22 @@ export class EntityManager<CC extends BaseConfigMap> {
    *
    * @throws `Error` if `entityToken` is invalid.
    */
+  getPrimaryKey<ET extends EntityToken<CC>>(
+    entityToken: ET,
+    item: EIBT<CC, ET>,
+    overwrite?: boolean,
+  ): EntityKey<CC>[];
+  /**
+   * @overload
+   */
+  getPrimaryKey<ET extends EntityToken<CC>>(
+    entityToken: ET,
+    items: EIBT<CC, ET>[],
+    overwrite?: boolean,
+  ): EntityKey<CC>[];
+  /**
+   * @overload
+   */
   getPrimaryKey(
     entityToken: EntityToken<CC>,
     item: EntityItem<CC>,
@@ -179,6 +212,20 @@ export class EntityManager<CC extends BaseConfigMap> {
    *
    * @throws `Error` if `entityToken` is invalid.
    *
+   * @overload
+   */
+  removeKeys<ET extends EntityToken<CC>>(
+    entityToken: ET,
+    item: ERBT<CC, ET>,
+  ): EIBT<CC, ET>;
+  /**
+   * @overload
+   */
+  removeKeys<ET extends EntityToken<CC>>(
+    entityToken: ET,
+    items: ERBT<CC, ET>[],
+  ): EIBT<CC, ET>[];
+  /**
    * @overload
    */
   removeKeys(

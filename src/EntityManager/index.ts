@@ -14,4 +14,5 @@ export * from './ShardBump';
 export * from './ShardQueryFunction';
 export * from './ShardQueryMap';
 export * from './ShardQueryResult';
+export * from './TokenAware';
 export * from './ValidateConfigMap';
