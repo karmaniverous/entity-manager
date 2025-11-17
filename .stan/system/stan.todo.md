@@ -77,4 +77,9 @@
   - Added optional entitiesSchema to ConfigInput. When present, EM is inferred
     directly from Zod schemas (values-first, no explicit generics).
   - Fallback remains EntityMap when schemas are omitted; runtime config parsing/validation unchanged.
-  - Documentation updated to state schemas include only non-generated fields.
+  - Documentation updated to state schemas include only non-generated fields.
+
+- Overload cleanup (TS2394 fix)
+  - Removed broad (non-generic) overloads for addKeys/getPrimaryKey/removeKeys.
+  - Kept ET-aware overloads and matched implementation signatures to ET-aware forms.
+  - Resolves overload/implementation mismatch without introducing any “any” types.
