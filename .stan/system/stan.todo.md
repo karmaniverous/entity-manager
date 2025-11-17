@@ -31,11 +31,7 @@
   - Provide concise usage snippets for PageKey typing by index; sorting with defineSortOrder<E> (entity-tools); and config authoring patterns.
 
 - Step 5 — Type tests and guardrails
-  - Add tsd tests covering:
-    - createEntityManager inference from a literal value (CC capture).
-    - Narrowing of addKeys/removeKeys/getPrimaryKey by ET.
-    - Query typing: ET and ITS inferred from options values (entityToken and shardQueryMap keys).
-    - Low-level helpers produce ET/IT-typed results.
+  - Optional: add a CI check that scans generated d.ts to enforce strict acronym dictionary for template params.
   - Optional: add a simple CI check or script to scan generated d.ts and assert template parameter names follow the strict acronym dictionary.
 
 - Step 6 — Release and coordination
@@ -150,4 +146,8 @@
 - EntityManager.query CF generic
   - Added CF parameter to EntityManager.query signature and forwarded to the internal
     query() function. Aligns with BaseQueryBuilder and QueryOptions CF threading.
-  - Fixes TS2558 from generic arity mismatch.
+  - Fixes TS2558 from generic arity mismatch.
+
+- TSD tests — CF-based PageKeyByIndex narrowing
+  - Added pagekey-narrowing.test-d.ts to validate CF-driven narrowing for PageKeyByIndex and ShardQueryFunction pageKey parameter using values-first config with literal index keys.
+  - Confirms only the expected index components are permitted; improper keys produce type errors as intended.
