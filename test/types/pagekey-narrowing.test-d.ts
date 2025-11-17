@@ -1,3 +1,4 @@
+import type { Entity } from '@karmaniverous/entity-tools';
 import { expectError, expectType } from 'tsd';
 
 import type {
@@ -7,13 +8,13 @@ import type {
 } from '../../src/index.ts';
 
 // Minimal entity shapes for testing.
-interface Email {
+interface Email extends Entity {
   created: number;
   email: string;
   userId: string;
 }
 
-interface User {
+interface User extends Entity {
   beneficiaryId: string;
   created: number;
   firstNameCanonical: string;
@@ -52,6 +53,8 @@ const cf = {
   },
 } as const;
 type CF = typeof cf;
+// Keep cf “used” to satisfy ESLint in tsd context.
+expectType<typeof cf>(cf);
 
 // PageKeyByIndex should narrow to hashKey2 | rangeKey | firstNameRK for 'firstName'.
 type PKFirst = PageKeyByIndex<MyConfigMap, 'user', 'firstName', CF>;
@@ -60,25 +63,20 @@ expectType<string | undefined>(pkFirst.hashKey2);
 expectType<string | undefined>(pkFirst.rangeKey);
 expectType<string | undefined>(pkFirst.firstNameRK);
 // Not allowed for 'firstName' index:
-// @ts-expect-error — lastNameRK is not part of the 'firstName' index components
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _bad1 = pkFirst.lastNameRK;
-// @ts-expect-error — phoneRK is not part of the 'firstName' index components
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _bad2 = pkFirst.phoneRK;
+// lastNameRK and phoneRK should not be accessible as components of 'firstName'
+expectError(pkFirst.lastNameRK);
+expectError(pkFirst.phoneRK);
 
 // ShardQueryFunction pageKey param should also be narrowed to the same components.
 type SQFFirst = ShardQueryFunction<MyConfigMap, 'user', 'firstName', CF>;
-const sqfFirst: SQFFirst = async (_hashKey, pageKey, _pageSize) => {
+const sqfFirst: SQFFirst = (_hashKey, pageKey) => {
   if (pageKey) {
     expectType<string | undefined>(pageKey.hashKey2);
     expectType<string | undefined>(pageKey.rangeKey);
     expectType<string | undefined>(pageKey.firstNameRK);
-    // @ts-expect-error — lastNameRK is not part of the 'firstName' index components
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const _bad3 = pageKey.lastNameRK;
+    expectError(pageKey.lastNameRK);
   }
-  return { count: 0, items: [], pageKey };
+  return Promise.resolve({ count: 0, items: [], pageKey });
 };
 
 // Same check for 'lastName' index — ensure allowed/forbidden keys are consistent.
@@ -87,11 +85,9 @@ declare const pkLast: PKLast;
 expectType<string | undefined>(pkLast.hashKey2);
 expectType<string | undefined>(pkLast.rangeKey);
 expectType<string | undefined>(pkLast.lastNameRK);
-// @ts-expect-error — firstNameRK is not part of the 'lastName' index components
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _bad4 = pkLast.firstNameRK;
+expectError(pkLast.firstNameRK);
 
 type SQFLast = ShardQueryFunction<MyConfigMap, 'user', 'lastName', CF>;
-const sqfLast: SQFLast = async (_hashKey, pageKey, _pageSize) => {
-  return { count: 0, items: [], pageKey };
+const sqfLast: SQFLast = (_hashKey, pageKey) => {
+  return Promise.resolve({ count: 0, items: [], pageKey });
 };
