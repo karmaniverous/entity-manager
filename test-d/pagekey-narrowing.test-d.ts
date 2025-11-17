@@ -104,11 +104,13 @@ const goodMap: ShardQueryMap<MyConfigMap, 'user', 'firstName', CF> = {
 };
 
 // Bad: 'unknownKey' is not present in CF.indexes; excess property rejected.
+// Place assertion on a call site so the directive is consumed.
+declare function acceptMap(
+  m: ShardQueryMap<MyConfigMap, 'user', 'firstName', CF>,
+): void;
 // @ts-expect-error - 'unknownKey' is not a valid index token per CF.indexes
-const badMap: ShardQueryMap<
-  MyConfigMap,
-  'user',
-  'firstName' | 'unknownKey',
-  CF
-> = { firstName: sqfFirst, unknownKey: sqfFirst };
+acceptMap({
+  firstName: sqfFirst,
+  unknownKey: sqfFirst,
+});
 

@@ -26,7 +26,7 @@
 
 - Step 4 — Documentation and examples (DX)
   - Update README and API docs to:
-    - Prefer the factory (values-first) + “satisfies/as const” guidance.
+    - Prefer the factory (values-first) + “satisfies/as ~const” guidance.
     - Demonstrate token-aware add/remove/keys and index-aware page keys, with inference across values (no explicit generics).
   - Provide concise usage snippets for PageKey typing by index; sorting with defineSortOrder<E> (entity-tools); and config authoring patterns.
 
@@ -159,4 +159,9 @@
 - CF-indexes constraint on ShardQueryMap keys
   - ShardQueryMap now constrains map keys to CF.indexes when a values-first
     config literal (with `indexes`) is provided. Excess keys rejected by
-    excess property checks. Added tsd negative case.
+    excess property checks. Added tsd negative case.
+
+- TSD fix — consume @ts-expect-error via call site
+  - Reworked ShardQueryMap negative case to call a typed helper so the error
+    is emitted at the call, avoiding an unused @ts-expect-error directive.
+
