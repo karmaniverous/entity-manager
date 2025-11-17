@@ -2,6 +2,7 @@ import type {
   DefaultTranscodeRegistry,
   EntityMap,
 } from '@karmaniverous/entity-tools';
+import type { infer as zInfer, ZodTypeAny } from 'zod';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { Config } from './Config';
@@ -27,6 +28,10 @@ export interface ConfigInput {
     { hashKey: string; rangeKey: string; projections?: string[] }
   >;
   entities?: Record<string, unknown>;
+  /**
+   * Optional Zod schemas for per-entity domain shapes (non-generated fields only).
+   */
+  entitiesSchema?: Record<string, ZodTypeAny>;
   generatedKeyDelimiter?: string;
   generatedValueDelimiter?: string;
   shardKeyDelimiter?: string;
@@ -56,13 +61,16 @@ type TranscodedPropertiesFrom<CC> = CC extends { propertyTranscodes?: infer PT }
   : never;
 
 /**
- * Placeholder minimal EntityMap derived from the captured config. This can be
- * expanded in a future step to reflect propertyTranscodes or other captured
- * information. For now it defaults to an empty map, which remains safe and
- * non-breaking for values-first workflows.
+ * Derive an EntityMap from CC.entitiesSchema when provided (values-first, no generics).
+ * Fallback to broad EntityMap if schemas are absent.
  */
-/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-export type MinimalEntityMapFrom<CC> = Record<string, never> & EntityMap;
+export type EntitiesFromSchema<CC> = CC extends {
+  entitiesSchema?: infer S;
+}
+  ? S extends Record<string, ZodTypeAny>
+    ? { [K in keyof S & string]: zInfer<S[K]> } & EntityMap
+    : EntityMap
+  : EntityMap;
 
 /**
  * Captures a BaseConfigMap-compatible type from a literal ConfigInput value
@@ -86,11 +94,11 @@ export type CapturedConfigMapFrom<CC, EM extends EntityMap> = {
  * @typeParam CC - Captured config input (values-first). Prefer `as const` and
  *                 `satisfies` at call sites to preserve literal keys.
  * @typeParam EM - EntityMap for the manager. Defaults to a minimal derived map
- *                 from `CC`. Supply an explicit map for richer typing.
+ *                 from `CC.entitiesSchema` when present; otherwise falls back to EntityMap.
  */
 export function createEntityManager<
   const CC extends ConfigInput,
-  EM extends EntityMap = MinimalEntityMapFrom<CC>,
+  EM extends EntityMap = EntitiesFromSchema<CC>,
 >(
   config: CC,
   logger: Pick<Console, 'debug' | 'error'> = console,

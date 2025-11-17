@@ -50,6 +50,18 @@ Goals
 - Value-first helpers and patterns ensure literal keys are preserved across module boundaries (use “as const” and “satisfies”).
 - Runtime behavior remains unchanged: Zod-based validation persists; we intersect parsed configuration with captured literal types at the type level.
 
+Zod-schema-first EM inference (no generics at call sites)
+
+- Factory supports optional entitiesSchema: Record<entityToken, Zod schema>.
+- When provided, EM is inferred as { [ET]: z.infer<typeof schema[ET]> } directly from values.
+- When omitted, EM falls back to a broad EntityMap (no breaking change).
+- Schemas define only non-generated properties (base/domain fields). Do not include:
+  - global keys (hashKey/rangeKey),
+  - generated property tokens (sharded/unsharded keys such as userPK, firstNameRK).
+- Item-facing types layer optional key/token strings and base properties over schemas where applicable.
+- Record-facing types layer required global keys (hashKey/rangeKey) over schemas for storage-facing shapes.
+- Runtime config parsing/validation remains unchanged; entitiesSchema is used for type capture only.
+
 Naming and acronym policy (hard rule)
 
 - Acronyms are reserved for type-parameter names only (e.g., CC, EM, ET, IT, ITS, EOT, EIBT, ERBT as template parameter identifiers).
@@ -93,10 +105,10 @@ Type-parameter ordering (public APIs)
 Inference-first API and typing (entity-manager)
 
 - Factory (values-first)
-  - createEntityManager<const CC extends ConfigInput, EM extends EntityMap = MinimalEntityMapFrom<CC>>(config: CC, logger?): EntityManager<CC, EM>
+  - createEntityManager<const CC extends ConfigInput, EM extends EntityMap = EntitiesFromSchema<CC>>(config: CC, logger?): EntityManager<CC, EM>
   - Behavior:
     - CC is captured from the literal value; callers should prefer “satisfies” for structure checks and “as const” for nested records (indexes, generatedProperties) to preserve literal keys.
-    - EM is optional; if omitted, MinimalEntityMapFrom<CC> is derived from propertyTranscodes in CC (scalars typed via TR; keys/generated tokens string-typed; other fields unknown).
+    - EM is optional; if entitiesSchema is provided, EM is inferred from the Zod schemas. Otherwise, EM falls back to a broad EntityMap.
     - Zod still validates at runtime; the parsed result is intersected with the captured literal types at the type level (no runtime change).
 - Items/records (entity-token aware)
   - EIBT<CC, EM, ET extends keyof EM> — partial EOT with key/generated tokens string-typed.

@@ -72,3 +72,9 @@
   - Renamed public type parameter `C` → `CC` across EntityManager, BaseEntityClient, BaseQueryBuilder, and public EM types (EntityItem/Record/Key/Token, PageKey, QueryOptions/Result, ShardQueryFunction/Map/Result, ValidateConfigMap).
   - TSDoc @typeParam updated accordingly. No runtime changes. All scripts remain green (allowing transitional lint/knip state per plan).
 
+- Factory inference (schema-first) and cleanup
+  - Removed MinimalEntityMapFrom (no practical contribution to inference).
+  - Added optional entitiesSchema to ConfigInput. When present, EM is inferred
+    directly from Zod schemas (values-first, no explicit generics).
+  - Fallback remains EntityMap when schemas are omitted; runtime config parsing/validation unchanged.
+  - Documentation updated to state schemas include only non-generated fields.
