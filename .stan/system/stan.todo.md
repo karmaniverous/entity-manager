@@ -127,3 +127,8 @@
   - When CF carries `indexes`, PKBI narrows to the specific index components (global hash/range plus that index’s hashKey/rangeKey); otherwise falls back to broad PageKey.
   - Threaded CF (defaulted to unknown) through PageKeyMapByIndexSet, ShardQueryFunction/Map/Result to enable downstream adoption without breaking existing code.
   - No runtime behavior changes; tests unaffected.
+
+- PKBI CF indexing fix
+  - Reworked PageKeyByIndex helpers to guard access to CF.indexes[IT] and extract literals via conditional types (avoids TS2536).
+  - Silenced placeholder ET generic lint locally in PageKeyByIndex for consistency with plan.
+  - No runtime changes; build/docs/typecheck now clean.

@@ -23,33 +23,53 @@ export type PageKey<CC extends BaseConfigMap> = Pick<
 >;
 
 /**
- * Internal helper — derive index component tokens for an index IT.
+ * Internal helpers to safely derive index component tokens for an index IT.
  *
- * If CF (config-literal) provides an `indexes` object with preserved literal
- * keys, we return the union of [global hash/range] plus the specific
- * index hashKey/rangeKey for IT. Otherwise, fall back to the broad union
- * of all token sets.
+ * These helpers avoid direct generic indexing into `CF['indexes'][IT]` which can
+ * trigger TS2536. They guard presence and key membership before extracting
+ * literal types when available.
  */
-type IndexComponentTokens<
-  CC extends BaseConfigMap,
-  CF,
-  IT extends string,
-> = CF extends {
-  indexes?: Record<string, { hashKey: string; rangeKey: string }>;
-}
-  ? IT extends keyof CF['indexes']
+type IndexHashKeyOf<CF, IT extends string> = CF extends { indexes?: infer I }
+  ? I extends Record<string, unknown>
+    ? IT extends keyof I
+      ? I[IT] extends { hashKey: infer HK }
+        ? HK & string
+        : never
+      : never
+    : never
+  : never;
+
+type IndexRangeKeyOf<CF, IT extends string> = CF extends { indexes?: infer I }
+  ? I extends Record<string, unknown>
+    ? IT extends keyof I
+      ? I[IT] extends { rangeKey: infer RK }
+        ? RK & string
+        : never
+      : never
+    : never
+  : never;
+
+type HasIndexFor<CF, IT extends string> = CF extends { indexes?: infer I }
+  ? I extends Record<string, unknown>
+    ? IT extends keyof I
+      ? true
+      : false
+    : false
+  : false;
+
+type IndexComponentTokens<CC extends BaseConfigMap, CF, IT extends string> =
+  HasIndexFor<CF, IT> extends true
     ?
         | CC['HashKey']
         | CC['RangeKey']
-        | (CF['indexes'][IT]['hashKey'] & string)
-        | (CF['indexes'][IT]['rangeKey'] & string)
-    : CC['HashKey'] | CC['RangeKey']
-  :
-      | CC['HashKey']
-      | CC['RangeKey']
-      | CC['ShardedKeys']
-      | CC['UnshardedKeys']
-      | CC['TranscodedProperties'];
+        | IndexHashKeyOf<CF, IT>
+        | IndexRangeKeyOf<CF, IT>
+    :
+        | CC['HashKey']
+        | CC['RangeKey']
+        | CC['ShardedKeys']
+        | CC['UnshardedKeys']
+        | CC['TranscodedProperties'];
 
 /**
  * Page key typed for a specific index token.
@@ -60,6 +80,8 @@ type IndexComponentTokens<
  */
 export type PageKeyByIndex<
   CC extends BaseConfigMap,
+  // TECHDEBT: placeholder retained for symmetry with other ET-aware types.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ET extends EntityToken<CC>,
   IT extends string = string,
   CF = unknown,
