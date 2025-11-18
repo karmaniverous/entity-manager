@@ -32,6 +32,12 @@ npm install --save-dev @karmaniverous/mock-db
 - Values‑first + schema‑first config:
   - Use a config literal (prefer `as const` and `satisfies`) to preserve literal tokens.
   - Optionally provide Zod schemas (`entitiesSchema`) to infer entity shapes without generics.
+- Projection‑aware typing (type‑only K):
+  - Pass attributes as a const tuple (K) through your query types to narrow result items to Pick<…> of those properties.
+  - No runtime change; adapters execute projections. Adapters should auto‑include `uniqueProperty` and any explicit sort keys when callers omit them to preserve dedupe/sort invariants.
+- Index‑aware typing (CF/CC helpers):
+  - CF: drive index token unions and page‑key narrowing directly from a values‑first config literal (`QueryOptionsByCF`, `ShardQueryMapByCF`).
+  - CC: derive index tokens from a captured config type while reusing CF for narrowing (`QueryOptionsByCC`, `ShardQueryMapByCC`).
 - Token‑aware helpers:
   - `addKeys`, `getPrimaryKey`, `removeKeys` narrow types by entity token (no casts).
 - Index‑aware page keys (optional CF channel):
@@ -41,14 +47,18 @@ npm install --save-dev @karmaniverous/mock-db
   - Use `QueryOptionsByCC` and `ShardQueryMapByCC` to derive index token unions from a captured config type (via `IndexTokensFrom`), while still benefiting from page-key narrowing.
 
 ## Quick start (values‑first + schema‑first)
-```ts
+
+```ts
 import { z } from 'zod';
-import { createEntityManager, defaultTranscodes } from '@karmaniverous/entity-manager';
+import {
+  createEntityManager,
+  defaultTranscodes,
+} from '@karmaniverous/entity-manager';
 
 // 1) Schema-first entity shapes (non-generated fields only)
 const userSchema = z.object({
-  userId: z.string(),          // unique property
-  created: z.number(),         // timestamp property
+  userId: z.string(), // unique property
+  created: z.number(), // timestamp property
   updated: z.number().optional(),
   firstNameCanonical: z.string(),
   lastNameCanonical: z.string(),
@@ -137,16 +147,24 @@ import type {
 const cf = {
   indexes: {
     firstName: { hashKey: 'hashKey2', rangeKey: 'firstNameRK' },
-    lastName:  { hashKey: 'hashKey2', rangeKey: 'lastNameRK'  },
+    lastName: { hashKey: 'hashKey2', rangeKey: 'lastNameRK' },
   },
 } as const;
 type CF = typeof cf;
 
 // SQFs are typed; pageKey is narrowed to index components per IT
-const firstNameSQF: ShardQueryFunction<MyConfigMap, 'user', 'firstName', CF> =
-  async (hashKey, pageKey, pageSize) => ({ count: 0, items: [], pageKey });
-const lastNameSQF: ShardQueryFunction<MyConfigMap, 'user', 'lastName', CF> =
-  async (hashKey, pageKey, pageSize) => ({ count: 0, items: [], pageKey });
+const firstNameSQF: ShardQueryFunction<
+  MyConfigMap,
+  'user',
+  'firstName',
+  CF
+> = async (hashKey, pageKey, pageSize) => ({ count: 0, items: [], pageKey });
+const lastNameSQF: ShardQueryFunction<
+  MyConfigMap,
+  'user',
+  'lastName',
+  CF
+> = async (hashKey, pageKey, pageSize) => ({ count: 0, items: [], pageKey });
 
 // CF-aware shardQueryMap — only 'firstName' | 'lastName' allowed
 const shardQueryMap: ShardQueryMapByCF<MyConfigMap, 'user', CF> = {
@@ -182,23 +200,35 @@ import type {
 const cc = {
   indexes: {
     firstName: { hashKey: 'hashKey2', rangeKey: 'firstNameRK' },
-    lastName:  { hashKey: 'hashKey2', rangeKey: 'lastNameRK'  },
+    lastName: { hashKey: 'hashKey2', rangeKey: 'lastNameRK' },
   },
 } as const;
 type CC = typeof cc;
 
 // Reuse typed SQFs (pageKey narrowed per index)
-const firstNameSQF: ShardQueryFunction<MyConfigMap, 'user', 'firstName', CC> =
-  async (hashKey, pageKey, pageSize) => ({ count: 0, items: [], pageKey });
-const lastNameSQF: ShardQueryFunction<MyConfigMap, 'user', 'lastName', CC> =
-  async (hashKey, pageKey, pageSize) => ({ count: 0, items: [], pageKey });
+const firstNameSQF: ShardQueryFunction<
+  MyConfigMap,
+  'user',
+  'firstName',
+  CC
+> = async (hashKey, pageKey, pageSize) => ({ count: 0, items: [], pageKey });
+const lastNameSQF: ShardQueryFunction<
+  MyConfigMap,
+  'user',
+  'lastName',
+  CC
+> = async (hashKey, pageKey, pageSize) => ({ count: 0, items: [], pageKey });
 
 // CC-aware shardQueryMap — only 'firstName' | 'lastName' allowed
 const shardQueryMapCC: ShardQueryMapByCC<MyConfigMap, 'user', CC> = {
   firstName: firstNameSQF,
   lastName: lastNameSQF,
 };
-const optionsCC: QueryOptionsByCC<MyConfigMap, 'user', CC> = { entityToken: 'user', item: {}, shardQueryMap: shardQueryMapCC };
+const optionsCC: QueryOptionsByCC<MyConfigMap, 'user', CC> = {
+  entityToken: 'user',
+  item: {},
+  shardQueryMap: shardQueryMapCC,
+};
 const resultCC = await manager.query(optionsCC);
 ```
 
@@ -206,7 +236,97 @@ Notes:
 
 - Entity Manager enumerates hash‑key space for the time window, rehydrates page keys (when present), executes shard queries in parallel (throttled), dedupes by unique property, sorts, and dehydrates a new pageKeyMap.
 - For provider integration, the SQF lambda encapsulates the platform‑specific query for one index + shard page. See tests and entity‑client‑dynamodb for examples.
-## Page keys in a nutshell
+
+## Projection‑aware typing (K)
+
+Entity Manager supports a type‑only projection channel K that narrows result item shapes when a provider adapter projects a subset of attributes at runtime. Pass your attributes as a const tuple and thread K through `ShardQueryFunction/Map`, `QueryOptions`, and `QueryResult`.
+
+```ts
+import type {
+  ConfigMap,
+  EntityItemByToken,
+  QueryOptions,
+  QueryResult,
+  ShardQueryFunction,
+  ShardQueryMap,
+} from '@karmaniverous/entity-manager';
+
+// Minimal entities (example)
+interface Email {
+  created: number;
+  email: string;
+  userId: string;
+}
+interface User {
+  beneficiaryId: string;
+  created: number;
+  firstNameCanonical: string;
+  lastNameCanonical: string;
+  phone?: string;
+  updated: number;
+  userId: string;
+}
+
+type MyConfigMap = ConfigMap<{
+  EntityMap: { email: Email; user: User };
+  HashKey: 'hashKey2';
+  RangeKey: 'rangeKey';
+  ShardedKeys: 'beneficiaryPK' | 'userPK';
+  UnshardedKeys: 'firstNameRK' | 'lastNameRK' | 'phoneRK';
+  TranscodedProperties:
+    | 'beneficiaryId'
+    | 'created'
+    | 'email'
+    | 'firstNameCanonical'
+    | 'lastNameCanonical'
+    | 'phone'
+    | 'updated'
+    | 'userId';
+}>;
+
+// CF capturing a single index
+const cf = {
+  indexes: {
+    firstName: { hashKey: 'hashKey2', rangeKey: 'firstNameRK' },
+  },
+} as const;
+type CF = typeof cf;
+
+// Projection attributes as const tuple — narrows K.
+const attrs = ['userId', 'created'] as const;
+type K = typeof attrs;
+
+// A typed SQF: pageKey narrows via CF; items narrow via K (type-only).
+const sqf: ShardQueryFunction<MyConfigMap, 'user', 'firstName', CF, K> = async (
+  _hashKey,
+  _pageKey,
+  _pageSize,
+) => ({
+  count: 0,
+  items: [], // never[] is assignable to the projected array
+  pageKey: _pageKey,
+});
+
+// ShardQueryMap carrying CF and K.
+const map: ShardQueryMap<MyConfigMap, 'user', 'firstName', CF, K> = {
+  firstName: sqf,
+};
+const options: QueryOptions<MyConfigMap, 'user', 'firstName', CF, K> = {
+  entityToken: 'user',
+  item: {},
+  shardQueryMap: map,
+};
+const result: QueryResult<MyConfigMap, 'user', 'firstName', K> =
+  await manager.query(options);
+// result.items: Pick<EntityItemByToken<MyConfigMap, 'user'>, 'userId' | 'created'>[]
+```
+
+Notes:
+
+- K is a type‑only channel; it does not change runtime behavior. Providers (e.g., DynamoDB adapters) execute projections.
+- Dedupe/sort invariants: Entity Manager dedupes by `uniqueProperty` and applies `QueryOptions.sortOrder`. If your adapter projects attributes, ensure it auto‑includes `uniqueProperty` and any explicit sort keys when callers omit them from K.
+
+## Page keys in a nutshell
 
 - `rehydratePageKeyMap` decodes a dehydrated array (compressed string) into a two‑layer map of `{ indexToken: { hashKeyValue: pageKey | undefined } }`.
 - `dehydratePageKeyMap` performs the inverse and emits a compact array (compressed in `query()`).
@@ -216,10 +336,16 @@ Notes:
 
 ```ts
 // ESM
-import { createEntityManager, defaultTranscodes } from '@karmaniverous/entity-manager';
+import {
+  createEntityManager,
+  defaultTranscodes,
+} from '@karmaniverous/entity-manager';
 
 // CJS
-const { createEntityManager, defaultTranscodes } = require('@karmaniverous/entity-manager');
+const {
+  createEntityManager,
+  defaultTranscodes,
+} = require('@karmaniverous/entity-manager');
 ```
 
 ## Logging
@@ -243,12 +369,17 @@ const manager = createEntityManager(config, logger);
   - `ShardQueryFunction<CC, ET, IT, CF>`, `ShardQueryMap<CC, ET, ITS, CF>`
   - `QueryOptions<CC, ET, ITS, CF>`, `QueryResult<CC, ET, ITS>`
   - DX sugar: `IndexTokensOf<CF>`, `QueryOptionsByCF`, `ShardQueryMapByCF`, `IndexTokensFrom<CC>`, `QueryOptionsByCC`, `ShardQueryMapByCC`
+- Projection helpers
+  - `KeysFrom<K>`
+  - `Projected<T, K>`
+  - `ProjectedItemByToken<CC, ET, K>`
 
 See the full API: https://docs.karmanivero.us/entity-manager
 
 ## Scripts (repo)
 
-- build: rollup outputs ESM/CJS + .d.ts- test: vitest with coverage
+- build: rollup outputs ESM/CJS + .d.ts
+- test: vitest with coverage
 - lint: ESLint (type‑aware) + Prettier
 - docs: TypeDoc
 - typecheck: tsc + tsd (type‑level tests)
@@ -259,4 +390,4 @@ BSD‑3‑Clause (see package.json).
 
 ---
 
-Built for you with ❤️ on Bali! Find more great tools & templates on [my GitHub Profile](https://github.com/karmaniverous).
+Built for you with ❤️ on Bali! Find more great tools & templates on [my GitHub Profile](https://github.com/karmaniverous).
