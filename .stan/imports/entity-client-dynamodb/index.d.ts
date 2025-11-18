@@ -3,7 +3,7 @@ import { BatchProcessOptions } from '@karmaniverous/batch-process';
 import * as _smithy_util_waiter from '@smithy/util-waiter';
 import * as _aws_sdk_client_dynamodb from '@aws-sdk/client-dynamodb';
 import { DynamoDBClientConfig, DynamoDBClient, CreateTableCommandInput, DeleteTableCommandInput, ScalarAttributeType } from '@aws-sdk/client-dynamodb';
-import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, EntityToken, EntityRecordByToken, EntityItemByToken, BaseQueryBuilder, ShardQueryFunction, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex, EntityManager } from '@karmaniverous/entity-manager';
+import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, EntityToken, EntityItemByToken, EntityRecordByToken, BaseQueryBuilder, ShardQueryFunction, HasIndexFor, IndexRangeKeyOf, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex, EntityManager } from '@karmaniverous/entity-manager';
 export { EntityItemByToken, EntityRecordByToken, EntityToken } from '@karmaniverous/entity-manager';
 import { MakeOptional, ReplaceKey, TranscodeRegistry, Exactify, DefaultTranscodeRegistry } from '@karmaniverous/entity-tools';
 import { WaiterConfiguration } from '@smithy/types';
@@ -71,6 +71,7 @@ interface GetItemsOptions extends BatchGetOptions {
  */
 type WaiterConfig = Omit<WaiterConfiguration<DynamoDBClient>, 'client'>;
 
+type Projected<T, A extends readonly string[]> = Pick<T, Extract<A[number], keyof T>>;
 /**
  * Convenience wrapper around the AWS DynamoDB SDK in addition to
  * {@link BaseEntityClient | BaseEntityClient} functionality.
@@ -186,6 +187,19 @@ declare class EntityClient<C extends BaseConfigMap> extends BaseEntityClient<C> 
     /**
      * Token-aware getItem overloads, with optional key stripping (removeKeys) in options.
      */
+    getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, attributes: readonly string[], options: GetItemOptions & {
+        removeKeys: true;
+    }): Promise<ReplaceKey<GetCommandOutput, 'Item', EntityItemByToken<C, ET> | undefined>>;
+    getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, attributes: readonly string[], options: GetItemOptions & {
+        removeKeys: false;
+    }): Promise<ReplaceKey<GetCommandOutput, 'Item', EntityRecordByToken<C, ET> | undefined>>;
+    getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, options: GetItemOptions & {
+        removeKeys: true;
+    }): Promise<ReplaceKey<GetCommandOutput, 'Item', EntityItemByToken<C, ET> | undefined>>;
+    getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, options: GetItemOptions & {
+        removeKeys: false;
+    }): Promise<ReplaceKey<GetCommandOutput, 'Item', EntityRecordByToken<C, ET> | undefined>>;
+    getItem<ET extends EntityToken<C>, A extends readonly string[]>(entityToken: ET, key: EntityKey<C>, attributes: A, options?: GetItemOptions): Promise<ReplaceKey<GetCommandOutput, 'Item', Projected<EntityRecordByToken<C, ET>, A> | Projected<EntityItemByToken<C, ET>, A> | undefined>>;
     getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, attributes: string[], options?: GetItemOptions): Promise<ReplaceKey<GetCommandOutput, 'Item', EntityRecordByToken<C, ET> | EntityItemByToken<C, ET> | undefined>>;
     getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, options?: GetItemOptions): Promise<ReplaceKey<GetCommandOutput, 'Item', EntityRecordByToken<C, ET> | EntityItemByToken<C, ET> | undefined>>;
     getItem<ET extends EntityToken<C>>(entityToken: ET, options: MakeOptional<GetCommandInput, 'TableName'>): Promise<ReplaceKey<GetCommandOutput, 'Item', EntityRecordByToken<C, ET> | EntityItemByToken<C, ET> | undefined>>;
@@ -223,6 +237,22 @@ declare class EntityClient<C extends BaseConfigMap> extends BaseEntityClient<C> 
      * @param attributes - Optional list of attributes to project.
      * @param options - BatchGetOptions.
      */
+    getItems<ET extends EntityToken<C>, A extends readonly string[]>(entityToken: ET, keys: EntityKey<C>[], attributes: A, options: GetItemsOptions & {
+        removeKeys: true;
+    }): Promise<{
+        items: Projected<EntityItemByToken<C, ET>, A>[];
+        outputs: BatchGetCommandOutput[];
+    }>;
+    getItems<ET extends EntityToken<C>, A extends readonly string[]>(entityToken: ET, keys: EntityKey<C>[], attributes: A, options: GetItemsOptions & {
+        removeKeys: false;
+    }): Promise<{
+        items: Projected<EntityRecordByToken<C, ET>, A>[];
+        outputs: BatchGetCommandOutput[];
+    }>;
+    getItems<ET extends EntityToken<C>, A extends readonly string[]>(entityToken: ET, keys: EntityKey<C>[], attributes: A, options?: GetItemsOptions): Promise<{
+        items: Projected<EntityRecordByToken<C, ET> | EntityItemByToken<C, ET>, A>[];
+        outputs: BatchGetCommandOutput[];
+    }>;
     getItems<ET extends EntityToken<C>>(entityToken: ET, keys: EntityKey<C>[], attributes: string[], options?: GetItemsOptions): Promise<{
         items: EntityRecordByToken<C, ET>[] | EntityItemByToken<C, ET>[];
         outputs: BatchGetCommandOutput[];
@@ -236,6 +266,18 @@ declare class EntityClient<C extends BaseConfigMap> extends BaseEntityClient<C> 
      */
     getItems<ET extends EntityToken<C>>(entityToken: ET, keys: EntityKey<C>[], options?: GetItemsOptions): Promise<{
         items: EntityRecordByToken<C, ET>[] | EntityItemByToken<C, ET>[];
+        outputs: BatchGetCommandOutput[];
+    }>;
+    getItems<ET extends EntityToken<C>>(entityToken: ET, keys: EntityKey<C>[], options: GetItemsOptions & {
+        removeKeys: true;
+    }): Promise<{
+        items: EntityItemByToken<C, ET>[];
+        outputs: BatchGetCommandOutput[];
+    }>;
+    getItems<ET extends EntityToken<C>>(entityToken: ET, keys: EntityKey<C>[], options: GetItemsOptions & {
+        removeKeys: false;
+    }): Promise<{
+        items: EntityRecordByToken<C, ET>[];
         outputs: BatchGetCommandOutput[];
     }>;
     /**
@@ -424,7 +466,9 @@ declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = 
      *
      * @returns - The modified {@link ShardQueryMap | `ShardQueryMap`} instance.
      */
-    addRangeKeyCondition(indexToken: string, condition: RangeKeyCondition): this;
+    addRangeKeyCondition<IT extends ITS>(indexToken: IT, condition: Omit<RangeKeyCondition, 'property'> & {
+        property: HasIndexFor<CF, IT> extends true ? IndexRangeKeyOf<CF, IT> : string;
+    }): this;
     /**
      * Adds a filter condition to a {@link ShardQueryMap | `ShardQueryMap`} index.  See the {@link FilterCondition | `FilterCondition`} type for more info.
      *
@@ -433,7 +477,7 @@ declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = 
      *
      * @returns - The modified {@link ShardQueryMap | `ShardQueryMap`} instance.
      */
-    addFilterCondition(indexToken: string, condition: FilterCondition<C>): this;
+    addFilterCondition(indexToken: ITS, condition: FilterCondition<C>): this;
 }
 
 /**

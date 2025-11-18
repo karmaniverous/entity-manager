@@ -13,7 +13,7 @@ import type { EntityManager } from './EntityManager'; // imported to support API
 import type { EntityToken } from './EntityToken';
 import type { IndexTokensOf } from './PageKey';
 import type { ShardQueryMap } from './ShardQueryMap';
-import type { ProjectedItemByToken } from './TokenAware';
+import type { EntityItemByToken, ProjectedItemByToken } from './TokenAware';
 
 /**
  * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.

@@ -47,9 +47,10 @@ export async function query<
   options: QueryOptions<C, ET, ITS, CF, K>,
 ): Promise<QueryResult<C, ET, ITS, K>> {
   try {
-    // Get defaults.
-    const { defaultLimit, defaultPageSize } =
-      entityManager.config.entities[options.entityToken];
+    // Get defaults (avoid unsafe destructuring on generic access).
+    const entityDefaults = entityManager.config.entities[options.entityToken];
+    const defaultLimit = entityDefaults.defaultLimit;
+    const defaultPageSize = entityDefaults.defaultPageSize;
 
     // Extract params.
     const {
