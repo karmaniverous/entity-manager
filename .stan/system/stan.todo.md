@@ -182,4 +182,11 @@
   - Added ShardQueryMapByCF alias mirroring QueryOptionsByCF to derive ITS from CF.indexes for shardQueryMap typing (no runtime changes).
 
 - Docs — README DX rewrite
-  - Rewrote README with a values/schema-first focus; added CF-aware DX examples (QueryOptionsByCF, ShardQueryMapByCF). Preserved header/footer.
+  - Rewrote README with a values/schema-first focus; added CF-aware DX examples (QueryOptionsByCF, ShardQueryMapByCF). Preserved header/footer.
+
+- DX sugar — CC aliases
+  - Added QueryOptionsByCC and ShardQueryMapByCC to derive ITS from a values-first captured config (IndexTokensFrom<CC>) and pass CC through the CF channel.
+
+- Tests — DX helper coverage
+  - Added tsd tests validating QueryOptionsByCF/CC and ShardQueryMapByCF/CC typing, key constraints, and basic compatibility with ShardQueryFunction signatures.
+

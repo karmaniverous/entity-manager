@@ -2,6 +2,7 @@
 import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools'; // imported to support API docs
 
 import type { BaseConfigMap } from './BaseConfigMap';
+import type { IndexTokensFrom } from './createEntityManager';
 import type { EntityToken } from './EntityToken';
 import type { IndexTokensOf } from './PageKey';
 import type { ShardQueryFunction } from './ShardQueryFunction';
@@ -37,6 +38,23 @@ export type ShardQueryMap<
     : Record<ITS, ShardQueryFunction<CC, ET, ITS, CF>>
   : Record<ITS, ShardQueryFunction<CC, ET, ITS, CF>>;
 
+/**
+ * Convenience alias for ShardQueryMap that derives ITS (index token subset)
+ * from a values-first captured config CC (e.g., your config literal type).
+ *
+ * - If CC has `indexes`, ITS becomes the union of its keys.
+ * - Otherwise, ITS defaults to `string`.
+ *
+ * It also passes CC through the CF channel so per-index page-key narrowing
+ * applies consistently.
+ *
+ * This is optional DX sugar; it does not change runtime behavior.
+ */
+export type ShardQueryMapByCC<
+  CC extends BaseConfigMap,
+  ET extends EntityToken<CC>,
+  CCLit = unknown,
+> = ShardQueryMap<CC, ET, IndexTokensFrom<CCLit>, CCLit>;
 /**
  * Convenience alias for ShardQueryMap that derives ITS (index token subset)
  * directly from a values-first config literal CF when it carries `indexes`.

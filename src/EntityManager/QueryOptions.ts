@@ -7,6 +7,7 @@ import type {
 } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
+import type { IndexTokensFrom } from './createEntityManager';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { EntityManager } from './EntityManager'; // imported to support API docs
 import type { EntityToken } from './EntityToken';
@@ -124,3 +125,21 @@ export type QueryOptionsByCF<
   ET extends EntityToken<CC> = EntityToken<CC>,
   CF = unknown,
 > = QueryOptions<CC, ET, IndexTokensOf<CF>, CF>;
+
+/**
+ * Convenience alias for QueryOptions that derives ITS (index token subset)
+ * from a values-first captured config CC (e.g., your config literal type).
+ *
+ * - If CC has `indexes`, ITS becomes the union of its keys.
+ * - Otherwise, ITS defaults to `string`.
+ *
+ * It also passes CC through the CF channel so page-key narrowing and other
+ * CF-aware typing applies consistently.
+ *
+ * This is optional DX sugar; it does not change runtime behavior.
+ */
+export type QueryOptionsByCC<
+  CCMap extends BaseConfigMap,
+  ET extends EntityToken<CCMap> = EntityToken<CCMap>,
+  CC = unknown,
+> = QueryOptions<CCMap, ET, IndexTokensFrom<CC>, CC>;
