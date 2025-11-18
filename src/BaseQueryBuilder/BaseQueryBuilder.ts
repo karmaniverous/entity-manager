@@ -19,6 +19,7 @@ import type { QueryBuilderQueryOptions } from './QueryBuilderQueryOptions';
  * @typeParam EntityClient - {@link BaseEntityClient | `BaseEntityClient`} derived class instance.
  * @typeParam IndexParams - Database platform-specific, index-specific query parameters.
  * @typeParam CF - Optional values-first config literal type for page key narrowing.
+ * @typeParam K - Optional projection keys; narrows item shape when provided.
  *
  * @category QueryBuilder
  */
@@ -29,6 +30,7 @@ export abstract class BaseQueryBuilder<
   ET extends EntityToken<CC> = EntityToken<CC>,
   ITS extends string = string,
   CF = unknown,
+  K = unknown,
 > {
   /** {@link BaseEntityClient | `EntityClient`} instance. */
   readonly entityClient: EntityClient;
@@ -64,17 +66,17 @@ export abstract class BaseQueryBuilder<
 
   protected abstract getShardQueryFunction(
     indexToken: ITS,
-  ): ShardQueryFunction<CC, ET, ITS, CF>;
+  ): ShardQueryFunction<CC, ET, ITS, CF, K>;
 
   /**
    * Builds a {@link ShardQueryMap | `ShardQueryMap`} object.
    *
    * @returns - The {@link ShardQueryMap | `ShardQueryMap`} object.
    */
-  build(): ShardQueryMap<CC, ET, ITS, CF> {
+  build(): ShardQueryMap<CC, ET, ITS, CF, K> {
     return mapValues(this.indexParamsMap, (_indexConfig, indexToken) =>
       this.getShardQueryFunction(indexToken),
-    ) as ShardQueryMap<CC, ET, ITS, CF>;
+    ) as ShardQueryMap<CC, ET, ITS, CF, K>;
   }
 
   async query(options: QueryBuilderQueryOptions<CC, CF>) {
@@ -85,7 +87,7 @@ export abstract class BaseQueryBuilder<
     } = this;
     const shardQueryMap = this.build();
 
-    return await entityManager.query<ET, ITS, CF>({
+    return await entityManager.query<ET, ITS, CF, K>({
       ...options,
       entityToken,
       pageKeyMap,

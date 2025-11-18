@@ -3,7 +3,7 @@ import { BatchProcessOptions } from '@karmaniverous/batch-process';
 import * as _smithy_util_waiter from '@smithy/util-waiter';
 import * as _aws_sdk_client_dynamodb from '@aws-sdk/client-dynamodb';
 import { DynamoDBClientConfig, DynamoDBClient, CreateTableCommandInput, DeleteTableCommandInput, ScalarAttributeType } from '@aws-sdk/client-dynamodb';
-import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, EntityToken, EntityItemByToken, EntityRecordByToken, BaseQueryBuilder, ShardQueryFunction, HasIndexFor, IndexRangeKeyOf, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex, EntityManager } from '@karmaniverous/entity-manager';
+import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, EntityToken, EntityItemByToken, EntityRecordByToken, BaseQueryBuilder, ShardQueryFunction, IndexRangeKeyOf, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex, EntityManager } from '@karmaniverous/entity-manager';
 export { EntityItemByToken, EntityRecordByToken, EntityToken } from '@karmaniverous/entity-manager';
 import { MakeOptional, ReplaceKey, TranscodeRegistry, Exactify, DefaultTranscodeRegistry } from '@karmaniverous/entity-tools';
 import { WaiterConfiguration } from '@smithy/types';
@@ -466,9 +466,10 @@ declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = 
      *
      * @returns - The modified {@link ShardQueryMap | `ShardQueryMap`} instance.
      */
-    addRangeKeyCondition<IT extends ITS>(indexToken: IT, condition: Omit<RangeKeyCondition, 'property'> & {
-        property: HasIndexFor<CF, IT> extends true ? IndexRangeKeyOf<CF, IT> : string;
+    addRangeKeyCondition(indexToken: ITS, condition: Omit<RangeKeyCondition, 'property'> & {
+        property: IndexRangeKeyOf<CF, ITS>;
     }): this;
+    addRangeKeyCondition(indexToken: ITS, condition: RangeKeyCondition): this;
     /**
      * Adds a filter condition to a {@link ShardQueryMap | `ShardQueryMap`} index.  See the {@link FilterCondition | `FilterCondition`} type for more info.
      *
