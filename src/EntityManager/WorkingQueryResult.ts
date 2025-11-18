@@ -1,7 +1,7 @@
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityToken } from './EntityToken';
 import type { PageKeyMapByIndexSet } from './PageKeyMap';
-import type { EntityItemByToken } from './TokenAware';
+import type { ProjectedItemByToken } from './TokenAware';
 
 /**
  * A QueryResult object with rehydrated pageKeyMap.
@@ -15,9 +15,10 @@ export interface WorkingQueryResult<
   C extends BaseConfigMap,
   ET extends EntityToken<C>,
   ITS extends string,
+  K = unknown,
 > {
   /** The returned records. */
-  items: EntityItemByToken<C, ET>[];
+  items: ProjectedItemByToken<C, ET, K>[];
 
   /**
    * A compressed, two-layer map of page keys, used to query the next page of

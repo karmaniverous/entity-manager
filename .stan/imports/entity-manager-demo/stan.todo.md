@@ -7,6 +7,16 @@
 
 ## Completed (recent)
 
+- Interop: propose removeKeys-literal overloads in entity-client-dynamodb
+  - Added .stan/interop/entity-client-dynamodb/remove-keys-literal-overloads.md
+    describing additive overloads for getItem/getItems that narrow return types
+    when `removeKeys` is a literal true/false in token-aware calls.
+  - Included signatures for attribute and non-attribute variants, fallback to
+    union for non-literal flags, and compatibility guidance.
+  - Provided a tsd test plan to validate inference and optional runtime checks
+    to confirm post-fetch key stripping under removeKeys=true.
+  - Goal: enable keepKeys-style ergonomics downstream without local wrappers or
+    assertions, while preserving backwards compatibility.
 - Interop: propose token-aware types/overloads upstream in entity-manager
   - Added interop note at .stan/interop/entity-manager/token-aware-types-and-overloads.md
     specifying helper types (EntityItemByToken/EntityRecordByToken), overloads

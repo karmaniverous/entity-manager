@@ -35,4 +35,29 @@ export type EntityRecordByToken<
   ET extends EntityToken<CC>,
 > = EntityItemByToken<CC, ET> & EntityKey<CC>;
 
+/**
+ * Normalize literals: string | readonly string[] -\> union of strings.
+ */
+export type KeysFrom<K> = K extends readonly (infer E)[]
+  ? Extract<E, string>
+  : K extends string
+    ? K
+    : never;
+
+/**
+ * Project item shape by keys; if K is never/unknown, fall back to T.
+ */
+export type Projected<T, K> = [KeysFrom<K>] extends [never]
+  ? T
+  : Pick<T, Extract<keyof T, KeysFrom<K>>>;
+
+/**
+ * Projected item by token — narrows EntityItemByToken by K when provided.
+ */
+export type ProjectedItemByToken<
+  CC extends BaseConfigMap,
+  ET extends EntityToken<CC>,
+  K = unknown,
+> = Projected<EntityItemByToken<CC, ET>, K>;
+
 export {};

@@ -13,7 +13,7 @@ import type { EntityManager } from './EntityManager'; // imported to support API
 import type { EntityToken } from './EntityToken';
 import type { IndexTokensOf } from './PageKey';
 import type { ShardQueryMap } from './ShardQueryMap';
-import type { EntityItemByToken } from './TokenAware';
+import type { ProjectedItemByToken } from './TokenAware';
 
 /**
  * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
@@ -22,6 +22,7 @@ import type { EntityItemByToken } from './TokenAware';
  * @typeParam ET - Entity token narrowing the item types.
  * @typeParam ITS - Index token subset (inferred from shardQueryMap keys).
  * @typeParam CF - Optional values-first config literal type used for index-aware narrowing.
+ * @typeParam K - Optional projection keys; narrows item/sort shapes when provided.
  *
  * @category EntityManager
  * @protected
@@ -31,6 +32,7 @@ export interface QueryOptions<
   ET extends EntityToken<CC> = EntityToken<CC>,
   ITS extends string = string,
   CF = unknown,
+  K = unknown,
 > {
   /** Identifies the entity to be queried. Key of {@link Config | `Config`} `entities`. */
   entityToken: ET;
@@ -74,12 +76,12 @@ export interface QueryOptions<
    * page key, e.g. to match the same string against `firstName` and `lastName`
    * properties without performing a table scan for either.
    */
-  shardQueryMap: ShardQueryMap<CC, ET, ITS, CF>;
+  shardQueryMap: ShardQueryMap<CC, ET, ITS, CF, K>;
 
   /**
-   * A {@link SortOrder | `SortOrder`} object specifying the sort order of the result set. Defaults to `[]`.
+   * A {@link SortOrder | `SortOrder`} object specifying the sort order of the result set. Defaults to `[]`. Aligned with the projected item shape when K is provided.
    */
-  sortOrder?: SortOrder<EntityItemByToken<CC, ET>>;
+  sortOrder?: SortOrder<ProjectedItemByToken<CC, ET, K>>;
 
   /**
    * Lower limit to query shard space.
@@ -124,7 +126,8 @@ export type QueryOptionsByCF<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC> = EntityToken<CC>,
   CF = unknown,
-> = QueryOptions<CC, ET, IndexTokensOf<CF>, CF>;
+  K = unknown,
+> = QueryOptions<CC, ET, IndexTokensOf<CF>, CF, K>;
 
 /**
  * Convenience alias for QueryOptions that derives ITS (index token subset)
@@ -142,4 +145,5 @@ export type QueryOptionsByCC<
   CCMap extends BaseConfigMap,
   ET extends EntityToken<CCMap> = EntityToken<CCMap>,
   CC = unknown,
-> = QueryOptions<CCMap, ET, IndexTokensFrom<CC>, CC>;
+  K = unknown,
+> = QueryOptions<CCMap, ET, IndexTokensFrom<CC>, CC, K>;

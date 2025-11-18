@@ -21,6 +21,7 @@ import type { ShardQueryResult } from './ShardQueryResult';
  * @typeParam ET - Entity token narrowing the item/record types.
  * @typeParam IT - Index token (inferred from shardQueryMap keys).
  * @typeParam CF - Optional values-first config literal type for narrowing.
+ * @typeParam K - Optional projection keys; narrows item shape when provided.
  *
  * @category EntityManager
  * @protected
@@ -30,6 +31,7 @@ export type ShardQueryFunction<
   ET extends EntityToken<CC>,
   IT extends string,
   CF = unknown,
+  K = unknown,
 > =
   // When CF carries an `indexes` map, only permit IT values that are keys of
   // that map. Invalid IT resolves the type to `never`, producing a compile-time
@@ -41,15 +43,15 @@ export type ShardQueryFunction<
             hashKey: string,
             pageKey?: PageKeyByIndex<CC, ET, IT, CF>,
             pageSize?: number,
-          ) => Promise<ShardQueryResult<CC, ET, IT, CF>>
+          ) => Promise<ShardQueryResult<CC, ET, IT, CF, K>>
         : never
       : (
           hashKey: string,
           pageKey?: PageKeyByIndex<CC, ET, IT, CF>,
           pageSize?: number,
-        ) => Promise<ShardQueryResult<CC, ET, IT, CF>>
+        ) => Promise<ShardQueryResult<CC, ET, IT, CF, K>>
     : (
         hashKey: string,
         pageKey?: PageKeyByIndex<CC, ET, IT, CF>,
         pageSize?: number,
-      ) => Promise<ShardQueryResult<CC, ET, IT, CF>>;
+      ) => Promise<ShardQueryResult<CC, ET, IT, CF, K>>;

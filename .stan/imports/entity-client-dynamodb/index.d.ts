@@ -1,10 +1,11 @@
-import { BatchGetCommandInput, BatchWriteCommandInput, DynamoDBDocument, PutCommandInput, PutCommandOutput, DeleteCommandInput, DeleteCommandOutput, BatchWriteCommandOutput, TransactWriteCommandOutput, GetCommandInput, GetCommandOutput, BatchGetCommandOutput, NativeScalarAttributeValue, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
+import { BatchGetCommandInput, BatchWriteCommandInput, GetCommandInput, DynamoDBDocument, PutCommandInput, PutCommandOutput, DeleteCommandInput, DeleteCommandOutput, BatchWriteCommandOutput, TransactWriteCommandOutput, GetCommandOutput, BatchGetCommandOutput, NativeScalarAttributeValue, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
 import { BatchProcessOptions } from '@karmaniverous/batch-process';
 import * as _smithy_util_waiter from '@smithy/util-waiter';
 import * as _aws_sdk_client_dynamodb from '@aws-sdk/client-dynamodb';
 import { DynamoDBClientConfig, DynamoDBClient, CreateTableCommandInput, DeleteTableCommandInput, ScalarAttributeType } from '@aws-sdk/client-dynamodb';
-import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, BaseQueryBuilder, ShardQueryFunction, BaseQueryBuilderOptions, PageKey, EntityManager } from '@karmaniverous/entity-manager';
-import { MakeOptional, ReplaceKey, TranscodeMap, Exactify, DefaultTranscodeMap } from '@karmaniverous/entity-tools';
+import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, EntityToken, EntityRecordByToken, EntityItemByToken, BaseQueryBuilder, ShardQueryFunction, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex, EntityManager } from '@karmaniverous/entity-manager';
+export { EntityItemByToken, EntityRecordByToken, EntityToken } from '@karmaniverous/entity-manager';
+import { MakeOptional, ReplaceKey, TranscodeRegistry, Exactify, DefaultTranscodeRegistry } from '@karmaniverous/entity-tools';
 import { WaiterConfiguration } from '@smithy/types';
 
 /**
@@ -42,6 +43,24 @@ interface EntityClientOptions<C extends BaseConfigMap> extends BaseEntityClientO
     enableXray?: boolean;
     /** Table name. */
     tableName: string;
+}
+
+/**
+ * Options for EntityClient.getItem.
+ * - removeKeys: when true and a token-aware overload is used, generated/global keys are removed from the returned Item.
+ *   Without a token, removeKeys is ignored (no runtime error).
+ */
+interface GetItemOptions extends Omit<GetCommandInput, 'Key' | 'AttributesToGet' | 'ExpressionAttributeNames' | 'ProjectionExpression' | 'TableName'> {
+    removeKeys?: boolean;
+}
+
+/**
+ * Options for EntityClient.getItems.
+ * - removeKeys: when true and a token-aware overload is used, generated/global keys are removed from returned items.
+ *   Without a token, removeKeys is ignored (no runtime error).
+ */
+interface GetItemsOptions extends BatchGetOptions {
+    removeKeys?: boolean;
 }
 
 /**
@@ -165,6 +184,12 @@ declare class EntityClient<C extends BaseConfigMap> extends BaseEntityClient<C> 
      */
     transactDeleteItems(keys: EntityKey<C>[]): Promise<TransactWriteCommandOutput>;
     /**
+     * Token-aware getItem overloads, with optional key stripping (removeKeys) in options.
+     */
+    getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, attributes: string[], options?: GetItemOptions): Promise<ReplaceKey<GetCommandOutput, 'Item', EntityRecordByToken<C, ET> | EntityItemByToken<C, ET> | undefined>>;
+    getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, options?: GetItemOptions): Promise<ReplaceKey<GetCommandOutput, 'Item', EntityRecordByToken<C, ET> | EntityItemByToken<C, ET> | undefined>>;
+    getItem<ET extends EntityToken<C>>(entityToken: ET, options: MakeOptional<GetCommandInput, 'TableName'>): Promise<ReplaceKey<GetCommandOutput, 'Item', EntityRecordByToken<C, ET> | EntityItemByToken<C, ET> | undefined>>;
+    /**
      * Get item from a DynamoDB table.
      *
      * @param key - EntityKey object.
@@ -198,6 +223,28 @@ declare class EntityClient<C extends BaseConfigMap> extends BaseEntityClient<C> 
      * @param attributes - Optional list of attributes to project.
      * @param options - BatchGetOptions.
      */
+    getItems<ET extends EntityToken<C>>(entityToken: ET, keys: EntityKey<C>[], attributes: string[], options?: GetItemsOptions): Promise<{
+        items: EntityRecordByToken<C, ET>[] | EntityItemByToken<C, ET>[];
+        outputs: BatchGetCommandOutput[];
+    }>;
+    /**
+     * Gets multiple items from a DynamoDB table in batches (token-aware).
+     *
+     * @param entityToken - Entity token to narrow the item type.
+     * @param keys - Array of EntityKey.
+     * @param options - BatchGetOptions.
+     */
+    getItems<ET extends EntityToken<C>>(entityToken: ET, keys: EntityKey<C>[], options?: GetItemsOptions): Promise<{
+        items: EntityRecordByToken<C, ET>[] | EntityItemByToken<C, ET>[];
+        outputs: BatchGetCommandOutput[];
+    }>;
+    /**
+     * Gets multiple items from a DynamoDB table in batches.
+     *
+     * @param keys - Array of EntityKey.
+     * @param attributes - Optional list of attributes to project.
+     * @param options - BatchGetOptions.
+     */
     getItems(keys: EntityKey<C>[], attributes: string[], options?: BatchGetOptions): Promise<{
         items: EntityRecord<C>[];
         outputs: BatchGetCommandOutput[];
@@ -208,7 +255,7 @@ declare class EntityClient<C extends BaseConfigMap> extends BaseEntityClient<C> 
      * @param keys - Array of EntityKey.
      * @param options - BatchGetOptions.
      */
-    getItems(keys: EntityKey<C>[], options?: BatchGetOptions): Promise<{
+    getItems(keys: EntityKey<C>[], options?: GetItemsOptions): Promise<{
         items: EntityRecord<C>[];
         outputs: BatchGetCommandOutput[];
     }>;
@@ -367,8 +414,8 @@ interface IndexParams {
  *
  * @category QueryBuilder
  */
-declare class QueryBuilder<C extends BaseConfigMap> extends BaseQueryBuilder<C, EntityClient<C>, IndexParams> {
-    getShardQueryFunction(indexToken: string): ShardQueryFunction<C>;
+declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = EntityToken<C>, ITS extends string = string, CF = unknown> extends BaseQueryBuilder<C, EntityClient<C>, IndexParams, ET, ITS, CF> {
+    getShardQueryFunction(indexToken: ITS): ShardQueryFunction<C, ET, ITS, CF>;
     /**
      * Adds a range key condition to a {@link ShardQueryMap | `ShardQueryMap`} index. See the {@link RangeKeyCondition | `RangeKeyCondition`} type for more info.
      *
@@ -423,6 +470,29 @@ declare const addFilterCondition: <C extends BaseConfigMap>(builder: QueryBuilde
 declare const attributeValueAlias: () => string;
 
 /**
+ * Factory that produces a token-/config-aware QueryBuilder with fully inferred generics.
+ *
+ * Overloads:
+ * - Without `cf`: ET is inferred; ITS defaults to `string`; CF defaults to `unknown`.
+ * - With `cf`: ET is inferred; ITS derives as IndexTokensOf<CF>; CF is threaded for page-key narrowing.
+ *
+ * No generics are required at the call site.
+ */
+declare function createQueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C>>(options: {
+    entityClient: EntityClient<C>;
+    entityToken: ET;
+    hashKeyToken: C['HashKey'] | C['ShardedKeys'];
+    pageKeyMap?: string;
+}): QueryBuilder<C, ET>;
+declare function createQueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C>, CF>(options: {
+    entityClient: EntityClient<C>;
+    entityToken: ET;
+    hashKeyToken: C['HashKey'] | C['ShardedKeys'];
+    cf: CF;
+    pageKeyMap?: string;
+}): QueryBuilder<C, ET, IndexTokensOf<CF>, CF>;
+
+/**
  * {@link QueryBuilder | `QueryBuilder`} constructor options.
  *
  * @category QueryBuilder
@@ -432,31 +502,31 @@ interface QueryBuilderOptions<C extends BaseConfigMap> extends BaseQueryBuilderO
     tableName: string;
 }
 
-interface GetDocumentQueryArgsParams<C extends BaseConfigMap> {
-    indexParamsMap: Record<string, IndexParams>;
-    indexToken: string;
+interface GetDocumentQueryArgsParams<C extends BaseConfigMap, ET extends EntityToken<C>, IT extends string, CF = unknown> {
+    indexParamsMap: Record<IT, IndexParams>;
+    indexToken: IT;
     hashKeyToken: C['HashKey'] | C['ShardedKeys'];
     hashKey: string;
-    pageKey?: PageKey<C>;
+    pageKey?: PageKeyByIndex<C, ET, IT, CF>;
     pageSize?: number;
     tableName: string;
 }
-declare const getDocumentQueryArgs: <C extends BaseConfigMap>({ indexParamsMap, indexToken, hashKeyToken, hashKey, pageKey, pageSize, tableName, }: GetDocumentQueryArgsParams<C>) => QueryCommandInput;
+declare const getDocumentQueryArgs: <C extends BaseConfigMap, ET extends EntityToken<C>, IT extends string, CF = unknown>({ indexParamsMap, indexToken, hashKeyToken, hashKey, pageKey, pageSize, tableName, }: GetDocumentQueryArgsParams<C, ET, IT, CF>) => QueryCommandInput;
 
 /**
  * Maps non-string transcodes to a DynamoDB {@link ScalarAttributeType | `ScalarAttributeType`}.
  *
  * @category Tables
  */
-type TranscodeAttributeTypeMap<T extends TranscodeMap> = {
+type TranscodeAttributeTypeMap<T extends TranscodeRegistry> = {
     [P in keyof Exactify<T> as T[P] extends string ? never : P]?: ScalarAttributeType;
 };
 /**
- * {@link TranscodeAttributeTypeMap | `TranscodeAttributeTypeMap`} object supporting default transcodes defined in {@link DefaultTranscodeMap | `DefaultTranscodeMap`}.
+ * {@link TranscodeAttributeTypeMap | `TranscodeAttributeTypeMap`} object supporting default transcodes defined in {@link DefaultTranscodeRegistry | `DefaultTranscodeRegistry`}.
  *
  * @category Tables
  */
-declare const defaultTranscodeAttributeTypeMap: TranscodeAttributeTypeMap<DefaultTranscodeMap>;
+declare const defaultTranscodeAttributeTypeMap: TranscodeAttributeTypeMap<DefaultTranscodeRegistry>;
 
 /**
  * Generates a partial DynamoDB {@link CreateTableCommandInput | `CreateTableCommandInput`} object for a given EntityManager. Properties generated:
@@ -480,7 +550,7 @@ declare const defaultTranscodeAttributeTypeMap: TranscodeAttributeTypeMap<Defaul
  *
  * @category Tables
  */
-declare const generateTableDefinition: <C extends BaseConfigMap>(entityManager: EntityManager<C>, transcodeAtttributeTypeMap?: TranscodeAttributeTypeMap<C["TranscodeMap"]>) => Pick<CreateTableCommandInput, "AttributeDefinitions" | "GlobalSecondaryIndexes" | "KeySchema">;
+declare const generateTableDefinition: <C extends BaseConfigMap>(entityManager: EntityManager<C>, transcodeAtttributeTypeMap?: TranscodeAttributeTypeMap<C["TranscodeRegistry"]>) => Pick<CreateTableCommandInput, "AttributeDefinitions" | "GlobalSecondaryIndexes" | "KeySchema">;
 
-export { EntityClient, QueryBuilder, addFilterCondition, addRangeKeyCondition, attributeValueAlias, defaultTranscodeAttributeTypeMap, generateTableDefinition, getDocumentQueryArgs };
-export type { ActuallyScalarAttributeValue, BatchGetOptions, BatchWriteOptions, ComposeCondition, EntityClientOptions, FilterCondition, GetDocumentQueryArgsParams, IndexParams, QueryBuilderOptions, QueryCondition, QueryConditionBeginsWith, QueryConditionBetween, QueryConditionComparison, QueryConditionContains, QueryConditionExists, QueryConditionGroup, QueryConditionIn, QueryConditionNot, RangeKeyCondition, TranscodeAttributeTypeMap, WaiterConfig };
+export { EntityClient, QueryBuilder, addFilterCondition, addRangeKeyCondition, attributeValueAlias, createQueryBuilder, defaultTranscodeAttributeTypeMap, generateTableDefinition, getDocumentQueryArgs };
+export type { ActuallyScalarAttributeValue, BatchGetOptions, BatchWriteOptions, ComposeCondition, EntityClientOptions, FilterCondition, GetDocumentQueryArgsParams, GetItemOptions, GetItemsOptions, IndexParams, QueryBuilderOptions, QueryCondition, QueryConditionBeginsWith, QueryConditionBetween, QueryConditionComparison, QueryConditionContains, QueryConditionExists, QueryConditionGroup, QueryConditionIn, QueryConditionNot, RangeKeyCondition, TranscodeAttributeTypeMap, WaiterConfig };

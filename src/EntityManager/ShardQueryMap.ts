@@ -18,6 +18,7 @@ import type { ShardQueryFunction } from './ShardQueryFunction';
  *                 literal keys (prefer `as const` at call sites), the map keys
  *                 are constrained to that set. Excess keys are rejected by
  *                 excess property checks on object literals.
+ * @typeParam K - Optional projection keys; narrows item shape when provided.
  *
  * @category EntityManager
  * @protected
@@ -27,16 +28,17 @@ export type ShardQueryMap<
   ET extends EntityToken<CC>,
   ITS extends string,
   CF = unknown,
+  K = unknown,
 > = CF extends { indexes?: infer I }
   ? I extends Record<string, unknown>
     ? // Constrain keys to CF.indexes when present; extra keys are rejected by
       // excess property checks. Each value’s IT is also narrowed accordingly.
       Record<
         ITS & (keyof I & string),
-        ShardQueryFunction<CC, ET, ITS & (keyof I & string), CF>
+        ShardQueryFunction<CC, ET, ITS & (keyof I & string), CF, K>
       >
-    : Record<ITS, ShardQueryFunction<CC, ET, ITS, CF>>
-  : Record<ITS, ShardQueryFunction<CC, ET, ITS, CF>>;
+    : Record<ITS, ShardQueryFunction<CC, ET, ITS, CF, K>>
+  : Record<ITS, ShardQueryFunction<CC, ET, ITS, CF, K>>;
 
 /**
  * Convenience alias for ShardQueryMap that derives ITS (index token subset)
@@ -54,7 +56,8 @@ export type ShardQueryMapByCC<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
   CCLit = unknown,
-> = ShardQueryMap<CC, ET, IndexTokensFrom<CCLit>, CCLit>;
+  K = unknown,
+> = ShardQueryMap<CC, ET, IndexTokensFrom<CCLit>, CCLit, K>;
 /**
  * Convenience alias for ShardQueryMap that derives ITS (index token subset)
  * directly from a values-first config literal CF when it carries `indexes`.
@@ -68,4 +71,5 @@ export type ShardQueryMapByCF<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
   CF = unknown,
-> = ShardQueryMap<CC, ET, IndexTokensOf<CF>, CF>;
+  K = unknown,
+> = ShardQueryMap<CC, ET, IndexTokensOf<CF>, CF, K>;

@@ -11,6 +11,7 @@ import type { PageKeyByIndex } from './PageKey';
 import type { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
 import { rehydratePageKeyMap } from './rehydratePageKeyMap';
+import type { EntityItemByToken, ProjectedItemByToken } from './TokenAware';
 import type { WorkingQueryResult } from './WorkingQueryResult';
 
 const { compressToEncodedURIComponent, decompressFromEncodedURIComponent } =
@@ -40,10 +41,11 @@ export async function query<
   ET extends EntityToken<C>,
   ITS extends string,
   CF = unknown,
+  K = unknown,
 >(
   entityManager: EntityManager<C>,
-  options: QueryOptions<C, ET, ITS, CF>,
-): Promise<QueryResult<C, ET, ITS>> {
+  options: QueryOptions<C, ET, ITS, CF, K>,
+): Promise<QueryResult<C, ET, ITS, K>> {
   try {
     // Get defaults.
     const { defaultLimit, defaultPageSize } =
@@ -102,7 +104,7 @@ export async function query<
     let workingResult = {
       items: [],
       pageKeyMap: rehydratedPageKeyMap,
-    } as WorkingQueryResult<C, ET, ITS>;
+    } as WorkingQueryResult<C, ET, ITS, K>;
 
     do {
       // TODO: This loop will blow up as shards scale, since at a minimum it will return shardCount * pageSize
@@ -145,19 +147,18 @@ export async function query<
       );
 
       // Reduce shardQueryResults & update working result.
-      workingResult = shardQueryResults.reduce<WorkingQueryResult<C, ET, ITS>>(
-        ({ items, pageKeyMap }, { indexToken, queryResult, hashKey }) => {
-          Object.assign(rehydratedPageKeyMap[indexToken], {
-            [hashKey]: queryResult.pageKey,
-          });
+      workingResult = shardQueryResults.reduce<
+        WorkingQueryResult<C, ET, ITS, K>
+      >(({ items, pageKeyMap }, { indexToken, queryResult, hashKey }) => {
+        Object.assign(rehydratedPageKeyMap[indexToken], {
+          [hashKey]: queryResult.pageKey,
+        });
 
-          return {
-            items: [...items, ...queryResult.items],
-            pageKeyMap,
-          };
-        },
-        workingResult,
-      );
+        return {
+          items: [...items, ...queryResult.items],
+          pageKeyMap,
+        };
+      }, workingResult);
 
       // Repeat while pages remain & limit is not reached.
       let pagesRemain = false;
@@ -176,8 +177,14 @@ export async function query<
     } while (workingResult.items.length < limit);
 
     // Dedupe & sort working result.
-    workingResult.items = sort(
-      unique(workingResult.items, (i) =>
+    // Note: when projecting, callers may omit uniqueProperty/sort keys.
+    // We perform operations on the full item shape and then cast back.
+    const itemsForOps = workingResult.items as unknown as EntityItemByToken<
+      C,
+      ET
+    >[];
+    const dedupedSorted = sort(
+      unique(itemsForOps, (i) =>
         (
           i[
             entityManager.config.entities[entityToken]
@@ -185,8 +192,11 @@ export async function query<
           ] as string | number
         ).toString(),
       ),
-      sortOrder,
-    );
+      sortOrder as unknown as import('@karmaniverous/entity-tools').SortOrder<
+        EntityItemByToken<C, ET>
+      >,
+    ) as unknown as ProjectedItemByToken<C, ET, K>[];
+    workingResult.items = dedupedSorted;
 
     const result = {
       count: workingResult.items.length,
@@ -200,7 +210,7 @@ export async function query<
           ),
         ),
       ),
-    } as QueryResult<C, ET, ITS>;
+    } as QueryResult<C, ET, ITS, K>;
 
     entityManager.logger.debug('queried entityToken across shards', {
       options,
