@@ -2,7 +2,8 @@ import type {
   DefaultTranscodeRegistry,
   EntityMap,
 } from '@karmaniverous/entity-tools';
-import type { infer as zInfer, ZodType } from 'zod';
+import type * as z from 'zod';
+import type { ZodType } from 'zod';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { Config } from './Config';
@@ -77,7 +78,7 @@ export type EntitiesFromSchema<CC> = CC extends {
   entitiesSchema?: infer S;
 }
   ? S extends Record<string, ZodType>
-    ? { [K in keyof S & string]: zInfer<S[K]> } & EntityMap
+    ? { [K in keyof S & string]: z.infer<S[K]> } & EntityMap
     : EntityMap
   : EntityMap;
 
