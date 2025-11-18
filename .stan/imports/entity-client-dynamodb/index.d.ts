@@ -459,7 +459,8 @@ interface IndexParams {
 declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = EntityToken<C>, ITS extends string = string, CF = unknown> extends BaseQueryBuilder<C, EntityClient<C>, IndexParams, ET, ITS, CF> {
     getShardQueryFunction(indexToken: ITS): ShardQueryFunction<C, ET, ITS, CF>;
     /**
-     * Adds a range key condition to a {@link ShardQueryMap | `ShardQueryMap`} index. See the {@link RangeKeyCondition | `RangeKeyCondition`} type for more info.
+     * Adds a range key condition to a {@link ShardQueryMap | `ShardQueryMap`} index.
+     * See the {@link RangeKeyCondition | `RangeKeyCondition`} type for more info.
      *
      * @param indexToken - The index token.
      * @param condition - The {@link RangeKeyCondition | `RangeKeyCondition`} object.
@@ -469,9 +470,8 @@ declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = 
     addRangeKeyCondition(indexToken: ITS, condition: Omit<RangeKeyCondition, 'property'> & {
         property: IndexRangeKeyOf<CF, ITS> extends string ? IndexRangeKeyOf<CF, ITS> : string;
     }): this;
-    addRangeKeyCondition(indexToken: ITS, condition: RangeKeyCondition): this;
     /**
-     * Adds a filter condition to a {@link ShardQueryMap | `ShardQueryMap`} index.  See the {@link FilterCondition | `FilterCondition`} type for more info.
+     * Adds a filter condition to a {@link ShardQueryMap | `ShardQueryMap`} index. See the {@link FilterCondition | `FilterCondition`} type for more info.
      *
      * @param indexToken - The index token.
      * @param condition - The {@link FilterCondition | `FilterCondition`} object.

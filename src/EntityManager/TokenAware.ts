@@ -50,8 +50,12 @@ export type KeysFrom<K> = K extends readonly (infer E)[]
 export type Projected<T, K> = [KeysFrom<K>] extends [never]
   ? T
   : // Intersect requested keys with the exactified key set of T to avoid
-    // collapse to `never` when T carries an index signature.
-    Pick<T, Extract<KeysFrom<K>, keyof Exactify<T>>>;
+    // collapse to `never` when T carries an index signature. Guard Exactify
+    // usage behind an object check to satisfy TS constraints when T is not
+    // known to be an object.
+    T extends object
+    ? Pick<T, Extract<KeysFrom<K>, keyof Exactify<T>>>
+    : T;
 
 /**
  * Projected item by token — narrows EntityItemByToken by K when provided.
