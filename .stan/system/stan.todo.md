@@ -190,3 +190,8 @@
 - Tests — DX helper coverage
   - Added tsd tests validating QueryOptionsByCF/CC and ShardQueryMapByCF/CC typing, key constraints, and basic compatibility with ShardQueryFunction signatures.
 
+- Docs — README update (CC sugar)
+  - Updated README to document QueryOptionsByCC and ShardQueryMapByCC, including examples and DX highlights.
+
+- Interop — entity-client-dynamodb response
+  - Added .stan/interop/entity-client-dynamodb/interop-response.md summarizing delivered features and DX enhancements beyond the original request.

@@ -37,10 +37,11 @@ npm install --save-dev @karmaniverous/mock-db
 - Index‑aware page keys (optional CF channel):
   - Provide a values‑first config literal (CF) with `indexes` and get typed page keys per index.
   - Use `QueryOptionsByCF` and `ShardQueryMapByCF` to derive index token unions directly from CF.
+- CC-based DX sugar (values-first captured config):
+  - Use `QueryOptionsByCC` and `ShardQueryMapByCC` to derive index token unions from a captured config type (via `IndexTokensFrom`), while still benefiting from page-key narrowing.
 
 ## Quick start (values‑first + schema‑first)
-
-```ts
+```ts
 import { z } from 'zod';
 import { createEntityManager, defaultTranscodes } from '@karmaniverous/entity-manager';
 
@@ -166,12 +167,46 @@ const result = await manager.query(options);
 // result.pageKeyMap is a compact string — pass it to the next call’s options.pageKeyMap
 ```
 
+### CC-based aliases
+
+You can also derive ITS (index token subset) directly from a values‑first captured config type (CC) using `QueryOptionsByCC` and `ShardQueryMapByCC`. This mirrors the CF helpers but drives ITS from the CC type (via `IndexTokensFrom`) and passes the same CC through the CF channel for page‑key narrowing.
+
+```ts
+import type {
+  ShardQueryFunction,
+  ShardQueryMapByCC,
+  QueryOptionsByCC,
+} from '@karmaniverous/entity-manager';
+
+// A values-first config literal capturing index tokens (the same shape used for CF)
+const cc = {
+  indexes: {
+    firstName: { hashKey: 'hashKey2', rangeKey: 'firstNameRK' },
+    lastName:  { hashKey: 'hashKey2', rangeKey: 'lastNameRK'  },
+  },
+} as const;
+type CC = typeof cc;
+
+// Reuse typed SQFs (pageKey narrowed per index)
+const firstNameSQF: ShardQueryFunction<MyConfigMap, 'user', 'firstName', CC> =
+  async (hashKey, pageKey, pageSize) => ({ count: 0, items: [], pageKey });
+const lastNameSQF: ShardQueryFunction<MyConfigMap, 'user', 'lastName', CC> =
+  async (hashKey, pageKey, pageSize) => ({ count: 0, items: [], pageKey });
+
+// CC-aware shardQueryMap — only 'firstName' | 'lastName' allowed
+const shardQueryMapCC: ShardQueryMapByCC<MyConfigMap, 'user', CC> = {
+  firstName: firstNameSQF,
+  lastName: lastNameSQF,
+};
+const optionsCC: QueryOptionsByCC<MyConfigMap, 'user', CC> = { entityToken: 'user', item: {}, shardQueryMap: shardQueryMapCC };
+const resultCC = await manager.query(optionsCC);
+```
+
 Notes:
 
 - Entity Manager enumerates hash‑key space for the time window, rehydrates page keys (when present), executes shard queries in parallel (throttled), dedupes by unique property, sorts, and dehydrates a new pageKeyMap.
 - For provider integration, the SQF lambda encapsulates the platform‑specific query for one index + shard page. See tests and entity‑client‑dynamodb for examples.
-
-## Page keys in a nutshell
+## Page keys in a nutshell
 
 - `rehydratePageKeyMap` decodes a dehydrated array (compressed string) into a two‑layer map of `{ indexToken: { hashKeyValue: pageKey | undefined } }`.
 - `dehydratePageKeyMap` performs the inverse and emits a compact array (compressed in `query()`).
@@ -207,14 +242,13 @@ const manager = createEntityManager(config, logger);
   - `PageKeyByIndex<CC, ET, IT, CF>`
   - `ShardQueryFunction<CC, ET, IT, CF>`, `ShardQueryMap<CC, ET, ITS, CF>`
   - `QueryOptions<CC, ET, ITS, CF>`, `QueryResult<CC, ET, ITS>`
-  - DX sugar: `IndexTokensOf<CF>`, `QueryOptionsByCF`, `ShardQueryMapByCF`
+  - DX sugar: `IndexTokensOf<CF>`, `QueryOptionsByCF`, `ShardQueryMapByCF`, `IndexTokensFrom<CC>`, `QueryOptionsByCC`, `ShardQueryMapByCC`
 
 See the full API: https://docs.karmanivero.us/entity-manager
 
 ## Scripts (repo)
 
-- build: rollup outputs ESM/CJS + .d.ts
-- test: vitest with coverage
+- build: rollup outputs ESM/CJS + .d.ts- test: vitest with coverage
 - lint: ESLint (type‑aware) + Prettier
 - docs: TypeDoc
 - typecheck: tsc + tsd (type‑level tests)
