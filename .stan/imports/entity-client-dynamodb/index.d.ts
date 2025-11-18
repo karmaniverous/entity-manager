@@ -468,7 +468,7 @@ declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = 
      * @returns - The modified {@link ShardQueryMap | `ShardQueryMap`} instance.
      */
     addRangeKeyCondition(indexToken: ITS, condition: RangeKeyCondition & {
-        property: [IndexRangeKeyOf<CF, ITS>] extends [string] ? IndexRangeKeyOf<CF, ITS> : string;
+        property: [IndexRangeKeyOf<CF, ITS>] extends [never] ? string : IndexRangeKeyOf<CF, ITS>;
     }): this;
     /**
      * Adds a filter condition to a {@link ShardQueryMap | `ShardQueryMap`} index. See the {@link FilterCondition | `FilterCondition`} type for more info.
