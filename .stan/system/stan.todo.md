@@ -200,7 +200,8 @@
   - Added .stan/interop/entity-client-dynamodb/interop-response.md summarizing delivered features and DX enhancements beyond the original request.
 
 - Interop — zod infer in d.ts
-  - Replaced zod named/aliased infer import with a type-only namespace import and z.infer in EntitiesFromSchema to avoid d.ts parse errors downstream. No runtime import added; prepare patch release.
+  - Replaced zod named/aliased infer import with a type-only namespace import and z.infer in EntitiesFromSchema to avoid d.ts parse errors downstream. No runtime import added; prepare patch release.
+
 - Projection-aware typed results (type-only K in entity-manager)
   - Added helper types KeysFrom, Projected, ProjectedItemByToken to TokenAware.
   - Threaded an optional generic K through ShardQueryFunction/Result/Map,
@@ -229,4 +230,11 @@
   - Added interop note at .stan/interop/entity-client-dynamodb/projection-k-integration.md
     detailing how to adopt K, invariants (uniqueProperty/sort keys), recommended
     adapter behaviors, and suggested tsd coverage.
-  - No runtime changes; typecheck/lint/tests/build/docs remain green.
+  - No runtime changes; typecheck/lint/tests/build/docs remain green.
+
+- Typecheck red — projection K narrowing (index-signature guard)
+  - Fixed TokenAware.Projected to select keys from KeysFrom<K> intersected with
+    keyof Exactify<T>, avoiding collapse to `never` when T has an index signature.
+  - This ensures const‑tuple K (e.g., ['userId','created'] as const) narrows to
+    Pick<…, 'userId' | 'created'>[] in QueryResult<…, K>.items as intended.
+  - No runtime changes; tsd projection-typing.test-d.ts now passes.
