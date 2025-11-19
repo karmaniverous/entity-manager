@@ -3,7 +3,7 @@ import { BatchProcessOptions } from '@karmaniverous/batch-process';
 import * as _smithy_util_waiter from '@smithy/util-waiter';
 import * as _aws_sdk_client_dynamodb from '@aws-sdk/client-dynamodb';
 import { DynamoDBClientConfig, DynamoDBClient, CreateTableCommandInput, DeleteTableCommandInput, ScalarAttributeType } from '@aws-sdk/client-dynamodb';
-import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, EntityToken, EntityItemByToken, EntityRecordByToken, BaseQueryBuilder, ShardQueryFunction, IndexRangeKeyOf, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex, EntityManager } from '@karmaniverous/entity-manager';
+import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, EntityToken, EntityItemByToken, EntityRecordByToken, BaseQueryBuilder, ShardQueryFunction, IndexRangeKeyOf, QueryBuilderQueryOptions, QueryResult, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex, EntityManager } from '@karmaniverous/entity-manager';
 export { EntityItemByToken, EntityRecordByToken, EntityToken } from '@karmaniverous/entity-manager';
 import { MakeOptional, ReplaceKey, TranscodeRegistry, Exactify, DefaultTranscodeRegistry } from '@karmaniverous/entity-tools';
 import { WaiterConfiguration } from '@smithy/types';
@@ -447,6 +447,8 @@ interface IndexParams {
     expressionAttributeNames: Record<string, string | undefined>;
     expressionAttributeValues: Record<string, NativeScalarAttributeValue | undefined>;
     filterConditions: (string | undefined)[];
+    /** Optional list of attributes to project for this index. */
+    projectionAttributes?: string[];
     rangeKeyCondition?: string;
     scanIndexForward?: boolean;
 }
@@ -456,8 +458,8 @@ interface IndexParams {
  *
  * @category QueryBuilder
  */
-declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = EntityToken<C>, ITS extends string = string, CF = unknown> extends BaseQueryBuilder<C, EntityClient<C>, IndexParams, ET, ITS, CF> {
-    getShardQueryFunction(indexToken: ITS): ShardQueryFunction<C, ET, ITS, CF>;
+declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = EntityToken<C>, ITS extends string = string, CF = unknown, K = unknown> extends BaseQueryBuilder<C, EntityClient<C>, IndexParams, ET, ITS, CF, K> {
+    getShardQueryFunction(indexToken: ITS): ShardQueryFunction<C, ET, ITS, CF, K>;
     /**
      * Adds a range key condition to a {@link ShardQueryMap | `ShardQueryMap`} index.
      * See the {@link RangeKeyCondition | `RangeKeyCondition`} type for more info.
@@ -467,9 +469,23 @@ declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = 
      *
      * @returns - The modified {@link ShardQueryMap | `ShardQueryMap`} instance.
      */
-    addRangeKeyCondition(indexToken: ITS, condition: RangeKeyCondition & {
-        property: [IndexRangeKeyOf<CF, ITS>] extends [never] ? string : IndexRangeKeyOf<CF, ITS>;
+    addRangeKeyCondition<IT extends ITS>(indexToken: IT, condition: RangeKeyCondition & {
+        property: [IndexRangeKeyOf<CF, IT>] extends [never] ? string : IndexRangeKeyOf<CF, IT>;
     }): this;
+    /**
+     * Set a projection (attributes) for an index token.
+     * - Type-only: narrows K when called with a const tuple.
+     * - Runtime: populates ProjectionExpression for the index.
+     *
+     * Note: At query time, uniqueProperty and any explicit sort keys will be
+     * auto-included to preserve dedupe/sort invariants.
+     */
+    setProjection<KAttr extends readonly string[]>(indexToken: ITS, attributes: KAttr): QueryBuilder<C, ET, ITS, CF, KAttr>;
+    /**
+     * Override query to auto-include uniqueProperty and any explicit sort keys
+     * when projections are present (preserves dedupe/sort invariants).
+     */
+    query(options: QueryBuilderQueryOptions<C, CF>): Promise<QueryResult<C, ET, ITS, K>>;
     /**
      * Adds a filter condition to a {@link ShardQueryMap | `ShardQueryMap`} index. See the {@link FilterCondition | `FilterCondition`} type for more info.
      *
@@ -598,4 +614,4 @@ declare const defaultTranscodeAttributeTypeMap: TranscodeAttributeTypeMap<Defaul
 declare const generateTableDefinition: <C extends BaseConfigMap>(entityManager: EntityManager<C>, transcodeAtttributeTypeMap?: TranscodeAttributeTypeMap<C["TranscodeRegistry"]>) => Pick<CreateTableCommandInput, "AttributeDefinitions" | "GlobalSecondaryIndexes" | "KeySchema">;
 
 export { EntityClient, QueryBuilder, addFilterCondition, addRangeKeyCondition, attributeValueAlias, createQueryBuilder, defaultTranscodeAttributeTypeMap, generateTableDefinition, getDocumentQueryArgs };
-export type { ActuallyScalarAttributeValue, BatchGetOptions, BatchWriteOptions, ComposeCondition, EntityClientOptions, FilterCondition, GetDocumentQueryArgsParams, GetItemOptions, GetItemsOptions, IndexParams, QueryBuilderOptions, QueryCondition, QueryConditionBeginsWith, QueryConditionBetween, QueryConditionComparison, QueryConditionContains, QueryConditionExists, QueryConditionGroup, QueryConditionIn, QueryConditionNot, RangeKeyCondition, TranscodeAttributeTypeMap, WaiterConfig };
+export type { ActuallyScalarAttributeValue, BatchGetOptions, BatchWriteOptions, ComposeCondition, EntityClientOptions, FilterCondition, GetDocumentQueryArgsParams, GetItemOptions, GetItemsOptions, IndexParams, Projected, QueryBuilderOptions, QueryCondition, QueryConditionBeginsWith, QueryConditionBetween, QueryConditionComparison, QueryConditionContains, QueryConditionExists, QueryConditionGroup, QueryConditionIn, QueryConditionNot, RangeKeyCondition, TranscodeAttributeTypeMap, WaiterConfig };
