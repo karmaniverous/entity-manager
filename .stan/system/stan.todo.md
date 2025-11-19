@@ -1,6 +1,7 @@
 # Development Plan
 
 ## Next up (in priority order)
+
 - Interop (entity-client-dynamodb) — Option B helper typing (typing-only)
   - Goal: Remove variance-bridging casts at QueryBuilder call sites by relaxing
     helper parameter types to accept any BaseQueryBuilder instantiation while
@@ -8,7 +9,7 @@
   - Changes (downstream in entity-client-dynamodb):
     - addRangeKeyCondition signature:
       • builder: BaseQueryBuilder<CC, Client, unknown, ET, ITS, CF, K> &
-        { indexParamsMap: Record<ITS, IndexParams>; entityClient: { logger: Pick<Console,'debug'|'error'> } }
+      { indexParamsMap: Record<ITS, IndexParams>; entityClient: { logger: Pick<Console,'debug'|'error'> } }
       • indexToken: ITS
       • condition: RangeKeyCondition
     - addFilterCondition signature mirrors the above with FilterCondition<CC>.
@@ -27,7 +28,7 @@
     terms to avoid cryptic documentation.
   - Sweep:
     • README sections using “CF/CC” add local definitions on first use or
-      expand to descriptive names.
+    expand to descriptive names.
     • API docs / JSDoc: define acronyms inline on first mention per file/section.
   - Keep the project prompt policy authoritative; do not export abbreviated type aliases.
 - Docs (DX) — projection K + builder threading:
@@ -278,4 +279,15 @@
 
 - Interop: response note for entity‑client‑dynamodb
   - Created .stan/interop/entity-client-dynamodb/projection-k-and-rangekey-narrowing-response.md
-  - Summarized shipped changes (K channel, CF/CC typing, BaseQueryBuilder K threading) and guidance for CF‑aware range‑key property narrowing.
+  - Summarized shipped changes (K channel, CF/CC typing, BaseQueryBuilder K threading) and guidance for CF‑aware range‑key property narrowing.
+
+- Docs: acronym readability (README)
+  - Defined CF (“values‑first config literal”) and CC (“Captured Config”) inline
+    on first use and clarified related headings/bullets. Aligns with project
+    prompt policy; no API changes.
+
+- Project prompt: documentation acronym usage policy moved from requirements and formalized in stan.project.md.
+
+- Interop: Option B helper typing (implementation guide)
+  - Added .stan/interop/entity-client-dynamodb/option-b-helper-typing-impl.md
+    detailing signatures, steps, tests, and release plan (typing-only change).

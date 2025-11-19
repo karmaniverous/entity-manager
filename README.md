@@ -35,9 +35,9 @@ npm install --save-dev @karmaniverous/mock-db
 - Projection‑aware typing (type‑only K):
   - Pass attributes as a const tuple (K) through your query types to narrow result items to Pick<…> of those properties.
   - No runtime change; adapters execute projections. Adapters should auto‑include `uniqueProperty` and any explicit sort keys when callers omit them to preserve dedupe/sort invariants.
-- Index‑aware typing (CF/CC helpers):
-  - CF: drive index token unions and page‑key narrowing directly from a values‑first config literal (`QueryOptionsByCF`, `ShardQueryMapByCF`).
-  - CC: derive index tokens from a captured config type while reusing CF for narrowing (`QueryOptionsByCC`, `ShardQueryMapByCC`).
+- Index‑aware typing (values‑first config literal “CF” and captured config “CC” helpers):
+  - CF (values‑first config literal): drive index token unions and page‑key narrowing directly from a values‑first config literal (`QueryOptionsByCF`, `ShardQueryMapByCF`).
+  - CC (Captured Config): derive index tokens from a captured config type while reusing CF for narrowing (`QueryOptionsByCC`, `ShardQueryMapByCC`).
 - Token‑aware helpers:
   - `addKeys`, `getPrimaryKey`, `removeKeys` narrow types by entity token (no casts).
 - Index‑aware page keys (optional CF channel):
@@ -128,7 +128,7 @@ const item = manager.removeKeys('user', record);
 
 Types narrow automatically from the entity token (`'user'`). No casts required.
 
-## Index‑aware querying (CF channel)
+## Index‑aware querying (values‑first config literal, “CF” channel)
 
 When you author a values‑first config literal with `indexes` (prefer `as const`), Entity Manager can:
 
@@ -185,7 +185,7 @@ const result = await manager.query(options);
 // result.pageKeyMap is a compact string — pass it to the next call’s options.pageKeyMap
 ```
 
-### CC-based aliases
+### Captured Config (“CC”) aliases
 
 You can also derive ITS (index token subset) directly from a values‑first captured config type (CC) using `QueryOptionsByCC` and `ShardQueryMapByCC`. This mirrors the CF helpers but drives ITS from the CC type (via `IndexTokensFrom`) and passes the same CC through the CF channel for page‑key narrowing.
 
@@ -364,7 +364,7 @@ const manager = createEntityManager(config, logger);
   - `ConfigInput` (values‑first), `CapturedConfigMapFrom`, `EntitiesFromSchema`
 - Token aware
   - `EntityToken<CC>`, `EntityItemByToken<CC, ET>`, `EntityRecordByToken<CC, ET>`
-- Index aware (CF channel)
+- Index aware (values‑first config literal, “CF” channel)
   - `PageKeyByIndex<CC, ET, IT, CF>`
   - `ShardQueryFunction<CC, ET, IT, CF>`, `ShardQueryMap<CC, ET, ITS, CF>`
   - `QueryOptions<CC, ET, ITS, CF>`, `QueryResult<CC, ET, ITS>`
