@@ -1,6 +1,35 @@
 # Development Plan
 
 ## Next up (in priority order)
+- Interop (entity-client-dynamodb) — Option B helper typing (typing-only)
+  - Goal: Remove variance-bridging casts at QueryBuilder call sites by relaxing
+    helper parameter types to accept any BaseQueryBuilder instantiation while
+    intersecting the mutated shape (indexParamsMap + logger).
+  - Changes (downstream in entity-client-dynamodb):
+    - addRangeKeyCondition signature:
+      • builder: BaseQueryBuilder<CC, Client, unknown, ET, ITS, CF, K> &
+        { indexParamsMap: Record<ITS, IndexParams>; entityClient: { logger: Pick<Console,'debug'|'error'> } }
+      • indexToken: ITS
+      • condition: RangeKeyCondition
+    - addFilterCondition signature mirrors the above with FilterCondition<CC>.
+    - No runtime changes; retain existing implementation.
+  - Remove “unknown as …” casts at helper call sites.
+  - Compile/test plan:
+    • tsd/compile checks that typed calls no longer require casts.
+    • Unit/integration tests remain green (behavior unchanged).
+  - Release plan:
+    • Patch release of entity-client-dynamodb.
+    • Note as “typing-only” interop improvement; no behavior change.
+
+- Docs: acronym readability pass (README, docs, comments)
+  - Rationale: dictionary acronyms (CC, CF, ET, IT, ITS, …) are for type
+    parameters; prose must introduce acronyms inline or prefer descriptive
+    terms to avoid cryptic documentation.
+  - Sweep:
+    • README sections using “CF/CC” add local definitions on first use or
+      expand to descriptive names.
+    • API docs / JSDoc: define acronyms inline on first mention per file/section.
+  - Keep the requirements policy authoritative; do not export abbreviated type aliases.
 - Docs (DX) — projection K + builder threading:
   - README/API: add a focused section showing:
     - How to use projection K with const tuples (end‑to‑end narrowing in ShardQueryFunction/Map, QueryOptions/Result).
@@ -11,6 +40,7 @@
   - Add tsd coverage mirroring the new K path: const‑tuple attrs narrow items across SQF/Map/Options/Result; include getItem/getItems removeKeys literal overload combos.
   - Implement/confirm ProjectionExpression auto‑inclusion of uniqueProperty + explicit sort keys when attrs omit them (preserves dedupe/sort invariants at runtime).
   - Ensure createQueryBuilder examples show CF‑aware typed page keys alongside K usage.
+  - Implement Option B helper typing (see task above) and remove variance casts.
 
 - Demo repo:
   - Update to use entitiesSchema factory + token‑aware calls; add a small example demonstrating projection K and index‑aware page keys (DX validation).

@@ -67,6 +67,16 @@ Naming and acronym policy (hard rule)
 - Acronyms are reserved for type-parameter names only (e.g., CC, EM, ET, IT, ITS, EOT, EIBT, ERBT as template parameter identifiers).
 - Never export abbreviated type aliases. All exported types must be fully named (e.g., EntityOfToken, EntityItemByToken, EntityRecordByToken).
 
+Documentation and comments — acronym usage policy
+
+- Dictionary acronyms MUST be used as type parameters (e.g., function<CC, ET, ITS, CF, K>).
+- They MAY be used elsewhere (README, API docs, comments) only if the acronym is defined locally to the usage on first mention.
+  - Example: “Captured Config (CC)” and “values‑first config literal (CF)”.
+  - When in doubt, prefer the descriptive term over the acronym for readability.
+- Do not use dictionary acronyms as a substitute for type names or concept names in general prose unless the acronym is introduced inline and improves brevity without sacrificing clarity.
+- Never export abbreviated type aliases (reiterated). Acronyms remain for type parameters and local explanatory shorthand only.
+- Rationale: avoid cryptic documentation while preserving a consistent set of generic parameter names across the codebase and examples.
+
 Projection-aware typing (type-only K channel; provider-agnostic)
 
 - Add a type-only “projection” channel K that narrows item shapes when a provider projects a subset of attributes.
@@ -350,7 +360,7 @@ Runtime config validation (selected checks)
   - De-duplicate by uniqueProperty and sort by sortOrder.
   - Dehydrate, compress, and return.
   - Projection channel K (type-only):
-    - Narrows result item shape to Pick<EntityItemByToken<…, ET>, KeysFrom<K>>.
+    - Narrows result item shape to Pick<EIBT<CC, EM, ET>, KeysFrom<K>>.
     - Does not alter runtime behavior; adapters/providers execute projections and may auto-include uniqueProperty and any sortOrder keys to preserve dedupe/sort invariants.
     - QueryOptions.sortOrder is typed over the projected shape; include used keys in K or auto-include at the adapter.
 
@@ -373,7 +383,7 @@ Runtime config validation (selected checks)
 
 ## Logging and errors
 
-- EntityManager accepts an injected logger implementing { debug, error } (console by default).
+- Entity Manager accepts an injected logger implementing { debug, error } (console by default).
 - All helpers log debug context and error detail; errors are rethrown.
 
 ---
@@ -386,3 +396,116 @@ Runtime config validation (selected checks)
 - Add a brief example of projection-aware typing:
   - Attributes as const tuples (K) narrow item shapes.
   - Note that sort keys and uniqueProperty should be included in K or automatically included by adapters.
+
+---
+
+## Adapter-level QueryBuilder ergonomics (DynamoDB) — helper methods
+
+Purpose
+
+- Provide small, explicit helpers for common per-index query parameters and projection lifecycle while preserving the type-only K channel invariants in adapters.
+
+Helpers and behavior (adapter-level)
+
+- setScanIndexForward(indexToken: ITS, value: boolean): this
+  - Runtime: sets IndexParams.scanIndexForward for the index; getDocumentQueryArgs emits ScanIndexForward.
+  - Typing: no effect on K (pure query-direction toggle).
+
+- setProjection<KAttr extends readonly string[]>(indexToken: ITS, attrs: KAttr): QueryBuilder<…, KAttr>
+  - Runtime: sets per-index projection attributes; getDocumentQueryArgs emits ProjectionExpression.
+  - Query-time invariant: when any projections are present, auto-include uniqueProperty and explicit sort keys to preserve dedupe/sort invariants.
+  - Typing: narrows the builder’s K to KAttr (global to the builder; reflects the merged result shape).
+
+- resetProjection(indexToken: ITS): QueryBuilder<…, unknown>
+  - Runtime: clears projectionAttributes for the index (no ProjectionExpression ⇒ full items).
+  - Typing: widens K back to unknown (result items are no longer uniformly projected).
+
+- resetAllProjections(): QueryBuilder<…, unknown>
+  - Runtime: clears projections for all indices on the builder.
+  - Typing: widens K to unknown (result items are full shape).
+
+- setProjectionAll<KAttr extends readonly string[]>(indices: ITS[] | readonly ITS[], attrs: KAttr): QueryBuilder<…, KAttr>
+  - Runtime: applies the same ProjectionExpression across the supplied indices (or all, if a “current indices” form is later added).
+  - Typing: narrows builder K to KAttr, keeping a uniform projected shape aligned with EntityManager’s merged result semantics.
+
+Notes
+
+- K remains a single, builder-wide type parameter to match merged results across all indices. Uniform projections via setProjectionAll are recommended to keep typing and runtime aligned.
+- The adapter’s runtime policy continues to auto-include uniqueProperty and explicit sort keys when projections are present, ensuring stable dedupe/sort.
+
+---
+
+## Internals / variance (typing contract with entity‑manager)
+
+Problem
+
+- Downstream adapters extend BaseQueryBuilder with additional generics (e.g., CF for CF-aware narrowing and K for projection), and call helper functions exported by entity‑manager (e.g., addFilterCondition, addRangeKeyCondition).
+- Helper parameter typing that requires a concrete builder type can force variance-bridging casts at call sites even though helpers only rely on a small mutable subset (indexParamsMap, entityClient.logger).
+
+Chosen approach — Option B: Generic BaseQueryBuilder acceptance (typing-only; no runtime change)
+
+- Relax helper parameter types to accept any BaseQueryBuilder instantiation (regardless of its generics ET/ITS/CF/K) and intersect the mutable shape helpers actually use.
+- Keep behavior unchanged; this is a pure type improvement that removes downstream casts while preserving type inference for indexToken (ITS).
+
+Canonical signatures (conceptual)
+
+```ts
+import type {
+  BaseConfigMap,
+  BaseEntityClient,
+  BaseQueryBuilder,
+  EntityToken,
+} from '@karmaniverous/entity-manager';
+
+// IndexParams is the adapter's per-index state mutated by helpers.
+
+export function addRangeKeyCondition<
+  CC extends BaseConfigMap,
+  Client extends BaseEntityClient<CC>,
+  ET extends EntityToken<CC>,
+  ITS extends string,
+  CF = unknown,
+  K = unknown,
+>(
+  builder: BaseQueryBuilder<CC, Client, unknown, ET, ITS, CF, K> & {
+    indexParamsMap: Record<ITS, IndexParams>;
+    entityClient: { logger: Pick<Console, 'debug' | 'error'> };
+  },
+  indexToken: ITS,
+  condition: RangeKeyCondition,
+): void;
+
+export function addFilterCondition<
+  CC extends BaseConfigMap,
+  Client extends BaseEntityClient<CC>,
+  ET extends EntityToken<CC>,
+  ITS extends string,
+  CF = unknown,
+  K = unknown,
+>(
+  builder: BaseQueryBuilder<CC, Client, unknown, ET, ITS, CF, K> & {
+    indexParamsMap: Record<ITS, IndexParams>;
+    entityClient: { logger: Pick<Console, 'debug' | 'error'> };
+  },
+  indexToken: ITS,
+  condition: FilterCondition<CC>,
+): void;
+```
+
+Details and rationale
+
+- Intersection expresses the precise mutable contract (indexParamsMap and logger) while keeping a strong semantic tie to BaseQueryBuilder.
+- ITS flows from the builder into indexToken, maintaining helpful key narrowing at call sites.
+- Zero runtime changes — only typing is widened to be variance-friendly.
+
+Acceptance criteria
+
+- Updated helper signatures compile and remain backward-compatible.
+- Downstream adapters (e.g., entity-client-dynamodb) remove variance-bridging casts at helper call sites.
+- Existing unit/integration tests continue to pass; no behavior changes.
+
+Follow-up downstream (in entity-client-dynamodb)
+
+- Remove the variance casts around addFilterCondition/addRangeKeyCondition.
+- Keep QueryBuilder generics (CF, K) and per-index IndexParams unchanged.
+- Publish as a patch (typing-only) and note the improvement in release notes.
