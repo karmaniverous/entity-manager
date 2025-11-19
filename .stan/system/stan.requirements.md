@@ -67,16 +67,6 @@ Naming and acronym policy (hard rule)
 - Acronyms are reserved for type-parameter names only (e.g., CC, EM, ET, IT, ITS, EOT, EIBT, ERBT as template parameter identifiers).
 - Never export abbreviated type aliases. All exported types must be fully named (e.g., EntityOfToken, EntityItemByToken, EntityRecordByToken).
 
-Documentation and comments — acronym usage policy
-
-- Dictionary acronyms MUST be used as type parameters (e.g., function<CC, ET, ITS, CF, K>).
-- They MAY be used elsewhere (README, API docs, comments) only if the acronym is defined locally to the usage on first mention.
-  - Example: “Captured Config (CC)” and “values‑first config literal (CF)”.
-  - When in doubt, prefer the descriptive term over the acronym for readability.
-- Do not use dictionary acronyms as a substitute for type names or concept names in general prose unless the acronym is introduced inline and improves brevity without sacrificing clarity.
-- Never export abbreviated type aliases (reiterated). Acronyms remain for type parameters and local explanatory shorthand only.
-- Rationale: avoid cryptic documentation while preserving a consistent set of generic parameter names across the codebase and examples.
-
 Projection-aware typing (type-only K channel; provider-agnostic)
 
 - Add a type-only “projection” channel K that narrows item shapes when a provider projects a subset of attributes.

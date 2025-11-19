@@ -29,7 +29,7 @@
     • README sections using “CF/CC” add local definitions on first use or
       expand to descriptive names.
     • API docs / JSDoc: define acronyms inline on first mention per file/section.
-  - Keep the requirements policy authoritative; do not export abbreviated type aliases.
+  - Keep the project prompt policy authoritative; do not export abbreviated type aliases.
 - Docs (DX) — projection K + builder threading:
   - README/API: add a focused section showing:
     - How to use projection K with const tuples (end‑to‑end narrowing in ShardQueryFunction/Map, QueryOptions/Result).
