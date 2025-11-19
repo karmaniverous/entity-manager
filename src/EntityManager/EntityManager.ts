@@ -46,7 +46,17 @@ export class EntityManager<CC extends BaseConfigMap> {
     config: Config<CC>,
     logger: Pick<Console, 'debug' | 'error'> = console,
   ) {
-    this.#config = configSchema.parse(config);
+    // Accept a compile-time-only `entitiesSchema` key on values-first configs.
+    // We strip it here so the same literal config can be used with either the
+    // factory or the direct constructor without tripping Zod's strict parser.
+    //
+    // This keeps runtime semantics unchanged and avoids widening ParsedConfig.
+    const cfgWithOptionalES = config as Config<CC> & {
+      entitiesSchema?: unknown;
+    };
+    const { entitiesSchema: _ignored, ...configForParse } = cfgWithOptionalES;
+
+    this.#config = configSchema.parse(configForParse as unknown as Config<CC>);
     this.logger = logger;
   }
 

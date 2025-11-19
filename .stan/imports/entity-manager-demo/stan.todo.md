@@ -7,6 +7,8 @@
 
 ## Completed (recent)
 
+**CRITICAL: This list is append-only; do not edit items! Place most recent entries at the BOTTOM of the list. When pruning, remove older entries from the top.**
+
 - Interop: propose removeKeys-literal overloads in entity-client-dynamodb
   - Added .stan/interop/entity-client-dynamodb/remove-keys-literal-overloads.md
     describing additive overloads for getItem/getItems that narrow return types
@@ -52,3 +54,9 @@
   - Configured Vitest single-worker execution (threads.singleThread = true) to
     prevent concurrent container startups on port 8000.
 
+- Interop (entity-manager): accept or strip `entitiesSchema` in factory
+  - Added .stan/interop/entity-manager/entitiesSchema-accept-or-strip.md
+    requesting either Zod acceptance of the `entitiesSchema` key or a
+    factory-level strip before invoking the constructor. Keeps README
+    schema-first flow working and avoids the current ZodError while preserving
+    existing runtime validation and behavior.
