@@ -33,4 +33,8 @@ None
 
 - Tests: adjust tsd expectations for structural assignability.
   - Removed negative expectNotAssignable checks between different ETs since
-    EntityItemByToken is structurally assignable (Partial + index signature).
+    EntityItemByToken is structurally assignable (Partial + index signature).
+
+- Interop: document ET-aware QueryBuilder options change for adapter.
+  - Added .stan/interop/entity-client-dynamodb/et-aware-querybuilder-options.md
+    with the exact signature change and acceptance criteria.
