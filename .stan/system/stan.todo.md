@@ -21,3 +21,8 @@ None
     reference unused params (no async/await), satisfying ESLint.
   - Fix rehydrateIndexItem mismatch test to force segment-count mismatch.
   - Use now + day in hash-key update validation to require uniqueProperty.
+
+- Interop (types): Make QueryBuilder options ET-aware to restore cast-free DX.
+  - Changed QueryBuilderQueryOptions to carry ET and updated
+    BaseQueryBuilder.query to accept QueryBuilderQueryOptions<CC, ET, CF>.
+  - Eliminates `item: never` at builder.query sites; no runtime changes.

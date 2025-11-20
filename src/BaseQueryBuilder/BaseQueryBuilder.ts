@@ -79,7 +79,7 @@ export abstract class BaseQueryBuilder<
     ) as ShardQueryMap<CC, ET, ITS, CF, K>;
   }
 
-  async query(options: QueryBuilderQueryOptions<CC, CF>) {
+  async query(options: QueryBuilderQueryOptions<CC, ET, CF>) {
     const {
       entityClient: { entityManager },
       entityToken,
