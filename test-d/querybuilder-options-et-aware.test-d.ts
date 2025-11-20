@@ -1,5 +1,5 @@
 import type { Entity } from '@karmaniverous/entity-tools';
-import { expectNotAssignable, expectType } from 'tsd';
+import { expectType } from 'tsd';
 
 import type {
   ConfigMap,
@@ -49,12 +49,8 @@ type MyConfigMap = ConfigMap<{
 type OptUser = QueryBuilderQueryOptions<MyConfigMap, 'user'>;
 declare const optUser: OptUser;
 expectType<EntityItemByToken<MyConfigMap, 'user'>>(optUser.item);
-// And is not assignable to EntityItemByToken<..., 'email'>.
-expectNotAssignable<EntityItemByToken<MyConfigMap, 'email'>>(optUser.item);
 
 // ET='email' — options.item narrows to EntityItemByToken<..., 'email'>.
 type OptEmail = QueryBuilderQueryOptions<MyConfigMap, 'email'>;
 declare const optEmail: OptEmail;
 expectType<EntityItemByToken<MyConfigMap, 'email'>>(optEmail.item);
-// And is not assignable to EntityItemByToken<..., 'user'>.
-expectNotAssignable<EntityItemByToken<MyConfigMap, 'user'>>(optEmail.item);

@@ -30,3 +30,7 @@ None
 - Tests: pin ET-aware QueryBuilder options typing with tsd.
   - Added test-d/querybuilder-options-et-aware.test-d.ts to assert
     options.item resolves to EntityItemByToken<CC, ET> without casts.
+
+- Tests: adjust tsd expectations for structural assignability.
+  - Removed negative expectNotAssignable checks between different ETs since
+    EntityItemByToken is structurally assignable (Partial + index signature).
