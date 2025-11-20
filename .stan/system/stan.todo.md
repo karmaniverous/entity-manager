@@ -26,3 +26,7 @@ None
   - Changed QueryBuilderQueryOptions to carry ET and updated
     BaseQueryBuilder.query to accept QueryBuilderQueryOptions<CC, ET, CF>.
   - Eliminates `item: never` at builder.query sites; no runtime changes.
+
+- Tests: pin ET-aware QueryBuilder options typing with tsd.
+  - Added test-d/querybuilder-options-et-aware.test-d.ts to assert
+    options.item resolves to EntityItemByToken<CC, ET> without casts.
