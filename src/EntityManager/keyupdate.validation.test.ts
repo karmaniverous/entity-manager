@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { entityManager } from '../../test/config';
+import { day, entityManager, now } from '../../test/config';
 import { updateItemHashKey } from './updateItemHashKey';
 import { updateItemRangeKey } from './updateItemRangeKey';
 
@@ -17,7 +17,7 @@ describe('key update validations', function () {
         entityManager,
         'user',
         // Provide timestamp but omit uniqueProperty
-        { created: Date.now() },
+        { created: now + day },
       ),
     ).toThrow(/missing item unique property/i);
   });

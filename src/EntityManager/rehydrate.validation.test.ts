@@ -42,7 +42,7 @@ describe('rehydration validations', function () {
   it('rehydrateIndexItem throws on key-value mismatch count', function () {
     // 'firstName' unwrapped elements are 4; providing 3 should fail.
     expect(() =>
-      rehydrateIndexItem(entityManager, 'user', 'firstName', 'a|b|c'),
+      rehydrateIndexItem(entityManager, 'user', 'firstName', 'a|b'),
     ).toThrow(/index rehydration key-value mismatch/i);
   });
 });

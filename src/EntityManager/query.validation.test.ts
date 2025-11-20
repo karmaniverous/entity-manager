@@ -5,11 +5,16 @@ import { query } from './query';
 import type { ShardQueryFunction } from './ShardQueryFunction';
 
 describe('query input validation', function () {
-  const sqf: ShardQueryFunction<MyConfigMap, 'user', 'firstName'> = async (
+  const sqf: ShardQueryFunction<MyConfigMap, 'user', 'firstName'> = (
     _hashKey,
     pageKey,
     _pageSize,
-  ) => ({ count: 0, items: [], pageKey });
+  ) => {
+    // Silence unused-parameter lint for this validation-only SQF.
+    void _hashKey;
+    void _pageSize;
+    return Promise.resolve({ count: 0, items: [], pageKey });
+  };
 
   it('throws on invalid limit', async function () {
     await expect(
