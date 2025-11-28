@@ -2,9 +2,18 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v7.3.2](https://github.com/karmaniverous/entity-manager/compare/v7.3.1...v7.3.2)
+
+- feat(types): carry CF through BaseEntityClient; add tsd test via client [`ddf2ccb`](https://github.com/karmaniverous/entity-manager/commit/ddf2ccbebaee2d08da590d725bb0a61da802ad29)
+- test(tsd): assert findIndexToken narrows to configured index tokens [`5c49089`](https://github.com/karmaniverous/entity-manager/commit/5c490898d9dfba7ce5bc1abf0d5ce1df862f3c00)
+- chore(lint): replace explicit any with unknown in CF generics [`8423830`](https://github.com/karmaniverous/entity-manager/commit/84238306610bb60ba1f4e71f31816370e307a971)
+
 #### [v7.3.1](https://github.com/karmaniverous/entity-manager/compare/v7.3.0...v7.3.1)
 
+> 28 November 2025
+
 - feat(validation): reject duplicate index pairs; type-safe findIndexToken [`e355f1c`](https://github.com/karmaniverous/entity-manager/commit/e355f1c4e65bb571e74a46e17ce922035ac136b4)
+- chore: release v7.3.1 [`45d2fb2`](https://github.com/karmaniverous/entity-manager/commit/45d2fb2abb3a2d10de208acaff5d5adde3c68f66)
 - docs: note CF phantom generic in TSDoc; single-arg factory [`09ca91f`](https://github.com/karmaniverous/entity-manager/commit/09ca91f5d2a04efcc3888f8541e0c869d0e15309)
 - fix: overload call for findIndexToken; clean TSDoc [`d49b13e`](https://github.com/karmaniverous/entity-manager/commit/d49b13e84b0c54a879c90722ed71cdfbfe1af1a9)
 
