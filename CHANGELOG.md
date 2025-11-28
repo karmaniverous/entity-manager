@@ -2,8 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v7.3.3](https://github.com/karmaniverous/entity-manager/compare/v7.3.2...v7.3.3)
+
+- support exactOptionalPropertyTypes [`70484eb`](https://github.com/karmaniverous/entity-manager/commit/70484eb2e0a54a7d5b76305c50b1d6f689b0d505)
+
 #### [v7.3.2](https://github.com/karmaniverous/entity-manager/compare/v7.3.1...v7.3.2)
 
+> 28 November 2025
+
+- chore: release v7.3.2 [`fa0de7e`](https://github.com/karmaniverous/entity-manager/commit/fa0de7e003dcf1b1ca09b4b897a6edc0f55200d0)
 - feat(types): carry CF through BaseEntityClient; add tsd test via client [`ddf2ccb`](https://github.com/karmaniverous/entity-manager/commit/ddf2ccbebaee2d08da590d725bb0a61da802ad29)
 - test(tsd): assert findIndexToken narrows to configured index tokens [`5c49089`](https://github.com/karmaniverous/entity-manager/commit/5c490898d9dfba7ce5bc1abf0d5ce1df862f3c00)
 - chore(lint): replace explicit any with unknown in CF generics [`8423830`](https://github.com/karmaniverous/entity-manager/commit/84238306610bb60ba1f4e71f31816370e307a971)
