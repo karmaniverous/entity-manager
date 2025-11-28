@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
-#### [Unreleased](https://github.com/karmaniverous/entity-manager/compare/v7.2.0...HEAD)
+#### [v7.3.0](https://github.com/karmaniverous/entity-manager/compare/v7.2.0...v7.3.0)
+
+- docs: carry CF type via generics; update plan [`dc3dbb8`](https://github.com/karmaniverous/entity-manager/commit/dc3dbb83d016ed82cdfeb2517b847fc3763da62a)
+- updated docs [`d8d361f`](https://github.com/karmaniverous/entity-manager/commit/d8d361fbf1c89481962834857331cc2dd64884c9)
+- docs(interop): response for config-literal index typing [`7d6c197`](https://github.com/karmaniverous/entity-manager/commit/7d6c1978b7abd2bce92afd77576fbad0e450780c)
+- feat: thread CF via EntityManager generic (type-only) [`3e55912`](https://github.com/karmaniverous/entity-manager/commit/3e559120c97501985e27d6051c6ab09310ad6755)
 
 #### [v7.2.0](https://github.com/karmaniverous/entity-manager/compare/v7.1.2...v7.2.0)
 
