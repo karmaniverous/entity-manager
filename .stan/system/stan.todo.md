@@ -23,4 +23,7 @@
 **CRITICAL: This list is append-only; do not edit items! Place most recent entries at the BOTTOM of the list. When pruning, remove older entries from the top.**
 
 - Code: added CF as a phantom generic on EntityManager and updated the factory
-  to return EntityManager<…, CF>. No runtime configLiteral field introduced.
+  to return EntityManager<…, CF>. No runtime configLiteral field introduced.
+
+- Interop: documented upstream changes and adapter leverage plan in
+  .stan/interop/entity-client-dynamodb/preserve-config-literal-for-index-typing.md.
