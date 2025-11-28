@@ -35,4 +35,9 @@
   with literal true/false; cleaned TSDoc to remove undefined @code tag usage.
 
 - Tests (tsd): added findindextoken-narrowing.test-d.ts to assert that
-  EntityManager.findIndexToken returns the configured index-token union (CF).
+  EntityManager.findIndexToken returns the configured index-token union (CF).
+
+- Types: propagated CF through BaseEntityClient and BaseEntityClientOptions so
+  client-facing calls (e.g., entityManager.findIndexToken) retain narrowed
+  index-token unions.
+- Tests (tsd): added findindextoken-through-client.test-d.ts to assert narrowing via BaseEntityClient.

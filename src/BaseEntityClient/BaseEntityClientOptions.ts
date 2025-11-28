@@ -11,7 +11,10 @@ import type { BaseConfigMap, EntityManager } from '../EntityManager';
  *
  * @category EntityClient
  */
-export interface BaseEntityClientOptions<CC extends BaseConfigMap> {
+export interface BaseEntityClientOptions<
+  CC extends BaseConfigMap,
+  CF = unknown,
+> {
   /** Default batch process options. */
   batchProcessOptions?: Omit<
     BatchProcessOptions<unknown, unknown>,
@@ -19,7 +22,7 @@ export interface BaseEntityClientOptions<CC extends BaseConfigMap> {
   >;
 
   /** {@link EntityManager | `EntityManager`} instance. */
-  entityManager: EntityManager<CC>;
+  entityManager: EntityManager<CC, CF>;
 
   /** Injected logger object. Must support `debug` and `error` methods. Default: `console` */
   logger?: Pick<Console, 'debug' | 'error'>;
