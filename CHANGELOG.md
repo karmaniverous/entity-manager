@@ -2,8 +2,15 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v7.3.4](https://github.com/karmaniverous/entity-manager/compare/v7.3.3...v7.3.4)
+
+- support exactOptionalPropertyTypes [`e33d665`](https://github.com/karmaniverous/entity-manager/commit/e33d6658c552077326d13e76aa19d3618665eacf)
+
 #### [v7.3.3](https://github.com/karmaniverous/entity-manager/compare/v7.3.2...v7.3.3)
 
+> 29 November 2025
+
+- chore: release v7.3.3 [`c9ae119`](https://github.com/karmaniverous/entity-manager/commit/c9ae1199db3e5109f42cadb7c8e971eba9a91e05)
 - support exactOptionalPropertyTypes [`70484eb`](https://github.com/karmaniverous/entity-manager/commit/70484eb2e0a54a7d5b76305c50b1d6f689b0d505)
 
 #### [v7.3.2](https://github.com/karmaniverous/entity-manager/compare/v7.3.1...v7.3.2)
