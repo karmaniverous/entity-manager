@@ -30,7 +30,7 @@ import type { EntityItemByToken, EntityRecordByToken } from './TokenAware';
  *
  * @category EntityManager
  */
-export class EntityManager<CC extends BaseConfigMap> {
+export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
   #config: ParsedConfig;
 
   /** Logger object (defaults to `console`, must support `debug` & `error` methods). */

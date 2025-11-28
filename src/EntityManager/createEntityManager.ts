@@ -123,7 +123,7 @@ export function createEntityManager<
 >(
   config: CC,
   logger: Pick<Console, 'debug' | 'error'> = console,
-): EntityManager<CapturedConfigMapFrom<CC, EM>> {
+): EntityManager<CapturedConfigMapFrom<CC, EM>, CC> {
   // Cast to the existing Config<C> shape for runtime parsing; Zod validation
   // remains authoritative at construction time.
   // Optional dev guardrail: cross-check entitiesSchema keys vs config.entities keys.
@@ -154,7 +154,7 @@ export function createEntityManager<
   } catch {
     // Best-effort warning only; never block construction.
   }
-  return new EntityManager(
+  return new EntityManager<CapturedConfigMapFrom<CC, EM>, CC>(
     config as unknown as Config<CapturedConfigMapFrom<CC, EM>>,
     logger,
   );

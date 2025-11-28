@@ -2,11 +2,6 @@
 
 ## Next up (in priority order)
 
-- Entity Manager: add CF as a phantom generic on EntityManager and update the
-  factory to return EntityManager<…, CF>.
-  - Change: class EntityManager<CC extends BaseConfigMap, CF = unknown>.
-  - Factory: createEntityManager returns EntityManager<CapturedConfigMapFrom<CC, EM>, CC>.
-  - No runtime configLiteral field; CF is type‑only.
 - Entity Client (downstream coordination): update EntityClient to be generic on
   CF and accept EntityManager<CC, CF>. Propagate CF through its type surface.
 - QueryBuilder creation (downstream coordination): change createQueryBuilder to
@@ -26,3 +21,6 @@
 ## Completed
 
 **CRITICAL: This list is append-only; do not edit items! Place most recent entries at the BOTTOM of the list. When pruning, remove older entries from the top.**
+
+- Code: added CF as a phantom generic on EntityManager and updated the factory
+  to return EntityManager<…, CF>. No runtime configLiteral field introduced.
