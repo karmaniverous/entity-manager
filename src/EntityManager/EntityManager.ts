@@ -28,9 +28,7 @@ import type { EntityItemByToken, EntityRecordByToken } from './TokenAware';
  * @typeParam CF - Values-first config literal type captured at construction
  *                 time (phantom generic; type-only). This is used by downstream
  *                 adapters to infer index-token unions (ITS) and per-index page
- *                 key shapes. No runtime {@code configLiteral} property is
- *                 exposed; the canonical runtime config remains {@link ParsedConfig | `ParsedConfig`}
- *                 via {@link EntityManager.config | `config`}.
+ *                 key shapes.
  *
  * @remarks
  * While the {@link EntityManager.query | `query`} method is `public`, normally it should not be called directly. The `query` method is used by a platform-specific {@link BaseQueryBuilder.query | `QueryBuilder.query`} method to provide a fluent query API.
@@ -279,7 +277,10 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
       | CC['TranscodedProperties'],
     suppressError?: boolean,
   ): IndexTokensOf<CF> | undefined {
-    return findIndexToken(this, hashKeyToken, rangeKeyToken, suppressError);
+    // Dispatch with a literal to satisfy overload selection.
+    return suppressError === true
+      ? findIndexToken(this, hashKeyToken, rangeKeyToken, true)
+      : findIndexToken(this, hashKeyToken, rangeKeyToken, false);
   }
 
   /**
