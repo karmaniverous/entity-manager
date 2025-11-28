@@ -25,5 +25,5 @@ export interface BaseEntityClientOptions<
   entityManager: EntityManager<CC, CF>;
 
   /** Injected logger object. Must support `debug` and `error` methods. Default: `console` */
-  logger?: Pick<Console, 'debug' | 'error'>;
+  logger?: Pick<Console, 'debug' | 'error'> | undefined;
 }

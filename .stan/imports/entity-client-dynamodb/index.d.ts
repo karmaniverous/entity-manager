@@ -3,7 +3,7 @@ import { BatchProcessOptions } from '@karmaniverous/batch-process';
 import * as _smithy_util_waiter from '@smithy/util-waiter';
 import * as _aws_sdk_client_dynamodb from '@aws-sdk/client-dynamodb';
 import { DynamoDBClientConfig, DynamoDBClient, CreateTableCommandInput, DeleteTableCommandInput, ScalarAttributeType } from '@aws-sdk/client-dynamodb';
-import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityManager, EntityRecord, EntityKey, EntityToken, EntityRecordByToken, BaseQueryBuilder, ShardQueryFunction, IndexRangeKeyOf, QueryBuilderQueryOptions, QueryResult, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex } from '@karmaniverous/entity-manager';
+import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, EntityToken, EntityRecordByToken, BaseQueryBuilder, ShardQueryFunction, IndexRangeKeyOf, QueryBuilderQueryOptions, QueryResult, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex, EntityManager } from '@karmaniverous/entity-manager';
 export { EntityItemByToken, EntityRecordByToken, EntityToken } from '@karmaniverous/entity-manager';
 import { MakeOptional, ReplaceKey, TranscodeRegistry, Exactify, DefaultTranscodeRegistry } from '@karmaniverous/entity-tools';
 import { WaiterConfiguration } from '@smithy/types';
@@ -38,7 +38,7 @@ interface BatchWriteOptions extends Omit<BatchWriteCommandInput, 'RequestItems'>
  *
  * @category EntityClient
  */
-interface EntityClientOptions<C extends BaseConfigMap> extends BaseEntityClientOptions<C>, Omit<DynamoDBClientConfig, 'logger'> {
+interface EntityClientOptions<C extends BaseConfigMap, CF = unknown> extends BaseEntityClientOptions<C, CF>, Omit<DynamoDBClientConfig, 'logger'> {
     /** Activates AWS Xray for internal DynamoDb client when `true` and running in a Lambda environment. */
     enableXray?: boolean;
     /** Table name. */
@@ -65,7 +65,7 @@ type Projected<T, A extends readonly string[]> = Pick<T, Extract<A[number], keyo
  *
  * @category EntityClient
  */
-declare class EntityClient<C extends BaseConfigMap, CF = unknown> extends BaseEntityClient<C> {
+declare class EntityClient<C extends BaseConfigMap, CF = unknown> extends BaseEntityClient<C, CF> {
     /** AWS SDK DynamoDBClient instance. */
     readonly client: DynamoDBClient;
     /** AWS SDK DynamoDBDocument instance. */
@@ -77,9 +77,7 @@ declare class EntityClient<C extends BaseConfigMap, CF = unknown> extends BaseEn
      *
      * @param options - {@link EntityClientOptions | EntityClientOptions} object.
      */
-    constructor(options: EntityClientOptions<C> & {
-        entityManager: EntityManager<C, CF>;
-    });
+    constructor(options: EntityClientOptions<C, CF>);
     /**
      * Creates a DynamoDB table and waits for it to become active.
      *

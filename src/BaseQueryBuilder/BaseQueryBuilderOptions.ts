@@ -26,5 +26,5 @@ export interface BaseQueryBuilderOptions<
   hashKeyToken: CC['HashKey'] | CC['ShardedKeys'];
 
   /** Dehydrated page key map. */
-  pageKeyMap?: string;
+  pageKeyMap?: string | undefined;
 }

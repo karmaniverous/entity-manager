@@ -42,7 +42,7 @@ export abstract class BaseQueryBuilder<
   readonly hashKeyToken: CC['HashKey'] | CC['ShardedKeys'];
 
   /** Dehydrated page key map. */
-  readonly pageKeyMap?: string;
+  readonly pageKeyMap?: string | undefined;
 
   /**
    * Maps `indexToken` values to database platform-specific query parameters.
