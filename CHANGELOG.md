@@ -2,10 +2,19 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v7.3.1](https://github.com/karmaniverous/entity-manager/compare/v7.3.0...v7.3.1)
+
+- feat(validation): reject duplicate index pairs; type-safe findIndexToken [`e355f1c`](https://github.com/karmaniverous/entity-manager/commit/e355f1c4e65bb571e74a46e17ce922035ac136b4)
+- docs: note CF phantom generic in TSDoc; single-arg factory [`09ca91f`](https://github.com/karmaniverous/entity-manager/commit/09ca91f5d2a04efcc3888f8541e0c869d0e15309)
+- fix: overload call for findIndexToken; clean TSDoc [`d49b13e`](https://github.com/karmaniverous/entity-manager/commit/d49b13e84b0c54a879c90722ed71cdfbfe1af1a9)
+
 #### [v7.3.0](https://github.com/karmaniverous/entity-manager/compare/v7.2.0...v7.3.0)
+
+> 28 November 2025
 
 - docs: carry CF type via generics; update plan [`dc3dbb8`](https://github.com/karmaniverous/entity-manager/commit/dc3dbb83d016ed82cdfeb2517b847fc3763da62a)
 - updated docs [`d8d361f`](https://github.com/karmaniverous/entity-manager/commit/d8d361fbf1c89481962834857331cc2dd64884c9)
+- chore: release v7.3.0 [`2804c4b`](https://github.com/karmaniverous/entity-manager/commit/2804c4be7ebfd1f10c23ecd9de514c9b31651e2b)
 - docs(interop): response for config-literal index typing [`7d6c197`](https://github.com/karmaniverous/entity-manager/commit/7d6c1978b7abd2bce92afd77576fbad0e450780c)
 - feat: thread CF via EntityManager generic (type-only) [`3e55912`](https://github.com/karmaniverous/entity-manager/commit/3e559120c97501985e27d6051c6ab09310ad6755)
 
