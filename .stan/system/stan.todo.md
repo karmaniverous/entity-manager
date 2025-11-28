@@ -27,3 +27,6 @@
 
 - Interop: documented upstream changes and adapter leverage plan in
   .stan/interop/entity-client-dynamodb/preserve-config-literal-for-index-typing.md.
+
+- Docs: updated TSDoc for EntityManager (CF phantom generic) and
+  createEntityManager (CF capture from single-argument factory).

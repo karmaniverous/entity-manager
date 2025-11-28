@@ -116,6 +116,10 @@ export type CapturedConfigMapFrom<CC, EM extends EntityMap> = {
  *                 `satisfies` at call sites to preserve literal keys.
  * @typeParam EM - EntityMap for the manager. Defaults to a minimal derived map
  *                 from `CC.entitiesSchema` when present; otherwise falls back to EntityMap.
+ *
+ * @returns An {@link EntityManager | `EntityManager`} instance whose type
+ *          captures CF from the single values-first config literal ({@link ConfigInput | `ConfigInput`})
+ *          as the second generic parameter (phantom; type-only).
  */
 export function createEntityManager<
   const CC extends ConfigInput,

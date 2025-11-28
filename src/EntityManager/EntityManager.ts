@@ -24,6 +24,11 @@ import type { EntityItemByToken, EntityRecordByToken } from './TokenAware';
  * query strategy to NoSql data.
  *
  * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines the configuration's {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
+ * @typeParam CF - Values-first config literal type captured at construction
+ *                 time (phantom generic; type-only). This is used by downstream
+ *                 adapters to infer index-token unions (ITS) and per-index page
+ *                 key shapes.
+ *                 via {@link EntityManager.config | `config`}.
  *
  * @remarks
  * While the {@link EntityManager.query | `query`} method is `public`, normally it should not be called directly. The `query` method is used by a platform-specific {@link BaseQueryBuilder.query | `QueryBuilder.query`} method to provide a fluent query API.
