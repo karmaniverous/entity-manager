@@ -43,6 +43,13 @@ Non‑requirements (current behavior)
 
 ## Inference‑first typing (refactor) — strict acronyms and API requirements
 
+Carry values‑first literal type (CF) end‑to‑end (type‑only)
+
+- CF is threaded as a phantom generic (type‑only; no runtime field) to preserve the literal index‑token union captured at construction time.
+- Callers continue to pass a single values‑first config literal to createEntityManager — no second config object is introduced.
+- Adapters infer ITS (index‑token subset) and per‑index page‑key narrowing from CF without requiring callers to pass a separate cf parameter.
+- Runtime semantics remain unchanged; Zod validation stays authoritative.
+
 Goals
 
 - Inference‑first configuration: callers pass a literal config value; Entity Manager captures tokens and index names directly from the value (no explicit generic parameters required in normal use).
@@ -117,19 +124,21 @@ Type‑parameter ordering (public APIs)
 
 Inference‑first API and typing (entity‑manager)
 
-- Factory (values‑first)
-  - createEntityManager<const CC extends ConfigInput, EM extends EntityMap = EntitiesFromSchema<CC>>(config: CC, logger?): EntityManager<CC, EM>
+- EntityManager phantom generic
+  - class EntityManager<CC extends BaseConfigMap, CF = unknown> { /_ … _/ }
+  - CF is type‑only; no runtime configLiteral property is exposed or required.
+- Factory (values‑first; single config argument)
+  - createEntityManager<const CC extends ConfigInput, EM extends EntityMap = EntitiesFromSchema<CC>>(config: CC, logger?): EntityManager<CapturedConfigMapFrom<CC, EM>, CC>
   - Behavior:
     - CC is captured from the literal value; callers should prefer “satisfies” for structure checks and “as const” for nested records (indexes, generatedProperties) to preserve literal keys.
     - EM is optional; if entitiesSchema is provided, EM is inferred from the Zod schemas. Otherwise, EM falls back to a broad EntityMap.
     - Zod still validates at runtime; the parsed result is intersected with the captured literal types at the type level (no runtime change).
+- EntityClient phantom generic
+  - class EntityClient<CC extends BaseConfigMap, CF = unknown> extends BaseEntityClient<CC> { /_ … _/ }
+  - The client is constructed with an EntityManager<CC, CF>, preserving CF for adapter typing.
 - Items/records (entity‑token aware)
   - EIBT<CC, EM, ET extends keyof EM> — partial EOT with key/generated tokens string‑typed.
   - ERBT<CC, EM, ET> — EIBT plus required keys HKT|RKT present as strings.
-- Core methods (no explicit generics at call sites; inferred from parameters)
-  - addKeys<CC, EM, ET>(entityToken: ET, item: EIBT<CC, EM, ET>, overwrite?): ERBT<CC, EM, ET>
-  - removeKeys<CC, EM, ET>(entityToken: ET, item: ERBT<CC, EM, ET>): EIBT<CC, EM, ET>
-  - getPrimaryKey<CC, EM, ET>(entityToken: ET, item: EIBT<CC, EM, ET>, overwrite?): Array<Record<HKT<CC> | RKT<CC>, string>>
 - Query (entity + index aware; values‑first)
   - Page keys:
     - PKBI<CC, EM, ET, IT> — index‑specific page‑key object type
@@ -144,28 +153,43 @@ Inference‑first API and typing (entity‑manager)
     - ET inferred from options.entityToken.
     - ITS inferred from the literal keys of options.shardQueryMap (subset of IT).
     - Optional K (projection) narrows result item shape when provided; defaults to unknown for back‑compat.
-- BaseQueryBuilder (adapters) carries ET/ITS/CF/K
-  - getShardQueryFunction(indexToken): ShardQueryFunction<…, CF, K>
-  - build(): ShardQueryMap<…, CF, K>
-  - query(): forwards K to EntityManager.query<…, CF, K>
-- Low‑level helpers (thread ET/IT; inference‑first)
-  - getIndexComponents<CC, EM, ET, IT>(…): Array<HKT<CC> | RKT<CC> | SGKT<CC> | UGKT<CC> | PT>
-  - unwrapIndex<CC, EM, ET, IT>(…): Array<PT>
-  - encodeElement<CC, EM, ET>(…): string | undefined
-  - decodeElement<CC, EM, ET>(…): EIBT<CC, EM, ET>[PK]
-  - dehydrateIndexItem<CC, EM, ET, IT>(…): string
-  - rehydrateIndexItem<CC, EM, ET, IT>(…): EIBT<CC, EM, ET>
-  - dehydratePageKeyMap<CC, EM, ET, ITS>(…): string[]
-  - rehydratePageKeyMap<CC, EM, ET, ITS>(…): [HKT<CC>, PKMBIS<CC, EM, ET, ITS>]
-  - decodeGeneratedProperty<CC, EM, ET>(entityManager, entityToken: ET, encoded: string): EntityItemByToken<CC, EM, ET>
-    - Note: entityToken is required (no backward‑compat constraint).
-- IndexTokenByEntity
-  - Computed from CC (and optionally EM) using config semantics:
-    - Hash side: global HKT → all entities; sharded generated hashKey → E must contain all elements of the sharded generated property.
-    - Range side:
-      - RKT → E must have uniqueProperty.
-      - Unsharded generated range → E must contain its elements.
-      - Scalar PT → E must have that property and it must be mapped in propertyTranscodes.
+- Adapter builder creation & ITS inference
+  - The adapter factory createQueryBuilder takes an EntityClient<CC, CF> and derives ITS = IndexTokensOf<CF>. No explicit cf parameter is required.
+  - Conceptual signature:
+    - createQueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C>, CF>(options: {
+      entityClient: EntityClient<C, CF>;
+      entityToken: ET;
+      hashKeyToken: C['HashKey'] | C['ShardedKeys'];
+      pageKeyMap?: string;
+      }): QueryBuilder<C, ET, IndexTokensOf<CF>, CF>
+
+BaseQueryBuilder (adapters) carries ET/ITS/CF/K
+
+- getShardQueryFunction(indexToken): ShardQueryFunction<…, CF, K>
+- build(): ShardQueryMap<…, CF, K>
+- query(): forwards K to EntityManager.query<…, CF, K>
+
+Low‑level helpers (thread ET/IT; inference‑first)
+
+- getIndexComponents<CC, EM, ET, IT>(…): Array<HKT<CC> | RKT<CC> | SGKT<CC> | UGKT<CC> | PT>
+- unwrapIndex<CC, EM, ET, IT>(…): Array<PT>
+- encodeElement<CC, EM, ET>(…): string | undefined
+- decodeElement<CC, EM, ET>(…): EIBT<CC, EM, ET>[PK]
+- dehydrateIndexItem<CC, EM, ET, IT>(…): string
+- rehydrateIndexItem<CC, EM, ET, IT>(…): EIBT<CC, EM, ET>
+- dehydratePageKeyMap<CC, EM, ET, ITS>(…): string[]
+- rehydratePageKeyMap<CC, EM, ET, ITS>(…): [HKT<CC>, PKMBIS<CC, EM, ET, ITS>]
+- decodeGeneratedProperty<CC, EM, ET>(entityManager, entityToken: ET, encoded: string): EntityItemByToken<CC, EM, ET>
+  - Note: entityToken is required (no backward‑compat constraint).
+
+IndexTokenByEntity
+
+- Computed from CC (and optionally EM) using config semantics:
+  - Hash side: global HKT → all entities; sharded generated hashKey → E must contain all elements of the sharded generated property.
+  - Range side:
+    - RKT → E must have uniqueProperty.
+    - Unsharded generated range → E must contain its elements.
+    - Scalar PT → E must have that property and it must be mapped in propertyTranscodes.
 
 DX guidance (values‑first patterns)
 
@@ -406,7 +430,7 @@ Helpers and behavior (adapter‑level; implemented downstream)
   - Typing: widens K to unknown (result items are full shape).
 - setProjectionAll<KAttr extends readonly string[]>(indices: ITS[] | readonly ITS[], attrs: KAttr): QueryBuilder<…, KAttr>
   - Runtime: applies the same ProjectionExpression across the supplied indices (or all, if a “current indices” form is later added).
-  - Typing: narrows builder K to KAttr, keeping a uniform projected shape aligned with Entity Manager’s merged result semantics.
+  - Typing: narrows K to KAttr, keeping a uniform projected shape aligned with Entity Manager’s merged result semantics.
 
 Notes
 
@@ -477,6 +501,7 @@ Details and rationale
 - Intersection expresses the precise mutable contract (indexParamsMap and logger) while keeping a strong semantic tie to BaseQueryBuilder.
 - ITS flows from the builder into indexToken, maintaining helpful key narrowing at call sites.
 - Zero runtime changes — only typing is widened to be variance‑friendly.
+- With CF threaded on EntityClient and EntityManager, adapters obtain ITS automatically via IndexTokensOf<CF> and no longer need to ask callers for a values‑first cf argument.
 
 Scope and callout
 

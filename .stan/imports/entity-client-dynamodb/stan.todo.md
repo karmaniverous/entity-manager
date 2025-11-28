@@ -2,38 +2,26 @@
 
 ## Next up (priority order)
 
-- Release v0.4.0
-  - Run `npm run release` (release-it; CHANGELOG, tag, publish).
-  - Ensure `.env.local` has GITHUB_TOKEN if releasing locally.
+None.
 
 ## Completed
 
-- Interop typing (local; no upstream dependency)
-  - addRangeKeyCondition/addFilterCondition accept a generic BaseQueryBuilder
-    plus the minimal structural contract (indexParamsMap + logger).
-  - TSD: added helper-assignability test to assert QueryBuilder<C, …> is
-    assignable to helper params without casts at call sites.
+**CRITICAL: Append-only list. Add new completed items at the end. Prune old completed entries from the top. Do not edit existing entries.**
 
-- TSD coverage hardening
-  - Added negative test: invalid index token when CF is present (excess
-    property checks).
-  - Confirmed non-literal removeKeys typing:
-    • getItems('token', …, { removeKeys: boolean }) → union-of-arrays
-    (EntityRecordByToken[] | EntityItemByToken[]).
-    • getItem('token', …, { removeKeys: boolean }) → union (plus undefined).
-  - Tuple projections remain pinned to Pick<…> over correct base for
-    removeKeys true/false.
+- Docs: compact README + TypeDoc guides (core & CLI Plugin section with index)
+  - Replaced long README with landing page and bulleted index.
+  - Added targeted guides under docs/guides and docs/guides/cli with children front matter on CLI index.
+  - Updated typedoc.json projectDocuments to include all guides.
+- Local DynamoDB orchestration — code foundations
+  - Types/config: added DynamodbPluginConfig.local without “ready”.
+  - Services: services/local.ts with deriveEndpoint, config-command exec (execaCommand), health probes (library preferred, SDK fallback), and start/stop/status orchestrators using buildSpawnEnv and capture/stdio precedence.
+  - CLI wiring: commands/local.ts registering “dynamodb local start|stop|status”; integrated into plugin index; start blocks until healthy and prints endpoint + export hint; status returns 0 when healthy.
 
-- Docs polish
-  - README/API includes compact CF + PageKeyByIndex example.
-  - Notes captured for non-literal removeKeys typing and projection policy
-    (auto-include uniqueProperty and explicit sort keys).
+  - Wiring tests for commands/local (mocked services; asserted env/shell/capture and port override; verified outputs/exitCode).
+  - Unit tests for services/local (deriveEndpoint; statusLocal config path success/failure).
 
-- Batch nicety tests
-  - Added “unprocessed requeue” tests for batch put/delete to pin behavior
-    when UnprocessedItems are returned (requeue verified).
+- Local DynamoDB orchestration — docs
+  - Added guides/cli/local-dynamodb.md and linked from CLI Plugin index.
+  - Documented config-first + embedded fallback, endpoint derivation, and start waiting for readiness.
 
-- Tests/lint hardening
-  - Refined batch requeue tests to avoid `any` casts and satisfy
-    `@typescript-eslint/require-await`; stubs now omit `UnprocessedItems`
-    when empty so later outputs match the expected undefined property.
+- Docs: linked Local DynamoDB guide from CLI Plugin section (guides/cli/index.md).

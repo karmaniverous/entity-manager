@@ -2,39 +2,27 @@
 
 ## Next up (in priority order)
 
-None
+- Entity Manager: add CF as a phantom generic on EntityManager and update the
+  factory to return EntityManager<…, CF>.
+  - Change: class EntityManager<CC extends BaseConfigMap, CF = unknown>.
+  - Factory: createEntityManager returns EntityManager<CapturedConfigMapFrom<CC, EM>, CC>.
+  - No runtime configLiteral field; CF is type‑only.
+- Entity Client (downstream coordination): update EntityClient to be generic on
+  CF and accept EntityManager<CC, CF>. Propagate CF through its type surface.
+- QueryBuilder creation (downstream coordination): change createQueryBuilder to
+  derive ITS = IndexTokensOf<CF> from EntityClient<CC, CF> and remove the
+  explicit cf parameter from its public API.
+- Types and tests (this repo):
+  - Ensure exported types still compile with the new EntityManager signature.
+  - Add/adjust tsd tests to confirm QueryOptions/ShardQueryMap typing remains
+    stable and the CF channel continues to narrow per‑index PageKey types.
+- Docs:
+  - Update adapter docs/snippets to show builder creation without cf and
+    emphasize “values‑first literal (as const)” for createEntityManager.
+- Release:
+  - Prepare minor release notes in this repo and coordinate adapter release
+    once the downstream changes land.
 
-## Completed (append-only)
+## Completed
 
 **CRITICAL: This list is append-only; do not edit items! Place most recent entries at the BOTTOM of the list. When pruning, remove older entries from the top.**
-
-- Accept compile-time `entitiesSchema` in both flows:
-  - Strip `entitiesSchema` (whitelist) in EntityManager constructor before Zod
-    parsing so the same values-first config literal works via factory or direct
-    constructor; runtime config remains unchanged.
-  - Added runtime tests for factory/constructor acceptance and key validations:
-    query param validation (limit/pageSize), rehydrate edge cases, key update
-    error paths, and validator error paths.
-
-- Lint and test fixes:
-  - Adjust SQF in query.validation.test.ts to return Promise.resolve and
-    reference unused params (no async/await), satisfying ESLint.
-  - Fix rehydrateIndexItem mismatch test to force segment-count mismatch.
-  - Use now + day in hash-key update validation to require uniqueProperty.
-
-- Interop (types): Make QueryBuilder options ET-aware to restore cast-free DX.
-  - Changed QueryBuilderQueryOptions to carry ET and updated
-    BaseQueryBuilder.query to accept QueryBuilderQueryOptions<CC, ET, CF>.
-  - Eliminates `item: never` at builder.query sites; no runtime changes.
-
-- Tests: pin ET-aware QueryBuilder options typing with tsd.
-  - Added test-d/querybuilder-options-et-aware.test-d.ts to assert
-    options.item resolves to EntityItemByToken<CC, ET> without casts.
-
-- Tests: adjust tsd expectations for structural assignability.
-  - Removed negative expectNotAssignable checks between different ETs since
-    EntityItemByToken is structurally assignable (Partial + index signature).
-
-- Interop: document ET-aware QueryBuilder options change for adapter.
-  - Added .stan/interop/entity-client-dynamodb/et-aware-querybuilder-options.md
-    with the exact signature change and acceptance criteria.

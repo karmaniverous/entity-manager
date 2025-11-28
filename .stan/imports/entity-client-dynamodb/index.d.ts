@@ -1,9 +1,9 @@
-import { BatchGetCommandInput, BatchWriteCommandInput, GetCommandInput, DynamoDBDocument, PutCommandInput, PutCommandOutput, DeleteCommandInput, DeleteCommandOutput, BatchWriteCommandOutput, TransactWriteCommandOutput, GetCommandOutput, BatchGetCommandOutput, NativeScalarAttributeValue, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
+import { BatchGetCommandInput, BatchWriteCommandInput, DynamoDBDocument, PutCommandInput, PutCommandOutput, DeleteCommandInput, DeleteCommandOutput, BatchWriteCommandOutput, TransactWriteCommandOutput, GetCommandInput, GetCommandOutput, BatchGetCommandOutput, NativeScalarAttributeValue, QueryCommandInput } from '@aws-sdk/lib-dynamodb';
 import { BatchProcessOptions } from '@karmaniverous/batch-process';
 import * as _smithy_util_waiter from '@smithy/util-waiter';
 import * as _aws_sdk_client_dynamodb from '@aws-sdk/client-dynamodb';
 import { DynamoDBClientConfig, DynamoDBClient, CreateTableCommandInput, DeleteTableCommandInput, ScalarAttributeType } from '@aws-sdk/client-dynamodb';
-import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, EntityToken, EntityItemByToken, EntityRecordByToken, BaseQueryBuilder, ShardQueryFunction, IndexRangeKeyOf, QueryBuilderQueryOptions, QueryResult, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex, EntityManager } from '@karmaniverous/entity-manager';
+import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, EntityToken, EntityRecordByToken, BaseQueryBuilder, ShardQueryFunction, IndexRangeKeyOf, QueryBuilderQueryOptions, QueryResult, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex, EntityManager } from '@karmaniverous/entity-manager';
 export { EntityItemByToken, EntityRecordByToken, EntityToken } from '@karmaniverous/entity-manager';
 import { MakeOptional, ReplaceKey, TranscodeRegistry, Exactify, DefaultTranscodeRegistry } from '@karmaniverous/entity-tools';
 import { WaiterConfiguration } from '@smithy/types';
@@ -43,24 +43,6 @@ interface EntityClientOptions<C extends BaseConfigMap> extends BaseEntityClientO
     enableXray?: boolean;
     /** Table name. */
     tableName: string;
-}
-
-/**
- * Options for EntityClient.getItem.
- * - removeKeys: when true and a token-aware overload is used, generated/global keys are removed from the returned Item.
- *   Without a token, removeKeys is ignored (no runtime error).
- */
-interface GetItemOptions extends Omit<GetCommandInput, 'Key' | 'AttributesToGet' | 'ExpressionAttributeNames' | 'ProjectionExpression' | 'TableName'> {
-    removeKeys?: boolean;
-}
-
-/**
- * Options for EntityClient.getItems.
- * - removeKeys: when true and a token-aware overload is used, generated/global keys are removed from returned items.
- *   Without a token, removeKeys is ignored (no runtime error).
- */
-interface GetItemsOptions extends BatchGetOptions {
-    removeKeys?: boolean;
 }
 
 /**
@@ -185,31 +167,19 @@ declare class EntityClient<C extends BaseConfigMap> extends BaseEntityClient<C> 
      */
     transactDeleteItems(keys: EntityKey<C>[]): Promise<TransactWriteCommandOutput>;
     /**
-     * Token-aware getItem overloads, with optional key stripping (removeKeys) in options.
+     * Token-aware getItem overloads (records). Strip keys in handlers when needed via entityManager.removeKeys.
      */
-    getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, attributes: readonly string[], options: GetItemOptions & {
-        removeKeys: true;
-    }): Promise<Omit<GetCommandOutput, 'Item'> & {
-        Item?: EntityItemByToken<C, ET> | undefined;
+    getItem<ET extends EntityToken<C>, A extends readonly string[]>(entityToken: ET, key: EntityKey<C>, attributes: A, options?: MakeOptional<Omit<GetCommandInput, 'AttributesToGet' | 'ExpressionAttributeNames' | 'Key' | 'ProjectionExpression'>, 'TableName'>): Promise<Omit<GetCommandOutput, 'Item'> & {
+        Item?: Projected<EntityRecordByToken<C, ET>, A> | undefined;
     }>;
-    getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, attributes: readonly string[], options: GetItemOptions & {
-        removeKeys: false;
-    }): Promise<Omit<GetCommandOutput, 'Item'> & {
+    getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, attributes: string[], options?: MakeOptional<Omit<GetCommandInput, 'AttributesToGet' | 'ExpressionAttributeNames' | 'Key' | 'ProjectionExpression'>, 'TableName'>): Promise<Omit<GetCommandOutput, 'Item'> & {
         Item?: EntityRecordByToken<C, ET> | undefined;
     }>;
-    getItem<ET extends EntityToken<C>, RK extends boolean | undefined = undefined>(entityToken: ET, key: EntityKey<C>, options?: Omit<GetItemOptions, 'removeKeys'> & {
-        removeKeys?: RK;
-    }): Promise<Omit<GetCommandOutput, 'Item'> & {
-        Item?: (RK extends true ? EntityItemByToken<C, ET> | undefined : RK extends false ? EntityRecordByToken<C, ET> | undefined : EntityRecordByToken<C, ET> | EntityItemByToken<C, ET>) | undefined;
-    }>;
-    getItem<ET extends EntityToken<C>, A extends readonly string[]>(entityToken: ET, key: EntityKey<C>, attributes: A, options?: GetItemOptions): Promise<Omit<GetCommandOutput, 'Item'> & {
-        Item?: Projected<EntityRecordByToken<C, ET>, A> | Projected<EntityItemByToken<C, ET>, A> | undefined;
-    }>;
-    getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, attributes: string[], options?: GetItemOptions): Promise<Omit<GetCommandOutput, 'Item'> & {
-        Item?: EntityRecordByToken<C, ET> | EntityItemByToken<C, ET> | undefined;
+    getItem<ET extends EntityToken<C>>(entityToken: ET, key: EntityKey<C>, options?: MakeOptional<Omit<GetCommandInput, 'AttributesToGet' | 'ExpressionAttributeNames' | 'Key' | 'ProjectionExpression'>, 'TableName'>): Promise<Omit<GetCommandOutput, 'Item'> & {
+        Item?: EntityRecordByToken<C, ET> | undefined;
     }>;
     getItem<ET extends EntityToken<C>>(entityToken: ET, options: MakeOptional<GetCommandInput, 'TableName'>): Promise<Omit<GetCommandOutput, 'Item'> & {
-        Item?: EntityRecordByToken<C, ET> | EntityItemByToken<C, ET> | undefined;
+        Item?: EntityRecordByToken<C, ET> | undefined;
     }>;
     /**
      * Get item from a DynamoDB table.
@@ -239,36 +209,22 @@ declare class EntityClient<C extends BaseConfigMap> extends BaseEntityClient<C> 
      */
     getItem(options: MakeOptional<GetCommandInput, 'TableName'>): Promise<ReplaceKey<GetCommandOutput, 'Item', EntityRecord<C> | undefined>>;
     /**
-     * Gets multiple items from a DynamoDB table in batches.
+     * Gets multiple items from a DynamoDB table in batches (records). Strip keys in handlers when needed via entityManager.removeKeys.
      *
      * @param keys - Array of EntityKey.
      * @param attributes - Optional list of attributes to project.
      * @param options - BatchGetOptions.
      */
-    getItems<ET extends EntityToken<C>, A extends readonly string[]>(entityToken: ET, keys: EntityKey<C>[], attributes: A, options: GetItemsOptions & {
-        removeKeys: true;
-    }): Promise<{
-        items: Projected<EntityItemByToken<C, ET>, A>[];
-        outputs: BatchGetCommandOutput[];
-    }>;
-    getItems<ET extends EntityToken<C>, A extends readonly string[]>(entityToken: ET, keys: EntityKey<C>[], attributes: A, options: GetItemsOptions & {
-        removeKeys: false;
-    }): Promise<{
+    getItems<ET extends EntityToken<C>, A extends readonly string[]>(entityToken: ET, keys: EntityKey<C>[], attributes: A, options?: BatchGetOptions): Promise<{
         items: Projected<EntityRecordByToken<C, ET>, A>[];
         outputs: BatchGetCommandOutput[];
     }>;
-    getItems<ET extends EntityToken<C>, A extends readonly string[]>(entityToken: ET, keys: EntityKey<C>[], attributes: A, options?: GetItemsOptions): Promise<{
-        items: Projected<EntityRecordByToken<C, ET> | EntityItemByToken<C, ET>, A>[];
+    getItems<ET extends EntityToken<C>>(entityToken: ET, keys: EntityKey<C>[], attributes: string[], options?: BatchGetOptions): Promise<{
+        items: EntityRecordByToken<C, ET>[];
         outputs: BatchGetCommandOutput[];
     }>;
-    getItems<ET extends EntityToken<C>>(entityToken: ET, keys: EntityKey<C>[], attributes: string[], options?: GetItemsOptions): Promise<{
-        items: EntityRecordByToken<C, ET>[] | EntityItemByToken<C, ET>[];
-        outputs: BatchGetCommandOutput[];
-    }>;
-    getItems<ET extends EntityToken<C>, RK extends boolean | undefined = undefined>(entityToken: ET, keys: EntityKey<C>[], options?: Omit<GetItemsOptions, 'removeKeys'> & {
-        removeKeys?: RK;
-    }): Promise<{
-        items: RK extends true ? EntityItemByToken<C, ET>[] : RK extends false ? EntityRecordByToken<C, ET>[] : EntityRecordByToken<C, ET>[] | EntityItemByToken<C, ET>[];
+    getItems<ET extends EntityToken<C>>(entityToken: ET, keys: EntityKey<C>[], options?: BatchGetOptions): Promise<{
+        items: EntityRecordByToken<C, ET>[];
         outputs: BatchGetCommandOutput[];
     }>;
     /**
@@ -288,7 +244,7 @@ declare class EntityClient<C extends BaseConfigMap> extends BaseEntityClient<C> 
      * @param keys - Array of EntityKey.
      * @param options - BatchGetOptions.
      */
-    getItems(keys: EntityKey<C>[], options?: GetItemsOptions): Promise<{
+    getItems(keys: EntityKey<C>[], options?: BatchGetOptions): Promise<{
         items: EntityRecord<C>[];
         outputs: BatchGetCommandOutput[];
     }>;
@@ -308,96 +264,6 @@ interface IndexParams {
     projectionAttributes?: string[];
     rangeKeyCondition?: string;
     scanIndexForward?: boolean;
-}
-
-/**
- * Passed as `condition` argument to {@link QueryBuilder.addRangeKeyCondition | `QueryBuilder.addRangeKeyCondition`}.
- *
- * @remarks
- * The `operator` property determines the condition type. Operators map to conditions as follows:
- * - `begins_with` - {@link QueryConditionBeginsWith | `QueryConditionBeginsWith`}
- * - `between` - {@link QueryConditionBetween | `QueryConditionBetween`}
- * - `<`, `<=`, `=`, `>`, `>=`, `<>` - {@link QueryConditionComparison | `QueryConditionComparison`}
- *
- * For more info, see the DynamoDB [key condition expression documentation](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.KeyConditionExpressions.html).
- *
- * @category QueryBuilder
- * @protected
- */
-type RangeKeyCondition = QueryConditionBeginsWith | QueryConditionBetween<string | number> | QueryConditionComparison<string | number>;
-/**
- * Add range key condition to builder.
- *
- * @param builder - {@link QueryBuilder | `QueryBuilder`} instance.
- * @param indexToken - Index token in {@link QueryBuilder | `QueryBuilder`} `indexParamsMap`.
- * @param condition - {@link RangeKeyCondition | `RangeKeyCondition`} object.
- */
-declare const addRangeKeyCondition: <C extends BaseConfigMap, Client extends BaseEntityClient<C>, ET extends EntityToken<C>, ITS extends string, CF = unknown, K = unknown>(builder: BaseQueryBuilder<C, Client, IndexParams, ET, ITS, CF, K> & {
-    indexParamsMap: Record<ITS, IndexParams>;
-    entityClient: {
-        logger: Pick<Console, "debug" | "error">;
-    };
-}, indexToken: ITS, condition: RangeKeyCondition) => void;
-
-/**
- * Provides a fluent API for building a {@link ShardQueryMap | `ShardQueryMap`} using a DynamoDB Document client.
- *
- * @category QueryBuilder
- */
-declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = EntityToken<C>, ITS extends string = string, CF = unknown, K = unknown> extends BaseQueryBuilder<C, EntityClient<C>, IndexParams, ET, ITS, CF, K> {
-    getShardQueryFunction(indexToken: ITS): ShardQueryFunction<C, ET, ITS, CF, K>;
-    /**
-     * Adds a range key condition to a {@link ShardQueryMap | `ShardQueryMap`} index.
-     * See the {@link RangeKeyCondition | `RangeKeyCondition`} type for more info.
-     *
-     * @param indexToken - The index token.
-     * @param condition - The {@link RangeKeyCondition | `RangeKeyCondition`} object.
-     *
-     * @returns - The modified {@link ShardQueryMap | `ShardQueryMap`} instance.
-     */
-    addRangeKeyCondition<IT extends ITS>(indexToken: IT, condition: RangeKeyCondition & {
-        property: [IndexRangeKeyOf<CF, IT>] extends [never] ? string : IndexRangeKeyOf<CF, IT>;
-    }): this;
-    /**
-     * Set scan direction for an index.
-     */
-    setScanIndexForward(indexToken: ITS, value: boolean): this;
-    /**
-     * Reset projection attributes for a single index. Widens K back to unknown.
-     */
-    resetProjection(indexToken: ITS): QueryBuilder<C, ET, ITS, CF>;
-    /**
-     * Reset projections for all indices. Widens K back to unknown.
-     */
-    resetAllProjections(): QueryBuilder<C, ET, ITS, CF>;
-    /**
-     * Set a projection (attributes) for an index token.
-     * - Type-only: narrows K when called with a const tuple.
-     * - Runtime: populates ProjectionExpression for the index.
-     *
-     * Note: At query time, uniqueProperty and any explicit sort keys will be
-     * auto-included to preserve dedupe/sort invariants.
-     */
-    setProjection<KAttr extends readonly string[]>(indexToken: ITS, attributes: KAttr): QueryBuilder<C, ET, ITS, CF, KAttr>;
-    /**
-     * Apply the same projection across the supplied indices.
-     * Narrows K to KAttr.
-     */
-    setProjectionAll<KAttr extends readonly string[]>(indices: ITS[] | readonly ITS[], attributes: KAttr): QueryBuilder<C, ET, ITS, CF, KAttr>;
-    /**
-     * Override query to auto-include uniqueProperty and any explicit sort keys
-     * when projections are present (preserves dedupe/sort invariants).
-     */
-    query(options: QueryBuilderQueryOptions<C, CF>): Promise<QueryResult<C, ET, ITS, K>>;
-    /**
-     * Adds a filter condition to a {@link ShardQueryMap | `ShardQueryMap`} index. See the {@link FilterCondition | `FilterCondition`} type for more info.
-     *
-     * @param indexToken - The index token.
-     * @param condition - The {@link FilterCondition | `FilterCondition`} object.
-     *
-     * @returns - The modified {@link ShardQueryMap | `ShardQueryMap`} instance.
-     */
-    addFilterCondition(indexToken: ITS, condition: FilterCondition<C>): this;
 }
 
 /**
@@ -508,7 +374,18 @@ interface QueryConditionNot<C extends QueryCondition> {
     operator: 'not';
     condition: C;
 }
-type ComposeCondition<C extends BaseConfigMap, Q extends QueryCondition> = (builder: QueryBuilder<C>, indexToken: string, condition: Q) => string | undefined;
+/**
+ * Minimal builder shape required by condition helpers.
+ * - indexParamsMap: per-index mutable params
+ * - entityClient.logger: debug/error logging
+ */
+interface MinimalBuilder {
+    indexParamsMap: Record<string, IndexParams>;
+    entityClient: {
+        logger: Pick<Console, 'debug' | 'error'>;
+    };
+}
+type ComposeCondition<B, Q extends QueryCondition> = (builder: B, indexToken: string, condition: Q) => string | undefined;
 
 /**
  * Passed as `condition` argument to {@link QueryBuilder.addFilterCondition | `QueryBuilder.addFilterCondition`}.
@@ -546,7 +423,97 @@ declare const addFilterCondition: <C extends BaseConfigMap, Client extends BaseE
     };
 }, indexToken: ITS, condition: FilterCondition<C>) => void;
 
+/**
+ * Passed as `condition` argument to {@link QueryBuilder.addRangeKeyCondition | `QueryBuilder.addRangeKeyCondition`}.
+ *
+ * @remarks
+ * The `operator` property determines the condition type. Operators map to conditions as follows:
+ * - `begins_with` - {@link QueryConditionBeginsWith | `QueryConditionBeginsWith`}
+ * - `between` - {@link QueryConditionBetween | `QueryConditionBetween`}
+ * - `<`, `<=`, `=`, `>`, `>=`, `<>` - {@link QueryConditionComparison | `QueryConditionComparison`}
+ *
+ * For more info, see the DynamoDB [key condition expression documentation](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.KeyConditionExpressions.html).
+ *
+ * @category QueryBuilder
+ * @protected
+ */
+type RangeKeyCondition = QueryConditionBeginsWith | QueryConditionBetween<string | number> | QueryConditionComparison<string | number>;
+/**
+ * Add range key condition to builder.
+ *
+ * @param builder - {@link QueryBuilder | `QueryBuilder`} instance.
+ * @param indexToken - Index token in {@link QueryBuilder | `QueryBuilder`} `indexParamsMap`.
+ * @param condition - {@link RangeKeyCondition | `RangeKeyCondition`} object.
+ */
+declare const addRangeKeyCondition: <C extends BaseConfigMap, Client extends BaseEntityClient<C>, ET extends EntityToken<C>, ITS extends string, CF = unknown, K = unknown>(builder: BaseQueryBuilder<C, Client, IndexParams, ET, ITS, CF, K> & {
+    indexParamsMap: Record<ITS, IndexParams>;
+    entityClient: {
+        logger: Pick<Console, "debug" | "error">;
+    };
+}, indexToken: ITS, condition: RangeKeyCondition) => void;
+
 declare const attributeValueAlias: () => string;
+
+/**
+ * Provides a fluent API for building a {@link ShardQueryMap | `ShardQueryMap`} using a DynamoDB Document client.
+ *
+ * @category QueryBuilder
+ */
+declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = EntityToken<C>, ITS extends string = string, CF = unknown, K = unknown> extends BaseQueryBuilder<C, EntityClient<C>, IndexParams, ET, ITS, CF, K> {
+    getShardQueryFunction(indexToken: ITS): ShardQueryFunction<C, ET, ITS, CF, K>;
+    /**
+     * Adds a range key condition to a {@link ShardQueryMap | `ShardQueryMap`} index.
+     * See the {@link RangeKeyCondition | `RangeKeyCondition`} type for more info.
+     *
+     * @param indexToken - The index token.
+     * @param condition - The {@link RangeKeyCondition | `RangeKeyCondition`} object.
+     *
+     * @returns - The modified {@link ShardQueryMap | `ShardQueryMap`} instance.
+     */
+    addRangeKeyCondition<IT extends ITS>(indexToken: IT, condition: RangeKeyCondition & {
+        property: [IndexRangeKeyOf<CF, IT>] extends [never] ? string : IndexRangeKeyOf<CF, IT>;
+    }): this;
+    /**
+     * Set scan direction for an index.
+     */
+    setScanIndexForward(indexToken: ITS, value: boolean): this;
+    /**
+     * Reset projection attributes for a single index. Widens K back to unknown.
+     */
+    resetProjection(indexToken: ITS): QueryBuilder<C, ET, ITS, CF>;
+    /**
+     * Reset projections for all indices. Widens K back to unknown.
+     */
+    resetAllProjections(): QueryBuilder<C, ET, ITS, CF>;
+    /**
+     * Set a projection (attributes) for an index token.
+     * - Type-only: narrows K when called with a const tuple.
+     * - Runtime: populates ProjectionExpression for the index.
+     *
+     * Note: At query time, uniqueProperty and any explicit sort keys will be
+     * auto-included to preserve dedupe/sort invariants.
+     */
+    setProjection<KAttr extends readonly string[]>(indexToken: ITS, attributes: KAttr): QueryBuilder<C, ET, ITS, CF, KAttr>;
+    /**
+     * Apply the same projection across the supplied indices.
+     * Narrows K to KAttr.
+     */
+    setProjectionAll<KAttr extends readonly string[]>(indices: ITS[] | readonly ITS[], attributes: KAttr): QueryBuilder<C, ET, ITS, CF, KAttr>;
+    /**
+     * Override query to auto-include uniqueProperty and any explicit sort keys
+     * when projections are present (preserves dedupe/sort invariants).
+     */
+    query(options: QueryBuilderQueryOptions<C, ET, CF>): Promise<QueryResult<C, ET, ITS, K>>;
+    /**
+     * Adds a filter condition to a {@link ShardQueryMap | `ShardQueryMap`} index. See the {@link FilterCondition | `FilterCondition`} type for more info.
+     *
+     * @param indexToken - The index token.
+     * @param condition - The {@link FilterCondition | `FilterCondition`} object.
+     *
+     * @returns - The modified {@link ShardQueryMap | `ShardQueryMap`} instance.
+     */
+    addFilterCondition(indexToken: ITS, condition: FilterCondition<C>): this;
+}
 
 /**
  * Factory that produces a token-/config-aware QueryBuilder with fully inferred generics.
@@ -632,4 +599,4 @@ declare const defaultTranscodeAttributeTypeMap: TranscodeAttributeTypeMap<Defaul
 declare const generateTableDefinition: <C extends BaseConfigMap>(entityManager: EntityManager<C>, transcodeAtttributeTypeMap?: TranscodeAttributeTypeMap<C["TranscodeRegistry"]>) => Pick<CreateTableCommandInput, "AttributeDefinitions" | "GlobalSecondaryIndexes" | "KeySchema">;
 
 export { EntityClient, QueryBuilder, addFilterCondition, addRangeKeyCondition, attributeValueAlias, createQueryBuilder, defaultTranscodeAttributeTypeMap, generateTableDefinition, getDocumentQueryArgs };
-export type { ActuallyScalarAttributeValue, BatchGetOptions, BatchWriteOptions, ComposeCondition, EntityClientOptions, FilterCondition, GetDocumentQueryArgsParams, GetItemOptions, GetItemsOptions, IndexParams, Projected, QueryBuilderOptions, QueryCondition, QueryConditionBeginsWith, QueryConditionBetween, QueryConditionComparison, QueryConditionContains, QueryConditionExists, QueryConditionGroup, QueryConditionIn, QueryConditionNot, RangeKeyCondition, TranscodeAttributeTypeMap, WaiterConfig };
+export type { ActuallyScalarAttributeValue, BatchGetOptions, BatchWriteOptions, ComposeCondition, EntityClientOptions, FilterCondition, GetDocumentQueryArgsParams, IndexParams, MinimalBuilder, Projected, QueryBuilderOptions, QueryCondition, QueryConditionBeginsWith, QueryConditionBetween, QueryConditionComparison, QueryConditionContains, QueryConditionExists, QueryConditionGroup, QueryConditionIn, QueryConditionNot, RangeKeyCondition, TranscodeAttributeTypeMap, WaiterConfig };

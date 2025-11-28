@@ -6,26 +6,25 @@ stan-core:
     - package-lock.json
   imports:
     entity-client-dynamodb:
+      - ../entity-client-dynamodb/.stan/interop/entity-manager/**
       - ../entity-client-dynamodb/.stan/system/stan.requirements.md
       - ../entity-client-dynamodb/.stan/system/stan.todo.md
       - ../entity-client-dynamodb/dist/index.d.ts
-      - ../entity-client-dynamodb/.stan/interop/entity-manager/**
     entity-manager-demo:
-      - ../entity-manager-demo/.stan/system/stan.requirements.md
-      - ../entity-manager-demo/.stan/system/stan.todo.md
-      - ../entity-manager-demo/dist/index.d.ts
       - ../entity-manager-demo/.stan/interop/entity-manager/**
+      # - ../entity-manager-demo/.stan/system/stan.requirements.md
+      # - ../entity-manager-demo/.stan/system/stan.todo.md
+      - ../entity-manager-demo/dist/index.d.ts
     entity-tools:
-      - ../entity-tools/.stan/system/stan.requirements.md
-      - ../entity-tools/.stan/system/stan.todo.md
-      - ../entity-tools/dist/index.d.ts
       - ../entity-tools/.stan/interop/entity-manager/**
+      # - ../entity-tools/.stan/system/stan.requirements.md
+      # - ../entity-tools/.stan/system/stan.todo.md
+      - ../entity-tools/dist/index.d.ts
     mock-db:
-      - ../mock-db/.stan/system/stan.requirements.md
-      - ../mock-db/.stan/system/stan.todo.md
-      - ../mock-db/dist/index.d.ts
       - ../mock-db/.stan/interop/entity-manager/**
-  includes: []
+      # - ../mock-db/.stan/system/stan.requirements.md
+      # - ../mock-db/.stan/system/stan.todo.md
+      - ../mock-db/dist/index.d.ts
 stan-cli:
   cliDefaults:
     run:
