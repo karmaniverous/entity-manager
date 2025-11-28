@@ -16,7 +16,7 @@ import { WaiterConfiguration } from '@smithy/types';
  */
 interface BatchGetOptions extends Omit<BatchGetCommandInput, 'RequestItems'> {
     batchProcessOptions?: Omit<BatchProcessOptions<unknown, unknown>, 'batchHandler' | 'unprocessedItemExtractor'>;
-    tableName?: string;
+    tableName?: string | undefined;
 }
 
 /**
@@ -27,7 +27,7 @@ interface BatchGetOptions extends Omit<BatchGetCommandInput, 'RequestItems'> {
  */
 interface BatchWriteOptions extends Omit<BatchWriteCommandInput, 'RequestItems'> {
     batchProcessOptions?: Omit<BatchProcessOptions<unknown, unknown>, 'batchHandler' | 'unprocessedItemExtractor'>;
-    tableName?: string;
+    tableName?: string | undefined;
 }
 
 /**
@@ -40,7 +40,7 @@ interface BatchWriteOptions extends Omit<BatchWriteCommandInput, 'RequestItems'>
  */
 interface EntityClientOptions<C extends BaseConfigMap, CF = unknown> extends BaseEntityClientOptions<C, CF>, Omit<DynamoDBClientConfig, 'logger'> {
     /** Activates AWS Xray for internal DynamoDb client when `true` and running in a Lambda environment. */
-    enableXray?: boolean;
+    enableXray?: boolean | undefined;
     /** Table name. */
     tableName: string;
 }
@@ -261,9 +261,9 @@ interface IndexParams {
     expressionAttributeValues: Record<string, NativeScalarAttributeValue | undefined>;
     filterConditions: (string | undefined)[];
     /** Optional list of attributes to project for this index. */
-    projectionAttributes?: string[];
-    rangeKeyCondition?: string;
-    scanIndexForward?: boolean;
+    projectionAttributes?: string[] | undefined;
+    rangeKeyCondition?: string | undefined;
+    scanIndexForward?: boolean | undefined;
 }
 
 /**
@@ -529,7 +529,7 @@ declare function createQueryBuilder<C extends BaseConfigMap, ET extends EntityTo
     entityClient: EntityClient<C, CF>;
     entityToken: ET;
     hashKeyToken: C['HashKey'] | C['ShardedKeys'];
-    pageKeyMap?: string;
+    pageKeyMap?: string | undefined;
 }): QueryBuilder<C, ET, IndexTokensOf<CF>, CF>;
 
 /**
@@ -547,8 +547,8 @@ interface GetDocumentQueryArgsParams<C extends BaseConfigMap, ET extends EntityT
     indexToken: IT;
     hashKeyToken: C['HashKey'] | C['ShardedKeys'];
     hashKey: string;
-    pageKey?: PageKeyByIndex<C, ET, IT, CF>;
-    pageSize?: number;
+    pageKey?: PageKeyByIndex<C, ET, IT, CF> | undefined;
+    pageSize?: number | undefined;
     tableName: string;
 }
 declare const getDocumentQueryArgs: <C extends BaseConfigMap, ET extends EntityToken<C>, IT extends string, CF = unknown>({ indexParamsMap, indexToken, hashKeyToken, hashKey, pageKey, pageSize, tableName, }: GetDocumentQueryArgsParams<C, ET, IT, CF>) => QueryCommandInput;
