@@ -33,3 +33,6 @@
 
 - Fix: resolved TS overload error in EntityManager.findIndexToken by dispatching
   with literal true/false; cleaned TSDoc to remove undefined @code tag usage.
+
+- Tests (tsd): added findindextoken-narrowing.test-d.ts to assert that
+  EntityManager.findIndexToken returns the configured index-token union (CF).
