@@ -297,10 +297,19 @@ export const configSchema = z
           });
 
     // Validate indexes.
-    // TODO: Vaidate no two indexes have the same hashKey & rangeKey.
+    // Validate no two indexes have the same hashKey & rangeKey.
+    const seenIndexPairs = new Set<string>();
     for (const [indexKey, { hashKey, rangeKey, projections }] of Object.entries(
       data.indexes,
     )) {
+      const pairSig = `${hashKey}|${rangeKey}`;
+      if (seenIndexPairs.has(pairSig)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `duplicate index hashKey/rangeKey pair`,
+          path: ['indexes', indexKey],
+        });
+      } else seenIndexPairs.add(pairSig);
       // Validate hash key is sharded.
       if (![data.hashKey, ...shardedKeys].includes(hashKey)) {
         ctx.addIssue({

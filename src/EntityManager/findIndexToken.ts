@@ -1,5 +1,6 @@
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityManager } from './EntityManager';
+import type { IndexTokensOf } from './PageKey';
 
 /**
  * Find an index token in a {@link Config | `Config`} object based on the index `hashKey` and `rangeKey`.
@@ -13,16 +14,29 @@ import type { EntityManager } from './EntityManager';
  *
  * @throws `Error` if no match found and `suppressError` is not `true`.
  */
-export function findIndexToken<C extends BaseConfigMap>(
-  entityManager: EntityManager<C>,
-  hashKeyToken: string,
-  rangeKeyToken: string,
+export function findIndexToken<C extends BaseConfigMap, CF = unknown>(
+  entityManager: EntityManager<C, CF>,
+  hashKeyToken: C['HashKey'] | C['ShardedKeys'],
+  rangeKeyToken: C['RangeKey'] | C['UnshardedKeys'] | C['TranscodedProperties'],
+  suppressError?: false,
+): IndexTokensOf<CF>;
+export function findIndexToken<C extends BaseConfigMap, CF = unknown>(
+  entityManager: EntityManager<C, CF>,
+  hashKeyToken: C['HashKey'] | C['ShardedKeys'],
+  rangeKeyToken: C['RangeKey'] | C['UnshardedKeys'] | C['TranscodedProperties'],
+  suppressError: true,
+): IndexTokensOf<CF> | undefined;
+export function findIndexToken<C extends BaseConfigMap, CF = unknown>(
+  entityManager: EntityManager<C, CF>,
+  hashKeyToken: C['HashKey'] | C['ShardedKeys'],
+  rangeKeyToken: C['RangeKey'] | C['UnshardedKeys'] | C['TranscodedProperties'],
   suppressError?: boolean,
-): string | undefined {
-  const indexToken = Object.entries(entityManager.config.indexes).find(
+): IndexTokensOf<CF> | undefined {
+  const indexToken = (Object.entries(entityManager.config.indexes).find(
     ([, index]) =>
-      index.hashKey === hashKeyToken && index.rangeKey === rangeKeyToken,
-  )?.[0];
+      index.hashKey === (hashKeyToken as string) &&
+      index.rangeKey === (rangeKeyToken as string),
+  )?.[0] ?? undefined) as IndexTokensOf<CF> | undefined;
 
   if (!indexToken && !suppressError)
     throw new Error(

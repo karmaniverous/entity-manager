@@ -3,7 +3,7 @@ import { BatchProcessOptions } from '@karmaniverous/batch-process';
 import * as _smithy_util_waiter from '@smithy/util-waiter';
 import * as _aws_sdk_client_dynamodb from '@aws-sdk/client-dynamodb';
 import { DynamoDBClientConfig, DynamoDBClient, CreateTableCommandInput, DeleteTableCommandInput, ScalarAttributeType } from '@aws-sdk/client-dynamodb';
-import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityRecord, EntityKey, EntityToken, EntityRecordByToken, BaseQueryBuilder, ShardQueryFunction, IndexRangeKeyOf, QueryBuilderQueryOptions, QueryResult, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex, EntityManager } from '@karmaniverous/entity-manager';
+import { BaseConfigMap, BaseEntityClientOptions, BaseEntityClient, EntityManager, EntityRecord, EntityKey, EntityToken, EntityRecordByToken, BaseQueryBuilder, ShardQueryFunction, IndexRangeKeyOf, QueryBuilderQueryOptions, QueryResult, IndexTokensOf, BaseQueryBuilderOptions, PageKeyByIndex } from '@karmaniverous/entity-manager';
 export { EntityItemByToken, EntityRecordByToken, EntityToken } from '@karmaniverous/entity-manager';
 import { MakeOptional, ReplaceKey, TranscodeRegistry, Exactify, DefaultTranscodeRegistry } from '@karmaniverous/entity-tools';
 import { WaiterConfiguration } from '@smithy/types';
@@ -65,7 +65,7 @@ type Projected<T, A extends readonly string[]> = Pick<T, Extract<A[number], keyo
  *
  * @category EntityClient
  */
-declare class EntityClient<C extends BaseConfigMap> extends BaseEntityClient<C> {
+declare class EntityClient<C extends BaseConfigMap, CF = unknown> extends BaseEntityClient<C> {
     /** AWS SDK DynamoDBClient instance. */
     readonly client: DynamoDBClient;
     /** AWS SDK DynamoDBDocument instance. */
@@ -77,7 +77,9 @@ declare class EntityClient<C extends BaseConfigMap> extends BaseEntityClient<C> 
      *
      * @param options - {@link EntityClientOptions | EntityClientOptions} object.
      */
-    constructor(options: EntityClientOptions<C>);
+    constructor(options: EntityClientOptions<C> & {
+        entityManager: EntityManager<C, CF>;
+    });
     /**
      * Creates a DynamoDB table and waits for it to become active.
      *
@@ -470,9 +472,9 @@ declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = 
      *
      * @returns - The modified {@link ShardQueryMap | `ShardQueryMap`} instance.
      */
-    addRangeKeyCondition<IT extends ITS>(indexToken: IT, condition: RangeKeyCondition & {
-        property: [IndexRangeKeyOf<CF, IT>] extends [never] ? string : IndexRangeKeyOf<CF, IT>;
-    }): this;
+    addRangeKeyCondition<IT extends ITS>(indexToken: IT, condition: ReplaceKey<RangeKeyCondition, 'property', [
+        IndexRangeKeyOf<CF, IT>
+    ] extends [never] ? string : IndexRangeKeyOf<CF, IT>>): this;
     /**
      * Set scan direction for an index.
      */
@@ -518,23 +520,17 @@ declare class QueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C> = 
 /**
  * Factory that produces a token-/config-aware QueryBuilder with fully inferred generics.
  *
- * Overloads:
- * - Without `cf`: ET is inferred; ITS defaults to `string`; CF defaults to `unknown`.
- * - With `cf`: ET is inferred; ITS derives as IndexTokensOf<CF>; CF is threaded for page-key narrowing.
+ * Automatic inference:
+ * - CF (values-first config literal) is captured by EntityManager via createEntityManager(config as const)
+ *   and threaded through EntityClient\<C, CF\>. ITS derives as IndexTokensOf<CF>.
+ * - Without a values-first literal (CF=unknown), ITS defaults to string.
  *
  * No generics are required at the call site.
  */
-declare function createQueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C>>(options: {
-    entityClient: EntityClient<C>;
-    entityToken: ET;
-    hashKeyToken: C['HashKey'] | C['ShardedKeys'];
-    pageKeyMap?: string;
-}): QueryBuilder<C, ET>;
 declare function createQueryBuilder<C extends BaseConfigMap, ET extends EntityToken<C>, CF>(options: {
-    entityClient: EntityClient<C>;
+    entityClient: EntityClient<C, CF>;
     entityToken: ET;
     hashKeyToken: C['HashKey'] | C['ShardedKeys'];
-    cf: CF;
     pageKeyMap?: string;
 }): QueryBuilder<C, ET, IndexTokensOf<CF>, CF>;
 

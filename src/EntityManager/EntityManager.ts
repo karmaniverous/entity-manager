@@ -12,6 +12,7 @@ import type { EntityToken } from './EntityToken';
 import type { EntityToken as ETToken } from './EntityToken';
 import { findIndexToken } from './findIndexToken';
 import { getPrimaryKey } from './getPrimaryKey';
+import type { IndexTokensOf } from './PageKey';
 import { configSchema, type ParsedConfig } from './ParsedConfig';
 import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
@@ -27,7 +28,8 @@ import type { EntityItemByToken, EntityRecordByToken } from './TokenAware';
  * @typeParam CF - Values-first config literal type captured at construction
  *                 time (phantom generic; type-only). This is used by downstream
  *                 adapters to infer index-token unions (ITS) and per-index page
- *                 key shapes.
+ *                 key shapes. No runtime {@code configLiteral} property is
+ *                 exposed; the canonical runtime config remains {@link ParsedConfig | `ParsedConfig`}
  *                 via {@link EntityManager.config | `config`}.
  *
  * @remarks
@@ -243,21 +245,40 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
   }
 
   /**
-   * Find an index token in a {@link Config | `Config`} object based on the index `hashKey` and `rangeKey`.
+   * Find an index token based on the configured hash and range key tokens.
    *
-   * @param hashKeyToken - Index hash key.
-   * @param rangeKeyToken - Index range key.
-   * @param suppressError - Suppress error if no match found.
+   * @param hashKeyToken - Index hash key token (global hashKey or a sharded generated key).
+   * @param rangeKeyToken - Index range key token (global rangeKey, unsharded generated key, or a transcodable scalar).
+   * @param suppressError - When false (default), throws if no match; when true, returns undefined instead.
    *
-   * @returns  Index token if found.
+   * @returns A configured index token (narrowed to the CF.indexes key union) or undefined when allowed.
    *
-   * @throws `Error` if no match found and `suppressError` is not `true`.
+   * @throws `Error` if no match is found and `suppressError` is not `true`.
    */
   findIndexToken(
-    hashKeyToken: string,
-    rangeKeyToken: string,
+    hashKeyToken: CC['HashKey'] | CC['ShardedKeys'],
+    rangeKeyToken:
+      | CC['RangeKey']
+      | CC['UnshardedKeys']
+      | CC['TranscodedProperties'],
+    suppressError?: false,
+  ): IndexTokensOf<CF>;
+  findIndexToken(
+    hashKeyToken: CC['HashKey'] | CC['ShardedKeys'],
+    rangeKeyToken:
+      | CC['RangeKey']
+      | CC['UnshardedKeys']
+      | CC['TranscodedProperties'],
+    suppressError: true,
+  ): IndexTokensOf<CF> | undefined;
+  findIndexToken(
+    hashKeyToken: CC['HashKey'] | CC['ShardedKeys'],
+    rangeKeyToken:
+      | CC['RangeKey']
+      | CC['UnshardedKeys']
+      | CC['TranscodedProperties'],
     suppressError?: boolean,
-  ): string | undefined {
+  ): IndexTokensOf<CF> | undefined {
     return findIndexToken(this, hashKeyToken, rangeKeyToken, suppressError);
   }
 
