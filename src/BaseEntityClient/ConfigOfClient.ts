@@ -7,7 +7,7 @@ import type { BaseEntityClient } from './BaseEntityClient';
 
 // Extract the captured ConfigMap from a BaseEntityClient instance type.
 export type ConfigOfClient<EC> =
-  EC extends BaseEntityClient<infer CC, any> ? CC : never;
+  EC extends BaseEntityClient<infer CC> ? CC : never;
 
 // Map a client instance type + entity token to the storage-record type.
 export type EntityClientRecordByToken<

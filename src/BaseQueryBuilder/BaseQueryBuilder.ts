@@ -25,7 +25,7 @@ import type { QueryBuilderQueryOptions } from './QueryBuilderQueryOptions';
  */
 export abstract class BaseQueryBuilder<
   CC extends BaseConfigMap,
-  EntityClient extends BaseEntityClient<CC, any>,
+  EntityClient extends BaseEntityClient<CC>,
   IndexParams,
   ET extends EntityToken<CC> = EntityToken<CC>,
   ITS extends string = string,

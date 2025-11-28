@@ -14,7 +14,7 @@ import type { BaseConfigMap, EntityToken } from '../EntityManager';
  */
 export interface BaseQueryBuilderOptions<
   CC extends BaseConfigMap,
-  EntityClient extends BaseEntityClient<CC, any>,
+  EntityClient extends BaseEntityClient<CC>,
 > {
   /** {@link BaseEntityClient | `EntityClient`} instance. */
   entityClient: EntityClient;
