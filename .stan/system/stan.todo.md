@@ -91,4 +91,8 @@
 - Follow-through: replaced stale EntityItemByToken cast in
   decodeGeneratedProperty (degenerate path) with EntityItemPartial and aligned
   EntityManager.removeKeys implementation signature/return to satisfy overloads
-  and ESLint no-redundant-type-constituents.
+  and ESLint no-redundant-type-constituents.
+
+- Follow-through: finalized removeKeys implementation to accept both strict and
+  projected DB records (single/array) and return strict domain items, resolving
+  the TS2394 overload incompatibility during build/docs.
