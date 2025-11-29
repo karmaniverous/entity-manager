@@ -67,3 +67,6 @@
 
 - Lint/TS: deduped index component unions via KeyUnion mapped-type; fixed
   template literals by coercing entityToken to string (TS2731, restrict-template-expressions).
+
+- Lint: finalized no-redundant-type-constituents cleanup in PageKey by introducing
+  DistinctFromBase (conditional exclusion of base keys) and removing KeyUnion.

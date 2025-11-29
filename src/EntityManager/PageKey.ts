@@ -1,7 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools'; // imported to support API docs
 
-type KeyUnion<U extends PropertyKey> = keyof Record<U, unknown>;
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityItem } from './EntityItem';
 import type { EntityToken } from './EntityToken';
@@ -76,25 +75,29 @@ export type HasIndexFor<CF, IT extends string> = CF extends {
     : false
   : false;
 
+// Exclude a derived index component if it collapses to a base key token.
+type DistinctFromBase<CC extends BaseConfigMap, T> = [T] extends [
+  CC['HashKey'] | CC['RangeKey'],
+]
+  ? never
+  : T;
 export type IndexComponentTokens<
   CC extends BaseConfigMap,
   CF,
   IT extends string,
 > =
   HasIndexFor<CF, IT> extends true
-    ? KeyUnion<
+    ?
         | CC['HashKey']
         | CC['RangeKey']
-        | IndexHashKeyOf<CF, IT>
-        | IndexRangeKeyOf<CF, IT>
-      >
-    : KeyUnion<
+        | DistinctFromBase<CC, IndexHashKeyOf<CF, IT>>
+        | DistinctFromBase<CC, IndexRangeKeyOf<CF, IT>>
+    :
         | CC['HashKey']
         | CC['RangeKey']
         | CC['ShardedKeys']
         | CC['UnshardedKeys']
-        | CC['TranscodedProperties']
-      >;
+        | CC['TranscodedProperties'];
 
 /**
  * Page key typed for a specific index token.
