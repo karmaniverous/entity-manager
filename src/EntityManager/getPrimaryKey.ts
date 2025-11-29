@@ -3,7 +3,7 @@ import type { EntityKey } from './EntityKey';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import { getHashKeySpace } from './getHashKeySpace';
-import type { EntityItemPartial, EntityRecordPartial } from './TokenAware';
+import type { EntityItemPartial } from './TokenAware';
 import { updateItemHashKey } from './updateItemHashKey';
 import { updateItemRangeKey } from './updateItemRangeKey';
 
@@ -86,12 +86,12 @@ export function getPrimaryKey<C extends BaseConfigMap>(
   );
 
   // Map to keys and de-duplicate.
-  const rk = withRangeKey[rangeKey] as string;
+  const rangeKeyValue = withRangeKey[rangeKey] as string;
   const seen = new Set<string>();
   const keys = hashKeys
     .map((hk) => {
-      const key = { [hashKey]: hk, [rangeKey]: rk } as unknown as EntityKey<C>;
-      const sig = `${hk}|${rk}`;
+      const key = { [hashKey]: hk, [rangeKey]: rangeKeyValue } as unknown as EntityKey<C>;
+      const sig = `${hk}|${rangeKeyValue}`;
       if (seen.has(sig)) return undefined;
       seen.add(sig);
       return key;

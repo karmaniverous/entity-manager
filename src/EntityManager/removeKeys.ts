@@ -1,7 +1,6 @@
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
-import type { StorageItem } from './StorageItem';
 import type { StorageRecord } from './StorageRecord';
 import { validateEntityToken } from './validateEntityToken';
 
@@ -39,20 +38,23 @@ export function removeKeys<C extends BaseConfigMap>(
       ...Object.keys(unsharded),
     ]);
 
-    // Create a shallow copy of item omitting the keys above (no delete operator).
-    const newItem = Object.fromEntries(
-      Object.entries(item as Record<string, unknown>).filter(
-        ([key]) => !keysToStrip.has(key),
-      ),
-    ) as EntityItem<C>;
+    // Create a shallow copy of item omitting the keys above (no delete operator),
+    // avoiding any-typed assignments.
+    const source = item as Record<string, unknown>;
+    const newItemObj: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(source)) {
+      if (!keysToStrip.has(key)) {
+        newItemObj[key] = value;
+      }
+    }
 
     entityManager.logger.debug('stripped entity item generated properties', {
       entityToken,
       item,
-      newItem,
+      newItem: newItemObj,
     });
 
-    return newItem as StorageItem<C>;
+    return newItemObj as unknown as import('./StorageItem').StorageItem<C>;
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, { entityToken, item });

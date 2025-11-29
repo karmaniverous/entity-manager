@@ -21,7 +21,7 @@ describe('updateItemHashKey', function () {
 
     item = updateItemHashKey(entityManager, 'user', item);
 
-    expect(item.hashKey2?.length).to.equal(6);
+    expect(item.hashKey2!.length).to.equal(6);
   });
 
   it('should not overwrite sharded entity item hash key', function () {
@@ -41,7 +41,7 @@ describe('updateItemHashKey', function () {
 
     item = updateItemHashKey(entityManager, 'user', item, true);
 
-    expect(item.hashKey2?.length).to.equal(7);
+    expect(item.hashKey2!.length).to.equal(7);
   });
 
   it('should use full shard space for multi-character shard keys', function () {

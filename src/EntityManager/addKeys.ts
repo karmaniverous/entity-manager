@@ -4,7 +4,6 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
-import type { EntityToken as ET } from './EntityToken';
 import type { EntityItemPartial, EntityRecordPartial } from './TokenAware';
 import { updateItemHashKey } from './updateItemHashKey';
 import { updateItemRangeKey } from './updateItemRangeKey';

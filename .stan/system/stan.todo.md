@@ -125,3 +125,9 @@
 - Policy alignment: confirmed requirements already mandate by-token signatures
   for helpers that accept entityToken; this change is a stepping stone toward
   converting remaining helpers (encodeElement/decodeElement remain property-level).
+- Fix: repaired PageKeyByIndex to use StorageItem and removed stray duplicate
+  line that broke parsing; typecheck now advances past PageKey.ts.
+
+- Fix: cleaned up unused imports (ET alias, EntityRecordPartial) and removed
+  unsafe any-typed assignments in removeKeys via a typed loop over unknown
+  values; resolved duplicate variable in getPrimaryKey and test lint issue.

@@ -2,11 +2,11 @@
 import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools'; // imported to support API docs
 
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { StorageItem } from './StorageItem';
 import type { EntityToken } from './EntityToken';
+import type { StorageItem } from './StorageItem';
 
 /**
- * A partial {@link EntityItem | `EntityItem`} restricted to keys defined in `C`.
+ * A partial {@link StorageItem | `StorageItem`} restricted to keys defined in `C`.
  *
  * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
@@ -75,7 +75,6 @@ export type HasIndexFor<CF, IT extends string> = CF extends {
     : false
   : false;
 
-// Base key tokens used by all indexes (global hash & range).
 /**
  * Base index component tokens shared by all indexes
  * (the global hashKey and rangeKey defined in the Config).
@@ -86,9 +85,6 @@ export type BaseKeyTokens<CC extends BaseConfigMap> =
   | CC['HashKey']
   | CC['RangeKey'];
 
-// When CF/IT identify an index, build a key set via key-remapping (no overlaps):
-// - Always include base key tokens.
-// - Include index hashKey/rangeKey only when they do not collapse to base keys.
 /**
  * Key set for index component tokens when CF/IT identify a concrete index.
  * - Always includes base key tokens (global hash/range).
@@ -111,7 +107,6 @@ export type PresentIndexTokenSet<
     : K]: true;
 };
 
-// Fallback key set when CF does not carry a typed index or IT is unknown.
 /**
  * Key set for index component tokens when CF does not carry an `indexes` map
  * or IT is unknown. Includes global keys, generated keys, and transcodable
@@ -151,5 +146,4 @@ export type PageKeyByIndex<
   ET extends EntityToken<CC>,
   IT extends string = string,
   CF = unknown,
-> = Pick<EntityItem<CC>, IndexComponentTokens<CC, CF, IT>>;
-> = Pick<StorageItem<CC>, IndexComponentTokens<CC, CF, IT>>;
+> = Pick<StorageItem<CC>, IndexComponentTokens<CC, CF, IT>>;
