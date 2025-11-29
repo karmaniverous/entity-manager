@@ -58,7 +58,7 @@ export function updateItemRangeKey<C extends BaseConfigMap>(
       {
         [entityManager.config.rangeKey]: [
           entityManager.config.entities[entityToken].uniqueProperty,
-          String(uniqueValue),
+          uniqueValue,
         ].join(entityManager.config.generatedValueDelimiter),
       },
     ) as EntityRecordPartial<C, EntityToken<C>>;

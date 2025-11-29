@@ -50,7 +50,7 @@ export function updateItemHashKey<
         },
       );
 
-      return { ...item };
+      return { ...item } as EntityRecordPartial<C, T>;
     }
 
     // Get item timestamp property & validate.

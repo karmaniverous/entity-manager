@@ -153,3 +153,9 @@
     object literal via a local obj and keyed cast.
   - updateItemHashKey: replace String() conversion with direct cast to satisfy
     no-unnecessary-type-conversion lint.
+
+- Finalize: early-return cast and lint cleanup
+  - updateItemHashKey: cast early return `{ ...item }` to EntityRecordPartial
+    to satisfy strict return type when K is unknown.
+  - updateItemRangeKey: replace String(uniqueValue) with a direct string cast
+    to resolve no-unnecessary-type-conversion.
