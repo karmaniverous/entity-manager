@@ -3,7 +3,7 @@ import { expectType } from 'tsd';
 
 import type {
   ConfigMap,
-  EntityItemByToken,
+  EntityItemPartial,
   QueryBuilderQueryOptions,
 } from '../src/index.ts';
 
@@ -48,9 +48,9 @@ type MyConfigMap = ConfigMap<{
 // ET='user' — options.item narrows to EntityItemByToken<..., 'user'>.
 type OptUser = QueryBuilderQueryOptions<MyConfigMap, 'user'>;
 declare const optUser: OptUser;
-expectType<EntityItemByToken<MyConfigMap, 'user'>>(optUser.item);
+expectType<EntityItemPartial<MyConfigMap, 'user'>>(optUser.item);
 
 // ET='email' — options.item narrows to EntityItemByToken<..., 'email'>.
 type OptEmail = QueryBuilderQueryOptions<MyConfigMap, 'email'>;
 declare const optEmail: OptEmail;
-expectType<EntityItemByToken<MyConfigMap, 'email'>>(optEmail.item);
+expectType<EntityItemPartial<MyConfigMap, 'email'>>(optEmail.item);

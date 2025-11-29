@@ -3,13 +3,12 @@ import { expectType } from 'tsd';
 
 import type {
   ConfigMap,
-  EntityItemByToken,
+  EntityItem,
   QueryOptions,
   QueryResult,
   ShardQueryFunction,
   ShardQueryMap,
-} from '../src/index.ts';
-
+} from '../src/index.ts';
 // Minimal entities for testing.
 interface Email extends Entity {
   created: number;
@@ -86,5 +85,5 @@ expectType<QueryOptions<MyConfigMap, 'user', 'firstName', CF, K>>(options);
 type QR = QueryResult<MyConfigMap, 'user', 'firstName', K>;
 declare const qr: QR;
 expectType<
-  Pick<EntityItemByToken<MyConfigMap, 'user'>, 'userId' | 'created'>[]
->(qr.items);
+  Pick<EntityItem<MyConfigMap, 'user'>, 'userId' | 'created'>[]
+>(qr.items);

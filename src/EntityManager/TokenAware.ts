@@ -11,29 +11,16 @@ export type EntityOfToken<
 > = Exactify<CC['EntityMap']>[ET];
 
 /**
- * EntityItemByToken — database-facing partial item narrowed to a specific entity token.
- * Mirrors `EntityItem<CC>` with the entity surface restricted to `EntityOfToken<CC, ET>`.
+ * EntityItem — strict, domain-facing item narrowed to a specific entity token.
+ * No index signature; required fields per captured entitiesSchema (when present).
  *
  * Note: If using createEntityManager with entitiesSchema, the schema must declare
  * only base (non-generated) properties. Generated keys/tokens are layered by EntityManager.
  */
-export type EntityItemByToken<
+export type EntityItem<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
-> = Partial<
-  EntityOfToken<CC, ET> &
-    Record<
-      CC['HashKey'] | CC['RangeKey'] | CC['ShardedKeys'] | CC['UnshardedKeys'],
-      string
-    >
-> &
-  Record<string, unknown>;
-
-/** EntityRecordByToken — database-facing record (keys required) narrowed to a specific entity token. */
-export type EntityRecordByToken<
-  CC extends BaseConfigMap,
-  ET extends EntityToken<CC>,
-> = EntityItemByToken<CC, ET> & EntityKey<CC>;
+> = EntityOfToken<CC, ET>;
 
 /**
  * Normalize literals: string | readonly string[] -\> union of strings.
@@ -57,13 +44,24 @@ export type Projected<T, K> = [KeysFrom<K>] extends [never]
     ? Pick<T, Extract<KeysFrom<K>, keyof Exactify<T>>>
     : T;
 
-/**
- * Projected item by token — narrows EntityItemByToken by K when provided.
- */
-export type ProjectedItemByToken<
+/** EntityRecord — DB-facing record (keys required), narrowed to a specific entity token. */
+export type EntityRecord<
+  CC extends BaseConfigMap,
+  ET extends EntityToken<CC>,
+> = EntityItem<CC, ET> & EntityKey<CC>;
+
+/** EntityItemPartial — projected/seed domain shape by token. */
+export type EntityItemPartial<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
   K = unknown,
-> = Projected<EntityItemByToken<CC, ET>, K>;
+> = Projected<EntityItem<CC, ET>, K>;
+
+/** EntityRecordPartial — projected DB record shape by token. */
+export type EntityRecordPartial<
+  CC extends BaseConfigMap,
+  ET extends EntityToken<CC>,
+  K = unknown,
+> = Projected<EntityRecord<CC, ET>, K>;
 
 export {};

@@ -4,7 +4,7 @@ import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools';
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityToken } from './EntityToken';
 import type { PageKeyByIndex } from './PageKey';
-import type { ProjectedItemByToken } from './TokenAware';
+import type { EntityItemPartial } from './TokenAware';
 
 /**
  * A result returned by a {@link ShardQueryFunction | `ShardQueryFunction`} querying an individual shard.
@@ -29,7 +29,7 @@ export interface ShardQueryResult<
   count: number;
 
   /** The returned records. */
-  items: ProjectedItemByToken<CC, ET, K>[];
+  items: EntityItemPartial<CC, ET, K>[];
 
   /** The page key for the next query on this shard. */
   pageKey?: PageKeyByIndex<CC, ET, IT, CF>;

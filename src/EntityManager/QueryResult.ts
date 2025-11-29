@@ -4,7 +4,7 @@ import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityToken } from './EntityToken';
-import type { ProjectedItemByToken } from './TokenAware';
+import type { EntityItemPartial } from './TokenAware';
 
 /**
  * A result returned by a query across multiple shards, where each shard may receive multiple page queries via a dynamically-generated {@link ShardQueryFunction | `ShardQueryFunction`}.
@@ -27,7 +27,7 @@ export interface QueryResult<
   count: number;
 
   /** The returned records. */
-  items: ProjectedItemByToken<CC, ET, K>[];
+  items: EntityItemPartial<CC, ET, K>[];
 
   /**
    * A compressed, two-layer map of page keys, used to query the next page of

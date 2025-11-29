@@ -13,7 +13,7 @@ import type { EntityManager } from './EntityManager'; // imported to support API
 import type { EntityToken } from './EntityToken';
 import type { IndexTokensOf } from './PageKey';
 import type { ShardQueryMap } from './ShardQueryMap';
-import type { EntityItemByToken, ProjectedItemByToken } from './TokenAware';
+import type { EntityItemPartial } from './TokenAware';
 
 /**
  * Options passed to the {@link EntityManager.query | `EntityManager.query`} method.
@@ -40,7 +40,7 @@ export interface QueryOptions<
   /**
    * Partial item object sufficiently populated to generate index hash keys.
    */
-  item: EntityItemByToken<CC, ET>;
+  item: EntityItemPartial<CC, ET>;
 
   /**
    * The target maximum number of records to be returned by the query across
@@ -81,7 +81,7 @@ export interface QueryOptions<
   /**
    * A {@link SortOrder | `SortOrder`} object specifying the sort order of the result set. Defaults to `[]`. Aligned with the projected item shape when K is provided.
    */
-  sortOrder?: SortOrder<ProjectedItemByToken<CC, ET, K>> | undefined;
+  sortOrder?: SortOrder<EntityItemPartial<CC, ET, K>> | undefined;
 
   /**
    * Lower limit to query shard space.

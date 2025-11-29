@@ -4,9 +4,9 @@ import { expectAssignable, expectNotAssignable, expectType } from 'tsd';
 import type {
   BaseConfigMap,
   ConfigMap,
-  EntityItem,
+  EntityItem as DomainItem,
   EntityKey,
-  EntityRecord,
+  EntityRecord as DbRecord,
   EntityToken,
   PageKey,
   QueryOptions,
@@ -56,9 +56,11 @@ type MyConfigMap = ConfigMap<{
     | 'userId';
 }>;
 
-// EntityItem — partial, accepts any subset of flattened entity properties.
-const itemOk: EntityItem<MyConfigMap> = { userId: 'u', created: Date.now() };
-expectAssignable<EntityItem<MyConfigMap>>(itemOk);
+// EntityItemPartial — partial, accepts any subset of domain properties for a token.
+import type { EntityItemPartial } from '../src/index.ts';
+type ItemUser = EntityItemPartial<MyConfigMap, 'user'>;
+const itemOk: ItemUser = { userId: 'u', created: Date.now() };
+expectAssignable<ItemUser>(itemOk);
 
 // EntityKey — requires hashKey and rangeKey tokens of the config.
 const keyOk: EntityKey<MyConfigMap> = {
@@ -69,13 +71,13 @@ expectAssignable<EntityKey<MyConfigMap>>(keyOk);
 // Wrong key token names should not be assignable.
 expectNotAssignable<EntityKey<MyConfigMap>>({ hashKey: 'x', rangeKey: 'y' });
 
-// EntityRecord — EntityItem + required key properties.
-const recordOk: EntityRecord<MyConfigMap> = {
+// EntityRecord — strict DB record (by token) + required key properties.
+const recordOk: DbRecord<MyConfigMap, 'user'> = {
   hashKey2: 'user!0',
   rangeKey: 'userId#u',
   userId: 'u',
 };
-expectAssignable<EntityRecord<MyConfigMap>>(recordOk);
+expectAssignable<DbRecord<MyConfigMap, 'user'>>(recordOk);
 
 // EntityToken — only valid entity map keys.
 type ET = EntityToken<MyConfigMap>;
@@ -97,12 +99,12 @@ const shardQueryFn: ShardQueryFunction<MyConfigMap, 'user', 'firstName'> = (
   void hashKey;
   void pageKey;
   void pageSize;
-  const items: EntityItem<MyConfigMap>[] = [];
+  const items: ItemUser[] = [];
   const res: ShardQueryResult<MyConfigMap, 'user', 'firstName'> = {
     count: 0,
     // items can be broader assignable type at compile-time check
     // (runtime narrowing occurs by token-aware helpers).
-    items: items as unknown as EntityItem<MyConfigMap>[],
+    items: items as unknown as ItemUser[],
     pageKey,
   };
   return Promise.resolve(res);
@@ -124,7 +126,7 @@ expectAssignable<ShardQueryMap<MyConfigMap, 'user', 'firstName' | 'lastName'>>(
 // QueryOptions — minimal valid options.
 const qo: QueryOptions<MyConfigMap, 'user', 'firstName' | 'lastName'> = {
   entityToken: 'user',
-  item: {} as EntityItem<MyConfigMap>,
+  item: {} as ItemUser,
   shardQueryMap,
 };
 expectAssignable<QueryOptions<MyConfigMap, 'user', 'firstName' | 'lastName'>>(
@@ -141,8 +143,8 @@ expectAssignable<QueryResult<MyConfigMap, 'user', 'firstName' | 'lastName'>>(
   qr,
 );
 expectType<number>(qr.count);
-expectType<EntityItem<MyConfigMap>[]>(
-  qr.items as unknown as EntityItem<MyConfigMap>[],
+expectType<ItemUser[]>(
+  qr.items as unknown as ItemUser[],
 );
 expectType<string>(qr.pageKeyMap);
 

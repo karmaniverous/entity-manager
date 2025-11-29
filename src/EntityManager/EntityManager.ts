@@ -18,7 +18,12 @@ import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
 import { removeKeys } from './removeKeys';
-import type { EntityItemByToken, EntityRecordByToken } from './TokenAware';
+import type {
+  EntityItem as DomainItem,
+  EntityItemPartial,
+  EntityRecord as DbRecord,
+  EntityRecordPartial,
+} from './TokenAware';
 
 /**
  * The EntityManager class applies a configuration-driven sharded data model &
@@ -115,23 +120,23 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
    */
   addKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    item: EntityItemByToken<CC, ET>,
+    item: EntityItemPartial<CC, ET>,
     overwrite?: boolean,
-  ): EntityRecordByToken<CC, ET>;
+  ): EntityRecordPartial<CC, ET>;
   /**
    * @overload
    */
   addKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    item: EntityItemByToken<CC, ET>[],
+    item: EntityItemPartial<CC, ET>[],
     overwrite?: boolean,
-  ): EntityRecordByToken<CC, ET>[];
+  ): EntityRecordPartial<CC, ET>[];
 
   addKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    i: EntityItemByToken<CC, ET> | EntityItemByToken<CC, ET>[],
+    i: EntityItemPartial<CC, ET> | EntityItemPartial<CC, ET>[],
     overwrite = false,
-  ): EntityRecordByToken<CC, ET> | EntityRecordByToken<CC, ET>[] {
+  ): EntityRecordPartial<CC, ET> | EntityRecordPartial<CC, ET>[] {
     if (Array.isArray(i)) {
       return i.map((item) =>
         addKeys(
@@ -140,7 +145,7 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
           item as unknown as EntityItem<CC>,
           overwrite,
         ),
-      ) as unknown as EntityRecordByToken<CC, ET>[];
+      ) as unknown as EntityRecordPartial<CC, ET>[];
     }
 
     return addKeys(
@@ -148,7 +153,7 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
       entityToken,
       i as unknown as EntityItem<CC>,
       overwrite,
-    ) as unknown as EntityRecordByToken<CC, ET>;
+    ) as unknown as EntityRecordPartial<CC, ET>;
   }
 
   /**
@@ -165,7 +170,7 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
    */
   getPrimaryKey<ET extends EntityToken<CC>>(
     entityToken: ET,
-    item: EntityItemByToken<CC, ET>,
+    item: EntityItemPartial<CC, ET>,
     overwrite?: boolean,
   ): EntityKey<CC>[];
   /**
@@ -173,13 +178,13 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
    */
   getPrimaryKey<ET extends EntityToken<CC>>(
     entityToken: ET,
-    items: EntityItemByToken<CC, ET>[],
+    items: EntityItemPartial<CC, ET>[],
     overwrite?: boolean,
   ): EntityKey<CC>[];
 
   getPrimaryKey<ET extends EntityToken<CC>>(
     entityToken: ET,
-    i: EntityItemByToken<CC, ET> | EntityItemByToken<CC, ET>[],
+    i: EntityItemPartial<CC, ET> | EntityItemPartial<CC, ET>[],
     overwrite = false,
   ): EntityKey<CC>[] {
     if (Array.isArray(i)) {
@@ -211,35 +216,40 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
    *
    * @throws `Error` if `entityToken` is invalid.
    *
-   * @overload
+   * Overloads:
    */
   removeKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    item: EntityRecordByToken<CC, ET>,
-  ): EntityItemByToken<CC, ET>;
-  /**
-   * @overload
-   */
+    item: DbRecord<CC, ET>,
+  ): DomainItem<CC, ET>;
+  removeKeys<ET extends EntityToken<CC>, K = unknown>(
+    entityToken: ET,
+    item: EntityRecordPartial<CC, ET, K>,
+  ): EntityItemPartial<CC, ET, K>;
   removeKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    items: EntityRecordByToken<CC, ET>[],
-  ): EntityItemByToken<CC, ET>[];
+    items: DbRecord<CC, ET>[],
+  ): DomainItem<CC, ET>[];
+  removeKeys<ET extends EntityToken<CC>, K = unknown>(
+    entityToken: ET,
+    items: EntityRecordPartial<CC, ET, K>[],
+  ): EntityItemPartial<CC, ET, K>[];
 
   removeKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    i: EntityRecordByToken<CC, ET> | EntityRecordByToken<CC, ET>[],
-  ): EntityItemByToken<CC, ET> | EntityItemByToken<CC, ET>[] {
+    i: DbRecord<CC, ET> | DbRecord<CC, ET>[],
+  ): DomainItem<CC, ET> | DomainItem<CC, ET>[] {
     if (Array.isArray(i)) {
       return i.map((item) =>
         removeKeys(this, entityToken, item as unknown as EntityRecord<CC>),
-      ) as unknown as EntityItemByToken<CC, ET>[];
+      ) as unknown as DomainItem<CC, ET>[];
     }
 
     return removeKeys(
       this,
       entityToken,
       i as unknown as EntityRecord<CC>,
-    ) as unknown as EntityItemByToken<CC, ET>;
+    ) as unknown as DomainItem<CC, ET>;
   }
 
   /**

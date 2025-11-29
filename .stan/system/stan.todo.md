@@ -83,3 +83,8 @@
 - Docs/API: exported PresentIndexTokenSet and FallbackIndexTokenSet from PageKey.
 
 - Docs/API: exported BaseKeyTokens from PageKey to include shared base-token definition in TypeDoc and remove remaining warning.
+
+- Types & exports: introduced new by-token type model and removed legacy
+  EntityItemByToken/EntityRecordByToken exports. Updated public API (QueryOptions,
+  QueryResult, ShardQueryResult, EntityManager overloads) and tsd tests to use
+  EntityItem/EntityItemPartial/EntityRecord/EntityRecordPartial. No runtime changes.
