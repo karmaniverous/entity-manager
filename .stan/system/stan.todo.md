@@ -95,4 +95,8 @@
 
 - Follow-through: finalized removeKeys implementation to accept both strict and
   projected DB records (single/array) and return strict domain items, resolving
-  the TS2394 overload incompatibility during build/docs.
+  the TS2394 overload incompatibility during build/docs.
+
+- Follow-through: widened removeKeys implementation signature to cover both
+  strict and projected DB record inputs and unified implementation return to
+  EntityItemPartial, resolving remaining TS2394 in build/docs.
