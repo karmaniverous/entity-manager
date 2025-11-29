@@ -167,4 +167,9 @@
     • K omitted → Partial<EntityItem> (permissive seed)
     • K provided → Projected<EntityItem, K> (required projected keys)
   - EntityRecord relaxed to Partial<EntityItem> & EntityKey to satisfy existing
-    tsd assignment expectations.
+    tsd assignment expectations.
+
+- Docs/typedoc: casting and TSDoc cleanup
+  - getPrimaryKey: cast key object via `unknown as EntityKey<C>` to satisfy
+    typedoc TS2352 without impacting runtime.
+  - TokenAware TSDoc: wrap generic examples in backticks to avoid malformed HTML warnings.

@@ -72,7 +72,7 @@ export function getPrimaryKey<C extends BaseConfigMap>(
       {
         [hashKey]: withHashKey[hashKey]!,
         [rangeKey]: withHashKey[rangeKey]!,
-      } as EntityKey<C>,
+      } as unknown as EntityKey<C>,
     ];
   }
 

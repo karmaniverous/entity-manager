@@ -55,8 +55,8 @@ export type EntityRecord<
 > = Partial<EntityItem<CC, ET>> & EntityKey<CC>;
 
 /** EntityItemPartial — projected/seed domain shape by token.
- * - If K provided: required projected keys (Projected<…>).
- * - If K omitted: permissive seed (Partial<EntityItem<…>>).
+ * - If K provided: required projected keys (`Projected<EntityItem<CC, ET>, K>`).
+ * - If K omitted: permissive seed (`Partial<EntityItem<CC, ET>>`).
  */
 export type EntityItemPartial<
   CC extends BaseConfigMap,
