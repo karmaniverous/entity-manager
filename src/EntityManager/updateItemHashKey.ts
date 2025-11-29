@@ -62,7 +62,7 @@ export function updateItemHashKey<C extends BaseConfigMap>(
       timestamp,
     );
 
-    let hashKey = `${entityToken}${entityManager.config.shardKeyDelimiter}`;
+    let hashKey = `${String(entityToken)}${entityManager.config.shardKeyDelimiter}`;
 
     if (chars) {
       // Radix is the numerical base of the shardKey.

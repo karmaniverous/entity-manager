@@ -80,7 +80,7 @@ export function getHashKeySpace<C extends BaseConfigMap>(
       .map((shardKey) => {
         // Calculate record hash key.
         let hashKey: string | undefined =
-          `${entityToken}${entityManager.config.shardKeyDelimiter}${shardKey}`;
+          `${String(entityToken)}${entityManager.config.shardKeyDelimiter}${shardKey}`;
 
         // If hash key space basis is a different property, encode it.
         if (hashKeyToken !== entityManager.config.hashKey)

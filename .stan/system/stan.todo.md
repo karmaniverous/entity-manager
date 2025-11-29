@@ -63,4 +63,7 @@
 - Plan: captured the big-bang by-token refactor (EntityItem / EntityItemPartial /
   EntityRecord / EntityRecordPartial) in .stan/system/stan.todo.by-token.md.
 
-- Lint: refactored advanced type aliases to satisfy @typescript-eslint/no-redundant-type-constituents (Extract/Exclude rewrites; removed redundant intersections/unions; no suppressions).
+- Lint: refactored advanced type aliases to satisfy @typescript-eslint/no-redundant-type-constituents (Extract/Exclude rewrites; removed redundant intersections/unions; no suppressions).
+
+- Lint/TS: deduped index component unions via KeyUnion mapped-type; fixed
+  template literals by coercing entityToken to string (TS2731, restrict-template-expressions).
