@@ -70,8 +70,8 @@ export function getPrimaryKey<C extends BaseConfigMap>(
 
     return [
       {
-        [hashKey]: withHashKey[hashKey] as string,
-        [rangeKey]: withHashKey[rangeKey] as string,
+        [hashKey]: withHashKey[hashKey]!,
+        [rangeKey]: withHashKey[rangeKey]!,
       } as EntityKey<C>,
     ];
   }
@@ -87,7 +87,7 @@ export function getPrimaryKey<C extends BaseConfigMap>(
   );
 
   // Map to keys and de-duplicate.
-  const rangeKeyValue = withRangeKey[rangeKey] as string;
+  const rangeKeyValue = withRangeKey[rangeKey]!;
   const seen = new Set<string>();
   const keys = hashKeys
     .map((hk) => {

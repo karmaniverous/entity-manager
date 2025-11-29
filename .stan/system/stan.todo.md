@@ -159,3 +159,12 @@
     to satisfy strict return type when K is unknown.
   - updateItemRangeKey: replace String(uniqueValue) with a direct string cast
     to resolve no-unnecessary-type-conversion.
+
+- TSD alignment: TokenAware shape refinements
+  - EntityItem now layers optional key/token properties (hashKey, rangeKey,
+    sharded/unsharded) over strict domain fields to match docs/tests.
+  - EntityItemPartial is conditional:
+    • K omitted → Partial<EntityItem> (permissive seed)
+    • K provided → Projected<EntityItem, K> (required projected keys)
+  - EntityRecord relaxed to Partial<EntityItem> & EntityKey to satisfy existing
+    tsd assignment expectations.

@@ -82,7 +82,7 @@ export async function query<
       entityManager,
       entityToken,
       Object.keys(shardQueryMap) as ITS[],
-      item as EntityItemPartial<C, ET>,
+      item,
       pageKeyMap
         ? (JSON.parse(
             decompressFromEncodedURIComponent(pageKeyMap),

@@ -11,16 +11,20 @@ export type EntityOfToken<
 > = Exactify<CC['EntityMap']>[ET];
 
 /**
- * EntityItem — strict, domain-facing item narrowed to a specific entity token.
- * No index signature; required fields per captured entitiesSchema (when present).
- *
- * Note: If using createEntityManager with entitiesSchema, the schema must declare
- * only base (non-generated) properties. Generated keys/tokens are layered by EntityManager.
+ * EntityItem — domain-facing item narrowed to a specific entity token, plus
+ * optional key/token properties. Required fields per captured entitiesSchema
+ * (when present); no string index signature.
  */
 export type EntityItem<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
-> = EntityOfToken<CC, ET>;
+> = EntityOfToken<CC, ET> &
+  Partial<
+    Record<
+      CC['HashKey'] | CC['RangeKey'] | CC['ShardedKeys'] | CC['UnshardedKeys'],
+      string
+    >
+  >;
 
 /**
  * Normalize literals: string | readonly string[] -\> union of strings.
@@ -48,14 +52,19 @@ export type Projected<T, K> = [KeysFrom<K>] extends [never]
 export type EntityRecord<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
-> = EntityItem<CC, ET> & EntityKey<CC>;
+> = Partial<EntityItem<CC, ET>> & EntityKey<CC>;
 
-/** EntityItemPartial — projected/seed domain shape by token. */
+/** EntityItemPartial — projected/seed domain shape by token.
+ * - If K provided: required projected keys (Projected<…>).
+ * - If K omitted: permissive seed (Partial<EntityItem<…>>).
+ */
 export type EntityItemPartial<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
   K = unknown,
-> = Partial<Projected<EntityItem<CC, ET>, K>>;
+> = [KeysFrom<K>] extends [never]
+  ? Partial<EntityItem<CC, ET>>
+  : Projected<EntityItem<CC, ET>, K>;
 
 /** EntityRecordPartial — projected DB record shape by token. */
 export type EntityRecordPartial<
