@@ -38,7 +38,7 @@ export type ShardQueryFunction<
   // error at annotation sites.
   CF extends { indexes?: infer I }
     ? I extends Record<string, unknown>
-      ? IT extends keyof I & string
+      ? IT extends Extract<keyof I, string>
         ? (
             hashKey: string,
             pageKey?: PageKeyByIndex<CC, ET, IT, CF>,

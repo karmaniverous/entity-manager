@@ -2,42 +2,65 @@
 
 ## Next up (in priority order)
 
-- Entity Client (downstream coordination): update EntityClient to be generic on
-  CF and accept EntityManager<CC, CF>. Propagate CF through its type surface.
-- QueryBuilder creation (downstream coordination): change createQueryBuilder to
-  derive ITS = IndexTokensOf<CF> from EntityClient<CC, CF> and remove the
-  explicit cf parameter from its public API.
-- Types and tests (this repo):
-  - Ensure exported types still compile with the new EntityManager signature.
-  - Add/adjust tsd tests to confirm QueryOptions/ShardQueryMap typing remains
-    stable and the CF channel continues to narrow per‑index PageKey types.
-- Docs:
-  - Update adapter docs/snippets to show builder creation without cf and
-    emphasize “values‑first literal (as const)” for createEntityManager.
-- Release:
-  - Prepare minor release notes in this repo and coordinate adapter release
-    once the downstream changes land.
+- Entity-manager v8.0.0 — implement big-bang by-token type model (Item/Record × Full/Partial)
+  - Types & exports
+    - Introduce new by-token types in TokenAware (or a dedicated types module):
+      - EntityItem<CC, ET> (strict, full; no index signature)
+      - EntityItemPartial<CC, ET, K=unknown> (Projected<EntityItem<…>, K>)
+      - EntityRecord<CC, ET> (strict, full DB; keys required; no index signature)
+      - EntityRecordPartial<CC, ET, K=unknown> (Projected<EntityRecord<…>, K>)
+    - Remove legacy EntityItemByToken / EntityRecordByToken from public exports.
+    - Update src/EntityManager/index.ts export surface to the new names.
+  - Core API signatures
+    - QueryOptions.item → EntityItemPartial<CC, ET>
+    - ShardQueryFunction/Result → items: EntityItemPartial<CC, ET, K>
+    - QueryResult.items → EntityItemPartial<CC, ET, K>[]
+    - EntityManager.addKeys → accepts EntityItemPartial; returns EntityRecordPartial
+    - EntityManager.removeKeys overloads:
+      - EntityRecord → EntityItem (strict)
+      - EntityRecordPartial → EntityItemPartial (projection-preserving)
+    - EntityManager.getPrimaryKey → accepts EntityItemPartial (unchanged output)
+  - Internals (by-token where ET is present)
+    - Convert helper signatures where appropriate to EntityItemPartial:
+      - updateItemHashKey / updateItemRangeKey / encodeElement / decodeElement
+      - encodeGeneratedProperty / decodeGeneratedProperty
+      - dehydrateIndexItem / rehydrateIndexItem
+      - dehydratePageKeyMap / rehydratePageKeyMap
+      - unwrapIndex / getIndexComponents
+    - Keep purely property-level helpers generic if clearer.
+  - Tests (tsd + runtime)
+    - tsd: pin strict vs partial flows:
+      - query→getItems(no attrs)→removeKeys returns EntityItem (strict; required fields present)
+      - projection flows remain partial unless enriched or projected to include required fields
+      - addKeys return type and removeKeys overloads behave correctly
+    - runtime: smoke over key update, (de)hydration, and query orchestration (unchanged semantics)
+  - Docs
+    - TypeDoc & README: document the new type model (Item/Record × Full/Partial),
+      projection K, schema-level looseness guidance (catchall)
+    - Migration mapping (old → new type names) and handler patterns
+  - Lint/build/typecheck: ensure repo passes ESLint, Vitest, tsd, rollup
+
+- DynamoDB adapter v1.0.0 — align with new type model (type-only changes)
+  - Overload getItems returns:
+    - No attrs → EntityRecord<CC, ET>[]
+    - With attrs A → EntityRecordPartial<CC, ET, A>[]
+  - Ensure QueryBuilder docs emphasize:
+    - “no projection → strict; projection → partial”
+  - Tsd tests: pin overload behavior and removeKeys narrowing after enrichment
+
+- Cross-repo validation & release
+  - Validate downstream fixture(s) (e.g., SMOZ) search route:
+    - Non-projection flow types as strict domain (required fields present) without casts
+    - Projection flows remain partial unless re-enriched
+  - Version & release:
+    - @karmaniverous/entity-manager v8.0.0 (breaking types)
+    - @karmaniverous/entity-client-dynamodb v1.0.0 (type surface)
 
 ## Completed
 
 **CRITICAL: This list is append-only; do not edit items! Place most recent entries at the BOTTOM of the list. When pruning, remove older entries from the top.**
 
-- Code: added CF as a phantom generic on EntityManager and updated the factory
-  to return EntityManager<…, CF>. No runtime configLiteral field introduced.
+- Plan: captured the big-bang by-token refactor (EntityItem / EntityItemPartial /
+  EntityRecord / EntityRecordPartial) in .stan/system/stan.todo.by-token.md.
 
-- Interop: documented upstream changes and adapter leverage plan in
-  .stan/interop/entity-client-dynamodb/preserve-config-literal-for-index-typing.md.
-
-- Docs: updated TSDoc for EntityManager (CF phantom generic) and
-  createEntityManager (CF capture from single-argument factory).
-
-- Fix: resolved TS overload error in EntityManager.findIndexToken by dispatching
-  with literal true/false; cleaned TSDoc to remove undefined @code tag usage.
-
-- Tests (tsd): added findindextoken-narrowing.test-d.ts to assert that
-  EntityManager.findIndexToken returns the configured index-token union (CF).
-
-- Types: propagated CF through BaseEntityClient and BaseEntityClientOptions so
-  client-facing calls (e.g., entityManager.findIndexToken) retain narrowed
-  index-token unions.
-- Tests (tsd): added findindextoken-through-client.test-d.ts to assert narrowing via BaseEntityClient.
+- Lint: refactored advanced type aliases to satisfy @typescript-eslint/no-redundant-type-constituents (Extract/Exclude rewrites; removed redundant intersections/unions; no suppressions).

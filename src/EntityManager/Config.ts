@@ -30,12 +30,17 @@ export type Config<C extends BaseConfigMap = BaseConfigMap> =
         defaultLimit?: number;
         defaultPageSize?: number;
         shardBumps?: ShardBump[];
-        timestampProperty: C['TranscodedProperties'] &
-          PropertiesOfType<C['EntityMap'][E], number> &
-          TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>;
-        uniqueProperty: C['TranscodedProperties'] &
-          keyof C['EntityMap'][E] &
-          TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>;
+        timestampProperty: Extract<
+          Extract<
+            C['TranscodedProperties'],
+            PropertiesOfType<C['EntityMap'][E], number>
+          >,
+          TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>
+        >;
+        uniqueProperty: Extract<
+          Extract<C['TranscodedProperties'], keyof C['EntityMap'][E]>,
+          TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>
+        >;
       };
     }
   > &

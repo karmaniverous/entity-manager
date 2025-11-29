@@ -61,7 +61,7 @@ export type IndexRangeKeyOf<CF, IT extends string> = CF extends {
  */
 export type IndexTokensOf<CF> = CF extends { indexes?: infer I }
   ? I extends Record<string, unknown>
-    ? keyof I & string
+    ? Extract<keyof I, string>
     : string
   : string;
 
@@ -84,8 +84,8 @@ export type IndexComponentTokens<
     ?
         | CC['HashKey']
         | CC['RangeKey']
-        | IndexHashKeyOf<CF, IT>
-        | IndexRangeKeyOf<CF, IT>
+        | Exclude<IndexHashKeyOf<CF, IT>, CC['HashKey'] | CC['RangeKey']>
+        | Exclude<IndexRangeKeyOf<CF, IT>, CC['HashKey'] | CC['RangeKey']>
     :
         | CC['HashKey']
         | CC['RangeKey']

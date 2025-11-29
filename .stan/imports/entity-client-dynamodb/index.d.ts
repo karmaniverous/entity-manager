@@ -292,7 +292,7 @@ interface QueryCondition {
 interface QueryConditionBeginsWith extends QueryCondition {
     property: string;
     operator: 'begins_with';
-    value?: string;
+    value?: string | undefined;
 }
 /**
  * Query condition for the `between` operator.
@@ -305,8 +305,8 @@ interface QueryConditionBetween<V extends ActuallyScalarAttributeValue> extends 
     property: string;
     operator: 'between';
     value: {
-        from?: V;
-        to?: V;
+        from?: V | undefined;
+        to?: V | undefined;
     };
 }
 /**
@@ -318,7 +318,7 @@ interface QueryConditionBetween<V extends ActuallyScalarAttributeValue> extends 
 interface QueryConditionComparison<V extends ActuallyScalarAttributeValue> extends QueryCondition {
     property: string;
     operator: '<' | '<=' | '<>' | '=' | '>' | '>=';
-    value?: V;
+    value?: V | undefined;
 }
 /**
  * Query condition for contains operator.
@@ -329,7 +329,7 @@ interface QueryConditionComparison<V extends ActuallyScalarAttributeValue> exten
 interface QueryConditionContains<V extends Exclude<NativeScalarAttributeValue, object>> extends QueryCondition {
     property: string;
     operator: 'contains';
-    value?: V;
+    value?: V | undefined;
 }
 /**
  * Query condition for attribute existence checks.
@@ -351,7 +351,7 @@ interface QueryConditionExists extends QueryCondition {
 interface QueryConditionIn<V extends NativeScalarAttributeValue> extends QueryCondition {
     property: string;
     operator: 'in';
-    value?: V[] | Set<V>;
+    value?: V[] | Set<V> | undefined;
 }
 /**
  * Grouping of multiple query conditions using logical operators.

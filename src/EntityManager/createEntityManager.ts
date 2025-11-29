@@ -78,7 +78,7 @@ export type EntitiesFromSchema<CC> = CC extends {
   entitiesSchema?: infer S;
 }
   ? S extends Record<string, ZodType>
-    ? { [K in keyof S & string]: z.infer<S[K]> } & EntityMap
+    ? { [K in Extract<keyof S, string>]: z.infer<S[K]> } & EntityMap
     : EntityMap
   : EntityMap;
 
@@ -97,7 +97,10 @@ export type IndexTokensFrom<CC> = CC extends { indexes?: infer I }
  * Captures a BaseConfigMap-compatible type from a literal ConfigInput value
  * and an EntityMap (defaults to MinimalEntityMapFrom<CC>).
  */
-export type CapturedConfigMapFrom<CC, EM extends EntityMap> = {
+export interface CapturedConfigMapFrom<
+  CC,
+  EM extends EntityMap,
+> extends BaseConfigMap {
   EntityMap: EM;
   HashKey: HashKeyFrom<CC>;
   RangeKey: RangeKeyFrom<CC>;
@@ -105,7 +108,7 @@ export type CapturedConfigMapFrom<CC, EM extends EntityMap> = {
   UnshardedKeys: UnshardedKeysFrom<CC>;
   TranscodedProperties: TranscodedPropertiesFrom<CC>;
   TranscodeRegistry: DefaultTranscodeRegistry;
-} & BaseConfigMap;
+}
 
 /**
  * Values-first factory that captures literal tokens and index names directly

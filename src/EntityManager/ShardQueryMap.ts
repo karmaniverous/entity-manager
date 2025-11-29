@@ -34,8 +34,14 @@ export type ShardQueryMap<
     ? // Constrain keys to CF.indexes when present; extra keys are rejected by
       // excess property checks. Each value’s IT is also narrowed accordingly.
       Record<
-        ITS & (keyof I & string),
-        ShardQueryFunction<CC, ET, ITS & (keyof I & string), CF, K>
+        Extract<ITS, Extract<keyof I, string>>,
+        ShardQueryFunction<
+          CC,
+          ET,
+          Extract<ITS, Extract<keyof I, string>>,
+          CF,
+          K
+        >
       >
     : Record<ITS, ShardQueryFunction<CC, ET, ITS, CF, K>>
   : Record<ITS, ShardQueryFunction<CC, ET, ITS, CF, K>>;

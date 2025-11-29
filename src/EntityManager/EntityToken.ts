@@ -16,7 +16,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
  * @category EntityManager
  * @protected
  */
-export type EntityToken<CC extends BaseConfigMap> = keyof Exactify<
-  CC['EntityMap']
-> &
-  string;
+export type EntityToken<CC extends BaseConfigMap> = Extract<
+  keyof Exactify<CC['EntityMap']>,
+  string
+>;
