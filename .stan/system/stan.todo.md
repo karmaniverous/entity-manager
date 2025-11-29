@@ -103,4 +103,8 @@
 
 - Follow-through: added K generic to the removeKeys implementation and accepted
   EntityRecordPartial forms (single/array) to match overloads exactly; unified
-  return to EntityItemPartial<…, K>, fixing TS2394 in build/docs.
+  return to EntityItemPartial<…, K>, fixing TS2394 in build/docs.
+
+- Follow-through: finalized removeKeys implementation as a supertype of all
+  overloads (accepting strict and projected inputs) and returning strict domain
+  items, satisfying overload compatibility (TS2394) during build/docs.

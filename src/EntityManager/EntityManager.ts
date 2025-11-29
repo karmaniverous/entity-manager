@@ -235,25 +235,21 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
     items: EntityRecordPartial<CC, ET, K>[],
   ): EntityItemPartial<CC, ET, K>[];
 
-  removeKeys<ET extends EntityToken<CC>, K = unknown>(
+  removeKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    i:
-      | DbRecord<CC, ET>
-      | DbRecord<CC, ET>[]
-      | EntityRecordPartial<CC, ET, K>
-      | EntityRecordPartial<CC, ET, K>[],
-  ): EntityItemPartial<CC, ET, K> | EntityItemPartial<CC, ET, K>[] {
+    i: DbRecord<CC, ET> | DbRecord<CC, ET>[],
+  ): DomainItem<CC, ET> | DomainItem<CC, ET>[] {
     if (Array.isArray(i)) {
       return i.map((item) =>
         removeKeys(this, entityToken, item as unknown as EntityRecord<CC>),
-      ) as unknown as EntityItemPartial<CC, ET, K>[];
+      ) as unknown as DomainItem<CC, ET>[];
     }
 
     return removeKeys(
       this,
       entityToken,
       i as unknown as EntityRecord<CC>,
-    ) as unknown as EntityItemPartial<CC, ET, K>;
+    ) as unknown as DomainItem<CC, ET>;
   }
 
   /**
