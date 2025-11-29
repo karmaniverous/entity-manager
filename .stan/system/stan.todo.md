@@ -72,4 +72,7 @@
   DistinctFromBase (conditional exclusion of base keys) and removing KeyUnion.
 
 - Lint: gated derived index tokens with conditional helpers (WithIndexHashKey /
-  WithIndexComponents) to avoid redundant unions in PageKey without suppressions.
+  WithIndexComponents) to avoid redundant unions in PageKey without suppressions.
+
+- Lint: finalized PageKey by deriving component unions via key-set mapped types
+  (PresentIndexTokenSet/FallbackIndexTokenSet) and `keyof` (no redundant unions).

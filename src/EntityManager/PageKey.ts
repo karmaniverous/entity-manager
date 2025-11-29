@@ -75,20 +75,34 @@ export type HasIndexFor<CF, IT extends string> = CF extends {
     : false
   : false;
 
-// Base key tokens used by all indexes.
+// Base key tokens used by all indexes (global hash & range).
 type BaseKeyTokens<CC extends BaseConfigMap> = CC['HashKey'] | CC['RangeKey'];
 
-// Conditionally add the index hashKey token only when it does not collapse to a base key.
-type WithIndexHashKey<CC extends BaseConfigMap, CF, IT extends string> =
-  IndexHashKeyOf<CF, IT> extends BaseKeyTokens<CC>
-    ? BaseKeyTokens<CC>
-    : BaseKeyTokens<CC> | IndexHashKeyOf<CF, IT>;
+// When CF/IT identify an index, build a key set:
+// - Always include base key tokens.
+// - Conditionally include the index's hashKey/rangeKey only when they do not
+//   collapse to the base key union (keeps unions non-redundant).
+type PresentIndexTokenSet<
+  CC extends BaseConfigMap,
+  CF,
+  IT extends string,
+> = Record<BaseKeyTokens<CC>, true> &
+  (IndexHashKeyOf<CF, IT> extends BaseKeyTokens<CC>
+    ? {}
+    : Record<IndexHashKeyOf<CF, IT>, true>) &
+  (IndexRangeKeyOf<CF, IT> extends BaseKeyTokens<CC>
+    ? {}
+    : Record<IndexRangeKeyOf<CF, IT>, true>);
 
-// Conditionally add the index rangeKey token only when it does not collapse to a base key.
-type WithIndexComponents<CC extends BaseConfigMap, CF, IT extends string> =
-  IndexRangeKeyOf<CF, IT> extends BaseKeyTokens<CC>
-    ? WithIndexHashKey<CC, CF, IT>
-    : WithIndexHashKey<CC, CF, IT> | IndexRangeKeyOf<CF, IT>;
+// Fallback key set when CF does not carry a typed index or IT is unknown.
+type FallbackIndexTokenSet<CC extends BaseConfigMap> = Record<
+  | CC['HashKey']
+  | CC['RangeKey']
+  | CC['ShardedKeys']
+  | CC['UnshardedKeys']
+  | CC['TranscodedProperties'],
+  true
+>;
 
 export type IndexComponentTokens<
   CC extends BaseConfigMap,
@@ -96,13 +110,8 @@ export type IndexComponentTokens<
   IT extends string,
 > =
   HasIndexFor<CF, IT> extends true
-    ? WithIndexComponents<CC, CF, IT>
-    :
-        | CC['HashKey']
-        | CC['RangeKey']
-        | CC['ShardedKeys']
-        | CC['UnshardedKeys']
-        | CC['TranscodedProperties'];
+    ? keyof PresentIndexTokenSet<CC, CF, IT>
+    : keyof FallbackIndexTokenSet<CC>;
 
 /**
  * Page key typed for a specific index token.
