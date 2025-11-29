@@ -88,3 +88,7 @@
   EntityItemByToken/EntityRecordByToken exports. Updated public API (QueryOptions,
   QueryResult, ShardQueryResult, EntityManager overloads) and tsd tests to use
   EntityItem/EntityItemPartial/EntityRecord/EntityRecordPartial. No runtime changes.
+- Follow-through: replaced stale EntityItemByToken cast in
+  decodeGeneratedProperty (degenerate path) with EntityItemPartial and aligned
+  EntityManager.removeKeys implementation signature/return to satisfy overloads
+  and ESLint no-redundant-type-constituents.
