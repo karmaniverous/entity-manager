@@ -87,7 +87,8 @@
 - Types & exports: introduced new by-token type model and removed legacy
   EntityItemByToken/EntityRecordByToken exports. Updated public API (QueryOptions,
   QueryResult, ShardQueryResult, EntityManager overloads) and tsd tests to use
-  EntityItem/EntityItemPartial/EntityRecord/EntityRecordPartial. No runtime changes.
+  EntityItem/EntityItemPartial/EntityRecord/EntityRecordPartial. No runtime changes.
+
 - Follow-through: replaced stale EntityItemByToken cast in
   decodeGeneratedProperty (degenerate path) with EntityItemPartial and aligned
   EntityManager.removeKeys implementation signature/return to satisfy overloads
@@ -107,4 +108,8 @@
 
 - Follow-through: finalized removeKeys implementation as a supertype of all
   overloads (accepting strict and projected inputs) and returning strict domain
-  items, satisfying overload compatibility (TS2394) during build/docs.
+  items, satisfying overload compatibility (TS2394) during build/docs.
+
+- Fix: resolved TS2394 in EntityManager.removeKeys by adding generic K to the
+  implementation and widening its parameter to accept strict/projected record(s)
+  (single/array). Kept return as strict DomainItem(s); overloads remain authoritative.
