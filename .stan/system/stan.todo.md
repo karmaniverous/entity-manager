@@ -99,4 +99,8 @@
 
 - Follow-through: widened removeKeys implementation signature to cover both
   strict and projected DB record inputs and unified implementation return to
-  EntityItemPartial, resolving remaining TS2394 in build/docs.
+  EntityItemPartial, resolving remaining TS2394 in build/docs.
+
+- Follow-through: added K generic to the removeKeys implementation and accepted
+  EntityRecordPartial forms (single/array) to match overloads exactly; unified
+  return to EntityItemPartial<…, K>, fixing TS2394 in build/docs.
