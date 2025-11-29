@@ -78,21 +78,22 @@ export type HasIndexFor<CF, IT extends string> = CF extends {
 // Base key tokens used by all indexes (global hash & range).
 type BaseKeyTokens<CC extends BaseConfigMap> = CC['HashKey'] | CC['RangeKey'];
 
-// When CF/IT identify an index, build a key set:
+// When CF/IT identify an index, build a key set via key-remapping (no overlaps):
 // - Always include base key tokens.
-// - Conditionally include the index's hashKey/rangeKey only when they do not
-//   collapse to the base key union (keeps unions non-redundant).
+// - Include index hashKey/rangeKey only when they do not collapse to base keys.
 type PresentIndexTokenSet<
   CC extends BaseConfigMap,
   CF,
   IT extends string,
-> = Record<BaseKeyTokens<CC>, true> &
-  (IndexHashKeyOf<CF, IT> extends BaseKeyTokens<CC>
-    ? {}
-    : Record<IndexHashKeyOf<CF, IT>, true>) &
-  (IndexRangeKeyOf<CF, IT> extends BaseKeyTokens<CC>
-    ? {}
-    : Record<IndexRangeKeyOf<CF, IT>, true>);
+> = Record<BaseKeyTokens<CC>, true> & {
+  [K in IndexHashKeyOf<CF, IT> as K extends BaseKeyTokens<CC>
+    ? never
+    : K]: true;
+} & {
+  [K in IndexRangeKeyOf<CF, IT> as K extends BaseKeyTokens<CC>
+    ? never
+    : K]: true;
+};
 
 // Fallback key set when CF does not carry a typed index or IT is unknown.
 type FallbackIndexTokenSet<CC extends BaseConfigMap> = Record<

@@ -75,4 +75,7 @@
   WithIndexComponents) to avoid redundant unions in PageKey without suppressions.
 
 - Lint: finalized PageKey by deriving component unions via key-set mapped types
-  (PresentIndexTokenSet/FallbackIndexTokenSet) and `keyof` (no redundant unions).
+  (PresentIndexTokenSet/FallbackIndexTokenSet) and `keyof` (no redundant unions).
+
+- Lint/TS: replaced `{}` conditionals with key-remapping to `never` in
+  PresentIndexTokenSet, ensuring `keyof` stays string-only and avoids overlaps.
