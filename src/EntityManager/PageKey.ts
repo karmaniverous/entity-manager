@@ -81,7 +81,15 @@ type BaseKeyTokens<CC extends BaseConfigMap> = CC['HashKey'] | CC['RangeKey'];
 // When CF/IT identify an index, build a key set via key-remapping (no overlaps):
 // - Always include base key tokens.
 // - Include index hashKey/rangeKey only when they do not collapse to base keys.
-type PresentIndexTokenSet<
+/**
+ * Key set for index component tokens when CF/IT identify a concrete index.
+ * - Always includes base key tokens (global hash/range).
+ * - Conditionally includes index hashKey/rangeKey when they do not collapse
+ *   to the base key union.
+ *
+ * @category QueryBuilder
+ */
+export type PresentIndexTokenSet<
   CC extends BaseConfigMap,
   CF,
   IT extends string,
@@ -96,7 +104,14 @@ type PresentIndexTokenSet<
 };
 
 // Fallback key set when CF does not carry a typed index or IT is unknown.
-type FallbackIndexTokenSet<CC extends BaseConfigMap> = Record<
+/**
+ * Key set for index component tokens when CF does not carry an `indexes` map
+ * or IT is unknown. Includes global keys, generated keys, and transcodable
+ * properties.
+ *
+ * @category QueryBuilder
+ */
+export type FallbackIndexTokenSet<CC extends BaseConfigMap> = Record<
   | CC['HashKey']
   | CC['RangeKey']
   | CC['ShardedKeys']

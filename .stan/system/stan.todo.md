@@ -78,4 +78,6 @@
   (PresentIndexTokenSet/FallbackIndexTokenSet) and `keyof` (no redundant unions).
 
 - Lint/TS: replaced `{}` conditionals with key-remapping to `never` in
-  PresentIndexTokenSet, ensuring `keyof` stays string-only and avoids overlaps.
+  PresentIndexTokenSet, ensuring `keyof` stays string-only and avoids overlaps.
+
+- Docs/API: exported PresentIndexTokenSet and FallbackIndexTokenSet from PageKey.
