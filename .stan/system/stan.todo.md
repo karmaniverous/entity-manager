@@ -69,4 +69,7 @@
   template literals by coercing entityToken to string (TS2731, restrict-template-expressions).
 
 - Lint: finalized no-redundant-type-constituents cleanup in PageKey by introducing
-  DistinctFromBase (conditional exclusion of base keys) and removing KeyUnion.
+  DistinctFromBase (conditional exclusion of base keys) and removing KeyUnion.
+
+- Lint: gated derived index tokens with conditional helpers (WithIndexHashKey /
+  WithIndexComponents) to avoid redundant unions in PageKey without suppressions.

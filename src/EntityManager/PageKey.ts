@@ -75,23 +75,28 @@ export type HasIndexFor<CF, IT extends string> = CF extends {
     : false
   : false;
 
-// Exclude a derived index component if it collapses to a base key token.
-type DistinctFromBase<CC extends BaseConfigMap, T> = [T] extends [
-  CC['HashKey'] | CC['RangeKey'],
-]
-  ? never
-  : T;
+// Base key tokens used by all indexes.
+type BaseKeyTokens<CC extends BaseConfigMap> = CC['HashKey'] | CC['RangeKey'];
+
+// Conditionally add the index hashKey token only when it does not collapse to a base key.
+type WithIndexHashKey<CC extends BaseConfigMap, CF, IT extends string> =
+  IndexHashKeyOf<CF, IT> extends BaseKeyTokens<CC>
+    ? BaseKeyTokens<CC>
+    : BaseKeyTokens<CC> | IndexHashKeyOf<CF, IT>;
+
+// Conditionally add the index rangeKey token only when it does not collapse to a base key.
+type WithIndexComponents<CC extends BaseConfigMap, CF, IT extends string> =
+  IndexRangeKeyOf<CF, IT> extends BaseKeyTokens<CC>
+    ? WithIndexHashKey<CC, CF, IT>
+    : WithIndexHashKey<CC, CF, IT> | IndexRangeKeyOf<CF, IT>;
+
 export type IndexComponentTokens<
   CC extends BaseConfigMap,
   CF,
   IT extends string,
 > =
   HasIndexFor<CF, IT> extends true
-    ?
-        | CC['HashKey']
-        | CC['RangeKey']
-        | DistinctFromBase<CC, IndexHashKeyOf<CF, IT>>
-        | DistinctFromBase<CC, IndexRangeKeyOf<CF, IT>>
+    ? WithIndexComponents<CC, CF, IT>
     :
         | CC['HashKey']
         | CC['RangeKey']
