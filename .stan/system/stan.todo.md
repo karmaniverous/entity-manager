@@ -80,4 +80,6 @@
 - Lint/TS: replaced `{}` conditionals with key-remapping to `never` in
   PresentIndexTokenSet, ensuring `keyof` stays string-only and avoids overlaps.
 
-- Docs/API: exported PresentIndexTokenSet and FallbackIndexTokenSet from PageKey.
+- Docs/API: exported PresentIndexTokenSet and FallbackIndexTokenSet from PageKey.
+
+- Docs/API: exported BaseKeyTokens from PageKey to include shared base-token definition in TypeDoc and remove remaining warning.

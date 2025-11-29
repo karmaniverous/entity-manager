@@ -76,7 +76,15 @@ export type HasIndexFor<CF, IT extends string> = CF extends {
   : false;
 
 // Base key tokens used by all indexes (global hash & range).
-type BaseKeyTokens<CC extends BaseConfigMap> = CC['HashKey'] | CC['RangeKey'];
+/**
+ * Base index component tokens shared by all indexes
+ * (the global hashKey and rangeKey defined in the Config).
+ *
+ * @category QueryBuilder
+ */
+export type BaseKeyTokens<CC extends BaseConfigMap> =
+  | CC['HashKey']
+  | CC['RangeKey'];
 
 // When CF/IT identify an index, build a key set via key-remapping (no overlaps):
 // - Always include base key tokens.
