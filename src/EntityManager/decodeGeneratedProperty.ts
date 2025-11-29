@@ -4,7 +4,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import { decodeElement } from './decodeElement';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
-import type { EntityItemByToken } from './TokenAware';
+import type { EntityItemPartial } from './TokenAware';
 
 /**
  * Decode a generated property value. Returns an {@link EntityItem | `EntityItem`}.
@@ -24,7 +24,7 @@ export function decodeGeneratedProperty<
   entityManager: EntityManager<CC>,
   entityToken: ET,
   encoded: string,
-): EntityItemByToken<CC, ET> {
+): EntityItemPartial<CC, ET> {
   try {
     const {
       generatedKeyDelimiter,
@@ -76,7 +76,7 @@ export function decodeGeneratedProperty<
 
     // entityToken used for typing only (ET-narrowed result).
     void entityToken;
-    return decoded as EntityItemByToken<CC, ET>;
+    return decoded as EntityItemPartial<CC, ET>;
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, { encoded });

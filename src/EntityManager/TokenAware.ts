@@ -55,7 +55,7 @@ export type EntityItemPartial<
   CC extends BaseConfigMap,
   ET extends EntityToken<CC>,
   K = unknown,
-> = Projected<EntityItem<CC, ET>, K>;
+> = Partial<Projected<EntityItem<CC, ET>, K>>;
 
 /** EntityRecordPartial — projected DB record shape by token. */
 export type EntityRecordPartial<
