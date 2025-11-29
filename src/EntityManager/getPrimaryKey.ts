@@ -90,7 +90,10 @@ export function getPrimaryKey<C extends BaseConfigMap>(
   const seen = new Set<string>();
   const keys = hashKeys
     .map((hk) => {
-      const key = { [hashKey]: hk, [rangeKey]: rangeKeyValue } as unknown as EntityKey<C>;
+      const key = {
+        [hashKey]: hk,
+        [rangeKey]: rangeKeyValue,
+      } as unknown as EntityKey<C>;
       const sig = `${hk}|${rangeKeyValue}`;
       if (seen.has(sig)) return undefined;
       seen.add(sig);
