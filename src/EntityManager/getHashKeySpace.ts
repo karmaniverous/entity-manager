@@ -3,9 +3,9 @@ import stringHash from 'string-hash';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
+import type { StorageItem } from './StorageItem';
 import { validateGeneratedProperty } from './validateGeneratedProperty';
 
 /**
@@ -26,7 +26,7 @@ export function getHashKeySpace<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   entityToken: EntityToken<C>,
   hashKeyToken: C['HashKey'] | C['ShardedKeys'],
-  item: EntityItem<C>,
+  item: StorageItem<C>,
   timestampFrom = 0,
   timestampTo = Date.now(),
 ): string[] {

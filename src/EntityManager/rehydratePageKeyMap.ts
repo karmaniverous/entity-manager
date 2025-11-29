@@ -3,13 +3,13 @@ import { cluster, mapValues, range, unique, zipToObject } from 'radash';
 import type { BaseConfigMap } from './BaseConfigMap';
 import { decodeGeneratedProperty } from './decodeGeneratedProperty';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import { getHashKeySpace } from './getHashKeySpace';
 import { getIndexComponents } from './getIndexComponents';
 import type { PageKeyMapByIndexSet } from './PageKeyMap';
 import { rehydrateIndexItem } from './rehydrateIndexItem';
+import type { StorageItem } from './StorageItem';
 import { updateItemRangeKey } from './updateItemRangeKey';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
@@ -109,7 +109,7 @@ export function rehydratePageKeyMap<
         zipToObject(hashKeySpace, (hashKey, i) => {
           if (!dehydratedIndexPageKeyMaps[i]) return;
 
-          let pageKeyItem: EntityItem<C> = {
+          let pageKeyItem: StorageItem<C> = {
             ...decodeGeneratedProperty(entityManager, entityToken, hashKey),
             ...rehydrateIndexItem(
               entityManager,

@@ -1,10 +1,10 @@
 import type { BaseConfigMap } from './BaseConfigMap';
 import { decodeGeneratedProperty } from './decodeGeneratedProperty';
 import { dehydrateIndexItem } from './dehydrateIndexItem';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import type { PageKeyMapByIndexSet } from './PageKeyMap';
+import type { StorageItem } from './StorageItem';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
 /**
@@ -95,7 +95,7 @@ export function dehydratePageKeyMap<
             return item;
           },
           // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter
-          {} as EntityItem<C>,
+          {} as StorageItem<C>,
         );
 
         // Dehydrate index from item.

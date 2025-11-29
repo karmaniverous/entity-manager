@@ -1,8 +1,8 @@
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
-import type { EntityRecord } from './EntityRecord';
 import type { EntityToken } from './EntityToken';
+import type { StorageItem } from './StorageItem';
+import type { StorageRecord } from './StorageRecord';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
@@ -19,8 +19,8 @@ import { validateEntityToken } from './validateEntityToken';
 export function removeKeys<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   entityToken: EntityToken<C>,
-  item: EntityRecord<C>,
-): EntityItem<C> {
+  item: StorageRecord<C>,
+): StorageItem<C> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -52,7 +52,7 @@ export function removeKeys<C extends BaseConfigMap>(
       newItem,
     });
 
-    return newItem;
+    return newItem as StorageItem<C>;
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, { entityToken, item });

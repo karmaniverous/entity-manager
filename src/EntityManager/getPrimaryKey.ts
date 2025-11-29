@@ -1,9 +1,9 @@
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
 import type { EntityKey } from './EntityKey';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import { getHashKeySpace } from './getHashKeySpace';
+import type { StorageItem } from './StorageItem';
 import { updateItemHashKey } from './updateItemHashKey';
 import { updateItemRangeKey } from './updateItemRangeKey';
 
@@ -30,7 +30,7 @@ import { updateItemRangeKey } from './updateItemRangeKey';
 export function getPrimaryKey<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   entityToken: EntityToken<C>,
-  item: EntityItem<C>,
+  item: StorageItem<C>,
   overwrite = false,
 ): EntityKey<C>[] {
   const { hashKey, rangeKey } = entityManager.config;
@@ -39,8 +39,8 @@ export function getPrimaryKey<C extends BaseConfigMap>(
   if (!overwrite && item[hashKey] && item[rangeKey]) {
     return [
       {
-        [hashKey]: item[hashKey] as string,
-        [rangeKey]: item[rangeKey] as string,
+        [hashKey]: item[hashKey as keyof StorageItem<C>]!,
+        [rangeKey]: item[rangeKey as keyof StorageItem<C>]!,
       } as EntityKey<C>,
     ];
   }
@@ -56,10 +56,11 @@ export function getPrimaryKey<C extends BaseConfigMap>(
   // If timestamp present, compute exactly one hash key and return single pair.
   const tsProp = entityManager.config.entities[entityToken].timestampProperty;
   if (withRangeKey[tsProp as keyof EntityItem<C>] !== undefined) {
+    // Note: use StorageItem here
     const withHashKey = updateItemHashKey(
       entityManager,
       entityToken,
-      withRangeKey,
+      withRangeKey as unknown as StorageItem<C>,
       true,
     );
 

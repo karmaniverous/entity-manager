@@ -1,17 +1,17 @@
 import { isNil } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
+import type { StorageItem } from './StorageItem';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Update the range key on an {@link EntityItem | `EntityItem`} object.
+ * Update the range key on an {@link StorageItem | `StorageItem`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param entityToken - {@link Config.entities | `this.config.entities`} key.
- * @param item - {@link EntityItem | `EntityItem`} object.
+ * @param item - {@link StorageItem | `StorageItem`} object.
  * @param overwrite - Overwrite existing {@link ConfigKeys.rangeKey | `this.config.rangeKey`} property value (default `false`).
  *
  * @returns Shallow clone of `item` with updated range key.
@@ -22,16 +22,16 @@ import { validateEntityToken } from './validateEntityToken';
 export function updateItemRangeKey<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   entityToken: EntityToken<C>,
-  item: EntityItem<C>,
+  item: StorageItem<C>,
   overwrite = false,
-): EntityItem<C> {
+): StorageItem<C> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
 
     // Return current item if rangeKey exists and overwrite is false.
     if (
-      item[entityManager.config.rangeKey as keyof EntityItem<C>] &&
+      item[entityManager.config.rangeKey as keyof StorageItem<C>] &&
       !overwrite
     ) {
       entityManager.logger.debug(
@@ -50,7 +50,7 @@ export function updateItemRangeKey<C extends BaseConfigMap>(
     const uniqueProperty =
       item[
         entityManager.config.entities[entityToken]
-          .uniqueProperty as keyof EntityItem<C>
+          .uniqueProperty as keyof StorageItem<C>
       ];
 
     if (isNil(uniqueProperty)) throw new Error(`missing item unique property`);
@@ -64,7 +64,7 @@ export function updateItemRangeKey<C extends BaseConfigMap>(
           uniqueProperty,
         ].join(entityManager.config.generatedValueDelimiter),
       },
-    );
+    ) as StorageItem<C>;
 
     entityManager.logger.debug('updated entity item range key', {
       entityToken,

@@ -2,18 +2,18 @@ import { isNil } from '@karmaniverous/entity-tools';
 import stringHash from 'string-hash';
 
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import { getShardBump } from './getShardBump';
+import type { StorageItem } from './StorageItem';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Update the hash key on an partial {@link EntityItem | `EntityItem`} object.
+ * Update the hash key on an partial {@link StorageItem | `StorageItem`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param entityToken - {@link Config.entities | `this.config.entities`} key.
- * @param item - {@link EntityItem | `EntityItem`} object.
+ * @param item - {@link StorageItem | `StorageItem`} object.
  * @param overwrite - Overwrite existing {@link ConfigKeys.hashKey | `this.config.hashKey`} property value (default `false`).
  *
  * @returns Shallow clone of `item` with updated hash key.
@@ -23,16 +23,16 @@ import { validateEntityToken } from './validateEntityToken';
 export function updateItemHashKey<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   entityToken: EntityToken<C>,
-  item: EntityItem<C>,
+  item: StorageItem<C>,
   overwrite = false,
-): EntityItem<C> {
+): StorageItem<C> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
 
     // Return current item if hashKey exists and overwrite is false.
     if (
-      item[entityManager.config.hashKey as keyof EntityItem<C>] &&
+      item[entityManager.config.hashKey as keyof StorageItem<C>] &&
       !overwrite
     ) {
       entityManager.logger.debug(
@@ -50,7 +50,7 @@ export function updateItemHashKey<C extends BaseConfigMap>(
     // Get item timestamp property & validate.
     const timestamp: number = item[
       entityManager.config.entities[entityToken]
-        .timestampProperty as keyof EntityItem<C>
+        .timestampProperty as keyof StorageItem<C>
     ] as unknown as number;
 
     if (isNil(timestamp)) throw new Error(`missing item timestamp property`);
@@ -75,7 +75,7 @@ export function updateItemHashKey<C extends BaseConfigMap>(
       const uniqueId =
         item[
           entityManager.config.entities[entityToken]
-            .uniqueProperty as keyof EntityItem<C>
+            .uniqueProperty as keyof StorageItem<C>
         ];
 
       if (isNil(uniqueId)) throw new Error(`missing item unique property`);
@@ -88,7 +88,7 @@ export function updateItemHashKey<C extends BaseConfigMap>(
     const newItem = Object.assign(
       { ...item },
       { [entityManager.config.hashKey]: hashKey },
-    );
+    ) as StorageItem<C>;
 
     entityManager.logger.debug('updated entity item hash key', {
       entityToken,

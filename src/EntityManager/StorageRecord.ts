@@ -2,16 +2,16 @@
 import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools'; // imported to support API docs
 
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
 import type { EntityKey } from './EntityKey';
+import type { StorageItem } from './StorageItem';
 
 /**
- * Database-facing record type from a {@link BaseConfigMap | `ConfigMap`} with required hash & range keys.
+ * Storage-facing record type with required keys.
  *
  * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityManager
- * @protected
+ * @internal
  */
-export type EntityRecord<CC extends BaseConfigMap> = EntityItem<CC> &
+export type StorageRecord<CC extends BaseConfigMap> = StorageItem<CC> &
   EntityKey<CC>;

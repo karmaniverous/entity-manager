@@ -1,8 +1,8 @@
 import type { BaseConfigMap } from './BaseConfigMap';
 import { encodeElement } from './encodeElement';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
+import type { StorageItem } from './StorageItem';
 import { unwrapIndex } from './unwrapIndex';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
@@ -33,7 +33,7 @@ export function dehydrateIndexItem<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   entityToken: EntityToken<C>,
   indexToken: string,
-  item: EntityItem<C> | undefined,
+  item: StorageItem<C> | undefined,
 ): string {
   try {
     // Validate params.

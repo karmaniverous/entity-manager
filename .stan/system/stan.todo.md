@@ -116,4 +116,12 @@
 
 - Fix: replaced removeKeys implementation with a generic, conditional signature
   that ties the return shape to the input (array vs single) and remains a proper
-  supertype of all overloads without using any.
+  supertype of all overloads without using any.
+
+- Internal types: renamed EntityItem/EntityRecord → StorageItem/StorageRecord
+  (token-agnostic, storage-facing) and updated all helper imports to remove
+  collisions with public by-token types. Kept Storage* @internal (not exported).
+
+- Policy alignment: confirmed requirements already mandate by-token signatures
+  for helpers that accept entityToken; this change is a stepping stone toward
+  converting remaining helpers (encodeElement/decodeElement remain property-level).

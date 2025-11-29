@@ -5,9 +5,7 @@ import { addKeys } from './addKeys';
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { Config } from './Config';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
-import type { EntityItem } from './EntityItem';
 import type { EntityKey } from './EntityKey';
-import type { EntityRecord } from './EntityRecord';
 import type { EntityToken } from './EntityToken';
 import type { EntityToken as ETToken } from './EntityToken';
 import { findIndexToken } from './findIndexToken';
@@ -18,6 +16,7 @@ import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
 import { removeKeys } from './removeKeys';
+import type { StorageRecord } from './StorageRecord';
 import type {
   EntityItem as DomainItem,
   EntityItemPartial,
@@ -235,36 +234,21 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
     items: EntityRecordPartial<CC, ET, K>[],
   ): EntityItemPartial<CC, ET, K>[];
 
-  removeKeys<
-    ET extends EntityToken<CC>,
-    K = unknown,
-    I extends
-      | DbRecord<CC, ET>
-      | EntityRecordPartial<CC, ET, K>
-      | (DbRecord<CC, ET> | EntityRecordPartial<CC, ET, K>)[],
-  >(
+  removeKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
-    i: I,
-  ): I extends unknown[] ? DomainItem<CC, ET>[] : DomainItem<CC, ET> {
+    i: DbRecord<CC, ET> | DbRecord<CC, ET>[],
+  ): DomainItem<CC, ET> | DomainItem<CC, ET>[] {
     if (Array.isArray(i)) {
-      const result = i.map((item) =>
-        removeKeys(this, entityToken, item as unknown as EntityRecord<CC>),
+      return i.map((item) =>
+        removeKeys(this, entityToken, item as unknown as StorageRecord<CC>),
       ) as unknown as DomainItem<CC, ET>[];
-
-      return result as unknown as I extends unknown[]
-        ? DomainItem<CC, ET>[]
-        : DomainItem<CC, ET>;
     }
 
-    const single = removeKeys(
+    return removeKeys(
       this,
       entityToken,
-      i as unknown as EntityRecord<CC>,
+      i as unknown as StorageRecord<CC>,
     ) as unknown as DomainItem<CC, ET>;
-
-    return single as unknown as I extends unknown[]
-      ? DomainItem<CC, ET>[]
-      : DomainItem<CC, ET>;
   }
 
   /**

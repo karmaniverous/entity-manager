@@ -1,8 +1,8 @@
 import { isNil } from '@karmaniverous/entity-tools';
 
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
+import type { StorageItem } from './StorageItem';
 import { validateGeneratedProperty } from './validateGeneratedProperty';
 
 /**
@@ -10,7 +10,7 @@ import { validateGeneratedProperty } from './validateGeneratedProperty';
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param property - {@link Config.generatedProperties | Generated property} key.
- * @param item - {@link EntityItem | `EntityItem`} object.
+ * @param item - {@link StorageItem | `StorageItem`} object.
  *
  * @returns Encoded generated property value.
  *
@@ -19,7 +19,7 @@ import { validateGeneratedProperty } from './validateGeneratedProperty';
 export function encodeGeneratedProperty<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   property: C['ShardedKeys'] | C['UnshardedKeys'],
-  item: EntityItem<C>,
+  item: StorageItem<C>,
 ): string | undefined {
   try {
     // Validate params.
@@ -33,7 +33,10 @@ export function encodeGeneratedProperty<C extends BaseConfigMap>(
     ][property] as C['TranscodedProperties'][];
 
     // Map elements to [element, value] pairs.
-    const elementMap = elements.map((element) => [element, item[element]]);
+    const elementMap = elements.map((element) => [
+      element,
+      item[element as keyof StorageItem<C>],
+    ]);
 
     // Return undefined if sharded & atomicity requirement fails.
     if (sharded && elementMap.some(([, value]) => isNil(value))) return;
@@ -41,7 +44,7 @@ export function encodeGeneratedProperty<C extends BaseConfigMap>(
     // Encode property value.
     const encoded = [
       ...(sharded
-        ? [item[entityManager.config.hashKey as keyof EntityItem<C>]]
+        ? [item[entityManager.config.hashKey as keyof StorageItem<C>]]
         : []),
       ...elementMap.map(([element, value]) =>
         [element, `${value ?? ''}`].join(

@@ -2,9 +2,9 @@ import { shake, zipToObject } from 'radash';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import { decodeElement } from './decodeElement';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
+import type { StorageItem } from './StorageItem';
 import { unwrapIndex } from './unwrapIndex';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
@@ -32,7 +32,7 @@ export function rehydrateIndexItem<C extends BaseConfigMap>(
   entityToken: EntityToken<C>,
   indexToken: string,
   dehydrated: string,
-): EntityItem<C> {
+): StorageItem<C> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -61,7 +61,7 @@ export function rehydrateIndexItem<C extends BaseConfigMap>(
           decodeElement(entityManager, elements[i], value),
         ),
       ),
-    ) as EntityItem<C>;
+    ) as StorageItem<C>;
 
     entityManager.logger.debug('rehydrated index', {
       entityToken,

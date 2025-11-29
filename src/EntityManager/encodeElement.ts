@@ -1,6 +1,6 @@
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
+import type { StorageItem } from './StorageItem';
 
 /**
  * Encode an {@link EntityItem | `EntityItem`} generated property element or ungenerated index component using the associated {@link Transcodes | Transcodes} `encode` function.
@@ -20,7 +20,7 @@ import type { EntityManager } from './EntityManager';
 export function encodeElement<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   element: C['HashKey'] | C['RangeKey'] | C['TranscodedProperties'],
-  item: EntityItem<C>,
+  item: StorageItem<C>,
 ): string | undefined {
   try {
     const { hashKey, rangeKey, propertyTranscodes, transcodes } =

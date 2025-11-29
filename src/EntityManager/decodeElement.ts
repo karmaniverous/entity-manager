@@ -1,6 +1,6 @@
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
+import type { StorageItem } from './StorageItem';
 import { validateTranscodedProperty } from './validateTranscodedProperty';
 
 /**
@@ -22,7 +22,7 @@ export function decodeElement<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   element: C['TranscodedProperties'],
   value: string | undefined,
-): EntityItem<C>[C['TranscodedProperties']] | undefined {
+): StorageItem<C>[C['TranscodedProperties']] | undefined {
   try {
     // Validate params.
     validateTranscodedProperty(entityManager, element);
@@ -35,7 +35,9 @@ export function decodeElement<C extends BaseConfigMap>(
       v: string,
     ) => unknown;
 
-    const decoded = decodeFn(value) as EntityItem<C>[C['TranscodedProperties']];
+    const decoded = decodeFn(
+      value,
+    ) as StorageItem<C>[C['TranscodedProperties']];
 
     entityManager.logger.debug('decoded entity element', {
       element,

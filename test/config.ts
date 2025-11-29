@@ -5,8 +5,8 @@ import {
 } from '@karmaniverous/entity-tools';
 
 import type { ConfigMap } from '../src/EntityManager/ConfigMap';
-import type { EntityItem } from '../src/EntityManager/EntityItem';
 import { EntityManager } from '../src/EntityManager/EntityManager';
+import type { StorageItem } from '../src/EntityManager/StorageItem';
 import type { User } from './users';
 
 export const now = Date.now();
@@ -108,4 +108,4 @@ export const entityManager = new EntityManager<MyConfigMap>(
   testLogger,
 );
 
-export type Item = EntityItem<MyConfigMap>;
+export type Item = StorageItem<MyConfigMap>;
