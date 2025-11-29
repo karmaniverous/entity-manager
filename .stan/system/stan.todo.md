@@ -113,3 +113,7 @@
 - Fix: resolved TS2394 in EntityManager.removeKeys by adding generic K to the
   implementation and widening its parameter to accept strict/projected record(s)
   (single/array). Kept return as strict DomainItem(s); overloads remain authoritative.
+
+- Fix: replaced removeKeys implementation with a generic, conditional signature
+  that ties the return shape to the input (array vs single) and remains a proper
+  supertype of all overloads without using any.
