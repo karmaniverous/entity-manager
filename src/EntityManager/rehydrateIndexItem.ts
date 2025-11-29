@@ -4,7 +4,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import { decodeElement } from './decodeElement';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
-import type { StorageItem } from './StorageItem';
+import type { EntityItemPartial } from './TokenAware';
 import { unwrapIndex } from './unwrapIndex';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
@@ -32,7 +32,7 @@ export function rehydrateIndexItem<C extends BaseConfigMap>(
   entityToken: EntityToken<C>,
   indexToken: string,
   dehydrated: string,
-): StorageItem<C> {
+): EntityItemPartial<C, EntityToken<C>> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -61,7 +61,7 @@ export function rehydrateIndexItem<C extends BaseConfigMap>(
           decodeElement(entityManager, elements[i], value),
         ),
       ),
-    ) as StorageItem<C>;
+    ) as EntityItemPartial<C, EntityToken<C>>;
 
     entityManager.logger.debug('rehydrated index', {
       entityToken,

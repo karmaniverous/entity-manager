@@ -3,6 +3,7 @@ import { encodeElement } from './encodeElement';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import type { StorageItem } from './StorageItem';
+import type { EntityItemPartial } from './TokenAware';
 import { unwrapIndex } from './unwrapIndex';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
@@ -33,7 +34,7 @@ export function dehydrateIndexItem<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   entityToken: EntityToken<C>,
   indexToken: string,
-  item: StorageItem<C> | undefined,
+  item: EntityItemPartial<C, EntityToken<C>> | undefined,
 ): string {
   try {
     // Validate params.
@@ -54,7 +55,13 @@ export function dehydrateIndexItem<C extends BaseConfigMap>(
     const { generatedKeyDelimiter } = entityManager.config;
 
     const dehydrated = elements
-      .map((element) => encodeElement(entityManager, element, item))
+      .map((element) =>
+        encodeElement(
+          entityManager,
+          element,
+          item as unknown as StorageItem<C>,
+        ),
+      )
       .join(generatedKeyDelimiter);
 
     entityManager.logger.debug('dehydrated index', {

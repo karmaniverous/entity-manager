@@ -16,6 +16,7 @@ import { query } from './query';
 import type { QueryOptions } from './QueryOptions';
 import type { QueryResult } from './QueryResult';
 import { removeKeys } from './removeKeys';
+import type { StorageItem } from './StorageItem';
 import type { StorageRecord } from './StorageRecord';
 import type {
   EntityItem as DomainItem,
@@ -91,7 +92,7 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
    * Encode a generated property value. Returns a string or undefined if atomicity requirement of sharded properties not met.
    *
    * @param property - {@link Config | Config} `generatedProperties` key.
-   * @param item - {@link EntityItem | `EntityItem`} object.
+   * @param item - {@link StorageItem | `StorageItem`} object.
    *
    * @returns Encoded generated property value.
    *
@@ -99,7 +100,7 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
    */
   encodeGeneratedProperty(
     property: CC['ShardedKeys'] | CC['UnshardedKeys'],
-    item: EntityItem<CC>,
+    item: StorageItem<CC>,
   ): string | undefined {
     return encodeGeneratedProperty(this, property as never, item as never);
   }
@@ -138,19 +139,14 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
   ): EntityRecordPartial<CC, ET> | EntityRecordPartial<CC, ET>[] {
     if (Array.isArray(i)) {
       return i.map((item) =>
-        addKeys(
-          this,
-          entityToken,
-          item as unknown as EntityItem<CC>,
-          overwrite,
-        ),
+        addKeys(this, entityToken, item, overwrite),
       ) as unknown as EntityRecordPartial<CC, ET>[];
     }
 
     return addKeys(
       this,
       entityToken,
-      i as unknown as EntityItem<CC>,
+      i,
       overwrite,
     ) as unknown as EntityRecordPartial<CC, ET>;
   }
@@ -159,11 +155,10 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
    * Convert one or more {@link EntityItem | `EntityItem`} objects into an array of {@link EntityKey | `EntityKey`} values.
    *
    * @param entityToken - {@link Config | `Config`} `entities` key.
-   * @param item - {@link EntityItem | `EntityItem`} object, or array of them.
+   * @param item - {@link EntityItem | `EntityItem`} object.
    * @param overwrite - Overwrite existing properties (default `false`).
    *
-   * @returns An array of {@link EntityKey | `EntityKey`} values. For a single input item, returns 0..N keys (usually 1).
-   *          For an array input, returns a single flattened array of keys across all inputs.
+   * @returns Array of {@link EntityKey | `EntityKey`} values derived from `item`.
    *
    * @throws `Error` if `entityToken` is invalid.
    */
@@ -188,21 +183,11 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
   ): EntityKey<CC>[] {
     if (Array.isArray(i)) {
       return i.flatMap((item) =>
-        getPrimaryKey(
-          this,
-          entityToken,
-          item as unknown as EntityItem<CC>,
-          overwrite,
-        ),
+        getPrimaryKey(this, entityToken, item, overwrite),
       );
     }
 
-    return getPrimaryKey(
-      this,
-      entityToken,
-      i as unknown as EntityItem<CC>,
-      overwrite,
-    );
+    return getPrimaryKey(this, entityToken, i, overwrite);
   }
 
   /**
@@ -240,14 +225,14 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
   ): DomainItem<CC, ET> | DomainItem<CC, ET>[] {
     if (Array.isArray(i)) {
       return i.map((item) =>
-        removeKeys(this, entityToken, item as unknown as StorageRecord<CC>),
+        removeKeys(this, entityToken, item as StorageRecord<CC>),
       ) as unknown as DomainItem<CC, ET>[];
     }
 
     return removeKeys(
       this,
       entityToken,
-      i as unknown as StorageRecord<CC>,
+      i as StorageRecord<CC>,
     ) as unknown as DomainItem<CC, ET>;
   }
 

@@ -5,11 +5,11 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import { getShardBump } from './getShardBump';
-import type { StorageItem } from './StorageItem';
+import type { EntityItemPartial, EntityRecordPartial } from './TokenAware';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Update the hash key on an partial {@link StorageItem | `StorageItem`} object.
+ * Update the hash key on an {@link EntityItemPartial | `EntityItemPartial`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param entityToken - {@link Config.entities | `this.config.entities`} key.
@@ -20,12 +20,15 @@ import { validateEntityToken } from './validateEntityToken';
  *
  * @throws `Error` if `entityToken` is invalid.
  */
-export function updateItemHashKey<C extends BaseConfigMap>(
+export function updateItemHashKey<
+  C extends BaseConfigMap,
+  T extends EntityToken<C>,
+>(
   entityManager: EntityManager<C>,
-  entityToken: EntityToken<C>,
-  item: StorageItem<C>,
+  entityToken: T,
+  item: EntityItemPartial<C, T>,
   overwrite = false,
-): StorageItem<C> {
+): EntityRecordPartial<C, T> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -48,10 +51,9 @@ export function updateItemHashKey<C extends BaseConfigMap>(
     }
 
     // Get item timestamp property & validate.
-    const timestamp: number = item[
-      entityManager.config.entities[entityToken]
-        .timestampProperty as keyof StorageItem<C>
-    ] as unknown as number;
+    const timestamp: number = (item as Record<string, unknown>)[
+      entityManager.config.entities[entityToken].timestampProperty
+    ] as number;
 
     if (isNil(timestamp)) throw new Error(`missing item timestamp property`);
 
@@ -72,11 +74,9 @@ export function updateItemHashKey<C extends BaseConfigMap>(
       // all placeholders are utilized (e.g., chars=2, charBits=2 => 16 combos).
       const space = radix ** chars;
       // Get item unique property & validate.
-      const uniqueId =
-        item[
-          entityManager.config.entities[entityToken]
-            .uniqueProperty as keyof StorageItem<C>
-        ];
+      const uniqueId = (item as Record<string, unknown>)[
+        entityManager.config.entities[entityToken].uniqueProperty
+      ];
 
       if (isNil(uniqueId)) throw new Error(`missing item unique property`);
 
@@ -88,7 +88,7 @@ export function updateItemHashKey<C extends BaseConfigMap>(
     const newItem = Object.assign(
       { ...item },
       { [entityManager.config.hashKey]: hashKey },
-    ) as StorageItem<C>;
+    ) as EntityRecordPartial<C, T>;
 
     entityManager.logger.debug('updated entity item hash key', {
       entityToken,

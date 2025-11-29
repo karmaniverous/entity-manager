@@ -3,7 +3,7 @@ import type { EntityKey } from './EntityKey';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import { getHashKeySpace } from './getHashKeySpace';
-import type { StorageItem } from './StorageItem';
+import type { EntityItemPartial, EntityRecordPartial } from './TokenAware';
 import { updateItemHashKey } from './updateItemHashKey';
 import { updateItemRangeKey } from './updateItemRangeKey';
 
@@ -30,17 +30,20 @@ import { updateItemRangeKey } from './updateItemRangeKey';
 export function getPrimaryKey<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   entityToken: EntityToken<C>,
-  item: StorageItem<C>,
+  item: EntityItemPartial<C, EntityToken<C>>,
   overwrite = false,
 ): EntityKey<C>[] {
   const { hashKey, rangeKey } = entityManager.config;
 
   // If both keys are present and we're not overwriting, return the exact pair.
-  if (!overwrite && item[hashKey] && item[rangeKey]) {
+  const rec = item as Partial<Record<string, string>>;
+  const hk = hashKey;
+  const rk = rangeKey;
+  if (!overwrite && rec[hk] && rec[rk]) {
     return [
       {
-        [hashKey]: item[hashKey as keyof StorageItem<C>]!,
-        [rangeKey]: item[rangeKey as keyof StorageItem<C>]!,
+        [hashKey]: rec[hk],
+        [rangeKey]: rec[rk],
       } as EntityKey<C>,
     ];
   }
@@ -55,12 +58,12 @@ export function getPrimaryKey<C extends BaseConfigMap>(
 
   // If timestamp present, compute exactly one hash key and return single pair.
   const tsProp = entityManager.config.entities[entityToken].timestampProperty;
-  if (withRangeKey[tsProp as keyof EntityItem<C>] !== undefined) {
+  if ((withRangeKey as Record<string, unknown>)[tsProp] !== undefined) {
     // Note: use StorageItem here
     const withHashKey = updateItemHashKey(
       entityManager,
       entityToken,
-      withRangeKey as unknown as StorageItem<C>,
+      withRangeKey,
       true,
     );
 

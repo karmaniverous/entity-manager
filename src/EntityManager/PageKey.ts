@@ -2,7 +2,7 @@
 import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools'; // imported to support API docs
 
 import type { BaseConfigMap } from './BaseConfigMap';
-import type { EntityItem } from './EntityItem';
+import type { StorageItem } from './StorageItem';
 import type { EntityToken } from './EntityToken';
 
 /**
@@ -14,7 +14,7 @@ import type { EntityToken } from './EntityToken';
  * @protected
  */
 export type PageKey<CC extends BaseConfigMap> = Pick<
-  EntityItem<CC>,
+  StorageItem<CC>,
   | CC['HashKey']
   | CC['RangeKey']
   | CC['ShardedKeys']
@@ -152,3 +152,4 @@ export type PageKeyByIndex<
   IT extends string = string,
   CF = unknown,
 > = Pick<EntityItem<CC>, IndexComponentTokens<CC, CF, IT>>;
+> = Pick<StorageItem<CC>, IndexComponentTokens<CC, CF, IT>>;

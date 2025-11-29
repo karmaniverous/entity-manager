@@ -1,11 +1,11 @@
 import { mapValues, pick } from 'radash';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import type { MyConfigMap } from '../../test/config';
 import { entityManager, type Item } from '../../test/config';
 import { getUsers } from '../../test/users';
 import { dehydratedPattern } from '../../test/util';
 import { addKeys } from './addKeys';
-import type { MyConfigMap } from './Config.types';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
 import { getIndexComponents } from './getIndexComponents';
 import type { PageKeyMap } from './PageKeyMap';

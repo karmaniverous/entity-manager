@@ -4,8 +4,8 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
-import type { StorageItem } from './StorageItem';
-import type { StorageRecord } from './StorageRecord';
+import type { EntityToken as ET } from './EntityToken';
+import type { EntityItemPartial, EntityRecordPartial } from './TokenAware';
 import { updateItemHashKey } from './updateItemHashKey';
 import { updateItemRangeKey } from './updateItemRangeKey';
 import { validateEntityToken } from './validateEntityToken';
@@ -22,12 +22,12 @@ import { validateEntityToken } from './validateEntityToken';
  *
  * @throws `Error` if `entityToken` is invalid.
  */
-export function addKeys<C extends BaseConfigMap>(
+export function addKeys<C extends BaseConfigMap, T extends EntityToken<C>>(
   entityManager: EntityManager<C>,
-  entityToken: EntityToken<C>,
-  item: StorageItem<C>,
+  entityToken: T,
+  item: EntityItemPartial<C, T>,
   overwrite = false,
-): StorageRecord<C> {
+): EntityRecordPartial<C, T> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -52,7 +52,7 @@ export function addKeys<C extends BaseConfigMap>(
     const { sharded, unsharded } = entityManager.config.generatedProperties;
 
     for (const property in { ...sharded, ...unsharded }) {
-      if (overwrite || isNil(item[property as keyof StorageItem<C>])) {
+      if (overwrite || isNil(item[property as keyof typeof item])) {
         const encoded = encodeGeneratedProperty(
           entityManager,
           property as C['ShardedKeys'] | C['UnshardedKeys'],
@@ -62,7 +62,7 @@ export function addKeys<C extends BaseConfigMap>(
         if (encoded) Object.assign(newItem, { [property]: encoded });
         else
           // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-          delete newItem[property as keyof StorageItem<C>];
+          delete (newItem as Record<string, unknown>)[property];
       }
     }
 
@@ -73,7 +73,7 @@ export function addKeys<C extends BaseConfigMap>(
       newItem,
     });
 
-    return newItem as StorageRecord<C>;
+    return newItem;
   } catch (error) {
     if (error instanceof Error)
       entityManager.logger.error(error.message, {

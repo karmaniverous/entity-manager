@@ -9,7 +9,7 @@ import { getHashKeySpace } from './getHashKeySpace';
 import { getIndexComponents } from './getIndexComponents';
 import type { PageKeyMapByIndexSet } from './PageKeyMap';
 import { rehydrateIndexItem } from './rehydrateIndexItem';
-import type { StorageItem } from './StorageItem';
+import type { EntityItemPartial } from './TokenAware';
 import { updateItemRangeKey } from './updateItemRangeKey';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
@@ -44,7 +44,7 @@ export function rehydratePageKeyMap<
   entityManager: EntityManager<C>,
   entityToken: ET,
   indexTokens: ITS[],
-  item: EntityItem<C>,
+  item: EntityItemPartial<C, ET>,
   dehydrated: string[] | undefined,
   timestampFrom = 0,
   timestampTo = Date.now(),
@@ -109,7 +109,7 @@ export function rehydratePageKeyMap<
         zipToObject(hashKeySpace, (hashKey, i) => {
           if (!dehydratedIndexPageKeyMaps[i]) return;
 
-          let pageKeyItem: StorageItem<C> = {
+          let pageKeyItem: EntityItemPartial<C, ET> = {
             ...decodeGeneratedProperty(entityManager, entityToken, hashKey),
             ...rehydrateIndexItem(
               entityManager,

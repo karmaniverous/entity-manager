@@ -4,7 +4,7 @@ import { dehydrateIndexItem } from './dehydrateIndexItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import type { PageKeyMapByIndexSet } from './PageKeyMap';
-import type { StorageItem } from './StorageItem';
+import type { EntityItemPartial } from './TokenAware';
 import { validateEntityToken } from './validateEntityToken';
 import { validateIndexToken } from './validateIndexToken';
 /**
@@ -95,7 +95,7 @@ export function dehydratePageKeyMap<
             return item;
           },
           // eslint-disable-next-line @typescript-eslint/prefer-reduce-type-parameter
-          {} as StorageItem<C>,
+          {} as EntityItemPartial<C, ET>,
         );
 
         // Dehydrate index from item.

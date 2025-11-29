@@ -1,7 +1,7 @@
 import type { MyConfigMap } from './Config.types';
-import type { EntityItem } from './EntityItem';
+import type { StorageItem } from './StorageItem';
 
-export type MyEntityItem = EntityItem<MyConfigMap>;
+export type MyEntityItem = StorageItem<MyConfigMap>;
 
 export type keys = keyof MyEntityItem;
 

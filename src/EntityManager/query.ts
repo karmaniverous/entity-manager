@@ -4,7 +4,6 @@ import { isInt, parallel, unique } from 'radash';
 
 import type { BaseConfigMap } from './BaseConfigMap';
 import { dehydratePageKeyMap } from './dehydratePageKeyMap';
-import type { EntityItem } from './EntityItem';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import type { PageKeyByIndex } from './PageKey';
@@ -83,7 +82,7 @@ export async function query<
       entityManager,
       entityToken,
       Object.keys(shardQueryMap) as ITS[],
-      item as EntityItem<C>,
+      item as DomainItem<C, ET> as unknown as Record<string, unknown>, // narrowed at call sites; safe for rehydration seed
       pageKeyMap
         ? (JSON.parse(
             decompressFromEncodedURIComponent(pageKeyMap),
@@ -186,7 +185,7 @@ export async function query<
         (
           i[
             entityManager.config.entities[entityToken]
-              .uniqueProperty as keyof EntityItem<C>
+              .uniqueProperty as keyof DomainItem<C, ET>
           ] as string | number
         ).toString(),
       ),

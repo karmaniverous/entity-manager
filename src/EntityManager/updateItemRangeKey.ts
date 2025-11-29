@@ -3,11 +3,11 @@ import { isNil } from '@karmaniverous/entity-tools';
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
-import type { StorageItem } from './StorageItem';
+import type { EntityItemPartial, EntityRecordPartial } from './TokenAware';
 import { validateEntityToken } from './validateEntityToken';
 
 /**
- * Update the range key on an {@link StorageItem | `StorageItem`} object.
+ * Update the range key on an {@link EntityItemPartial | `EntityItemPartial`} object.
  *
  * @param entityManager - {@link EntityManager | `EntityManager`} instance.
  * @param entityToken - {@link Config.entities | `this.config.entities`} key.
@@ -22,9 +22,9 @@ import { validateEntityToken } from './validateEntityToken';
 export function updateItemRangeKey<C extends BaseConfigMap>(
   entityManager: EntityManager<C>,
   entityToken: EntityToken<C>,
-  item: StorageItem<C>,
+  item: EntityItemPartial<C, EntityToken<C>>,
   overwrite = false,
-): StorageItem<C> {
+): EntityRecordPartial<C, EntityToken<C>> {
   try {
     // Validate params.
     validateEntityToken(entityManager, entityToken);
@@ -64,7 +64,7 @@ export function updateItemRangeKey<C extends BaseConfigMap>(
           uniqueProperty,
         ].join(entityManager.config.generatedValueDelimiter),
       },
-    ) as StorageItem<C>;
+    ) as EntityRecordPartial<C, EntityToken<C>>;
 
     entityManager.logger.debug('updated entity item range key', {
       entityToken,
