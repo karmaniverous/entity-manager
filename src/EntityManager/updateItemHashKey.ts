@@ -5,6 +5,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import { getShardBump } from './getShardBump';
+import type { StorageItem } from './StorageItem';
 import type { EntityItemPartial, EntityRecordPartial } from './TokenAware';
 import { validateEntityToken } from './validateEntityToken';
 
@@ -35,7 +36,9 @@ export function updateItemHashKey<
 
     // Return current item if hashKey exists and overwrite is false.
     if (
-      item[entityManager.config.hashKey as keyof StorageItem<C>] &&
+      (item as StorageItem<C>)[
+        entityManager.config.hashKey as keyof StorageItem<C>
+      ] &&
       !overwrite
     ) {
       entityManager.logger.debug(
@@ -51,9 +54,9 @@ export function updateItemHashKey<
     }
 
     // Get item timestamp property & validate.
-    const timestamp: number = (item as Record<string, unknown>)[
-      entityManager.config.entities[entityToken].timestampProperty
-    ] as number;
+    const tsProp = entityManager.config.entities[entityToken]
+      .timestampProperty as keyof StorageItem<C>;
+    const timestamp = (item as StorageItem<C>)[tsProp] as unknown as number;
 
     if (isNil(timestamp)) throw new Error(`missing item timestamp property`);
 
@@ -73,14 +76,15 @@ export function updateItemHashKey<
       // Compute the full shard space for this bump. Use radix ** chars to ensure
       // all placeholders are utilized (e.g., chars=2, charBits=2 => 16 combos).
       const space = radix ** chars;
+
       // Get item unique property & validate.
-      const uniqueId = (item as Record<string, unknown>)[
-        entityManager.config.entities[entityToken].uniqueProperty
-      ];
+      const upProp = entityManager.config.entities[entityToken]
+        .uniqueProperty as keyof StorageItem<C>;
+      const uniqueId = (item as StorageItem<C>)[upProp];
 
       if (isNil(uniqueId)) throw new Error(`missing item unique property`);
 
-      hashKey += (stringHash(uniqueId) % space)
+      hashKey += (stringHash(String(uniqueId)) % space)
         .toString(radix)
         .padStart(chars, '0');
     }

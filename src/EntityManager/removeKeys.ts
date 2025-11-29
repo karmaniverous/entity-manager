@@ -1,6 +1,7 @@
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
+import type { StorageItem } from './StorageItem';
 import type { StorageRecord } from './StorageRecord';
 import { validateEntityToken } from './validateEntityToken';
 

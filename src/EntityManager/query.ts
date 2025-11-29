@@ -82,7 +82,7 @@ export async function query<
       entityManager,
       entityToken,
       Object.keys(shardQueryMap) as ITS[],
-      item as DomainItem<C, ET> as unknown as Record<string, unknown>, // narrowed at call sites; safe for rehydration seed
+      item as EntityItemPartial<C, ET>,
       pageKeyMap
         ? (JSON.parse(
             decompressFromEncodedURIComponent(pageKeyMap),

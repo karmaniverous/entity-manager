@@ -4,6 +4,7 @@ import type { BaseConfigMap } from './BaseConfigMap';
 import { encodeGeneratedProperty } from './encodeGeneratedProperty';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
+import type { StorageItem } from './StorageItem';
 import type { EntityItemPartial, EntityRecordPartial } from './TokenAware';
 import { updateItemHashKey } from './updateItemHashKey';
 import { updateItemRangeKey } from './updateItemRangeKey';
@@ -55,7 +56,7 @@ export function addKeys<C extends BaseConfigMap, T extends EntityToken<C>>(
         const encoded = encodeGeneratedProperty(
           entityManager,
           property as C['ShardedKeys'] | C['UnshardedKeys'],
-          newItem,
+          newItem as StorageItem<C>,
         );
 
         if (encoded) Object.assign(newItem, { [property]: encoded });

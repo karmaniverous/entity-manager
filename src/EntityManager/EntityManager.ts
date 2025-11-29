@@ -219,21 +219,29 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
     items: EntityRecordPartial<CC, ET, K>[],
   ): EntityItemPartial<CC, ET, K>[];
 
-  removeKeys<ET extends EntityToken<CC>>(
+  removeKeys<ET extends EntityToken<CC>, K = unknown>(
     entityToken: ET,
-    i: DbRecord<CC, ET> | DbRecord<CC, ET>[],
-  ): DomainItem<CC, ET> | DomainItem<CC, ET>[] {
+    i:
+      | DbRecord<CC, ET>
+      | EntityRecordPartial<CC, ET, K>
+      | DbRecord<CC, ET>[]
+      | EntityRecordPartial<CC, ET, K>[],
+  ):
+    | DomainItem<CC, ET>
+    | EntityItemPartial<CC, ET, K>
+    | DomainItem<CC, ET>[]
+    | EntityItemPartial<CC, ET, K>[] {
     if (Array.isArray(i)) {
-      return i.map((item) =>
+      const out = i.map((item) =>
         removeKeys(this, entityToken, item as StorageRecord<CC>),
-      ) as unknown as DomainItem<CC, ET>[];
+      );
+      return out as unknown as
+        | DomainItem<CC, ET>[]
+        | EntityItemPartial<CC, ET, K>[];
     }
 
-    return removeKeys(
-      this,
-      entityToken,
-      i as StorageRecord<CC>,
-    ) as unknown as DomainItem<CC, ET>;
+    const out = removeKeys(this, entityToken, i as StorageRecord<CC>);
+    return out as unknown as DomainItem<CC, ET> | EntityItemPartial<CC, ET, K>;
   }
 
   /**
@@ -307,6 +315,7 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
   >(
     options: QueryOptions<CC, ET, ITS, CF, K>,
   ): Promise<QueryResult<CC, ET, ITS, K>> {
-    return await query<CC, ET, ITS, CF, K>(this, options);
+    const result = await query<CC, ET, ITS, CF, K>(this, options);
+    return result;
   }
 }

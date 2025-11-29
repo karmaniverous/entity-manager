@@ -3,6 +3,7 @@ import type { EntityKey } from './EntityKey';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
 import { getHashKeySpace } from './getHashKeySpace';
+import type { StorageItem } from './StorageItem';
 import type { EntityItemPartial } from './TokenAware';
 import { updateItemHashKey } from './updateItemHashKey';
 import { updateItemRangeKey } from './updateItemRangeKey';
@@ -80,7 +81,7 @@ export function getPrimaryKey<C extends BaseConfigMap>(
     entityManager,
     entityToken,
     hashKey as C['HashKey'],
-    withRangeKey,
+    withRangeKey as StorageItem<C>,
     0,
     Infinity,
   );

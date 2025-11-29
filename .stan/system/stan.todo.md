@@ -120,14 +120,28 @@
 
 - Internal types: renamed EntityItem/EntityRecord → StorageItem/StorageRecord
   (token-agnostic, storage-facing) and updated all helper imports to remove
-  collisions with public by-token types. Kept Storage* @internal (not exported).
+  collisions with public by-token types. Kept Storage\* @internal (not exported).
 
 - Policy alignment: confirmed requirements already mandate by-token signatures
   for helpers that accept entityToken; this change is a stepping stone toward
-  converting remaining helpers (encodeElement/decodeElement remain property-level).
+  converting remaining helpers (encodeElement/decodeElement remain property-level).
+
 - Fix: repaired PageKeyByIndex to use StorageItem and removed stray duplicate
   line that broke parsing; typecheck now advances past PageKey.ts.
 
 - Fix: cleaned up unused imports (ET alias, EntityRecordPartial) and removed
   unsafe any-typed assignments in removeKeys via a typed loop over unknown
-  values; resolved duplicate variable in getPrimaryKey and test lint issue.
+  values; resolved duplicate variable in getPrimaryKey and test lint issue.
+
+- Fix: typecheck and lint — StorageItem alignment and safer indexing
+  - Imported StorageItem and replaced unsafe/symbol indexing with typed keys in
+    updateItemHashKey/updateItemRangeKey/getHashKeySpace.
+  - Cast page-key/record intermediates to StorageItem where property-level helpers
+    require token-agnostic storage shapes (addKeys, getPrimaryKey, rehydratePageKeyMap).
+  - query.ts: removed unknown/Record cast; pass EntityItemPartial directly to
+    rehydratePageKeyMap seed parameter.
+  - EntityManager.removeKeys: widened implementation signature to a proper
+    supertype of all overloads (strict and projected, single and array) and
+    returned via local variables to satisfy no-unsafe-return.
+  - Tests: fixed pick() key typing in rehydratePageKeyMap.test and removed
+    unnecessary optional chaining in updateItemHashKey.test.

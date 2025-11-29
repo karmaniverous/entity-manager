@@ -9,6 +9,7 @@ import { getHashKeySpace } from './getHashKeySpace';
 import { getIndexComponents } from './getIndexComponents';
 import type { PageKeyMapByIndexSet } from './PageKeyMap';
 import { rehydrateIndexItem } from './rehydrateIndexItem';
+import type { StorageItem } from './StorageItem';
 import type { EntityItemPartial } from './TokenAware';
 import { updateItemRangeKey } from './updateItemRangeKey';
 import { validateEntityToken } from './validateEntityToken';
@@ -85,7 +86,7 @@ export function rehydratePageKeyMap<
       entityManager,
       entityToken,
       hashKeyToken,
-      item,
+      item as StorageItem<C>,
       timestampFrom,
       timestampTo,
     );
@@ -136,7 +137,7 @@ export function rehydratePageKeyMap<
                   ? encodeGeneratedProperty(
                       entityManager,
                       component as C['ShardedKeys'] | C['UnshardedKeys'],
-                      pageKeyItem,
+                      pageKeyItem as StorageItem<C>,
                     )!
                   : pageKeyItem[component],
           );

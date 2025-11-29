@@ -73,6 +73,6 @@ describe('updateItemHashKey', function () {
     item.created = now + day * 2; // pick the bump with chars=2
 
     const updated = updateItemHashKey(entityManager, 'user', item);
-    expect(updated.hashKey2?.endsWith(expectedSuffix)).to.be.true;
+    expect(updated.hashKey2.endsWith(expectedSuffix)).to.be.true;
   });
 });

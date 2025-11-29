@@ -45,7 +45,7 @@ export function getHashKeySpace<C extends BaseConfigMap>(
     const uniqueProp =
       entityManager.config.entities[entityToken].uniqueProperty;
 
-    const uniqueValue = item[uniqueProp as keyof EntityItem<C>];
+    const uniqueValue = item[uniqueProp as keyof StorageItem<C>];
 
     const hashKeySpace = shardBumps
       // Filter shard bumps by timestamp range.
