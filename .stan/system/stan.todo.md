@@ -145,3 +145,11 @@
     returned via local variables to satisfy no-unsafe-return.
   - Tests: fixed pick() key typing in rehydratePageKeyMap.test and removed
     unnecessary optional chaining in updateItemHashKey.test.
+
+- Follow-up: fix remaining typecheck/lint
+  - updateItemRangeKey: import StorageItem; use typed indexing for range/unique
+    properties; return EntityRecordPartial; build rangeKey string safely.
+  - rehydratePageKeyMap.test: ensure pick() receives keys typed to the exact
+    object literal via a local obj and keyed cast.
+  - updateItemHashKey: replace String() conversion with direct cast to satisfy
+    no-unnecessary-type-conversion lint.

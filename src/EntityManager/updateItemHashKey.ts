@@ -84,7 +84,7 @@ export function updateItemHashKey<
 
       if (isNil(uniqueId)) throw new Error(`missing item unique property`);
 
-      hashKey += (stringHash(String(uniqueId)) % space)
+      hashKey += (stringHash(uniqueId) % space)
         .toString(radix)
         .padStart(chars, '0');
     }

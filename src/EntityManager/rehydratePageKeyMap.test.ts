@@ -153,15 +153,17 @@ describe('rehydratePageKeyMep', function () {
           now,
           Infinity,
         ),
-        (beneficiaryPK, i) =>
-          pick(
-            {
-              ...items[i],
-              ...decodeGeneratedProperty(entityManager, 'user', beneficiaryPK),
-              beneficiaryPK,
-            },
-            beneficiaryCreatedIndexComponents,
-          ),
+        (beneficiaryPK, i) => {
+          const obj = {
+            ...items[i],
+            ...decodeGeneratedProperty(entityManager, 'user', beneficiaryPK),
+            beneficiaryPK,
+          };
+          return pick(
+            obj,
+            beneficiaryCreatedIndexComponents as (keyof typeof obj)[],
+          );
+        },
       ),
     };
 

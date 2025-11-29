@@ -3,6 +3,7 @@ import { isNil } from '@karmaniverous/entity-tools';
 import type { BaseConfigMap } from './BaseConfigMap';
 import type { EntityManager } from './EntityManager';
 import type { EntityToken } from './EntityToken';
+import type { StorageItem } from './StorageItem';
 import type { EntityItemPartial, EntityRecordPartial } from './TokenAware';
 import { validateEntityToken } from './validateEntityToken';
 
@@ -30,10 +31,8 @@ export function updateItemRangeKey<C extends BaseConfigMap>(
     validateEntityToken(entityManager, entityToken);
 
     // Return current item if rangeKey exists and overwrite is false.
-    if (
-      item[entityManager.config.rangeKey as keyof StorageItem<C>] &&
-      !overwrite
-    ) {
+    const rkProp = entityManager.config.rangeKey as keyof StorageItem<C>;
+    if ((item as StorageItem<C>)[rkProp] && !overwrite) {
       entityManager.logger.debug(
         'did not overwrite existing entity item range key',
         {
@@ -43,17 +42,15 @@ export function updateItemRangeKey<C extends BaseConfigMap>(
         },
       );
 
-      return { ...item };
+      return { ...item } as EntityRecordPartial<C, EntityToken<C>>;
     }
 
     // Get item unique property & validate.
-    const uniqueProperty =
-      item[
-        entityManager.config.entities[entityToken]
-          .uniqueProperty as keyof StorageItem<C>
-      ];
+    const upProp = entityManager.config.entities[entityToken]
+      .uniqueProperty as keyof StorageItem<C>;
+    const uniqueValue = (item as StorageItem<C>)[upProp];
 
-    if (isNil(uniqueProperty)) throw new Error(`missing item unique property`);
+    if (isNil(uniqueValue)) throw new Error(`missing item unique property`);
 
     // Update range key.
     const newItem = Object.assign(
@@ -61,7 +58,7 @@ export function updateItemRangeKey<C extends BaseConfigMap>(
       {
         [entityManager.config.rangeKey]: [
           entityManager.config.entities[entityToken].uniqueProperty,
-          uniqueProperty,
+          String(uniqueValue),
         ].join(entityManager.config.generatedValueDelimiter),
       },
     ) as EntityRecordPartial<C, EntityToken<C>>;
