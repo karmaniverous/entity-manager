@@ -172,4 +172,9 @@
 - Docs/typedoc: casting and TSDoc cleanup
   - getPrimaryKey: cast key object via `unknown as EntityKey<C>` to satisfy
     typedoc TS2352 without impacting runtime.
-  - TokenAware TSDoc: wrap generic examples in backticks to avoid malformed HTML warnings.
+  - TokenAware TSDoc: wrap generic examples in backticks to avoid malformed HTML warnings.
+
+- Docs: export storage types for TypeDoc
+  - Exported `StorageItem` and `StorageRecord` from the public barrel and
+    removed @internal tags so TypeDoc can link to them (resolves warnings for
+    PageKey and EntityManager.encodeGeneratedProperty references).

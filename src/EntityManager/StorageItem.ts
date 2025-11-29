@@ -11,13 +11,12 @@ import type { BaseConfigMap } from './BaseConfigMap';
 /**
  * Storage-facing partial item type from a {@link BaseConfigMap | `ConfigMap`}.
  *
- * Internal helper shape (token-agnostic) used by encoding/decoding, key updates,
- * and (de)hydration services. Not exported on the public surface.
+ * Token-agnostic shape used by encoding/decoding, key updates, and
+ * (de)hydration services.
  *
  * @typeParam CC - {@link ConfigMap | `ConfigMap`} that defines an {@link Config | `EntityManager configuration`}'s {@link EntityMap | `EntityMap`}, key properties, and {@link TranscodeRegistry | `TranscodeRegistry`}. If omitted, defaults to {@link BaseConfigMap | `BaseConfigMap`}.
  *
  * @category EntityManager
- * @internal
  */
 export type StorageItem<CC extends BaseConfigMap> = Partial<
   FlattenEntityMap<CC['EntityMap']> &

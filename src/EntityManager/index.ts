@@ -13,5 +13,7 @@ export * from './ShardBump';
 export * from './ShardQueryFunction';
 export * from './ShardQueryMap';
 export * from './ShardQueryResult';
+export type { StorageItem } from './StorageItem';
+export type { StorageRecord } from './StorageRecord';
 export * from './TokenAware';
 export * from './ValidateConfigMap';
