@@ -177,4 +177,9 @@
 - Docs: export storage types for TypeDoc
   - Exported `StorageItem` and `StorageRecord` from the public barrel and
     removed @internal tags so TypeDoc can link to them (resolves warnings for
-    PageKey and EntityManager.encodeGeneratedProperty references).
+    PageKey and EntityManager.encodeGeneratedProperty references).
+
+- Docs pass: README synchronization
+  - Updated “Types you’ll reach for” to reflect the by‑token family
+    (EntityItem / EntityItemPartial / EntityRecord / EntityRecordPartial) and
+    added an “Advanced” note for exported `StorageItem`/`StorageRecord`.

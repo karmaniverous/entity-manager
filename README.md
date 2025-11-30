@@ -363,7 +363,11 @@ const manager = createEntityManager(config, logger);
   - `createEntityManager(config, logger?)`
   - `ConfigInput` (values‑first), `CapturedConfigMapFrom`, `EntitiesFromSchema`
 - Token aware
-  - `EntityToken<CC>`, `EntityItemByToken<CC, ET>`, `EntityRecordByToken<CC, ET>`
+  - `EntityToken<CC>`
+  - `EntityItem<CC, ET>` — strict domain (full), includes optional key/token properties
+  - `EntityItemPartial<CC, ET, K>` — projected/seed domain; required keys when K provided, permissive partial when K omitted
+  - `EntityRecord<CC, ET>` — DB record (required keys) + partial domain fields
+  - `EntityRecordPartial<CC, ET, K>` — projected DB record
 - Index aware (values‑first config literal, “CF” channel)
   - `PageKeyByIndex<CC, ET, IT, CF>`
   - `ShardQueryFunction<CC, ET, IT, CF>`, `ShardQueryMap<CC, ET, ITS, CF>`
@@ -373,6 +377,8 @@ const manager = createEntityManager(config, logger);
   - `KeysFrom<K>`
   - `Projected<T, K>`
   - `ProjectedItemByToken<CC, ET, K>`
+ - Advanced (storage shapes; exported for reference and TypeDoc)
+   - `StorageItem<CC>`, `StorageRecord<CC>`
 
 See the full API: https://docs.karmanivero.us/entity-manager
 
