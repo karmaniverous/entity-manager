@@ -2,9 +2,16 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v8.0.0](https://github.com/karmaniverous/entity-manager/compare/v8.0.0-0...v8.0.0)
+
+- updated dependencies [`84ec76b`](https://github.com/karmaniverous/entity-manager/commit/84ec76b70fd45bdc444218ef553f0cbffe7c6201)
+
 #### [v8.0.0-0](https://github.com/karmaniverous/entity-manager/compare/v7.3.4...v8.0.0-0)
 
+> 30 November 2025
+
 - feat: adopt Item/Record × Full/Partial model; plan refactor [`ca5cce4`](https://github.com/karmaniverous/entity-manager/commit/ca5cce40d40fe8fda5596d8d1887cf8582fbcf0b)
+- chore: release v8.0.0-0 [`40bce72`](https://github.com/karmaniverous/entity-manager/commit/40bce72b348fb1daef5857f2d0e28a8a4e2acca8)
 - refactor: rename internal EntityItem/Record to Storage* and fix removeKeys [`bb75c2e`](https://github.com/karmaniverous/entity-manager/commit/bb75c2eea397d2f6932a6cf83146a8e486752984)
 - feat(types): big-bang by-token type refactor; remove legacy exports [`e395ed3`](https://github.com/karmaniverous/entity-manager/commit/e395ed387f8597e016a0d9f4e91193b80c170236)
 - refactor(types): make ET-aware helpers truly by-token; fix PageKey plumbing [`4276aa6`](https://github.com/karmaniverous/entity-manager/commit/4276aa664c421fa2152cdf19751bc77c52c38e01)
