@@ -2,8 +2,42 @@
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v8.0.0-0](https://github.com/karmaniverous/entity-manager/compare/v7.3.4...v8.0.0-0)
+
+- feat: adopt Item/Record × Full/Partial model; plan refactor [`ca5cce4`](https://github.com/karmaniverous/entity-manager/commit/ca5cce40d40fe8fda5596d8d1887cf8582fbcf0b)
+- refactor: rename internal EntityItem/Record to Storage* and fix removeKeys [`bb75c2e`](https://github.com/karmaniverous/entity-manager/commit/bb75c2eea397d2f6932a6cf83146a8e486752984)
+- feat(types): big-bang by-token type refactor; remove legacy exports [`e395ed3`](https://github.com/karmaniverous/entity-manager/commit/e395ed387f8597e016a0d9f4e91193b80c170236)
+- refactor(types): make ET-aware helpers truly by-token; fix PageKey plumbing [`4276aa6`](https://github.com/karmaniverous/entity-manager/commit/4276aa664c421fa2152cdf19751bc77c52c38e01)
+- fix(lint,ts): dedupe index unions; coerce entityToken in templates [`8a470ba`](https://github.com/karmaniverous/entity-manager/commit/8a470baf2a9ffa50c6493926225ebed369fa2eac)
+- fix(types): align StorageItem usage, remove unsafe casts, widen removeKeys impl [`ca23246`](https://github.com/karmaniverous/entity-manager/commit/ca232468ff507e7fd51909f35b82105751e10388)
+- fix: resolve TS2394 on EntityManager.removeKeys [`0ecc655`](https://github.com/karmaniverous/entity-manager/commit/0ecc655b5430044d9335711b6d647b1d52464ed1)
+- fix(by-token): repair PageKeyByIndex, clean unsafe assigns, lint/TS cleanup [`0671d2c`](https://github.com/karmaniverous/entity-manager/commit/0671d2cc1ba3e1ea374554c9a242f2af59517290)
+- fix(ts,lint): finalize StorageItem indexing, pick key typing, and lint cleanup [`7ae3ddb`](https://github.com/karmaniverous/entity-manager/commit/7ae3ddb8f6e7e5605aa7deb68cf9d65c580a0be6)
+- fix(lint): derive index component unions via key-set + keyof [`13da545`](https://github.com/karmaniverous/entity-manager/commit/13da545bc0642e38381fe5300c1e515014d5b149)
+- fix(types): TokenAware refinements to satisfy tsd (optional keys, projected required) [`8fb54b6`](https://github.com/karmaniverous/entity-manager/commit/8fb54b68047d84fefc2643b2a43e72dc11ae30cb)
+- docs(types): export BaseKeyTokens for TypeDoc [`0bbad6b`](https://github.com/karmaniverous/entity-manager/commit/0bbad6b0028f73005d3ebff5548a5c37a0db5466)
+- wip [`4ae99f5`](https://github.com/karmaniverous/entity-manager/commit/4ae99f5131d16e63c0ff72f924a6492558aee631)
+- fix(lint): gate derived index tokens to avoid redundant unions [`8cc7aa0`](https://github.com/karmaniverous/entity-manager/commit/8cc7aa0ed529f2d14bcf65befc7665263341a713)
+- fix: removeKeys implementation matches overloads (no any) [`955b142`](https://github.com/karmaniverous/entity-manager/commit/955b142701a617963524c10ca7203fdc8233c040)
+- fix(types): key-remap PageKey index tokens; avoid {} and overlaps [`03ae5c7`](https://github.com/karmaniverous/entity-manager/commit/03ae5c708946c09633233f4f742b97903281b854)
+- feat(types): export PageKey helper key-set types [`168d8e3`](https://github.com/karmaniverous/entity-manager/commit/168d8e376eede18d4dac39be5d676c8f1dad5e79)
+- fix(types): finish by-token refactor; restore partials and fix imports [`ef9d5dd`](https://github.com/karmaniverous/entity-manager/commit/ef9d5ddf01a4f71cf0f15f3ab4949a18f2249044)
+- fix(types): remove redundant constituents in PageKey without wrappers [`16c7be9`](https://github.com/karmaniverous/entity-manager/commit/16c7be96ccb089c1cd0ef5d99190d5ce6ff3adda)
+- fix(types): make removeKeys impl supertype of overloads (TS2394) [`fef5f47`](https://github.com/karmaniverous/entity-manager/commit/fef5f4719f00a145cb780d63078de79f99b8a176)
+- fix(types): finalize removeKeys implementation to match overloads (TS2394) [`e9ff77c`](https://github.com/karmaniverous/entity-manager/commit/e9ff77c3cf14291b540970535b4d96487747d4bc)
+- fix(types): remove stale EntityItemByToken cast; align removeKeys impl [`9470b63`](https://github.com/karmaniverous/entity-manager/commit/9470b63145d16fde272c79fe5f86ee9c2d230da6)
+- docs: sync README types with by-token model; note exported storage shapes [`2352bcc`](https://github.com/karmaniverous/entity-manager/commit/2352bcc28a3fa8ee4047d1d4843a8661a91f2696)
+- docs(types): export StorageItem/StorageRecord and remove @internal [`677e95f`](https://github.com/karmaniverous/entity-manager/commit/677e95feadd34010d32c37550e0631e05032798b)
+- fix(docs,tsdoc): typedoc cast in getPrimaryKey; TSDoc generic examples [`96150b4`](https://github.com/karmaniverous/entity-manager/commit/96150b421bcb71a21000423b8eb481410a49038b)
+- fix(ts,lint): cast early return in updateItemHashKey; remove String() in range key [`289f147`](https://github.com/karmaniverous/entity-manager/commit/289f1475b592652f68f6a406c1e212085e3985da)
+- fix(types): resolve removeKeys overload/impl mismatch (TS2394) [`2204e72`](https://github.com/karmaniverous/entity-manager/commit/2204e722b6e8566691d9e993e42b3e1e07e0ad68)
+- fix(types): finalize removeKeys impl to match overloads (TS2394) [`b9e436a`](https://github.com/karmaniverous/entity-manager/commit/b9e436ab088b7985accfaa7f3b632234b5a27dfc)
+
 #### [v7.3.4](https://github.com/karmaniverous/entity-manager/compare/v7.3.3...v7.3.4)
 
+> 29 November 2025
+
+- chore: release v7.3.4 [`b29d857`](https://github.com/karmaniverous/entity-manager/commit/b29d85774073b58df472ece25126da05f426fb6a)
 - support exactOptionalPropertyTypes [`e33d665`](https://github.com/karmaniverous/entity-manager/commit/e33d6658c552077326d13e76aa19d3618665eacf)
 
 #### [v7.3.3](https://github.com/karmaniverous/entity-manager/compare/v7.3.2...v7.3.3)
