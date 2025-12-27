@@ -122,7 +122,10 @@ export type ShardedKeysFrom<CC> = CC extends {
   /** Optional generated properties object containing sharded/unsharded maps. */
   generatedProperties?: infer GP;
 }
-  ? GP extends { sharded?: infer S }
+  ? GP extends {
+      /** Sharded generated property token map. */
+      sharded?: infer S;
+    }
     ? keyof S & string
     : never
   : never;
@@ -132,7 +135,10 @@ export type UnshardedKeysFrom<CC> = CC extends {
   /** Optional generated properties object containing sharded/unsharded maps. */
   generatedProperties?: infer GP;
 }
-  ? GP extends { unsharded?: infer U }
+  ? GP extends {
+      /** Unsharded generated property token map. */
+      unsharded?: infer U;
+    }
     ? keyof U & string
     : never
   : never;
@@ -166,7 +172,10 @@ export type EntitiesFromSchema<CC> = CC extends {
  * literal keys (prefer `as const` at call sites), this helper captures the
  * index token union. Falls back to `string` if absent.
  */
-export type IndexTokensFrom<CC> = CC extends { indexes?: infer I }
+export type IndexTokensFrom<CC> = CC extends {
+  /** Optional index token map used for index-token inference. */
+  indexes?: infer I;
+}
   ? keyof I & string
   : string;
 

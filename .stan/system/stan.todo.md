@@ -190,4 +190,7 @@
   probes and replacing ParsedConfig’s inferred shape with documented interfaces.
 
 - Fix: restored docs/typecheck by aligning ParsedTranscoder with the Zod schema
-  inference (encode/decode typed as unknown) and clearing tsdoc escape warnings.
+  inference (encode/decode typed as unknown) and clearing tsdoc escape warnings.
+
+- Docs: documented remaining conditional-type probe properties in
+  createEntityManager helpers to clear final TypeDoc notDocumented warnings.
