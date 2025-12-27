@@ -48,7 +48,7 @@
     "typedoc-plugin-replace-text",
     "typedoc-plugin-zod"
   ],
-  "projectDocuments": ["./CHANGELOG.md"],
+  "projectDocuments": ["./guides/stan-assistant-guide.md", "./CHANGELOG.md"],
   "replaceText": {
     "replacements": [
       {
@@ -61,6 +61,9 @@
   "searchInComments": true,
   "searchInDocuments": true,
   "titleLink": "https://github.com/karmaniverous/entity-manager",
+  "validation": {
+    "notDocumented": true
+  },
   "visibilityFilters": {
     "protected": false
   }
