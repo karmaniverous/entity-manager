@@ -118,6 +118,11 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
    *
    * @overload
    */
+  /**
+   * @param entityToken - Entity token (narrows types by token).
+   * @param item - Single item to update with generated keys/properties.
+   * @param overwrite - Overwrite existing keys/properties (default `false`).
+   */
   addKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
     item: EntityItemPartial<CC, ET>,
@@ -125,6 +130,11 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
   ): EntityRecordPartial<CC, ET>;
   /**
    * @overload
+   */
+  /**
+   * @param entityToken - Entity token (narrows types by token).
+   * @param item - Array of items to update with generated keys/properties.
+   * @param overwrite - Overwrite existing keys/properties (default `false`).
    */
   addKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
@@ -162,6 +172,11 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
    *
    * @throws `Error` if `entityToken` is invalid.
    */
+  /**
+   * @param entityToken - Entity token (narrows types by token).
+   * @param item - Single item to derive primary keys for.
+   * @param overwrite - Overwrite existing keys on the item before deriving (default `false`).
+   */
   getPrimaryKey<ET extends EntityToken<CC>>(
     entityToken: ET,
     item: EntityItemPartial<CC, ET>,
@@ -169,6 +184,11 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
   ): EntityKey<CC>[];
   /**
    * @overload
+   */
+  /**
+   * @param entityToken - Entity token (narrows types by token).
+   * @param items - Array of items to derive primary keys for.
+   * @param overwrite - Overwrite existing keys on each item before deriving (default `false`).
    */
   getPrimaryKey<ET extends EntityToken<CC>>(
     entityToken: ET,

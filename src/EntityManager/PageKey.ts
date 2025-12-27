@@ -30,6 +30,7 @@ export type PageKey<CC extends BaseConfigMap> = Pick<
  * literal types when available.
  */
 export type IndexHashKeyOf<CF, IT extends string> = CF extends {
+  /** Optional values-first index map used for literal narrowing. */
   indexes?: infer I;
 }
   ? I extends Record<string, unknown>
@@ -41,7 +42,14 @@ export type IndexHashKeyOf<CF, IT extends string> = CF extends {
     : never
   : never;
 
+/**
+ * Derive the index range-key token for a specific index token.
+ *
+ * When CF carries an `indexes` object and IT is a member key, this extracts the
+ * concrete `rangeKey` token type.
+ */
 export type IndexRangeKeyOf<CF, IT extends string> = CF extends {
+  /** Optional values-first index map used for literal narrowing. */
   indexes?: infer I;
 }
   ? I extends Record<string, unknown>
@@ -65,7 +73,14 @@ export type IndexTokensOf<CF> = CF extends { indexes?: infer I }
     : string
   : string;
 
+/**
+ * Test whether a values-first config literal CF carries a concrete index IT.
+ *
+ * @remarks
+ * Used to decide whether index-aware narrowing is available.
+ */
 export type HasIndexFor<CF, IT extends string> = CF extends {
+  /** Optional values-first index map used for literal narrowing. */
   indexes?: infer I;
 }
   ? I extends Record<string, unknown>

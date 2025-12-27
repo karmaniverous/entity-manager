@@ -21,22 +21,29 @@ import type { ValidateConfigMap } from './ValidateConfigMap';
 export type ConfigMap<
   M extends Partial<BaseConfigMap> = Partial<BaseConfigMap>,
 > = ValidateConfigMap<{
+  /** Entity map type (entity token -\> entity shape). */
   EntityMap: 'EntityMap' extends keyof M
     ? NonNullable<M['EntityMap']>
     : Record<string, never>;
+  /** Global hash key property name (defaults to `"hashKey"`). */
   HashKey: 'HashKey' extends keyof M ? NonNullable<M['HashKey']> : 'hashKey';
+  /** Global range key property name (defaults to `"rangeKey"`). */
   RangeKey: 'RangeKey' extends keyof M
     ? NonNullable<M['RangeKey']>
     : 'rangeKey';
+  /** Union of sharded generated key tokens (defaults to `never`). */
   ShardedKeys: 'ShardedKeys' extends keyof M
     ? NonNullable<M['ShardedKeys']>
     : never;
+  /** Union of unsharded generated key tokens (defaults to `never`). */
   UnshardedKeys: 'UnshardedKeys' extends keyof M
     ? NonNullable<M['UnshardedKeys']>
     : never;
+  /** Union of transcoded property tokens (defaults to `never`). */
   TranscodedProperties: 'TranscodedProperties' extends keyof M
     ? NonNullable<M['TranscodedProperties']>
     : never;
+  /** Transcode registry type (defaults to {@link DefaultTranscodeRegistry | `DefaultTranscodeRegistry`}). */
   TranscodeRegistry: 'TranscodeRegistry' extends keyof M
     ? NonNullable<M['TranscodeRegistry']>
     : DefaultTranscodeRegistry;

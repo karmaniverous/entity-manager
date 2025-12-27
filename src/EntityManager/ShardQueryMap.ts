@@ -29,7 +29,10 @@ export type ShardQueryMap<
   ITS extends string,
   CF = unknown,
   K = unknown,
-> = CF extends { indexes?: infer I }
+> = CF extends {
+  /** Optional values-first index map used for index-token narrowing. */
+  indexes?: infer I;
+}
   ? I extends Record<string, unknown>
     ? // Constrain keys to CF.indexes when present; extra keys are rejected by
       // excess property checks. Each value’s IT is also narrowed accordingly.

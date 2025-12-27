@@ -51,15 +51,51 @@ export const configSchema = z
         z.string(),
         z
           .object({
-            defaultLimit: z.number().int().positive().optional().default(10),
-            defaultPageSize: z.number().int().positive().optional().default(10),
+            defaultLimit: z
+              .number()
+              .int()
+              .positive()
+              .optional()
+              .default(10)
+              .describe(
+                'Default max items returned by EntityManager.query for this entity (across all shards).',
+              ),
+            defaultPageSize: z
+              .number()
+              .int()
+              .positive()
+              .optional()
+              .default(10)
+              .describe(
+                'Default per-shard page size used by EntityManager.query for this entity.',
+              ),
             shardBumps: z
               .array(
                 z
                   .object({
-                    timestamp: z.number().int().nonnegative(),
-                    charBits: z.number().int().min(1).max(5),
-                    chars: z.number().int().min(0).max(40),
+                    timestamp: z
+                      .number()
+                      .int()
+                      .nonnegative()
+                      .describe(
+                        'Start timestamp (ms) for this shard bump (inclusive).',
+                      ),
+                    charBits: z
+                      .number()
+                      .int()
+                      .min(1)
+                      .max(5)
+                      .describe(
+                        'Bits per shard character (radix = 2**charBits).',
+                      ),
+                    chars: z
+                      .number()
+                      .int()
+                      .min(0)
+                      .max(40)
+                      .describe(
+                        'Shard suffix width (chars); controls shard space.',
+                      ),
                   })
                   .strict(),
               )
@@ -97,27 +133,60 @@ export const configSchema = z
                       });
                 }
               }),
-            timestampProperty: z.string().min(1),
-            uniqueProperty: z.string().min(1),
+            timestampProperty: z
+              .string()
+              .min(1)
+              .describe(
+                'Property token whose value selects the shard bump (typically a timestamp).',
+              ),
+            uniqueProperty: z
+              .string()
+              .min(1)
+              .describe(
+                'Property token used to dedupe and build the global range key.',
+              ),
           })
           .strict(),
       )
       .optional()
-      .default({}),
+      .default({})
+      .describe('Entity definitions keyed by entity token.'),
     generatedProperties: z
       .object({
-        sharded: z.record(z.string(), componentArray).optional().default({}),
-        unsharded: z.record(z.string(), componentArray).optional().default({}),
+        sharded: z
+          .record(z.string(), componentArray)
+          .optional()
+          .default({})
+          .describe(
+            'Sharded generated property tokens (hash-side); atomic encoding semantics.',
+          ),
+        unsharded: z
+          .record(z.string(), componentArray)
+          .optional()
+          .default({})
+          .describe(
+            'Unsharded generated property tokens (range-side); non-atomic encoding semantics.',
+          ),
       })
       .optional()
       .default({ sharded: {}, unsharded: {} }),
-    hashKey: z.string(),
+    hashKey: z.string().describe('Global hash key property name.'),
     indexes: z
       .record(
         z.string(),
         z.object({
-          hashKey: z.string().min(1),
-          rangeKey: z.string().min(1),
+          hashKey: z
+            .string()
+            .min(1)
+            .describe(
+              'Index hash key token (global hash key or a sharded generated key).',
+            ),
+          rangeKey: z
+            .string()
+            .min(1)
+            .describe(
+              'Index range key token (global range key, an unsharded generated key, or a transcoded property).',
+            ),
           projections: z
             .array(z.string().min(1))
             .superRefine(validateArrayUnique)
@@ -125,13 +194,41 @@ export const configSchema = z
         }),
       )
       .optional()
-      .default({}),
-    generatedKeyDelimiter: z.string().regex(/\W+/).optional().default('|'),
-    generatedValueDelimiter: z.string().regex(/\W+/).optional().default('#'),
+      .default({})
+      .describe('Index definitions keyed by index token.'),
+    generatedKeyDelimiter: z
+      .string()
+      .regex(/\W+/)
+      .optional()
+      .default('|')
+      .describe('Delimiter between generated key elements (default `|`).'),
+    generatedValueDelimiter: z
+      .string()
+      .regex(/\W+/)
+      .optional()
+      .default('#')
+      .describe(
+        'Delimiter between generated element name and value (default `#`).',
+      ),
     propertyTranscodes: z.record(z.string(), z.string()).optional().default({}),
-    rangeKey: z.string(),
-    shardKeyDelimiter: z.string().regex(/\W+/).optional().default('!'),
-    throttle: z.number().int().positive().optional().default(10),
+    rangeKey: z.string().describe('Global range key property name.'),
+    shardKeyDelimiter: z
+      .string()
+      .regex(/\W+/)
+      .optional()
+      .default('!')
+      .describe(
+        'Delimiter between entity token and shard suffix in hash key values.',
+      ),
+    throttle: z
+      .number()
+      .int()
+      .positive()
+      .optional()
+      .default(10)
+      .describe(
+        'Default max concurrency for shard queries during EntityManager.query.',
+      ),
     transcodes: z
       .record(
         z.string(),
@@ -140,8 +237,16 @@ export const configSchema = z
             // Accept function shapes without relying on z.function()
             // to avoid TS inference conflicts across Zod versions and
             // to remain compatible with narrower parameter types.
-            encode: z.custom<unknown>((fn) => typeof fn === 'function'),
-            decode: z.custom<unknown>((fn) => typeof fn === 'function'),
+            encode: z
+              .custom<unknown>((fn) => typeof fn === 'function')
+              .describe(
+                'Encode a value to a lexicographically sortable string.',
+              ),
+            decode: z
+              .custom<unknown>((fn) => typeof fn === 'function')
+              .describe(
+                'Decode a previously encoded string back to the value type.',
+              ),
           })
           .strict(),
       )
@@ -389,3 +494,13 @@ export const configSchema = z
  * @category EntityManager
  */
 export type ParsedConfig = z.infer<typeof configSchema>;
+
+/**
+ * Parsed runtime configuration schema for {@link EntityManager | `EntityManager`}.
+ *
+ * @remarks
+ * This schema is authoritative at runtime; TypeDoc uses schema `.describe(...)` metadata
+ * to document the derived shape when `typedoc-plugin-zod` is enabled.
+ */
+
+export const _configSchemaDocsAnchor = configSchema;

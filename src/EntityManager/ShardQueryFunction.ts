@@ -36,7 +36,10 @@ export type ShardQueryFunction<
   // When CF carries an `indexes` map, only permit IT values that are keys of
   // that map. Invalid IT resolves the type to `never`, producing a compile-time
   // error at annotation sites.
-  CF extends { indexes?: infer I }
+  CF extends {
+    /** Optional values-first index map used for index-token narrowing. */
+    indexes?: infer I;
+  }
     ? I extends Record<string, unknown>
       ? IT extends Extract<keyof I, string>
         ? (

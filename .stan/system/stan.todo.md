@@ -182,4 +182,6 @@
 - Docs pass: README synchronization
   - Updated “Types you’ll reach for” to reflect the by‑token family
     (EntityItem / EntityItemPartial / EntityRecord / EntityRecordPartial) and
-    added an “Advanced” note for exported `StorageItem`/`StorageRecord`.
+    added an “Advanced” note for exported `StorageItem`/`StorageRecord`.
+
+- Docs: added missing TSDoc/Zod descriptions to clear typedoc notDocumented warnings.

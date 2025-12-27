@@ -1,4 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import type { EntityMap, TranscodeRegistry } from '@karmaniverous/entity-tools'; // imported to support API docs
 import { mapValues } from 'radash';
 
@@ -64,6 +65,23 @@ export abstract class BaseQueryBuilder<
     this.pageKeyMap = pageKeyMap;
   }
 
+  /**
+   * Build a shard query function for a specific index token.
+   *
+   * @param indexToken - Index token identifying which index to query.
+   *
+   * @returns A {@link ShardQueryFunction | `ShardQueryFunction`} that queries a single shard for this index.
+   *
+   * @remarks
+   * Implementations are provider-specific (e.g., DynamoDB). The returned function must:
+   * - Query exactly one shard (partition) per invocation using the provided hash key value.
+   * - Respect `pageKey` and `pageSize` for pagination.
+   * - Return `pageKey: undefined` when that shard is exhausted.
+   *
+   * Entity Manager will orchestrate calling these functions across shards and indexes.
+   *
+   * @protected
+   */
   protected abstract getShardQueryFunction(
     indexToken: ITS,
   ): ShardQueryFunction<CC, ET, ITS, CF, K>;
@@ -79,6 +97,16 @@ export abstract class BaseQueryBuilder<
     ) as ShardQueryMap<CC, ET, ITS, CF, K>;
   }
 
+  /**
+   * Execute the built query across shards and indexes via {@link EntityManager.query | `EntityManager.query`}.
+   *
+   * @param options - Query options excluding `entityToken`, `pageKeyMap`, and `shardQueryMap`, which are supplied by the builder.
+   *
+   * @returns The merged, de-duplicated, sorted query result, including a compact `pageKeyMap` token for the next page.
+   *
+   * @remarks
+   * This delegates orchestration to Entity Manager; provider-specific behavior lives in {@link getShardQueryFunction | `getShardQueryFunction`}.
+   */
   async query(options: QueryBuilderQueryOptions<CC, ET, CF>) {
     const {
       entityClient: { entityManager },
