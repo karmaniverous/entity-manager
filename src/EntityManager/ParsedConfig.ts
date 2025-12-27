@@ -507,9 +507,9 @@ export const configSchema = z
  */
 export interface ParsedTranscoder {
   /** Encode a value to a lexicographically sortable string. */
-  encode: (value: unknown) => unknown;
+  encode: unknown;
   /** Decode a previously encoded string back to the value type. */
-  decode: (value: unknown) => unknown;
+  decode: unknown;
 }
 
 /**
@@ -575,7 +575,7 @@ export interface ParsedConfig {
   generatedKeyDelimiter: string;
   /** Delimiter between generated element name and value (default `#`). */
   generatedValueDelimiter: string;
-  /** Map of transcoded property token -> transcode name. */
+  /** Map of transcoded property token -\> transcode name. */
   propertyTranscodes: Record<string, string>;
   /** Global range key property name. */
   rangeKey: string;

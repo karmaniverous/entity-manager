@@ -139,7 +139,7 @@ export type UnshardedKeysFrom<CC> = CC extends {
 
 /** Extract the union of transcoded property tokens from a values-first config input type. */
 export type TranscodedPropertiesFrom<CC> = CC extends {
-  /** Optional map of property token -> transcode name. */
+  /** Optional map of property token -\> transcode name. */
   propertyTranscodes?: infer PT;
 }
   ? keyof PT & string

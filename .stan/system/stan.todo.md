@@ -187,4 +187,7 @@
 - Docs: added missing TSDoc/Zod descriptions to clear typedoc notDocumented warnings.
 
 - Docs: addressed remaining TypeDoc warnings by documenting conditional-type
-  probes and replacing ParsedConfig’s inferred shape with documented interfaces.
+  probes and replacing ParsedConfig’s inferred shape with documented interfaces.
+
+- Fix: restored docs/typecheck by aligning ParsedTranscoder with the Zod schema
+  inference (encode/decode typed as unknown) and clearing tsdoc escape warnings.
