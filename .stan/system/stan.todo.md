@@ -184,4 +184,7 @@
     (EntityItem / EntityItemPartial / EntityRecord / EntityRecordPartial) and
     added an “Advanced” note for exported `StorageItem`/`StorageRecord`.
 
-- Docs: added missing TSDoc/Zod descriptions to clear typedoc notDocumented warnings.
+- Docs: added missing TSDoc/Zod descriptions to clear typedoc notDocumented warnings.
+
+- Docs: addressed remaining TypeDoc warnings by documenting conditional-type
+  probes and replacing ParsedConfig’s inferred shape with documented interfaces.

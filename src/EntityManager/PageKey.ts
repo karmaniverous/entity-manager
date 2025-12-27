@@ -35,7 +35,10 @@ export type IndexHashKeyOf<CF, IT extends string> = CF extends {
 }
   ? I extends Record<string, unknown>
     ? IT extends keyof I
-      ? I[IT] extends { hashKey: infer HK }
+      ? I[IT] extends {
+          /** Index hash key token. */
+          hashKey: infer HK;
+        }
         ? HK & string
         : never
       : never
@@ -54,7 +57,10 @@ export type IndexRangeKeyOf<CF, IT extends string> = CF extends {
 }
   ? I extends Record<string, unknown>
     ? IT extends keyof I
-      ? I[IT] extends { rangeKey: infer RK }
+      ? I[IT] extends {
+          /** Index range key token. */
+          rangeKey: infer RK;
+        }
         ? RK & string
         : never
       : never
@@ -67,7 +73,10 @@ export type IndexRangeKeyOf<CF, IT extends string> = CF extends {
  * When CF carries an `indexes` object with preserved literal keys (prefer `as const`),
  * this helper captures the index token union. Falls back to `string` if absent.
  */
-export type IndexTokensOf<CF> = CF extends { indexes?: infer I }
+export type IndexTokensOf<CF> = CF extends {
+  /** Optional values-first index map used for index-token narrowing. */
+  indexes?: infer I;
+}
   ? I extends Record<string, unknown>
     ? Extract<keyof I, string>
     : string
@@ -138,6 +147,13 @@ export type FallbackIndexTokenSet<CC extends BaseConfigMap> = Record<
   true
 >;
 
+/**
+ * Derive the union of token names that may appear in a page key for a specific index.
+ *
+ * @remarks
+ * If CF carries a concrete `indexes` map and IT is a member key, this narrows to the
+ * exact component-token set for that index. Otherwise, it falls back to the broad key set.
+ */
 export type IndexComponentTokens<
   CC extends BaseConfigMap,
   CF,

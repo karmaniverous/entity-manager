@@ -102,17 +102,26 @@ export interface ConfigInput {
 }
 
 /** Extract the hash key token string literal from a values-first config input type. */
-export type HashKeyFrom<CC> = CC extends { hashKey: infer H }
+export type HashKeyFrom<CC> = CC extends {
+  /** Hash key token property name. */
+  hashKey: infer H;
+}
   ? H & string
   : 'hashKey';
 
 /** Extract the range key token string literal from a values-first config input type. */
-export type RangeKeyFrom<CC> = CC extends { rangeKey: infer R }
+export type RangeKeyFrom<CC> = CC extends {
+  /** Range key token property name. */
+  rangeKey: infer R;
+}
   ? R & string
   : 'rangeKey';
 
 /** Extract the union of sharded generated key tokens from a values-first config input type. */
-export type ShardedKeysFrom<CC> = CC extends { generatedProperties?: infer GP }
+export type ShardedKeysFrom<CC> = CC extends {
+  /** Optional generated properties object containing sharded/unsharded maps. */
+  generatedProperties?: infer GP;
+}
   ? GP extends { sharded?: infer S }
     ? keyof S & string
     : never
@@ -120,6 +129,7 @@ export type ShardedKeysFrom<CC> = CC extends { generatedProperties?: infer GP }
 
 /** Extract the union of unsharded generated key tokens from a values-first config input type. */
 export type UnshardedKeysFrom<CC> = CC extends {
+  /** Optional generated properties object containing sharded/unsharded maps. */
   generatedProperties?: infer GP;
 }
   ? GP extends { unsharded?: infer U }
@@ -129,6 +139,7 @@ export type UnshardedKeysFrom<CC> = CC extends {
 
 /** Extract the union of transcoded property tokens from a values-first config input type. */
 export type TranscodedPropertiesFrom<CC> = CC extends {
+  /** Optional map of property token -> transcode name. */
   propertyTranscodes?: infer PT;
 }
   ? keyof PT & string
@@ -140,6 +151,7 @@ export type TranscodedPropertiesFrom<CC> = CC extends {
  * Fallback to broad EntityMap if schemas are absent.
  */
 export type EntitiesFromSchema<CC> = CC extends {
+  /** Optional per-entity Zod schema map used only for type inference. */
   entitiesSchema?: infer S;
 }
   ? S extends Record<string, ZodType>

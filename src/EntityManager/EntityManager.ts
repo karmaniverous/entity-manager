@@ -108,9 +108,9 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
   /**
    * Update generated properties, hash key, and range key on an {@link EntityItem | `EntityItem`} object.
    *
-   * @param entityToken - {@link Config | `Config`} `entities` key.
-   * @param item - {@link EntityItem | `EntityItem`} object.
-   * @param overwrite - Overwrite existing properties (default `false`).
+   * @param entityToken - Entity token (narrows types by token).
+   * @param item - Single item to update with generated keys/properties.
+   * @param overwrite - Overwrite existing keys/properties (default `false`).
    *
    * @returns {@link EntityRecord | `EntityRecord`} object with updated properties.
    *
@@ -118,23 +118,23 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
    *
    * @overload
    */
-  /**
-   * @param entityToken - Entity token (narrows types by token).
-   * @param item - Single item to update with generated keys/properties.
-   * @param overwrite - Overwrite existing keys/properties (default `false`).
-   */
   addKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
     item: EntityItemPartial<CC, ET>,
     overwrite?: boolean,
   ): EntityRecordPartial<CC, ET>;
   /**
-   * @overload
-   */
-  /**
+   * Update generated properties, hash key, and range key on an array of {@link EntityItem | `EntityItem`} objects.
+   *
    * @param entityToken - Entity token (narrows types by token).
-   * @param item - Array of items to update with generated keys/properties.
+   * @param item - Items to update with generated keys/properties.
    * @param overwrite - Overwrite existing keys/properties (default `false`).
+   *
+   * @returns Array of {@link EntityRecord | `EntityRecord`} objects with updated properties.
+   *
+   * @throws `Error` if `entityToken` is invalid.
+   *
+   * @overload
    */
   addKeys<ET extends EntityToken<CC>>(
     entityToken: ET,
@@ -164,18 +164,15 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
   /**
    * Convert one or more {@link EntityItem | `EntityItem`} objects into an array of {@link EntityKey | `EntityKey`} values.
    *
-   * @param entityToken - {@link Config | `Config`} `entities` key.
-   * @param item - {@link EntityItem | `EntityItem`} object.
-   * @param overwrite - Overwrite existing properties (default `false`).
+   * @param entityToken - Entity token (narrows types by token).
+   * @param item - Single item to derive primary keys for.
+   * @param overwrite - Overwrite existing keys on the item before deriving (default `false`).
    *
    * @returns Array of {@link EntityKey | `EntityKey`} values derived from `item`.
    *
    * @throws `Error` if `entityToken` is invalid.
-   */
-  /**
-   * @param entityToken - Entity token (narrows types by token).
-   * @param item - Single item to derive primary keys for.
-   * @param overwrite - Overwrite existing keys on the item before deriving (default `false`).
+   *
+   * @overload
    */
   getPrimaryKey<ET extends EntityToken<CC>>(
     entityToken: ET,
@@ -183,12 +180,17 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
     overwrite?: boolean,
   ): EntityKey<CC>[];
   /**
-   * @overload
-   */
-  /**
+   * Convert an array of {@link EntityItem | `EntityItem`} objects into {@link EntityKey | `EntityKey`} values.
+   *
    * @param entityToken - Entity token (narrows types by token).
    * @param items - Array of items to derive primary keys for.
    * @param overwrite - Overwrite existing keys on each item before deriving (default `false`).
+   *
+   * @returns Array of {@link EntityKey | `EntityKey`} values derived from all `items`.
+   *
+   * @throws `Error` if `entityToken` is invalid.
+   *
+   * @overload
    */
   getPrimaryKey<ET extends EntityToken<CC>>(
     entityToken: ET,

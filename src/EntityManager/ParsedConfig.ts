@@ -2,6 +2,8 @@ import { defaultTranscodes } from '@karmaniverous/entity-tools';
 import { counting, sort } from 'radash';
 import { z } from 'zod';
 
+import type { ShardBump } from './ShardBump';
+
 const defaultShardBump = { timestamp: 0, charBits: 1, chars: 0 };
 
 const validateArrayUnique = <T>(
@@ -44,6 +46,15 @@ const componentArray = z
   .nonempty()
   .superRefine(validateArrayUnique);
 
+/**
+ * Runtime configuration schema for {@link EntityManager | `EntityManager`}.
+ *
+ * @remarks
+ * This is authoritative at runtime and used internally by the {@link EntityManager | `EntityManager`} constructor.
+ * It is also used by tests. It is not intended as a user-facing TypeDoc artifact.
+ *
+ * @hidden
+ */
 export const configSchema = z
   .object({
     entities: z
@@ -489,18 +500,89 @@ export const configSchema = z
   });
 
 /**
- * Simplified type taken on by a {@link Config | `Config`} object after parsing in the {@link EntityManager | `EntityManager`} constructor.
+ * Parsed transcoder entry.
+ *
+ * @remarks
+ * This reflects the runtime contract enforced by Zod for entries in `transcodes`.
+ */
+export interface ParsedTranscoder {
+  /** Encode a value to a lexicographically sortable string. */
+  encode: (value: unknown) => unknown;
+  /** Decode a previously encoded string back to the value type. */
+  decode: (value: unknown) => unknown;
+}
+
+/**
+ * Parsed index definition (provider-agnostic).
+ *
+ * @remarks
+ * Provider adapters map these tokens to provider-specific index queries.
+ */
+export interface ParsedIndexConfig {
+  /** Index hash key token (global hash key or a sharded generated key). */
+  hashKey: string;
+  /** Index range key token (global range key, an unsharded generated key, or a transcoded scalar). */
+  rangeKey: string;
+  /** Optional list of projected attribute names (validated to exclude key tokens). */
+  projections?: string[] | undefined;
+}
+
+/**
+ * Parsed generated properties configuration.
+ */
+export interface ParsedGeneratedPropertiesConfig {
+  /** Sharded generated property tokens (hash-side); atomic encoding semantics. */
+  sharded: Record<string, string[]>;
+  /** Unsharded generated property tokens (range-side); non-atomic encoding semantics. */
+  unsharded: Record<string, string[]>;
+}
+
+/**
+ * Parsed per-entity configuration.
+ */
+export interface ParsedEntityConfig {
+  /** Default max items returned by EntityManager.query for this entity (across all shards). */
+  defaultLimit: number;
+  /** Default per-shard page size used by EntityManager.query for this entity. */
+  defaultPageSize: number;
+  /** Shard bump schedule for this entity (time-based sharding scale-up). */
+  shardBumps: ShardBump[];
+  /** Property token whose value selects the shard bump (typically a timestamp). */
+  timestampProperty: string;
+  /** Property token used to dedupe and build the global range key. */
+  uniqueProperty: string;
+}
+
+/**
+ * Simplified runtime configuration shape after parsing/validation.
+ *
+ * @remarks
+ * This is the type exposed by {@link EntityManager.config | `EntityManager.config`}.
+ * It mirrors the validated Zod schema output.
  *
  * @category EntityManager
  */
-export type ParsedConfig = z.infer<typeof configSchema>;
-
-/**
- * Parsed runtime configuration schema for {@link EntityManager | `EntityManager`}.
- *
- * @remarks
- * This schema is authoritative at runtime; TypeDoc uses schema `.describe(...)` metadata
- * to document the derived shape when `typedoc-plugin-zod` is enabled.
- */
-
-export const _configSchemaDocsAnchor = configSchema;
+export interface ParsedConfig {
+  /** Entity definitions keyed by entity token. */
+  entities: Record<string, ParsedEntityConfig>;
+  /** Generated property token maps. */
+  generatedProperties: ParsedGeneratedPropertiesConfig;
+  /** Global hash key property name. */
+  hashKey: string;
+  /** Provider-agnostic index definitions keyed by index token. */
+  indexes: Record<string, ParsedIndexConfig>;
+  /** Delimiter between generated key elements (default `|`). */
+  generatedKeyDelimiter: string;
+  /** Delimiter between generated element name and value (default `#`). */
+  generatedValueDelimiter: string;
+  /** Map of transcoded property token -> transcode name. */
+  propertyTranscodes: Record<string, string>;
+  /** Global range key property name. */
+  rangeKey: string;
+  /** Delimiter between entity token and shard suffix in hash key values (default `!`). */
+  shardKeyDelimiter: string;
+  /** Default max concurrency for shard queries during EntityManager.query. */
+  throttle: number;
+  /** Transcoder registry used for encoding/decoding values. */
+  transcodes: Record<string, ParsedTranscoder>;
+}
