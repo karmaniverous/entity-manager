@@ -1,0 +1,321 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>guides\stan-assistant-guide | @karmaniverous/entity-manager</title><meta name="description" content="Documentation for @karmaniverous/entity-manager"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar"><div class="tsd-toolbar-contents container"><a href="https://github.com/karmaniverous/entity-manager" class="title">@karmaniverous/entity-manager</a><div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/><ul role="listbox" id="tsd-search-results"></ul><div id="tsd-search-status" aria-live="polite" aria-atomic="true"><div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header><div class="container container-main"><div class="col-content"><div class="tsd-page-title"><ul class="tsd-breadcrumb" aria-label="Breadcrumb"><li><a href="" aria-current="page">guides\stan-assistant-guide</a></li></ul></div><div class="tsd-panel tsd-typography"><h1 id="stan-assistant-guide-" class="tsd-anchor-link">STAN Assistant Guide — <code>@karmaniverous/entity-manager</code><a href="#stan-assistant-guide-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1><p>This guide is written for STAN assistants working in codebases that use <strong>Entity Manager</strong>. It is intended to be self-contained: it explains the library’s runtime model, configuration rules, and the type-level contracts you must satisfy when integrating a provider (e.g., DynamoDB) or writing app code.</p>
+<p>Entity Manager is provider-agnostic: it does <strong>not</strong> talk to your database. Instead it:</p>
+<ul>
+<li>Generates and maintains key fields and other generated properties from config (<code>addKeys</code>, <code>getPrimaryKey</code>, <code>removeKeys</code>).</li>
+<li>Encodes/decodes generated properties via transcodes.</li>
+<li>Orchestrates parallel, cross-shard queries through injected shard query functions (<code>query</code>).</li>
+<li>Dehydrates/rehydrates cross-shard page keys into a single compact token (<code>pageKeyMap</code>).</li>
+</ul>
+<hr>
+<h2 id="acronyms-used-in-generics-local-glossary" class="tsd-anchor-link">Acronyms used in generics (local glossary)<a href="#acronyms-used-in-generics-local-glossary" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>This repo uses a strict generic-parameter dictionary. In this guide, acronyms appear primarily in generic type parameters.</p>
+<ul>
+<li>Captured config map (<strong>CC</strong>): the config-derived type map used across the library.</li>
+<li>Values-first config literal (<strong>CF</strong>): the literal config type captured at construction time (type-only “phantom” generic).</li>
+<li>Entity token (<strong>ET</strong>): a union of entity names (keys of the configured entity map).</li>
+<li>Index token (<strong>IT</strong>): a union of index names (keys of <code>config.indexes</code>).</li>
+<li>Index token subset (<strong>ITS</strong>): a subset union of index tokens used in a given query/map.</li>
+<li>Projection tuple (<strong>K</strong>): a type-only channel representing projected attribute keys (e.g., <code>const attrs = ['userId'] as const</code>).</li>
+</ul>
+<hr>
+<h2 id="mental-model-runtime" class="tsd-anchor-link">Mental model (runtime)<a href="#mental-model-runtime" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><h3 id="the-global-keys" class="tsd-anchor-link">The global keys<a href="#the-global-keys" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Entity Manager assumes a table with a <strong>global</strong> hash key and range key property name shared across all entity types:</p>
+<ul>
+<li><code>config.hashKey</code>: e.g. <code>&quot;pk&quot;</code> or <code>&quot;hashKey2&quot;</code>.</li>
+<li><code>config.rangeKey</code>: e.g. <code>&quot;sk&quot;</code> or <code>&quot;rangeKey&quot;</code>.</li>
+</ul>
+<p>For each entity token:</p>
+<ul>
+<li><strong>Hash key value</strong> is <code>&quot;&lt;entityToken&gt;&lt;shardKeyDelimiter&gt;&lt;shardSuffix&gt;&quot;</code>, e.g. <code>user!0a</code>.
+<ul>
+<li>If the active shard bump has <code>chars === 0</code>, the suffix is empty: <code>user!</code>.</li>
+</ul>
+</li>
+<li><strong>Range key value</strong> is <code>&quot;&lt;uniqueProperty&gt;&lt;generatedValueDelimiter&gt;&lt;uniqueValue&gt;&quot;</code>, e.g. <code>userId#abc123</code>.</li>
+</ul>
+<h3 id="sharding-shard-bumps" class="tsd-anchor-link">Sharding (“shard bumps”)<a href="#sharding-shard-bumps" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Each entity can define a time-based scale-up schedule via <code>shardBumps</code>:</p>
+<pre><code class="ts"><span class="hl-1">{ </span><span class="hl-10">timestamp</span><span class="hl-1">: </span><span class="hl-6">number</span><span class="hl-1">; </span><span class="hl-10">charBits</span><span class="hl-1">: </span><span class="hl-8">1..5</span><span class="hl-1">; </span><span class="hl-10">chars</span><span class="hl-1">: </span><span class="hl-8">0..40</span><span class="hl-1"> }</span>
+</code><button type="button">Copy</button></pre>
+
+<ul>
+<li>The applicable bump is chosen by <code>timestampProperty</code> on the item (e.g., <code>created</code>).</li>
+<li><code>charBits</code> controls radix: <code>radix = 2 ** charBits</code>.</li>
+<li><code>chars</code> controls width; full shard space is <code>radix ** chars</code>.</li>
+<li>The shard suffix is computed deterministically from <code>uniqueProperty</code> (string-hash) modulo the full shard space.</li>
+</ul>
+<h3 id="generated-properties-index-helpers" class="tsd-anchor-link">Generated properties (index helpers)<a href="#generated-properties-index-helpers" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Generated properties are additional string-valued tokens used as index key components:</p>
+<ul>
+<li><strong>Sharded generated property</strong>:
+<ul>
+<li>Encoded format: <code>&quot;&lt;hashKeyValue&gt;|k#v|k#v...&quot;</code></li>
+<li><strong>Atomic</strong>: if any required element is <code>null</code>/<code>undefined</code>, encoding returns <code>undefined</code>.</li>
+<li>Used only on the hash-key side of an index (must be global hashKey or a sharded generated property).</li>
+</ul>
+</li>
+<li><strong>Unsharded generated property</strong>:
+<ul>
+<li>Encoded format: <code>&quot;k#v|k#v...&quot;</code> (missing values become empty strings)</li>
+<li>Used on the range-key side of an index.</li>
+</ul>
+</li>
+</ul>
+<h3 id="indexes" class="tsd-anchor-link">Indexes<a href="#indexes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p><code>config.indexes</code> describes secondary index key <em>tokens</em> (not provider-specific index definitions):</p>
+<pre><code class="ts"><span class="hl-10">indexes</span><span class="hl-1">: {</span><br/><span class="hl-1">  [</span><span class="hl-6">indexToken</span><span class="hl-1">]: {</span><br/><span class="hl-1">    </span><span class="hl-6">hashKey:</span><span class="hl-1"> </span><span class="hl-6">config</span><span class="hl-1">.</span><span class="hl-6">hashKey</span><span class="hl-1"> | </span><span class="hl-6">shardedGeneratedKey</span><span class="hl-1">;</span><br/><span class="hl-1">    </span><span class="hl-6">rangeKey</span><span class="hl-1">: </span><span class="hl-6">config</span><span class="hl-1">.</span><span class="hl-6">rangeKey</span><span class="hl-1"> | </span><span class="hl-6">unshardedGeneratedKey</span><span class="hl-1"> | </span><span class="hl-6">transcodedProperty</span><span class="hl-1">;</span><br/><span class="hl-1">    </span><span class="hl-6">projections</span><span class="hl-1">?: </span><span class="hl-6">string</span><span class="hl-1">[]; </span><span class="hl-3">// optional, validated (must not include key tokens)</span><br/><span class="hl-1">  }</span><br/><span class="hl-1">}</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Entity Manager uses index definitions for:</p>
+<ul>
+<li>Determining page key <em>shape</em> per index (type narrowing with CF).</li>
+<li>Rehydrating and dehydrating page keys.</li>
+<li>Validating index tokens and finding an index token by (hashKeyToken, rangeKeyToken).</li>
+</ul>
+<hr>
+<h2 id="values-first-configuration-and" class="tsd-anchor-link">Values-first configuration and <code>createEntityManager</code><a href="#values-first-configuration-and" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><h3 id="preferred-construction-inference-first" class="tsd-anchor-link">Preferred construction (inference-first)<a href="#preferred-construction-inference-first" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Use <code>createEntityManager(config)</code> with a values-first config literal (<code>as const</code>) to capture tokens and index names:</p>
+<pre><code class="ts"><span class="hl-5">import</span><span class="hl-1"> { </span><span class="hl-6">z</span><span class="hl-1"> } </span><span class="hl-5">from</span><span class="hl-1"> </span><span class="hl-2">&#39;zod&#39;</span><span class="hl-1">;</span><br/><span class="hl-5">import</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-6">createEntityManager</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">defaultTranscodes</span><span class="hl-1">,</span><br/><span class="hl-1">} </span><span class="hl-5">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@karmaniverous/entity-manager&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">userSchema</span><span class="hl-1"> = </span><span class="hl-6">z</span><span class="hl-1">.</span><span class="hl-0">object</span><span class="hl-1">({</span><br/><span class="hl-1">  </span><span class="hl-6">userId:</span><span class="hl-1"> </span><span class="hl-6">z</span><span class="hl-1">.</span><span class="hl-0">string</span><span class="hl-1">(),</span><br/><span class="hl-1">  </span><span class="hl-6">created:</span><span class="hl-1"> </span><span class="hl-6">z</span><span class="hl-1">.</span><span class="hl-0">number</span><span class="hl-1">(),</span><br/><span class="hl-1">  </span><span class="hl-6">firstNameCanonical:</span><span class="hl-1"> </span><span class="hl-6">z</span><span class="hl-1">.</span><span class="hl-0">string</span><span class="hl-1">(),</span><br/><span class="hl-1">  </span><span class="hl-6">lastNameCanonical:</span><span class="hl-1"> </span><span class="hl-6">z</span><span class="hl-1">.</span><span class="hl-0">string</span><span class="hl-1">(),</span><br/><span class="hl-1">});</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">config</span><span class="hl-1"> = {</span><br/><span class="hl-1">  </span><span class="hl-6">hashKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;hashKey2&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">rangeKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;rangeKey&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">generatedProperties:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">sharded:</span><span class="hl-1"> { </span><span class="hl-6">userPK:</span><span class="hl-1"> [</span><span class="hl-2">&#39;userId&#39;</span><span class="hl-1">] </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-4">const</span><span class="hl-1"> },</span><br/><span class="hl-1">    </span><span class="hl-6">unsharded:</span><span class="hl-1"> {</span><br/><span class="hl-1">      </span><span class="hl-6">firstNameRK:</span><span class="hl-1"> [</span><span class="hl-2">&#39;firstNameCanonical&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;lastNameCanonical&#39;</span><span class="hl-1">] </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-4">const</span><span class="hl-1">,</span><br/><span class="hl-1">    },</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  </span><span class="hl-6">propertyTranscodes:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">userId:</span><span class="hl-1"> </span><span class="hl-2">&#39;string&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-6">created:</span><span class="hl-1"> </span><span class="hl-2">&#39;timestamp&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-6">firstNameCanonical:</span><span class="hl-1"> </span><span class="hl-2">&#39;string&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">    </span><span class="hl-6">lastNameCanonical:</span><span class="hl-1"> </span><span class="hl-2">&#39;string&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  </span><span class="hl-6">indexes:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">created:</span><span class="hl-1"> { </span><span class="hl-6">hashKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;hashKey2&#39;</span><span class="hl-1">, </span><span class="hl-6">rangeKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;created&#39;</span><span class="hl-1"> },</span><br/><span class="hl-1">    </span><span class="hl-6">firstName:</span><span class="hl-1"> { </span><span class="hl-6">hashKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;hashKey2&#39;</span><span class="hl-1">, </span><span class="hl-6">rangeKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;firstNameRK&#39;</span><span class="hl-1"> },</span><br/><span class="hl-1">    </span><span class="hl-6">userCreated:</span><span class="hl-1"> { </span><span class="hl-6">hashKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;userPK&#39;</span><span class="hl-1">, </span><span class="hl-6">rangeKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;created&#39;</span><span class="hl-1"> },</span><br/><span class="hl-1">  } </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-4">const</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">entities:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">user:</span><span class="hl-1"> { </span><span class="hl-6">uniqueProperty:</span><span class="hl-1"> </span><span class="hl-2">&#39;userId&#39;</span><span class="hl-1">, </span><span class="hl-6">timestampProperty:</span><span class="hl-1"> </span><span class="hl-2">&#39;created&#39;</span><span class="hl-1"> },</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">  </span><span class="hl-3">// compile-time shape capture only; stripped from runtime config</span><br/><span class="hl-1">  </span><span class="hl-6">entitiesSchema:</span><span class="hl-1"> { </span><span class="hl-6">user:</span><span class="hl-1"> </span><span class="hl-6">userSchema</span><span class="hl-1"> },</span><br/><span class="hl-1">  </span><span class="hl-6">transcodes:</span><span class="hl-1"> </span><span class="hl-6">defaultTranscodes</span><span class="hl-1">,</span><br/><span class="hl-1">} </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-4">const</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">em</span><span class="hl-1"> = </span><span class="hl-0">createEntityManager</span><span class="hl-1">(</span><span class="hl-6">config</span><span class="hl-1">);</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Notes:</p>
+<ul>
+<li><code>entitiesSchema</code> is compile-time only; the runtime config is still validated by Zod, and <code>entitiesSchema</code> is stripped before parsing.</li>
+<li>Use <code>as const</code> (especially on <code>indexes</code> and generated property element arrays) to preserve literal unions.</li>
+</ul>
+<h3 id="runtime-config-validation-what-can-break-at-construction-time" class="tsd-anchor-link">Runtime config validation (what can break at construction time)<a href="#runtime-config-validation-what-can-break-at-construction-time" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>The constructor parses config with Zod and rejects many mismatches, including:</p>
+<ul>
+<li>delimiter collisions (<code>generatedKeyDelimiter</code>, <code>generatedValueDelimiter</code>, <code>shardKeyDelimiter</code>)</li>
+<li>key token collisions (hashKey/rangeKey vs generated keys vs transcoded properties)</li>
+<li>generatedProperties elements not present in <code>propertyTranscodes</code></li>
+<li>indexes with invalid hashKey/rangeKey tokens, duplicate hash/range pairs, or invalid projections</li>
+<li>shard bump monotonicity errors</li>
+</ul>
+<p>If config parsing fails, treat it as a <strong>schema error</strong> and fix the config, not the code.</p>
+<hr>
+<h2 id="type-model-you-must-understand" class="tsd-anchor-link">Type model you must understand<a href="#type-model-you-must-understand" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><h3 id="by-token-domain-vs-db-shapes" class="tsd-anchor-link">By-token domain vs DB shapes<a href="#by-token-domain-vs-db-shapes" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Entity Manager’s public item/record types are by-token (narrowed by entity token).</p>
+<ul>
+<li><code>EntityItem&lt;CC, ET&gt;</code>
+<ul>
+<li>Domain-facing “full” shape for that entity token, plus optional key/token strings.</li>
+</ul>
+</li>
+<li><code>EntityItemPartial&lt;CC, ET, K = unknown&gt;</code>
+<ul>
+<li>Domain-facing projected/seed shape.</li>
+<li>If <code>K</code> omitted: permissive partial.</li>
+<li>If <code>K</code> provided: a <code>Pick&lt;...&gt;</code> restricted to <code>K</code>.</li>
+</ul>
+</li>
+<li><code>EntityRecord&lt;CC, ET&gt;</code>
+<ul>
+<li>DB-facing record: required global hash/range keys + partial domain fields.</li>
+</ul>
+</li>
+<li><code>EntityRecordPartial&lt;CC, ET, K = unknown&gt;</code>
+<ul>
+<li>Projected DB record (Pick by <code>K</code>).</li>
+</ul>
+</li>
+</ul>
+<p>Token-agnostic storage helpers (exported for reference and advanced use):</p>
+<ul>
+<li><code>StorageItem&lt;CC&gt;</code> / <code>StorageRecord&lt;CC&gt;</code> (property-level, flattened across entities)</li>
+</ul>
+<h3 id="key-type" class="tsd-anchor-link">Key type<a href="#key-type" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li><code>EntityKey&lt;CC&gt;</code>: <code>Record&lt;CC['HashKey'] | CC['RangeKey'], string&gt;</code></li>
+</ul>
+<h3 id="index-aware-page-keys-optional-cf-channel" class="tsd-anchor-link">Index-aware page keys (optional CF channel)<a href="#index-aware-page-keys-optional-cf-channel" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li><code>PageKeyByIndex&lt;CC, ET, IT, CF&gt;</code> narrows the page key object to only the key components for that index <strong>when CF carries <code>indexes</code></strong>.</li>
+<li>Without CF, it falls back to the broader <code>PageKey&lt;CC&gt;</code> shape.</li>
+</ul>
+<hr>
+<h2 id="key-lifecycle-" class="tsd-anchor-link">Key lifecycle: <code>addKeys</code>, <code>removeKeys</code>, <code>getPrimaryKey</code><a href="#key-lifecycle-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><h3 id="" class="tsd-anchor-link"><code>addKeys(entityToken, item, overwrite?)</code></h3><ul>
+<li>Input: domain-ish partial item (<code>EntityItemPartial</code>).</li>
+<li>Output: DB-ish record (<code>EntityRecordPartial</code>) with:
+<ul>
+<li>global hash/range keys set (unless already present and <code>overwrite=false</code>)</li>
+<li>generated properties updated based on overwrite rules</li>
+</ul>
+</li>
+</ul>
+<p>Use it before writes.</p>
+<pre><code class="ts"><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">record</span><span class="hl-1"> = </span><span class="hl-6">em</span><span class="hl-1">.</span><span class="hl-0">addKeys</span><span class="hl-1">(</span><span class="hl-2">&#39;user&#39;</span><span class="hl-1">, {</span><br/><span class="hl-1">  </span><span class="hl-6">userId:</span><span class="hl-1"> </span><span class="hl-2">&#39;u1&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">created:</span><span class="hl-1"> </span><span class="hl-6">Date</span><span class="hl-1">.</span><span class="hl-0">now</span><span class="hl-1">(),</span><br/><span class="hl-1">  </span><span class="hl-6">firstNameCanonical:</span><span class="hl-1"> </span><span class="hl-2">&#39;lee&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">lastNameCanonical:</span><span class="hl-1"> </span><span class="hl-2">&#39;zhang&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">});</span><br/><span class="hl-3">// record.hashKey2 and record.rangeKey are present (strings)</span>
+</code><button type="button">Copy</button></pre>
+
+<h3 id="-1" class="tsd-anchor-link"><code>removeKeys(entityToken, recordOrRecords)</code><a href="#-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Strips global keys and generated property tokens from a DB record.</li>
+<li>Overloads preserve projected-vs-strict behavior:
+<ul>
+<li>Strict <code>EntityRecord</code> input yields strict <code>EntityItem</code> output.</li>
+<li>Projected <code>EntityRecordPartial&lt;..., K&gt;</code> yields <code>EntityItemPartial&lt;..., K&gt;</code>.</li>
+</ul>
+</li>
+</ul>
+<p>Use it after reads if your app layer should not see storage keys.</p>
+<h3 id="-2" class="tsd-anchor-link"><code>getPrimaryKey(entityToken, itemOrItems, overwrite?)</code><a href="#-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Always returns an array of keys (<code>EntityKey&lt;CC&gt;[]</code>).</li>
+<li>Behavior:
+<ul>
+<li>If both keys exist and <code>overwrite=false</code>, returns exactly that pair.</li>
+<li>Otherwise computes <code>rangeKey</code> from <code>uniqueProperty</code>.</li>
+<li>If <code>timestampProperty</code> is present, computes exactly one hash key.</li>
+<li>If <code>timestampProperty</code> is missing, enumerates hash key space across bumps (deterministic per bump if <code>uniqueProperty</code> is present).</li>
+</ul>
+</li>
+</ul>
+<p>Use it to generate keys for point reads / batch reads.</p>
+<hr>
+<h2 id="query-orchestration-what-does" class="tsd-anchor-link">Query orchestration: what <code>EntityManager.query()</code> does<a href="#query-orchestration-what-does" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Entity Manager’s query API is <em>orchestration only</em>. You provide shard query functions (provider integration); it runs them across shards and indexes and merges results.</p>
+<h3 id="your-responsibility-implement" class="tsd-anchor-link">Your responsibility: implement <code>ShardQueryFunction</code><a href="#your-responsibility-implement" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p><code>ShardQueryFunction&lt;CC, ET, IT, CF, K&gt;</code> is:</p>
+<pre><code class="ts"><span class="hl-1">(</span><span class="hl-6">hashKey</span><span class="hl-1">: </span><span class="hl-9">string</span><span class="hl-1">, </span><span class="hl-6">pageKey</span><span class="hl-1">?: </span><span class="hl-9">PageKeyByIndex</span><span class="hl-1">&lt;...&gt;, </span><span class="hl-6">pageSize</span><span class="hl-1">?: </span><span class="hl-9">number</span><span class="hl-1">)</span><br/><span class="hl-1">  </span><span class="hl-4">=&gt;</span><span class="hl-1"> </span><span class="hl-9">Promise</span><span class="hl-1">&lt;{ </span><span class="hl-10">count</span><span class="hl-1">: </span><span class="hl-6">number</span><span class="hl-1">; </span><span class="hl-10">items</span><span class="hl-1">: </span><span class="hl-6">EntityItemPartial</span><span class="hl-1">&lt;</span><span class="hl-7">CC</span><span class="hl-1">, </span><span class="hl-7">ET</span><span class="hl-1">, </span><span class="hl-7">K</span><span class="hl-1">&gt;[]; </span><span class="hl-6">pageKey</span><span class="hl-1">?: </span><span class="hl-6">PageKeyByIndex</span><span class="hl-1">&lt;...&gt; }&gt;</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Rules for a correct implementation:</p>
+<ul>
+<li>Query <strong>exactly one shard</strong> (partition) per call using the provided <code>hashKey</code> value.</li>
+<li>Query <strong>exactly one index</strong> per function (the map key tells you which index you’re implementing).</li>
+<li>Respect <code>pageKey</code> and <code>pageSize</code> as “resume token” and per-shard page size.</li>
+<li>Return <code>pageKey: undefined</code> when that shard/index is exhausted.</li>
+</ul>
+<h3 id="orchestration-behavior-library-responsibility" class="tsd-anchor-link">Orchestration behavior (library responsibility)<a href="#orchestration-behavior-library-responsibility" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>When you call <code>em.query(options)</code>:</p>
+<ul>
+<li>It rehydrates the (possibly compressed) <code>pageKeyMap</code> into a 2-layer structure:
+<ul>
+<li><code>indexToken -&gt; hashKeyValue -&gt; pageKey | undefined</code></li>
+</ul>
+</li>
+<li>It enumerates shard hash key space for the given <code>entityToken</code>, <code>hashKeyToken</code>, and <code>[timestampFrom, timestampTo]</code>.</li>
+<li>It runs all shard queries in parallel (bounded by <code>throttle</code>).</li>
+<li>It repeats shard querying until:
+<ul>
+<li>all shards return <code>pageKey === undefined</code> (no pages remain), or</li>
+<li>the accumulated item count reaches <code>limit</code> (note: fan-out can exceed <code>limit</code>).</li>
+</ul>
+</li>
+<li>It dedupes by <code>uniqueProperty</code> and sorts by <code>sortOrder</code>.</li>
+<li>It dehydrates + compresses the updated page-key map into a single string token (<code>result.pageKeyMap</code>) you pass into the next call.</li>
+</ul>
+<h3 id="fields-you-must-understand" class="tsd-anchor-link"><code>QueryOptions</code> fields you must understand<a href="#fields-you-must-understand" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>Key options:</p>
+<ul>
+<li><code>entityToken</code>: selects entity config (uniqueProperty, timestampProperty, shard bumps, defaults).</li>
+<li><code>item</code>: a partial item used to generate alternate hash key spaces (if needed); may be <code>{}</code> for global hash key indexes.</li>
+<li><code>shardQueryMap</code>: map of <code>indexToken -&gt; ShardQueryFunction</code> (single- or multi-index).</li>
+<li><code>pageKeyMap?: string</code>: the returned token from a prior query call.</li>
+<li><code>limit?: number | Infinity</code>: target maximum total items across shards (positive int or Infinity).</li>
+<li><code>pageSize?: number</code>: max per-shard page size (positive int).</li>
+<li><code>timestampFrom?: number</code>, <code>timestampTo?: number</code>: bounds which shard bumps/shards are queried.</li>
+<li><code>sortOrder?: SortOrder&lt;...&gt;</code>: used after merge/dedupe.</li>
+<li><code>throttle?: number</code>: max shard queries in flight.</li>
+</ul>
+<h3 id="minimal-multi-index-example-provider-agnostic" class="tsd-anchor-link">Minimal multi-index example (provider-agnostic)<a href="#minimal-multi-index-example-provider-agnostic" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><pre><code class="ts"><span class="hl-5">import</span><span class="hl-1"> </span><span class="hl-5">type</span><span class="hl-1"> {</span><br/><span class="hl-1">  </span><span class="hl-6">QueryOptionsByCF</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">ShardQueryFunction</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">ShardQueryMapByCF</span><span class="hl-1">,</span><br/><span class="hl-1">} </span><span class="hl-5">from</span><span class="hl-1"> </span><span class="hl-2">&#39;@karmaniverous/entity-manager&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">cf</span><span class="hl-1"> = {</span><br/><span class="hl-1">  </span><span class="hl-6">indexes:</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-6">firstName:</span><span class="hl-1"> { </span><span class="hl-6">hashKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;hashKey2&#39;</span><span class="hl-1">, </span><span class="hl-6">rangeKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;firstNameRK&#39;</span><span class="hl-1"> },</span><br/><span class="hl-1">    </span><span class="hl-6">lastName:</span><span class="hl-1"> { </span><span class="hl-6">hashKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;hashKey2&#39;</span><span class="hl-1">, </span><span class="hl-6">rangeKey:</span><span class="hl-1"> </span><span class="hl-2">&#39;lastNameRK&#39;</span><span class="hl-1"> },</span><br/><span class="hl-1">  },</span><br/><span class="hl-1">} </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-4">const</span><span class="hl-1">;</span><br/><span class="hl-4">type</span><span class="hl-1"> </span><span class="hl-9">CF</span><span class="hl-1"> = </span><span class="hl-4">typeof</span><span class="hl-1"> </span><span class="hl-6">cf</span><span class="hl-1">;</span><br/><br/><span class="hl-4">type</span><span class="hl-1"> </span><span class="hl-9">CC</span><span class="hl-1"> = </span><span class="hl-3">/* your ConfigMap&lt;...&gt; */</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">firstNameSQF</span><span class="hl-1">: </span><span class="hl-9">ShardQueryFunction</span><span class="hl-1">&lt;</span><span class="hl-9">CC</span><span class="hl-1">, </span><span class="hl-2">&#39;user&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;firstName&#39;</span><span class="hl-1">, </span><span class="hl-9">CF</span><span class="hl-1">&gt; =</span><br/><span class="hl-1">  </span><span class="hl-4">async</span><span class="hl-1"> (</span><span class="hl-6">hashKey</span><span class="hl-1">, </span><span class="hl-6">pageKey</span><span class="hl-1">, </span><span class="hl-6">pageSize</span><span class="hl-1">) </span><span class="hl-4">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-3">// provider-specific query here</span><br/><span class="hl-1">    </span><span class="hl-5">return</span><span class="hl-1"> { </span><span class="hl-6">count:</span><span class="hl-1"> </span><span class="hl-8">0</span><span class="hl-1">, </span><span class="hl-6">items:</span><span class="hl-1"> [], </span><span class="hl-6">pageKey</span><span class="hl-1"> };</span><br/><span class="hl-1">  };</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">lastNameSQF</span><span class="hl-1">: </span><span class="hl-9">ShardQueryFunction</span><span class="hl-1">&lt;</span><span class="hl-9">CC</span><span class="hl-1">, </span><span class="hl-2">&#39;user&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;lastName&#39;</span><span class="hl-1">, </span><span class="hl-9">CF</span><span class="hl-1">&gt; =</span><br/><span class="hl-1">  </span><span class="hl-4">async</span><span class="hl-1"> (</span><span class="hl-6">hashKey</span><span class="hl-1">, </span><span class="hl-6">pageKey</span><span class="hl-1">, </span><span class="hl-6">pageSize</span><span class="hl-1">) </span><span class="hl-4">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-5">return</span><span class="hl-1"> { </span><span class="hl-6">count:</span><span class="hl-1"> </span><span class="hl-8">0</span><span class="hl-1">, </span><span class="hl-6">items:</span><span class="hl-1"> [], </span><span class="hl-6">pageKey</span><span class="hl-1"> };</span><br/><span class="hl-1">  };</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">shardQueryMap</span><span class="hl-1">: </span><span class="hl-9">ShardQueryMapByCF</span><span class="hl-1">&lt;</span><span class="hl-9">CC</span><span class="hl-1">, </span><span class="hl-2">&#39;user&#39;</span><span class="hl-1">, </span><span class="hl-9">CF</span><span class="hl-1">&gt; = {</span><br/><span class="hl-1">  </span><span class="hl-6">firstName:</span><span class="hl-1"> </span><span class="hl-6">firstNameSQF</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">lastName:</span><span class="hl-1"> </span><span class="hl-6">lastNameSQF</span><span class="hl-1">,</span><br/><span class="hl-1">};</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">options</span><span class="hl-1">: </span><span class="hl-9">QueryOptionsByCF</span><span class="hl-1">&lt;</span><span class="hl-9">CC</span><span class="hl-1">, </span><span class="hl-2">&#39;user&#39;</span><span class="hl-1">, </span><span class="hl-9">CF</span><span class="hl-1">&gt; = {</span><br/><span class="hl-1">  </span><span class="hl-6">entityToken:</span><span class="hl-1"> </span><span class="hl-2">&#39;user&#39;</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">item:</span><span class="hl-1"> {},</span><br/><span class="hl-1">  </span><span class="hl-6">shardQueryMap</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">pageSize:</span><span class="hl-1"> </span><span class="hl-8">25</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">limit:</span><span class="hl-1"> </span><span class="hl-8">200</span><span class="hl-1">,</span><br/><span class="hl-1">};</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">result</span><span class="hl-1"> = </span><span class="hl-5">await</span><span class="hl-1"> </span><span class="hl-6">em</span><span class="hl-1">.</span><span class="hl-0">query</span><span class="hl-1">(</span><span class="hl-6">options</span><span class="hl-1">);</span><br/><span class="hl-3">// result.pageKeyMap is a compact token: pass it back into the next call</span>
+</code><button type="button">Copy</button></pre>
+
+<hr>
+<h2 id="projection-type-only-k-and-adapter-responsibilities" class="tsd-anchor-link">Projection (type-only K) and adapter responsibilities<a href="#projection-type-only-k-and-adapter-responsibilities" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p><code>K</code> is a type-only way to express “I projected a subset of attributes at runtime”.</p>
+<p>If you pass a projection tuple type through your shard query functions/options/results, then:</p>
+<ul>
+<li>Items become <code>Pick&lt;EntityItem&lt;...&gt;, KeysFrom&lt;K&gt;&gt;[]</code>.</li>
+<li>Sort typing aligns to the projected shape.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="ts"><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">attrs</span><span class="hl-1"> = [</span><span class="hl-2">&#39;userId&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;created&#39;</span><span class="hl-1">] </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-4">const</span><span class="hl-1">;</span><br/><span class="hl-4">type</span><span class="hl-1"> </span><span class="hl-9">K</span><span class="hl-1"> = </span><span class="hl-4">typeof</span><span class="hl-1"> </span><span class="hl-6">attrs</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-0">sqf</span><span class="hl-1">: </span><span class="hl-9">ShardQueryFunction</span><span class="hl-1">&lt;</span><span class="hl-9">CC</span><span class="hl-1">, </span><span class="hl-2">&#39;user&#39;</span><span class="hl-1">, </span><span class="hl-2">&#39;firstName&#39;</span><span class="hl-1">, </span><span class="hl-9">CF</span><span class="hl-1">, </span><span class="hl-9">K</span><span class="hl-1">&gt; = </span><span class="hl-4">async</span><span class="hl-1"> () </span><span class="hl-4">=&gt;</span><span class="hl-1"> ({</span><br/><span class="hl-1">  </span><span class="hl-6">count:</span><span class="hl-1"> </span><span class="hl-8">0</span><span class="hl-1">,</span><br/><span class="hl-1">  </span><span class="hl-6">items:</span><span class="hl-1"> [],</span><br/><span class="hl-1">});</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Critical invariant:</p>
+<ul>
+<li>Entity Manager dedupes by <code>uniqueProperty</code> and sorts by <code>sortOrder</code>.</li>
+<li>If your adapter uses projections at runtime, it should auto-include:
+<ul>
+<li>the entity’s <code>uniqueProperty</code>, and</li>
+<li>any attributes used by the sort order,
+even if the caller omitted them from the projection tuple.</li>
+</ul>
+</li>
+</ul>
+<p>Otherwise, runtime dedupe/sort may be incorrect.</p>
+<hr>
+<h2 id="index-token-inference-and-narrowing-patterns" class="tsd-anchor-link">Index token inference and narrowing patterns<a href="#index-token-inference-and-narrowing-patterns" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>Entity Manager supports two complementary inference routes:</p>
+<h3 id="cf-route-values-first-config-literal" class="tsd-anchor-link">CF route (values-first config literal)<a href="#cf-route-values-first-config-literal" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>If you have a literal like:</p>
+<pre><code class="ts"><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-7">cf</span><span class="hl-1"> = { </span><span class="hl-6">indexes:</span><span class="hl-1"> { </span><span class="hl-6">firstName:</span><span class="hl-1"> {...}, </span><span class="hl-6">lastName:</span><span class="hl-1"> {...} } } </span><span class="hl-5">as</span><span class="hl-1"> </span><span class="hl-4">const</span><span class="hl-1">;</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Then:</p>
+<ul>
+<li><code>IndexTokensOf&lt;typeof cf&gt;</code> becomes <code>'firstName' | 'lastName'</code></li>
+<li><code>ShardQueryMapByCF&lt;..., typeof cf&gt;</code> only allows those keys</li>
+<li><code>PageKeyByIndex&lt;..., 'firstName', typeof cf&gt;</code> narrows the page key shape to that index’s components</li>
+</ul>
+<h3 id="cc-route-captured-config-type" class="tsd-anchor-link">CC route (captured config type)<a href="#cc-route-captured-config-type" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p>If you want ITS derived from a captured config literal type (commonly your config value type):</p>
+<ul>
+<li><code>ShardQueryMapByCC&lt;CCMap, ET, CCLiteral&gt;</code></li>
+<li><code>QueryOptionsByCC&lt;CCMap, ET, CCLiteral&gt;</code></li>
+</ul>
+<p>These derive ITS from <code>IndexTokensFrom&lt;CCLiteral&gt;</code> and pass <code>CCLiteral</code> through the CF channel for page-key narrowing.</p>
+<h3 id="convenience" class="tsd-anchor-link"><code>findIndexToken</code> convenience<a href="#convenience" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p><code>EntityManager.findIndexToken(hashKeyToken, rangeKeyToken, suppressError?)</code> returns an index token, and when the manager was constructed with a values-first config literal, its return type narrows to <code>IndexTokensOf&lt;CF&gt;</code>.</p>
+<hr>
+<h2 id="adapter-building-blocks-shipped-in-this-package" class="tsd-anchor-link">Adapter building blocks shipped in this package<a href="#adapter-building-blocks-shipped-in-this-package" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>This package includes abstract helpers meant for provider adapters.</p>
+<h3 id="-3" class="tsd-anchor-link"><code>BaseEntityClient</code><a href="#-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><ul>
+<li>Owns an <code>entityManager</code> and a <code>logger</code> (<code>debug</code>/<code>error</code>).</li>
+<li>Holds optional <code>batchProcessOptions</code> (used by downstream adapters).</li>
+</ul>
+<h3 id="-4" class="tsd-anchor-link"><code>BaseQueryBuilder</code><a href="#-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3><p><code>BaseQueryBuilder</code> helps adapters construct a <code>ShardQueryMap</code> fluently while keeping the provider-specific logic inside <code>getShardQueryFunction(indexToken)</code>.</p>
+<p>Key points:</p>
+<ul>
+<li>You define an <code>IndexParams</code> type (your per-index mutable query state).</li>
+<li>The builder maintains <code>indexParamsMap: Record&lt;ITS, IndexParams&gt;</code>.</li>
+<li><code>build()</code> returns a <code>ShardQueryMap</code> by mapping index tokens to shard query functions.</li>
+<li><code>query()</code> forwards to <code>entityManager.query(...)</code> with the builder’s <code>pageKeyMap</code> and built shardQueryMap.</li>
+</ul>
+<p>The shared query options type for builder <code>query()</code> is:</p>
+<ul>
+<li><code>QueryBuilderQueryOptions&lt;CC, ET, CF&gt;</code> = <code>QueryOptions</code> minus <code>entityToken</code>, <code>pageKeyMap</code>, <code>shardQueryMap</code>.</li>
+</ul>
+<hr>
+<h2 id="common-failure-modes-debug-checklist" class="tsd-anchor-link">Common failure modes (debug checklist)<a href="#common-failure-modes-debug-checklist" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><p>When queries behave unexpectedly, check:</p>
+<ul>
+<li>Config validity:
+<ul>
+<li><code>propertyTranscodes</code> includes every property referenced by generated properties.</li>
+<li>Index hashKey token is global hashKey or a <em>sharded</em> generated key.</li>
+<li>Index rangeKey token is global rangeKey or an <em>unsharded</em> generated key or a transcoded scalar.</li>
+</ul>
+</li>
+<li>Shard query function correctness:
+<ul>
+<li>You used the passed <code>hashKey</code> value as the partition key value.</li>
+<li>You mapped <code>pageKey</code> into provider pagination correctly.</li>
+<li>You return <code>pageKey: undefined</code> when exhausted.</li>
+</ul>
+</li>
+<li>Paging token handling:
+<ul>
+<li>You treat <code>result.pageKeyMap</code> as an opaque token and pass it unchanged.</li>
+<li>You keep the same set of index tokens between query calls (same shardQueryMap keys); otherwise pageKeyMap validation will fail.</li>
+</ul>
+</li>
+<li>Projection invariants:
+<ul>
+<li>If using projections, your adapter auto-included uniqueProperty and sort keys at runtime.</li>
+</ul>
+</li>
+<li>“limit” expectations:
+<ul>
+<li><code>limit</code> is a target cap across all shards. Fan-out may overshoot because it queries shards in batches of <code>pageSize</code>.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="what-stan-assistants-should-do-when-editing-code-that-uses-entity-manager" class="tsd-anchor-link">What STAN assistants should do when editing code that uses Entity Manager<a href="#what-stan-assistants-should-do-when-editing-code-that-uses-entity-manager" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2><ul>
+<li>Prefer values-first configs (<code>as const</code>) and avoid broad annotations that widen literal unions.</li>
+<li>Keep providers thin:
+<ul>
+<li>put orchestration in Entity Manager,</li>
+<li>put provider query details in the shard query functions or adapter helpers.</li>
+</ul>
+</li>
+<li>When you add a projection feature in an adapter, implement the auto-include policy for uniqueProperty and explicit sort keys.</li>
+<li>When you add a new index token, update:
+<ul>
+<li>config indexes,</li>
+<li>any adapter query builder maps/condition helpers that assume specific index names,</li>
+<li>tests that validate page key narrowing or index token unions.</li>
+</ul>
+</li>
+</ul>
+<p>That’s the full contract: if your shard query functions behave like “query one shard page”, Entity Manager can do the rest.</p>
+</div></div><div class="col-sidebar"><div class="page-menu"><div class="tsd-navigation settings"><details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>Settings</h3></summary><div class="tsd-accordion-details"><div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span><ul id="tsd-filter-options"><li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li></ul></div><div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div><details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg><h3>On This Page</h3></summary><div class="tsd-accordion-details"><a href="#stan-assistant-guide-"><span>STAN <wbr/>Assistant <wbr/>Guide — </span></a><ul><li><a href="#acronyms-used-in-generics-local-glossary"><span>Acronyms used in generics (local glossary)</span></a></li><li><a href="#mental-model-runtime"><span>Mental model (runtime)</span></a></li><li><ul><li><a href="#the-global-keys"><span>The global keys</span></a></li><li><a href="#sharding-shard-bumps"><span>Sharding (“shard bumps”)</span></a></li><li><a href="#generated-properties-index-helpers"><span>Generated properties (index helpers)</span></a></li><li><a href="#indexes"><span>Indexes</span></a></li></ul></li><li><a href="#values-first-configuration-and"><span>Values-<wbr/>first configuration and </span></a></li><li><ul><li><a href="#preferred-construction-inference-first"><span>Preferred construction (inference-<wbr/>first)</span></a></li><li><a href="#runtime-config-validation-what-can-break-at-construction-time"><span>Runtime config validation (what can break at construction time)</span></a></li></ul></li><li><a href="#type-model-you-must-understand"><span>Type model you must understand</span></a></li><li><ul><li><a href="#by-token-domain-vs-db-shapes"><span>By-<wbr/>token domain vs <wbr/>DB shapes</span></a></li><li><a href="#key-type"><span>Key type</span></a></li><li><a href="#index-aware-page-keys-optional-cf-channel"><span>Index-<wbr/>aware page keys (optional <wbr/>CF channel)</span></a></li></ul></li><li><a href="#key-lifecycle-"><span>Key lifecycle: , , </span></a></li><li><ul><li><a href="#"><span></span></a></li><li><a href="#-1"><span></span></a></li><li><a href="#-2"><span></span></a></li></ul></li><li><a href="#query-orchestration-what-does"><span>Query orchestration: what  does</span></a></li><li><ul><li><a href="#your-responsibility-implement"><span>Your responsibility: implement </span></a></li><li><a href="#orchestration-behavior-library-responsibility"><span>Orchestration behavior (library responsibility)</span></a></li><li><a href="#fields-you-must-understand"><span> fields you must understand</span></a></li><li><a href="#minimal-multi-index-example-provider-agnostic"><span>Minimal multi-<wbr/>index example (provider-<wbr/>agnostic)</span></a></li></ul></li><li><a href="#projection-type-only-k-and-adapter-responsibilities"><span>Projection (type-<wbr/>only <wbr/>K) and adapter responsibilities</span></a></li><li><a href="#index-token-inference-and-narrowing-patterns"><span>Index token inference and narrowing patterns</span></a></li><li><ul><li><a href="#cf-route-values-first-config-literal"><span>CF route (values-<wbr/>first config literal)</span></a></li><li><a href="#cc-route-captured-config-type"><span>CC route (captured config type)</span></a></li><li><a href="#convenience"><span> convenience</span></a></li></ul></li><li><a href="#adapter-building-blocks-shipped-in-this-package"><span>Adapter building blocks shipped in this package</span></a></li><li><ul><li><a href="#-3"><span></span></a></li><li><a href="#-4"><span></span></a></li></ul></li><li><a href="#common-failure-modes-debug-checklist"><span>Common failure modes (debug checklist)</span></a></li><li><a href="#what-stan-assistants-should-do-when-editing-code-that-uses-entity-manager"><span>What <wbr/>STAN assistants should do when editing code that uses <wbr/>Entity <wbr/>Manager</span></a></li></ul></div></details></div><div class="site-menu"><nav class="tsd-navigation"><a href="../modules.html">@karmaniverous/entity-manager</a><ul class="tsd-small-nested-navigation" id="tsd-nav-container"><li>Loading...</li></ul></nav></div></div></div><footer><p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer><div class="overlay"></div></body></html>
