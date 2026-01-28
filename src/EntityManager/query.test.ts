@@ -147,6 +147,34 @@ describe('query', function () {
     );
   });
 
+  it('pageKeyMap is stable even if shardQueryMap key insertion order changes', async function () {
+    const mapBothReversed: ShardQueryMap<
+      MyConfigMap,
+      'user',
+      'lastName' | 'firstName'
+    > = {
+      firstName: firstNameQuery,
+      lastName: lastNameQuery,
+    };
+
+    let result = await query(entityManager, {
+      entityToken: 'user',
+      item: {},
+      shardQueryMap: mapBoth,
+    });
+
+    result = await query(entityManager, {
+      entityToken: 'user',
+      item: {},
+      pageKeyMap: result.pageKeyMap,
+      shardQueryMap: mapBothReversed,
+    });
+
+    expect(result.count).to.be.greaterThan(
+      entityManager.config.entities.user.defaultLimit,
+    );
+  });
+
   it('complex sharded query', async function () {
     let result = await query(entityManager, {
       entityToken: 'user',

@@ -81,7 +81,7 @@ export async function query<
     >(
       entityManager,
       entityToken,
-      Object.keys(shardQueryMap) as ITS[],
+      (Object.keys(shardQueryMap).sort() as ITS[]),
       item,
       pageKeyMap
         ? (JSON.parse(
