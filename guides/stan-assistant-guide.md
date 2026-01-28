@@ -435,7 +435,7 @@ When queries behave unexpectedly, check:
 - Paging token handling:
   - You treat `result.pageKeyMap` as an opaque token and pass it unchanged.
   - You keep the same set of index tokens between query calls (same shardQueryMap keys); otherwise pageKeyMap validation will fail.
-  - You keep **index token order stable** between calls. `pageKeyMap` dehydration sorts index tokens, but rehydration uses the caller’s `Object.keys(shardQueryMap)` insertion order; rebuilding the map in a different order can silently corrupt pagination.
+  - **Older versions only:** You keep **index token order stable** between calls. Prior to the fix in PR #4, `pageKeyMap` dehydration sorted index tokens, but rehydration used the caller’s `Object.keys(shardQueryMap)` insertion order; rebuilding the map in a different order could silently corrupt pagination.
   - You reuse the **same `timestampFrom`/`timestampTo` bounds** between paged calls. The token does not encode the time window, and `timestampTo` defaults to `Date.now()` per call; changing the window can trigger `dehydrated length mismatch` or mis-page.
 - Projection invariants:
   - If using projections, your adapter auto-included uniqueProperty and sort keys at runtime.

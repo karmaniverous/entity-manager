@@ -157,17 +157,19 @@ describe('query', function () {
       lastName: lastNameQuery,
     };
 
+    // IMPORTANT: trigger the bug by first generating the token with the sorted-key map,
+    // then consuming it with the unsorted-key map.
     let result = await query(entityManager, {
       entityToken: 'user',
       item: {},
-      shardQueryMap: mapBoth,
+      shardQueryMap: mapBothReversed,
     });
 
     result = await query(entityManager, {
       entityToken: 'user',
       item: {},
       pageKeyMap: result.pageKeyMap,
-      shardQueryMap: mapBothReversed,
+      shardQueryMap: mapBoth,
     });
 
     expect(result.count).to.be.greaterThan(
