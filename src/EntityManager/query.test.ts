@@ -147,6 +147,41 @@ describe('query', function () {
     );
   });
 
+  it('reversed index order produces identical page 2 results', async function () {
+    const mapBothReversed: ShardQueryMap<
+      MyConfigMap,
+      'user',
+      'firstName' | 'lastName'
+    > = { firstName: firstNameQuery, lastName: lastNameQuery };
+
+    // Page 1 with original order.
+    const page1 = await query(entityManager, {
+      entityToken: 'user',
+      item: {},
+      shardQueryMap: mapBoth,
+    });
+
+    // Page 2 with original order.
+    const page2Original = await query(entityManager, {
+      entityToken: 'user',
+      item: {},
+      pageKeyMap: page1.pageKeyMap,
+      shardQueryMap: mapBoth,
+    });
+
+    // Page 2 with reversed order using same pageKeyMap from page 1.
+    const page2Reversed = await query(entityManager, {
+      entityToken: 'user',
+      item: {},
+      pageKeyMap: page1.pageKeyMap,
+      shardQueryMap: mapBothReversed,
+    });
+
+    expect(page2Reversed.count).to.equal(page2Original.count);
+    expect(page2Reversed.pageKeyMap).to.equal(page2Original.pageKeyMap);
+    expect(page2Reversed.items).to.deep.equal(page2Original.items);
+  });
+
   it('complex sharded query', async function () {
     let result = await query(entityManager, {
       entityToken: 'user',
