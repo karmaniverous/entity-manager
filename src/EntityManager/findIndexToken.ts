@@ -34,8 +34,7 @@ export function findIndexToken<C extends BaseConfigMap, CF = unknown>(
 ): IndexTokensOf<CF> | undefined {
   const indexToken = (Object.entries(entityManager.config.indexes).find(
     ([, index]) =>
-      index.hashKey === (hashKeyToken as string) &&
-      index.rangeKey === (rangeKeyToken as string),
+      index.hashKey === hashKeyToken && index.rangeKey === rangeKeyToken,
   )?.[0] ?? undefined) as IndexTokensOf<CF> | undefined;
 
   if (!indexToken && !suppressError)

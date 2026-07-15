@@ -34,7 +34,7 @@ export function decodeGeneratedProperty<
     } = entityManager.config;
 
     // Handle degenerate case.
-    if (!encoded) return {} as EntityItemPartial<CC, ET>;
+    if (!encoded) return {};
 
     // Split encoded into keys.
     const keys = encoded.split(generatedKeyDelimiter);

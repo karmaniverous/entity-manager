@@ -33,11 +33,7 @@ export function getHashKeySpace<C extends BaseConfigMap>(
   try {
     // Validate hashKeyToken is either the global hash key or a sharded generated property.
     if (hashKeyToken !== entityManager.config.hashKey)
-      validateGeneratedProperty(
-        entityManager,
-        hashKeyToken as C['ShardedKeys'],
-        true,
-      );
+      validateGeneratedProperty(entityManager, hashKeyToken, true);
 
     const { shardBumps } = entityManager.config.entities[entityToken];
 
@@ -84,14 +80,10 @@ export function getHashKeySpace<C extends BaseConfigMap>(
 
         // If hash key space basis is a different property, encode it.
         if (hashKeyToken !== entityManager.config.hashKey)
-          hashKey = encodeGeneratedProperty(
-            entityManager,
-            hashKeyToken as C['ShardedKeys'],
-            {
-              ...item,
-              [entityManager.config.hashKey]: hashKey,
-            },
-          );
+          hashKey = encodeGeneratedProperty(entityManager, hashKeyToken, {
+            ...item,
+            [entityManager.config.hashKey]: hashKey,
+          });
 
         if (!hashKey) throw new Error('item does not support hash key space');
 

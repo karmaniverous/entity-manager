@@ -50,7 +50,7 @@ export type MyConfigMap = ConfigMap<{
 // env var to avoid noisy stderr by default. Set VERBOSE_TEST=1 to re-enable.
 export const testLogger: Pick<Console, 'debug' | 'error'> = {
   debug: () => undefined,
-  error: (...args: Parameters<Console['error']>) => {
+  error: (...args: unknown[]) => {
     if (process.env.VERBOSE_TEST) console.error(...args);
   },
 };

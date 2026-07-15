@@ -76,11 +76,10 @@ export type Config<C extends BaseConfigMap = BaseConfigMap> =
       C['TranscodedProperties'] &
         TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>,
       {
-        [P in C['TranscodedProperties'] &
-          TranscodableProperties<
-            C['EntityMap'],
-            C['TranscodeRegistry']
-          >]: PropertiesOfType<
+        [
+          P in C['TranscodedProperties'] &
+            TranscodableProperties<C['EntityMap'], C['TranscodeRegistry']>
+        ]: PropertiesOfType<
           C['TranscodeRegistry'],
           FlattenEntityMap<C['EntityMap']>[P]
         >;

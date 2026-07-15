@@ -66,7 +66,7 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
     };
     const { entitiesSchema: _ignored, ...configForParse } = cfgWithOptionalES;
 
-    this.#config = configSchema.parse(configForParse as unknown as Config<CC>);
+    this.#config = configSchema.parse(configForParse);
     this.logger = logger;
   }
 
@@ -148,17 +148,10 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
     overwrite = false,
   ): EntityRecordPartial<CC, ET> | EntityRecordPartial<CC, ET>[] {
     if (Array.isArray(i)) {
-      return i.map((item) =>
-        addKeys(this, entityToken, item, overwrite),
-      ) as unknown as EntityRecordPartial<CC, ET>[];
+      return i.map((item) => addKeys(this, entityToken, item, overwrite));
     }
 
-    return addKeys(
-      this,
-      entityToken,
-      i,
-      overwrite,
-    ) as unknown as EntityRecordPartial<CC, ET>;
+    return addKeys(this, entityToken, i, overwrite);
   }
 
   /**
@@ -258,8 +251,7 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
         removeKeys(this, entityToken, item as StorageRecord<CC>),
       );
       return out as unknown as
-        | DomainItem<CC, ET>[]
-        | EntityItemPartial<CC, ET, K>[];
+        DomainItem<CC, ET>[] | EntityItemPartial<CC, ET, K>[];
     }
 
     const out = removeKeys(this, entityToken, i as StorageRecord<CC>);
@@ -280,25 +272,19 @@ export class EntityManager<CC extends BaseConfigMap, CF = unknown> {
   findIndexToken(
     hashKeyToken: CC['HashKey'] | CC['ShardedKeys'],
     rangeKeyToken:
-      | CC['RangeKey']
-      | CC['UnshardedKeys']
-      | CC['TranscodedProperties'],
+      CC['RangeKey'] | CC['UnshardedKeys'] | CC['TranscodedProperties'],
     suppressError?: false,
   ): IndexTokensOf<CF>;
   findIndexToken(
     hashKeyToken: CC['HashKey'] | CC['ShardedKeys'],
     rangeKeyToken:
-      | CC['RangeKey']
-      | CC['UnshardedKeys']
-      | CC['TranscodedProperties'],
+      CC['RangeKey'] | CC['UnshardedKeys'] | CC['TranscodedProperties'],
     suppressError: true,
   ): IndexTokensOf<CF> | undefined;
   findIndexToken(
     hashKeyToken: CC['HashKey'] | CC['ShardedKeys'],
     rangeKeyToken:
-      | CC['RangeKey']
-      | CC['UnshardedKeys']
-      | CC['TranscodedProperties'],
+      CC['RangeKey'] | CC['UnshardedKeys'] | CC['TranscodedProperties'],
     suppressError?: boolean,
   ): IndexTokensOf<CF> | undefined {
     // Dispatch with a literal to satisfy overload selection.
