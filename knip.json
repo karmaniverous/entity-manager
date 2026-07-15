@@ -2,7 +2,6 @@
   "entry": ["src/**/index.ts"],
   "ignore": [
     "test-d/**",
-    ".stan/imports/**",
     "src/EntityManager/EntityItem.types.ts"
   ],
   "ignoreDependencies": ["cross-env"],
