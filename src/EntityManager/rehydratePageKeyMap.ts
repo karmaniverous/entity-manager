@@ -61,7 +61,7 @@ export function rehydratePageKeyMap<
     const hashKeys = unique(
       indexTokens.map((indexToken) => {
         validateIndexToken(entityManager, indexToken);
-        return entityManager.config.indexes[indexToken].hashKey as C['HashKey'];
+        return entityManager.config.indexes[indexToken].hashKey;
       }),
     );
 
@@ -136,7 +136,7 @@ export function rehydratePageKeyMap<
                 : component in sharded || component in unsharded
                   ? encodeGeneratedProperty(
                       entityManager,
-                      component as C['ShardedKeys'] | C['UnshardedKeys'],
+                      component,
                       pageKeyItem as StorageItem<C>,
                     )!
                   : pageKeyItem[component],

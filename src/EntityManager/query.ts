@@ -98,7 +98,7 @@ export async function query<
         count: 0,
         items: [],
         pageKeyMap: compressToEncodedURIComponent(JSON.stringify([])),
-      } as QueryResult<C, ET, ITS>;
+      };
 
     // Iterate search over pages.
     let workingResult = {

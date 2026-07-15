@@ -106,8 +106,7 @@ export type HasIndexFor<CF, IT extends string> = CF extends {
  * @category QueryBuilder
  */
 export type BaseKeyTokens<CC extends BaseConfigMap> =
-  | CC['HashKey']
-  | CC['RangeKey'];
+  CC['HashKey'] | CC['RangeKey'];
 
 /**
  * Key set for index component tokens when CF/IT identify a concrete index.
@@ -122,13 +121,13 @@ export type PresentIndexTokenSet<
   CF,
   IT extends string,
 > = Record<BaseKeyTokens<CC>, true> & {
-  [K in IndexHashKeyOf<CF, IT> as K extends BaseKeyTokens<CC>
-    ? never
-    : K]: true;
+  [
+    K in IndexHashKeyOf<CF, IT> as K extends BaseKeyTokens<CC> ? never : K
+  ]: true;
 } & {
-  [K in IndexRangeKeyOf<CF, IT> as K extends BaseKeyTokens<CC>
-    ? never
-    : K]: true;
+  [
+    K in IndexRangeKeyOf<CF, IT> as K extends BaseKeyTokens<CC> ? never : K
+  ]: true;
 };
 
 /**

@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { readFileSync } from 'node:fs';
 
-import aliasPlugin, { Alias } from '@rollup/plugin-alias';
+import aliasPlugin, { type Alias } from '@rollup/plugin-alias';
 import commonjsPlugin from '@rollup/plugin-commonjs';
 import jsonPlugin from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
@@ -12,36 +11,41 @@ import dtsPlugin from 'rollup-plugin-dts';
 
 const pkg = JSON.parse(
   readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
-);
+) as Record<string, unknown>;
 
 const outputPath = `dist`;
 
-const commonPlugins = [
+const commonPlugins = (outDir: string) => [
   stripPlugin({ include: ['**/*.ts'] }),
   commonjsPlugin(),
   jsonPlugin(),
   nodeResolve(),
-  typescriptPlugin(),
+  typescriptPlugin({ compilerOptions: { outDir }, outputToFilesystem: true }),
 ];
 
 const commonAliases: Alias[] = [];
 
-type Package = Record<string, Record<string, string> | undefined>;
-
 const commonInputOptions: InputOptions = {
   external: [
-    ...Object.keys((pkg as unknown as Package).dependencies ?? {}),
-    ...Object.keys((pkg as unknown as Package).peerDependencies ?? {}),
+    ...Object.keys(
+      (pkg.dependencies as Record<string, string> | undefined) ?? {},
+    ),
+    ...Object.keys(
+      (pkg.peerDependencies as Record<string, string> | undefined) ?? {},
+    ),
     'tslib',
   ],
   input: 'src/index.ts',
-  plugins: [aliasPlugin({ entries: commonAliases }), ...commonPlugins],
 };
 
 const config: RollupOptions[] = [
   // ESM output.
   {
     ...commonInputOptions,
+    plugins: [
+      aliasPlugin({ entries: commonAliases }),
+      ...commonPlugins(`${outputPath}/mjs`),
+    ],
     output: [
       {
         dir: `${outputPath}/mjs`,
@@ -55,6 +59,10 @@ const config: RollupOptions[] = [
   // CommonJS output.
   {
     ...commonInputOptions,
+    plugins: [
+      aliasPlugin({ entries: commonAliases }),
+      ...commonPlugins(`${outputPath}/cjs`),
+    ],
     output: [
       {
         dir: `${outputPath}/cjs`,
@@ -68,11 +76,9 @@ const config: RollupOptions[] = [
   // Type definitions output.
   {
     ...commonInputOptions,
-    // Rebuild plugin list locally to avoid spreading a possibly non-iterable
-    // InputPluginOption union (fixes TS2488 in typed builds).
     plugins: [
       aliasPlugin({ entries: commonAliases }),
-      ...commonPlugins,
+      ...commonPlugins(outputPath),
       dtsPlugin(),
     ],
     output: [

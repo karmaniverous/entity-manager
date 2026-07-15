@@ -35,7 +35,7 @@ export function encodeElement<C extends BaseConfigMap>(
       v: unknown,
     ) => string;
 
-    const encoded = encodeFn(item[element] as unknown) || undefined;
+    const encoded = encodeFn(item[element]) || undefined;
 
     entityManager.logger.debug('encoded entity element', {
       element,

@@ -29,10 +29,5 @@ export function getIndexComponents<
   const { hashKey: indexHashKey, rangeKey: indexRangeKey } =
     indexes[indexToken];
 
-  return unique([
-    hashKey,
-    rangeKey,
-    indexHashKey,
-    indexRangeKey,
-  ]) as unknown as IndexComponentTokens<C, CF, IT>[];
+  return unique([hashKey, rangeKey, indexHashKey, indexRangeKey]);
 }
