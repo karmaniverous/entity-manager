@@ -1,0 +1,1432 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>CHANGELOG | @karmaniverous/entity-manager</title><meta name="description" content="Documentation for @karmaniverous/entity-manager"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container"><a href="https://github.com/karmaniverous/entity-manager" class="title">@karmaniverous/entity-manager</a>
+<div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/>
+<ul role="listbox" id="tsd-search-results"></ul>
+<div id="tsd-search-status" aria-live="polite" aria-atomic="true">
+<div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<ul class="tsd-breadcrumb" aria-label="Breadcrumb">
+<li><a href="" aria-current="page">CHANGELOG</a></li></ul></div>
+<div class="tsd-panel tsd-typography"><h3 id="changelog" class="tsd-anchor-link">Changelog<a href="#changelog" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<p>All notable changes to this project will be documented in this file. Dates are displayed in UTC.</p>
+<h4 id="v801" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v8.0.0...v8.0.1" target="_blank" class="external">v8.0.1</a><a href="#v801" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<ul>
+<li>chore: update all dependencies to latest <a href="https://github.com/karmaniverous/entity-manager/pull/10" target="_blank" class="external"><code>#10</code></a></li>
+<li>chore: move changelog generation to after:bump hook <a href="https://github.com/karmaniverous/entity-manager/pull/8" target="_blank" class="external"><code>#8</code></a></li>
+<li>chore: add npm-pack-check CI workflow <a href="https://github.com/karmaniverous/entity-manager/pull/7" target="_blank" class="external"><code>#7</code></a></li>
+<li>fix: sort indexTokens before rehydrate to prevent paging corruption <a href="https://github.com/karmaniverous/entity-manager/pull/6" target="_blank" class="external"><code>#6</code></a></li>
+<li>cleanup <a href="https://github.com/karmaniverous/entity-manager/commit/37bb56a993f3d939f52ed2048cc2d8e9d3f8d365" target="_blank" class="external"><code>37bb56a</code></a></li>
+<li>stan imports <a href="https://github.com/karmaniverous/entity-manager/commit/25cbb9cdb5fd2a9ef7f3dbda21dc39c9db049a81" target="_blank" class="external"><code>25cbb9c</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/814db90c9db22d03f3db5bd1bf77a596e706a294" target="_blank" class="external"><code>814db90</code></a></li>
+<li>docs: fix typedoc notDocumented warnings <a href="https://github.com/karmaniverous/entity-manager/commit/c892b69a8cf284b3d8da8482510550922b068cde" target="_blank" class="external"><code>c892b69</code></a></li>
+<li>docs: clear remaining typedoc warnings <a href="https://github.com/karmaniverous/entity-manager/commit/08d9bd4864b20246d8aae1c74e9faf12b2d8b2f1" target="_blank" class="external"><code>08d9bd4</code></a></li>
+<li>ni <a href="https://github.com/karmaniverous/entity-manager/commit/d2ff954ea0261727cdbac42b98076fc3e0181656" target="_blank" class="external"><code>d2ff954</code></a></li>
+<li>chore: add copilot review instructions <a href="https://github.com/karmaniverous/entity-manager/commit/f7a32cfd60756c7d06c051fdae778c427acbf368" target="_blank" class="external"><code>f7a32cf</code></a></li>
+<li>[ISSUE-5] fix: sort indexTokens before rehydrate to prevent paging corruption (#5) <a href="https://github.com/karmaniverous/entity-manager/commit/a6e598af61653846c7fa21fe1026073fa1c089ea" target="_blank" class="external"><code>a6e598a</code></a></li>
+<li>docs: clear final TypeDoc warnings <a href="https://github.com/karmaniverous/entity-manager/commit/42343d86678c71a83a80c53b4a52e1c40b81cb11" target="_blank" class="external"><code>42343d8</code></a></li>
+<li>fix: unblock docs by aligning ParsedTranscoder <a href="https://github.com/karmaniverous/entity-manager/commit/5e1e19b8274356093cb3bd0b5d435e8c812b6839" target="_blank" class="external"><code>5e1e19b</code></a></li>
+<li>chore: add npm publish safety net (.npmignore + gitignore *.local) <a href="https://github.com/karmaniverous/entity-manager/commit/76b29d681a4c1661040d53008bbd579ad5322543" target="_blank" class="external"><code>76b29d6</code></a></li>
+</ul>
+<h3 id="v800" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v8.0.0-0...v8.0.0" target="_blank" class="external">v8.0.0</a><a href="#v800" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<blockquote>
+<p>1 December 2025</p>
+</blockquote>
+<ul>
+<li>chore: release v8.0.0 <a href="https://github.com/karmaniverous/entity-manager/commit/1582cf60aa2853c0b9ddb94487a3d96eb27927d6" target="_blank" class="external"><code>1582cf6</code></a></li>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/84ec76b70fd45bdc444218ef553f0cbffe7c6201" target="_blank" class="external"><code>84ec76b</code></a></li>
+</ul>
+<h4 id="v800-0" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v7.3.4...v8.0.0-0" target="_blank" class="external">v8.0.0-0</a><a href="#v800-0" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>30 November 2025</p>
+</blockquote>
+<ul>
+<li>feat: adopt Item/Record × Full/Partial model; plan refactor <a href="https://github.com/karmaniverous/entity-manager/commit/ca5cce40d40fe8fda5596d8d1887cf8582fbcf0b" target="_blank" class="external"><code>ca5cce4</code></a></li>
+<li>chore: release v8.0.0-0 <a href="https://github.com/karmaniverous/entity-manager/commit/40bce72b348fb1daef5857f2d0e28a8a4e2acca8" target="_blank" class="external"><code>40bce72</code></a></li>
+<li>refactor: rename internal EntityItem/Record to Storage* and fix removeKeys <a href="https://github.com/karmaniverous/entity-manager/commit/bb75c2eea397d2f6932a6cf83146a8e486752984" target="_blank" class="external"><code>bb75c2e</code></a></li>
+<li>feat(types): big-bang by-token type refactor; remove legacy exports <a href="https://github.com/karmaniverous/entity-manager/commit/e395ed387f8597e016a0d9f4e91193b80c170236" target="_blank" class="external"><code>e395ed3</code></a></li>
+<li>refactor(types): make ET-aware helpers truly by-token; fix PageKey plumbing <a href="https://github.com/karmaniverous/entity-manager/commit/4276aa664c421fa2152cdf19751bc77c52c38e01" target="_blank" class="external"><code>4276aa6</code></a></li>
+<li>fix(lint,ts): dedupe index unions; coerce entityToken in templates <a href="https://github.com/karmaniverous/entity-manager/commit/8a470baf2a9ffa50c6493926225ebed369fa2eac" target="_blank" class="external"><code>8a470ba</code></a></li>
+<li>fix(types): align StorageItem usage, remove unsafe casts, widen removeKeys impl <a href="https://github.com/karmaniverous/entity-manager/commit/ca232468ff507e7fd51909f35b82105751e10388" target="_blank" class="external"><code>ca23246</code></a></li>
+<li>fix: resolve TS2394 on EntityManager.removeKeys <a href="https://github.com/karmaniverous/entity-manager/commit/0ecc655b5430044d9335711b6d647b1d52464ed1" target="_blank" class="external"><code>0ecc655</code></a></li>
+<li>fix(by-token): repair PageKeyByIndex, clean unsafe assigns, lint/TS cleanup <a href="https://github.com/karmaniverous/entity-manager/commit/0671d2cc1ba3e1ea374554c9a242f2af59517290" target="_blank" class="external"><code>0671d2c</code></a></li>
+<li>fix(ts,lint): finalize StorageItem indexing, pick key typing, and lint cleanup <a href="https://github.com/karmaniverous/entity-manager/commit/7ae3ddb8f6e7e5605aa7deb68cf9d65c580a0be6" target="_blank" class="external"><code>7ae3ddb</code></a></li>
+<li>fix(lint): derive index component unions via key-set + keyof <a href="https://github.com/karmaniverous/entity-manager/commit/13da545bc0642e38381fe5300c1e515014d5b149" target="_blank" class="external"><code>13da545</code></a></li>
+<li>fix(types): TokenAware refinements to satisfy tsd (optional keys, projected required) <a href="https://github.com/karmaniverous/entity-manager/commit/8fb54b68047d84fefc2643b2a43e72dc11ae30cb" target="_blank" class="external"><code>8fb54b6</code></a></li>
+<li>docs(types): export BaseKeyTokens for TypeDoc <a href="https://github.com/karmaniverous/entity-manager/commit/0bbad6b0028f73005d3ebff5548a5c37a0db5466" target="_blank" class="external"><code>0bbad6b</code></a></li>
+<li>wip <a href="https://github.com/karmaniverous/entity-manager/commit/4ae99f5131d16e63c0ff72f924a6492558aee631" target="_blank" class="external"><code>4ae99f5</code></a></li>
+<li>fix(lint): gate derived index tokens to avoid redundant unions <a href="https://github.com/karmaniverous/entity-manager/commit/8cc7aa0ed529f2d14bcf65befc7665263341a713" target="_blank" class="external"><code>8cc7aa0</code></a></li>
+<li>fix: removeKeys implementation matches overloads (no any) <a href="https://github.com/karmaniverous/entity-manager/commit/955b142701a617963524c10ca7203fdc8233c040" target="_blank" class="external"><code>955b142</code></a></li>
+<li>fix(types): key-remap PageKey index tokens; avoid {} and overlaps <a href="https://github.com/karmaniverous/entity-manager/commit/03ae5c708946c09633233f4f742b97903281b854" target="_blank" class="external"><code>03ae5c7</code></a></li>
+<li>feat(types): export PageKey helper key-set types <a href="https://github.com/karmaniverous/entity-manager/commit/168d8e376eede18d4dac39be5d676c8f1dad5e79" target="_blank" class="external"><code>168d8e3</code></a></li>
+<li>fix(types): finish by-token refactor; restore partials and fix imports <a href="https://github.com/karmaniverous/entity-manager/commit/ef9d5ddf01a4f71cf0f15f3ab4949a18f2249044" target="_blank" class="external"><code>ef9d5dd</code></a></li>
+<li>fix(types): remove redundant constituents in PageKey without wrappers <a href="https://github.com/karmaniverous/entity-manager/commit/16c7be96ccb089c1cd0ef5d99190d5ce6ff3adda" target="_blank" class="external"><code>16c7be9</code></a></li>
+<li>fix(types): make removeKeys impl supertype of overloads (TS2394) <a href="https://github.com/karmaniverous/entity-manager/commit/fef5f4719f00a145cb780d63078de79f99b8a176" target="_blank" class="external"><code>fef5f47</code></a></li>
+<li>fix(types): finalize removeKeys implementation to match overloads (TS2394) <a href="https://github.com/karmaniverous/entity-manager/commit/e9ff77c3cf14291b540970535b4d96487747d4bc" target="_blank" class="external"><code>e9ff77c</code></a></li>
+<li>fix(types): remove stale EntityItemByToken cast; align removeKeys impl <a href="https://github.com/karmaniverous/entity-manager/commit/9470b63145d16fde272c79fe5f86ee9c2d230da6" target="_blank" class="external"><code>9470b63</code></a></li>
+<li>docs: sync README types with by-token model; note exported storage shapes <a href="https://github.com/karmaniverous/entity-manager/commit/2352bcc28a3fa8ee4047d1d4843a8661a91f2696" target="_blank" class="external"><code>2352bcc</code></a></li>
+<li>docs(types): export StorageItem/StorageRecord and remove @internal <a href="https://github.com/karmaniverous/entity-manager/commit/677e95feadd34010d32c37550e0631e05032798b" target="_blank" class="external"><code>677e95f</code></a></li>
+<li>fix(docs,tsdoc): typedoc cast in getPrimaryKey; TSDoc generic examples <a href="https://github.com/karmaniverous/entity-manager/commit/96150b421bcb71a21000423b8eb481410a49038b" target="_blank" class="external"><code>96150b4</code></a></li>
+<li>fix(ts,lint): cast early return in updateItemHashKey; remove String() in range key <a href="https://github.com/karmaniverous/entity-manager/commit/289f1475b592652f68f6a406c1e212085e3985da" target="_blank" class="external"><code>289f147</code></a></li>
+<li>fix(types): resolve removeKeys overload/impl mismatch (TS2394) <a href="https://github.com/karmaniverous/entity-manager/commit/2204e722b6e8566691d9e993e42b3e1e07e0ad68" target="_blank" class="external"><code>2204e72</code></a></li>
+<li>fix(types): finalize removeKeys impl to match overloads (TS2394) <a href="https://github.com/karmaniverous/entity-manager/commit/b9e436ab088b7985accfaa7f3b632234b5a27dfc" target="_blank" class="external"><code>b9e436a</code></a></li>
+</ul>
+<h4 id="v734" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v7.3.3...v7.3.4" target="_blank" class="external">v7.3.4</a><a href="#v734" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>29 November 2025</p>
+</blockquote>
+<ul>
+<li>chore: release v7.3.4 <a href="https://github.com/karmaniverous/entity-manager/commit/b29d85774073b58df472ece25126da05f426fb6a" target="_blank" class="external"><code>b29d857</code></a></li>
+<li>support exactOptionalPropertyTypes <a href="https://github.com/karmaniverous/entity-manager/commit/e33d6658c552077326d13e76aa19d3618665eacf" target="_blank" class="external"><code>e33d665</code></a></li>
+</ul>
+<h4 id="v733" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v7.3.2...v7.3.3" target="_blank" class="external">v7.3.3</a><a href="#v733" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>29 November 2025</p>
+</blockquote>
+<ul>
+<li>chore: release v7.3.3 <a href="https://github.com/karmaniverous/entity-manager/commit/c9ae1199db3e5109f42cadb7c8e971eba9a91e05" target="_blank" class="external"><code>c9ae119</code></a></li>
+<li>support exactOptionalPropertyTypes <a href="https://github.com/karmaniverous/entity-manager/commit/70484eb2e0a54a7d5b76305c50b1d6f689b0d505" target="_blank" class="external"><code>70484eb</code></a></li>
+</ul>
+<h4 id="v732" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v7.3.1...v7.3.2" target="_blank" class="external">v7.3.2</a><a href="#v732" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>28 November 2025</p>
+</blockquote>
+<ul>
+<li>chore: release v7.3.2 <a href="https://github.com/karmaniverous/entity-manager/commit/fa0de7e003dcf1b1ca09b4b897a6edc0f55200d0" target="_blank" class="external"><code>fa0de7e</code></a></li>
+<li>feat(types): carry CF through BaseEntityClient; add tsd test via client <a href="https://github.com/karmaniverous/entity-manager/commit/ddf2ccbebaee2d08da590d725bb0a61da802ad29" target="_blank" class="external"><code>ddf2ccb</code></a></li>
+<li>test(tsd): assert findIndexToken narrows to configured index tokens <a href="https://github.com/karmaniverous/entity-manager/commit/5c490898d9dfba7ce5bc1abf0d5ce1df862f3c00" target="_blank" class="external"><code>5c49089</code></a></li>
+<li>chore(lint): replace explicit any with unknown in CF generics <a href="https://github.com/karmaniverous/entity-manager/commit/84238306610bb60ba1f4e71f31816370e307a971" target="_blank" class="external"><code>8423830</code></a></li>
+</ul>
+<h4 id="v731" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v7.3.0...v7.3.1" target="_blank" class="external">v7.3.1</a><a href="#v731" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>28 November 2025</p>
+</blockquote>
+<ul>
+<li>feat(validation): reject duplicate index pairs; type-safe findIndexToken <a href="https://github.com/karmaniverous/entity-manager/commit/e355f1c4e65bb571e74a46e17ce922035ac136b4" target="_blank" class="external"><code>e355f1c</code></a></li>
+<li>chore: release v7.3.1 <a href="https://github.com/karmaniverous/entity-manager/commit/45d2fb2abb3a2d10de208acaff5d5adde3c68f66" target="_blank" class="external"><code>45d2fb2</code></a></li>
+<li>docs: note CF phantom generic in TSDoc; single-arg factory <a href="https://github.com/karmaniverous/entity-manager/commit/09ca91f5d2a04efcc3888f8541e0c869d0e15309" target="_blank" class="external"><code>09ca91f</code></a></li>
+<li>fix: overload call for findIndexToken; clean TSDoc <a href="https://github.com/karmaniverous/entity-manager/commit/d49b13e84b0c54a879c90722ed71cdfbfe1af1a9" target="_blank" class="external"><code>d49b13e</code></a></li>
+</ul>
+<h4 id="v730" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v7.2.0...v7.3.0" target="_blank" class="external">v7.3.0</a><a href="#v730" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>28 November 2025</p>
+</blockquote>
+<ul>
+<li>docs: carry CF type via generics; update plan <a href="https://github.com/karmaniverous/entity-manager/commit/dc3dbb83d016ed82cdfeb2517b847fc3763da62a" target="_blank" class="external"><code>dc3dbb8</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/d8d361fbf1c89481962834857331cc2dd64884c9" target="_blank" class="external"><code>d8d361f</code></a></li>
+<li>chore: release v7.3.0 <a href="https://github.com/karmaniverous/entity-manager/commit/2804c4be7ebfd1f10c23ecd9de514c9b31651e2b" target="_blank" class="external"><code>2804c4b</code></a></li>
+<li>docs(interop): response for config-literal index typing <a href="https://github.com/karmaniverous/entity-manager/commit/7d6c1978b7abd2bce92afd77576fbad0e450780c" target="_blank" class="external"><code>7d6c197</code></a></li>
+<li>feat: thread CF via EntityManager generic (type-only) <a href="https://github.com/karmaniverous/entity-manager/commit/3e559120c97501985e27d6051c6ab09310ad6755" target="_blank" class="external"><code>3e55912</code></a></li>
+</ul>
+<h4 id="v720" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v7.1.2...v7.2.0" target="_blank" class="external">v7.2.0</a><a href="#v720" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>20 November 2025</p>
+</blockquote>
+<ul>
+<li>chore: release v7.2.0 <a href="https://github.com/karmaniverous/entity-manager/commit/77e8eb827b51028affe7cd7a753216ef1d85141d" target="_blank" class="external"><code>77e8eb8</code></a></li>
+<li>added ConfigOfClient exports <a href="https://github.com/karmaniverous/entity-manager/commit/9880e592da025e5970510b392c8fa4952c10dbd1" target="_blank" class="external"><code>9880e59</code></a></li>
+</ul>
+<h4 id="v712" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v7.1.1...v7.1.2" target="_blank" class="external">v7.1.2</a><a href="#v712" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>20 November 2025</p>
+</blockquote>
+<ul>
+<li>interop <a href="https://github.com/karmaniverous/entity-manager/commit/ec56477c98689e14ec64411b3d6e65f0206a10a2" target="_blank" class="external"><code>ec56477</code></a></li>
+<li>chore: release v7.1.2 <a href="https://github.com/karmaniverous/entity-manager/commit/6519a4ab3853e4c3a7edc0b457a1c78b2d318f80" target="_blank" class="external"><code>6519a4a</code></a></li>
+<li>docs(interop): note ET-aware QueryBuilder options for DynamoDB adapter <a href="https://github.com/karmaniverous/entity-manager/commit/438a787d687c1aa0e068d5dfa482b9502d41233c" target="_blank" class="external"><code>438a787</code></a></li>
+<li>test(tsd): pin ET-aware QueryBuilder options.item typing <a href="https://github.com/karmaniverous/entity-manager/commit/355ffdd857d816b909ad493afaa99ee72772dd14" target="_blank" class="external"><code>355ffdd</code></a></li>
+<li>feat(types): make QueryBuilder options ET-aware <a href="https://github.com/karmaniverous/entity-manager/commit/2b7030306c10dcf6498a2283653a410fed4ace7f" target="_blank" class="external"><code>2b70303</code></a></li>
+<li>test(tsd): relax negative assignability checks in ET options test <a href="https://github.com/karmaniverous/entity-manager/commit/1e654d8506bd0a44a76221e0c00f779e13340288" target="_blank" class="external"><code>1e654d8</code></a></li>
+</ul>
+<h4 id="v711" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v7.1.0...v7.1.1" target="_blank" class="external">v7.1.1</a><a href="#v711" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>20 November 2025</p>
+</blockquote>
+<ul>
+<li>imports <a href="https://github.com/karmaniverous/entity-manager/commit/b38bdcee55e24e2390241a89eb23b0b6d5dd4b13" target="_blank" class="external"><code>b38bdce</code></a></li>
+<li>fix: accept compile-time entitiesSchema; add runtime tests <a href="https://github.com/karmaniverous/entity-manager/commit/fa58779f752e174ed54e594447bdb72db95fac9b" target="_blank" class="external"><code>fa58779</code></a></li>
+<li>chore: trim dev plan; refactor requirements to repo scope <a href="https://github.com/karmaniverous/entity-manager/commit/2cae618f7e5d8655b5867e71367ca298ca3934fa" target="_blank" class="external"><code>2cae618</code></a></li>
+<li>chore: release v7.1.1 <a href="https://github.com/karmaniverous/entity-manager/commit/82cfd34b10d11c9132634328d8cf45512090456e" target="_blank" class="external"><code>82cfd34</code></a></li>
+<li>docs(readability): define CF/CC inline in README; log policy move <a href="https://github.com/karmaniverous/entity-manager/commit/09d82c9d92647d637331216b0caa7cd980a88a94" target="_blank" class="external"><code>09d82c9</code></a></li>
+<li>docs: adopt Option B helper typing + acronym policy <a href="https://github.com/karmaniverous/entity-manager/commit/2b6da7e84cb1f17afe18eefb4a1c56532cc4613c" target="_blank" class="external"><code>2b6da7e</code></a></li>
+<li>deleted interop message <a href="https://github.com/karmaniverous/entity-manager/commit/5d0c37579cb3ae3c9989fea40cec2249553ffe56" target="_blank" class="external"><code>5d0c375</code></a></li>
+<li>docs: move acronym policy to project prompt; align plan <a href="https://github.com/karmaniverous/entity-manager/commit/2befd6492747e5542ea0f6f87d565b05fdb73b28" target="_blank" class="external"><code>2befd64</code></a></li>
+<li>test: fix lint and failing validation tests <a href="https://github.com/karmaniverous/entity-manager/commit/614ac066ca23a432bddf0e0faffe6a35ab241316" target="_blank" class="external"><code>614ac06</code></a></li>
+<li>chore(todo): mark acronym readability pass as done <a href="https://github.com/karmaniverous/entity-manager/commit/4ff2e0fda9253047d7601f075d6f1e01ee1726b2" target="_blank" class="external"><code>4ff2e0f</code></a></li>
+</ul>
+<h4 id="v710" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v7.0.1...v7.1.0" target="_blank" class="external">v7.1.0</a><a href="#v710" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>18 November 2025</p>
+</blockquote>
+<ul>
+<li>feat: projection-aware typed query results (type-only) <a href="https://github.com/karmaniverous/entity-manager/commit/68e890cc4b4ac41f63e3c6405343724a2620af6c" target="_blank" class="external"><code>68e890c</code></a></li>
+<li>docs(README): add projection K section; interop note <a href="https://github.com/karmaniverous/entity-manager/commit/83a97514167581574b57c4e4bec485f2db0203dd" target="_blank" class="external"><code>83a9751</code></a></li>
+<li>chore: release v7.1.0 <a href="https://github.com/karmaniverous/entity-manager/commit/a2086f7f1c8b62c53cc15945664c8b4b7f456d8e" target="_blank" class="external"><code>a2086f7</code></a></li>
+<li>refactor(todo): prioritize projection K fix, docs, and interop <a href="https://github.com/karmaniverous/entity-manager/commit/c0f4d8c57c94ce3c86229a6b74b785a87b197b46" target="_blank" class="external"><code>c0f4d8c</code></a></li>
+<li>test/docs/interop: projection K typing test, requirements update, and adapter note <a href="https://github.com/karmaniverous/entity-manager/commit/1d53edd7f028100c00bde6de315fcded43c8479c" target="_blank" class="external"><code>1d53edd</code></a></li>
+<li>types: fix Projected&lt;K&gt; to ignore index signature <a href="https://github.com/karmaniverous/entity-manager/commit/8f773e57499c0c26327b9087b3262fdf28324b39" target="_blank" class="external"><code>8f773e5</code></a></li>
+<li>fix: restore EntityItemByToken import and satisfy ESLint rule <a href="https://github.com/karmaniverous/entity-manager/commit/ec7077b55c08e6a0aa813219da28e51e569a5411" target="_blank" class="external"><code>ec7077b</code></a></li>
+<li>feat: thread projection K through BaseQueryBuilder (type-only) <a href="https://github.com/karmaniverous/entity-manager/commit/797bf342588d3779b5ac25e4e8b5d9609aa04c2b" target="_blank" class="external"><code>797bf34</code></a></li>
+<li>types: guard Projected&lt;T,K&gt; for non-object T <a href="https://github.com/karmaniverous/entity-manager/commit/c61ca9019634b4a185201d6b5f89625d75b1f7d2" target="_blank" class="external"><code>c61ca90</code></a></li>
+<li>imports <a href="https://github.com/karmaniverous/entity-manager/commit/1bcba2077355c24d68e99a5b570ea02276206b90" target="_blank" class="external"><code>1bcba20</code></a></li>
+<li>docs: prune Next up — projection K fix completed <a href="https://github.com/karmaniverous/entity-manager/commit/11f00ffbc7b674ede6f14551efe404cf2c0d3759" target="_blank" class="external"><code>11f00ff</code></a></li>
+</ul>
+<h4 id="v701" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v7.0.0...v7.0.1" target="_blank" class="external">v7.0.1</a><a href="#v701" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>18 November 2025</p>
+</blockquote>
+<ul>
+<li>Normalize line endings <a href="https://github.com/karmaniverous/entity-manager/commit/640190e36c52d8ab896a2a3368d9d7aac1bf035f" target="_blank" class="external"><code>640190e</code></a></li>
+<li>fix: use type-only z namespace and z.infer <a href="https://github.com/karmaniverous/entity-manager/commit/fb151ec90a2a8dbea91b02db6b15171a575553d3" target="_blank" class="external"><code>fb151ec</code></a></li>
+<li>chore: release v7.0.1 <a href="https://github.com/karmaniverous/entity-manager/commit/33ed1d10c2448c9d7d82b7614b059fb154663d10" target="_blank" class="external"><code>33ed1d1</code></a></li>
+</ul>
+<h3 id="v700" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.14.3...v7.0.0" target="_blank" class="external">v7.0.0</a><a href="#v700" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<blockquote>
+<p>18 November 2025</p>
+</blockquote>
+<ul>
+<li>chore: step 3 typing — thread ET/ITS and add PKBI/PKMBIS <a href="https://github.com/karmaniverous/entity-manager/commit/8b1a5febb15b2fad0b44bfad97a1949ee1f57d17" target="_blank" class="external"><code>8b1a5fe</code></a></li>
+<li>chore: step 1 — align with entity-tools rename (types only) <a href="https://github.com/karmaniverous/entity-manager/commit/580fffe436987f00c67ccf6b93722b442a9c2c0e" target="_blank" class="external"><code>580fffe</code></a></li>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/a630525c67dd635e7cbb8ee55169b5556cf023a4" target="_blank" class="external"><code>a630525</code></a></li>
+<li>docs: replace TranscodeMap with TranscodeRegistry in TSDoc; silence TypeDoc warnings <a href="https://github.com/karmaniverous/entity-manager/commit/084c76211b98953b4ea08995ca2dfae7bd4f595c" target="_blank" class="external"><code>084c762</code></a></li>
+<li>refactor(types): adopt strict acronym CC for public generics (Step 2) <a href="https://github.com/karmaniverous/entity-manager/commit/e5948354e063e76029b8eddb9b181b365bba9c75" target="_blank" class="external"><code>e594835</code></a></li>
+<li>fix(types): remove abbreviated TokenAware exports; align ET-aware overloads <a href="https://github.com/karmaniverous/entity-manager/commit/aa075abb78fd1644066f36e7654e1ec80a887f4d" target="_blank" class="external"><code>aa075ab</code></a></li>
+<li>chore: fix typing fallout — QueryBuilder generics, page-key maps, tests <a href="https://github.com/karmaniverous/entity-manager/commit/521bb3df6fe1d9f9921d495c894802429438e941" target="_blank" class="external"><code>521bb3d</code></a></li>
+<li>feat(types): token-aware helpers + ET-aware overloads; require entityToken for decodeGeneratedProperty <a href="https://github.com/karmaniverous/entity-manager/commit/71de3a34738aa3f5694c1d6ffa7c30b58f9e981e" target="_blank" class="external"><code>71de3a3</code></a></li>
+<li>fix(overloads): make EntityManager impl signatures broad; lint/tsdoc cleanup <a href="https://github.com/karmaniverous/entity-manager/commit/6ae68450a300c53b867805f055f752b236ff47bf" target="_blank" class="external"><code>6ae6845</code></a></li>
+<li>fix(types): align ET-aware overload implementations; replace deprecated Zod type <a href="https://github.com/karmaniverous/entity-manager/commit/3a41d8aaf03733c263a4080eb2129ef6a89921e4" target="_blank" class="external"><code>3a41d8a</code></a></li>
+<li>chore: release v7.0.0 <a href="https://github.com/karmaniverous/entity-manager/commit/9c3b0872c3d148aec55542a2cd3145ea08314847" target="_blank" class="external"><code>9c3b087</code></a></li>
+<li>feat(types): thread CF through QueryOptions and query pipeline <a href="https://github.com/karmaniverous/entity-manager/commit/f4c17223da7a32de13181705f067b5e0442b4bed" target="_blank" class="external"><code>f4c1722</code></a></li>
+<li>feat(types): add ShardQueryMapByCF (derive ITS from CF.indexes) <a href="https://github.com/karmaniverous/entity-manager/commit/ddb951e41dc273f38a04281a7445a4831736cd4c" target="_blank" class="external"><code>ddb951e</code></a></li>
+<li>feat(types): CF-index-aware ShardQueryFunction; add tsd negative case <a href="https://github.com/karmaniverous/entity-manager/commit/d6d82b9c4a0b82858725a0bb6f3d5243407ce99c" target="_blank" class="external"><code>d6d82b9</code></a></li>
+<li>updated requirements &amp; dev plan <a href="https://github.com/karmaniverous/entity-manager/commit/91f9bcc9e7b45c63c86b59f0ff67b85cacd0581b" target="_blank" class="external"><code>91f9bcc</code></a></li>
+<li>fix(types): add CF generic to EntityManager.query and forward to query() <a href="https://github.com/karmaniverous/entity-manager/commit/5d8bd75c3d12427d54db7e3f50d32eb8dc6bf78e" target="_blank" class="external"><code>5d8bd75</code></a></li>
+<li>chore: silence IDE TS errors in tsd tests <a href="https://github.com/karmaniverous/entity-manager/commit/3e367e15f23a0ec4a788310e6f51d31863ef9509" target="_blank" class="external"><code>3e367e1</code></a></li>
+<li>chore: silence placeholder-generic lint and fix tsd width assertions <a href="https://github.com/karmaniverous/entity-manager/commit/d8f8107385dc79fa20e236023098bdb403e1b44f" target="_blank" class="external"><code>d8f8107</code></a></li>
+<li>feat: export factory and add IndexTokensFrom helper <a href="https://github.com/karmaniverous/entity-manager/commit/059a2dbf161f026c8e1216403dd00425e2840848" target="_blank" class="external"><code>059a2db</code></a></li>
+<li>docs: export helper types to clear TypeDoc warnings <a href="https://github.com/karmaniverous/entity-manager/commit/ace6ab10395847899f262276ebe80aa614614f56" target="_blank" class="external"><code>ace6ab1</code></a></li>
+<li>feat: add inference-first typing requirements and interop notes <a href="https://github.com/karmaniverous/entity-manager/commit/bf31c557347fd0c73e2b8636651d449f9a692137" target="_blank" class="external"><code>bf31c55</code></a></li>
+<li>interop <a href="https://github.com/karmaniverous/entity-manager/commit/6771dc8ddf831fcdb341393d746030b4a00325be" target="_blank" class="external"><code>6771dc8</code></a></li>
+<li>feat(types): DX alias to derive ITS from CF.indexes <a href="https://github.com/karmaniverous/entity-manager/commit/3061185ceb5d1ead823fe95e7e977a1e6c00ac79" target="_blank" class="external"><code>3061185</code></a></li>
+<li>feat(types,tests): add CC-based DX aliases + tsd coverage <a href="https://github.com/karmaniverous/entity-manager/commit/b2371c10b58a499f37e7f86d2abe47a4d7d91cb1" target="_blank" class="external"><code>b2371c1</code></a></li>
+<li>feat(factory): schema-first EM inference; remove MinimalEntityMapFrom <a href="https://github.com/karmaniverous/entity-manager/commit/ce2f8b530174ea14cdc3b1625591e1e4b7441ed2" target="_blank" class="external"><code>ce2f8b5</code></a></li>
+<li>fix(overloads): use broad implementation signatures for ET-aware methods <a href="https://github.com/karmaniverous/entity-manager/commit/5efb16f049acb9c721156c4ebcb629500b0f4a07" target="_blank" class="external"><code>5efb16f</code></a></li>
+<li>fix: finalize TranscodeRegistry rename; repair Config type and typedoc links <a href="https://github.com/karmaniverous/entity-manager/commit/dca5b30db3967f2333479084a8389c410694cda8" target="_blank" class="external"><code>dca5b30</code></a></li>
+<li>docs: export PageKey helper types to clear TypeDoc warnings <a href="https://github.com/karmaniverous/entity-manager/commit/0d1dac51401ec77f46bd623cf2117c8a430e5cb9" target="_blank" class="external"><code>0d1dac5</code></a></li>
+<li>feat(types): refine PKBI with optional config-literal narrowing <a href="https://github.com/karmaniverous/entity-manager/commit/f186c92208a5d5519b7cef81dd4bd216defa7a25" target="_blank" class="external"><code>f186c92</code></a></li>
+<li>test(tsd): fix CF narrowing tests to satisfy Entity constraints and lint <a href="https://github.com/karmaniverous/entity-manager/commit/cf6ca34fca226b983f4d1515a7a3c942304e6795" target="_blank" class="external"><code>cf6ca34</code></a></li>
+<li>docs: export IndexComponentTokens to clear TypeDoc warning <a href="https://github.com/karmaniverous/entity-manager/commit/2a96d5a04faaa4f747dabb9c17a6dcc43bfc4378" target="_blank" class="external"><code>2a96d5a</code></a></li>
+<li>docs: clear final TypeDoc warning by fixing BaseQueryBuilder TSDoc <a href="https://github.com/karmaniverous/entity-manager/commit/c41aa4160cddd8af6d6f86bdeea80f01ed4ab893" target="_blank" class="external"><code>c41aa41</code></a></li>
+<li>fix(typing): remove unused ET generic in unwrapIndex <a href="https://github.com/karmaniverous/entity-manager/commit/42042aa1849949ddd41af29b3bd2b26712d2faeb" target="_blank" class="external"><code>42042aa</code></a></li>
+<li>fix(types): resolve TS2536 in PKBI CF narrowing and silence ET lint <a href="https://github.com/karmaniverous/entity-manager/commit/f9fe1372cdbde42f1064bbd4dd19f9c95a6595b7" target="_blank" class="external"><code>f9fe137</code></a></li>
+<li>typing: CF/IT-aware unwrapIndex + TODO log <a href="https://github.com/karmaniverous/entity-manager/commit/74b97e508d3919f5bf3b8da6e2117066c65e5c90" target="_blank" class="external"><code>74b97e5</code></a></li>
+<li>docs+dx: README (CC sugar) and interop response for client <a href="https://github.com/karmaniverous/entity-manager/commit/d7a2f0af5896b07fb1d63b66761b49cd2faac0b1" target="_blank" class="external"><code>d7a2f0a</code></a></li>
+<li>fix(overloads): remove broad overloads; align ET-aware implementations <a href="https://github.com/karmaniverous/entity-manager/commit/47dcba2f2f0882a1c5407c5b7b32481f2b3ee471" target="_blank" class="external"><code>47dcba2</code></a></li>
+<li>test(tsd): add CF-based PageKeyByIndex narrowing tests; update plan <a href="https://github.com/karmaniverous/entity-manager/commit/4a46dd35387478ecdd9d06fea83bcf0a26b3b243" target="_blank" class="external"><code>4a46dd3</code></a></li>
+<li>feat: introduce values-first createEntityManager factory (non-breaking) <a href="https://github.com/karmaniverous/entity-manager/commit/ee50a02b27e59fffc7c6230fc28c57fdd251c25a" target="_blank" class="external"><code>ee50a02</code></a></li>
+<li>test(tsd): consume @ts-expect-error for CF-indexed ShardQueryMap <a href="https://github.com/karmaniverous/entity-manager/commit/6cc53ba4afef5dbc4fc33795768629b5b56f8250" target="_blank" class="external"><code>6cc53ba</code></a></li>
+<li>feat(types): CF/IT-aware getIndexComponents return type <a href="https://github.com/karmaniverous/entity-manager/commit/771ba7ef15f7d76cc167089a82fd32d58b572873" target="_blank" class="external"><code>771ba7e</code></a></li>
+<li>feat(types): constrain ShardQueryMap keys by CF.indexes + tsd check <a href="https://github.com/karmaniverous/entity-manager/commit/fffdca8585a85ead56b4749358c6f22ed50acc37" target="_blank" class="external"><code>fffdca8</code></a></li>
+<li>test(types): use typed ShardQueryMap vars to preserve ITS unions <a href="https://github.com/karmaniverous/entity-manager/commit/e42b2c28fa6b8dee324e5011f753c2a958232f68" target="_blank" class="external"><code>e42b2c2</code></a></li>
+<li>chore: refine tsd assertions to avoid width-compat mismatch <a href="https://github.com/karmaniverous/entity-manager/commit/241cb3a002f8f8966e40a8fd1622f57fb18bf276" target="_blank" class="external"><code>241cb3a</code></a></li>
+<li>chore: fix lint in tsd test by avoiding explicit any <a href="https://github.com/karmaniverous/entity-manager/commit/8e19ad15338caea10fe216e6637a251f3e587caf" target="_blank" class="external"><code>8e19ad1</code></a></li>
+<li>test(tsd): move @ts-expect-error to offending property line <a href="https://github.com/karmaniverous/entity-manager/commit/7ef98ee61bf377fd5905fdf3c2ab114e513f800a" target="_blank" class="external"><code>7ef98ee</code></a></li>
+</ul>
+<h4 id="v6143" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.14.2...v6.14.3" target="_blank" class="external">v6.14.3</a><a href="#v6143" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>12 November 2025</p>
+</blockquote>
+<ul>
+<li>chore: getPrimaryKey returns arrays; add tests <a href="https://github.com/karmaniverous/entity-manager/commit/7153fccb9a5cf2d6cb762239fd51d6a4862b914a" target="_blank" class="external"><code>7153fcc</code></a></li>
+<li>chore: release v6.14.3 <a href="https://github.com/karmaniverous/entity-manager/commit/56fd79609fe152a2821d6c2ab6fecfe3dd8e24d9" target="_blank" class="external"><code>56fd796</code></a></li>
+<li>chore: fix getPrimaryKey tests to use static key names <a href="https://github.com/karmaniverous/entity-manager/commit/9aa7ef26da2edb94bfaf935d5128fbf1f7cfe79d" target="_blank" class="external"><code>9aa7ef2</code></a></li>
+<li>updated readme <a href="https://github.com/karmaniverous/entity-manager/commit/b4c212c2c370b65415db4f1dab42a51b981ddaa5" target="_blank" class="external"><code>b4c212c</code></a></li>
+</ul>
+<h4 id="v6142" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.14.1...v6.14.2" target="_blank" class="external">v6.14.2</a><a href="#v6142" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>12 November 2025</p>
+</blockquote>
+<ul>
+<li>feat: auto-constrain shard space when unique is present <a href="https://github.com/karmaniverous/entity-manager/commit/3904436286e57ed0cfb3e646709a5ac8c6c79fb2" target="_blank" class="external"><code>3904436</code></a></li>
+<li>chore: release v6.14.2 <a href="https://github.com/karmaniverous/entity-manager/commit/cc6e5e00071cfddf75524cb4f711fdc926f15dfb" target="_blank" class="external"><code>cc6e5e0</code></a></li>
+</ul>
+<h4 id="v6141" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.14.0...v6.14.1" target="_blank" class="external">v6.14.1</a><a href="#v6141" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>4 November 2025</p>
+</blockquote>
+<ul>
+<li>chore: migrate Mocha/NYC to Vitest; ESLint TS flat config <a href="https://github.com/karmaniverous/entity-manager/commit/56ab35e009fb050a3d63f656b68d414f2c311e1c" target="_blank" class="external"><code>56ab35e</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/7cb7134c0f17cd8825001f76584f28225778e33f" target="_blank" class="external"><code>7cb7134</code></a></li>
+<li>chore: enforce typed ESLint on tests; fix lint issues <a href="https://github.com/karmaniverous/entity-manager/commit/67b76f09d4d5a61a575aa688146eac8156b4e571" target="_blank" class="external"><code>67b76f0</code></a></li>
+<li>imports <a href="https://github.com/karmaniverous/entity-manager/commit/86893fd761ed6684692127dc415b96d91b51487a" target="_blank" class="external"><code>86893fd</code></a></li>
+<li>refactor(zod): remove deprecated APIs; fix TS/lint/build <a href="https://github.com/karmaniverous/entity-manager/commit/88274ebd3ddeac54a733e3a862a9c517b38c73e4" target="_blank" class="external"><code>88274eb</code></a></li>
+<li>refactor: Zod v4 compatibility; fix imports; robust ESLint <a href="https://github.com/karmaniverous/entity-manager/commit/7a593290e5ccba0687ce1918d83c65fef534fc89" target="_blank" class="external"><code>7a59329</code></a></li>
+<li>fix: resolve TS2769 in ParsedConfig; silence dynamic delete <a href="https://github.com/karmaniverous/entity-manager/commit/67fde539dd408b3f9e6d541a8a95b6c7e4c67531" target="_blank" class="external"><code>67fde53</code></a></li>
+<li>docs: fix TypeDoc @param name for getPrimaryKey overload <a href="https://github.com/karmaniverous/entity-manager/commit/bb4eb75dfdd450e036e325253865cc37a8e73301" target="_blank" class="external"><code>bb4eb75</code></a></li>
+<li>fix: clear TS/lint/build/test issues; finalize quiet tests <a href="https://github.com/karmaniverous/entity-manager/commit/20d64371a1655d6cfd979fdcac4cb1e4dcd74704" target="_blank" class="external"><code>20d6437</code></a></li>
+<li>updated dependencies &amp; docs <a href="https://github.com/karmaniverous/entity-manager/commit/01a798344d26794ebb7e462e25ef63f36d13ebdd" target="_blank" class="external"><code>01a7983</code></a></li>
+<li>docs: fix TypeDoc @param mismatch on array overloads <a href="https://github.com/karmaniverous/entity-manager/commit/bac001a6f7a2f0c2db6da23ea6f8a539ebab1db8" target="_blank" class="external"><code>bac001a</code></a></li>
+<li>Implement full shard-space assignment and add test <a href="https://github.com/karmaniverous/entity-manager/commit/b7f9c3e79bf701be1e1d2b1917f46c2e309116c4" target="_blank" class="external"><code>b7f9c3e</code></a></li>
+<li>updated readme <a href="https://github.com/karmaniverous/entity-manager/commit/97d4f5927f2bb30450d5013c1337e7f352ebf774" target="_blank" class="external"><code>97d4f59</code></a></li>
+<li>Add authoritative <a href="http://stan.requirements.md" target="_blank" class="external">stan.requirements.md</a> and update TODO <a href="https://github.com/karmaniverous/entity-manager/commit/525d8697e1dd674218ad27b0c66fad61523a0426" target="_blank" class="external"><code>525d869</code></a></li>
+<li>chore: release v6.14.1 <a href="https://github.com/karmaniverous/entity-manager/commit/03d51266fbbdf59d58a778266140a21bbc94b0cb" target="_blank" class="external"><code>03d5126</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/f1d83748ccf5125fd018000637b943a99bbe8d4c" target="_blank" class="external"><code>f1d8374</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/bf44f905818cbf5dd68006493ee80b072df7ebd9" target="_blank" class="external"><code>bf44f90</code></a></li>
+<li>resolved tsd issues <a href="https://github.com/karmaniverous/entity-manager/commit/b6b1e2c7478f5c598c2c17c218527c911a7e52ec" target="_blank" class="external"><code>b6b1e2c</code></a></li>
+<li>refactor: remove dynamic delete in removeKeys; docs update <a href="https://github.com/karmaniverous/entity-manager/commit/33d51fa03772ef733e29cd8c2c13c08c39dda2e6" target="_blank" class="external"><code>33d51fa</code></a></li>
+<li>chore(test): silence debug logs to reduce Vitest output <a href="https://github.com/karmaniverous/entity-manager/commit/b09755d656d92b61de00690f3d2e052a537b0a31" target="_blank" class="external"><code>b09755d</code></a></li>
+<li>added google drive sync <a href="https://github.com/karmaniverous/entity-manager/commit/0dc2c9d598347b180ead1e0edf99379967bb6486" target="_blank" class="external"><code>0dc2c9d</code></a></li>
+</ul>
+<h4 id="v6140" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.13.3...v6.14.0" target="_blank" class="external">v6.14.0</a><a href="#v6140" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>14 November 2024</p>
+</blockquote>
+<ul>
+<li>reorganized repo <a href="https://github.com/karmaniverous/entity-manager/commit/56973aa7eedbbd0e433b99b2a13694b816263f00" target="_blank" class="external"><code>56973aa</code></a></li>
+<li>chore: release v6.14.0 <a href="https://github.com/karmaniverous/entity-manager/commit/b2b635a7c486e6f3db6a3064bc4465c95f091b59" target="_blank" class="external"><code>b2b635a</code></a></li>
+<li>Overloaded methods for array handling. <a href="https://github.com/karmaniverous/entity-manager/commit/3f1bdb15b2c171ce572afd6448aabb137d232238" target="_blank" class="external"><code>3f1bdb1</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/1e2810f720ed22f51f738a3c395a22cb6b5dbb1d" target="_blank" class="external"><code>1e2810f</code></a></li>
+</ul>
+<h4 id="v6133" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.13.2...v6.13.3" target="_blank" class="external">v6.13.3</a><a href="#v6133" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>14 November 2024</p>
+</blockquote>
+<ul>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/23fa87aac24e16780c51d4aef6395a60ca3fcdd8" target="_blank" class="external"><code>23fa87a</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/82faeda1a97d1244aaa72122f79f350f4f774d22" target="_blank" class="external"><code>82faeda</code></a></li>
+<li>chore: release v6.13.3 <a href="https://github.com/karmaniverous/entity-manager/commit/a349a569c223811ace62d1de479833415972aec8" target="_blank" class="external"><code>a349a56</code></a></li>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/d9d9f6ae881dd3c32a1b4cb365b460a938066788" target="_blank" class="external"><code>d9d9f6a</code></a></li>
+<li>updated comments <a href="https://github.com/karmaniverous/entity-manager/commit/8d05e5396e9128db084dbf4eda4b10bfc0fab302" target="_blank" class="external"><code>8d05e53</code></a></li>
+</ul>
+<h4 id="v6132" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.13.1...v6.13.2" target="_blank" class="external">v6.13.2</a><a href="#v6132" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>13 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.13.2 <a href="https://github.com/karmaniverous/entity-manager/commit/eaf9b41ed432f053de267379cfd7a7091e4b2d70" target="_blank" class="external"><code>eaf9b41</code></a></li>
+<li>allow empty index projections array <a href="https://github.com/karmaniverous/entity-manager/commit/4a46fc7e09c676cd08c04173dce36e766254b1e7" target="_blank" class="external"><code>4a46fc7</code></a></li>
+<li>updated tests <a href="https://github.com/karmaniverous/entity-manager/commit/59359f1ff249fdc70c1f428a268622c752bd24eb" target="_blank" class="external"><code>59359f1</code></a></li>
+</ul>
+<h4 id="v6131" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.13.0...v6.13.1" target="_blank" class="external">v6.13.1</a><a href="#v6131" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>13 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.13.1 <a href="https://github.com/karmaniverous/entity-manager/commit/c1123b0887879a6f8d4fd47547b2e9602dca3451" target="_blank" class="external"><code>c1123b0</code></a></li>
+<li>improved findIndexToken <a href="https://github.com/karmaniverous/entity-manager/commit/a7fd6a8d1bf12f16e6a4330c469242fc2536c612" target="_blank" class="external"><code>a7fd6a8</code></a></li>
+</ul>
+<h4 id="v6130" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.12.0...v6.13.0" target="_blank" class="external">v6.13.0</a><a href="#v6130" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>13 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.13.0 <a href="https://github.com/karmaniverous/entity-manager/commit/aac5f630657dd3f6be8798a9f0e7db31ac55233e" target="_blank" class="external"><code>aac5f63</code></a></li>
+<li>added encodeGeneratedProperty <a href="https://github.com/karmaniverous/entity-manager/commit/28a2a0bab142142412d6db54899a129c139cbcf3" target="_blank" class="external"><code>28a2a0b</code></a></li>
+</ul>
+<h4 id="v6120" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.11.4...v6.12.0" target="_blank" class="external">v6.12.0</a><a href="#v6120" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>13 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.12.0 <a href="https://github.com/karmaniverous/entity-manager/commit/f4cf6126d623f6c305f713413eb32635ba38258d" target="_blank" class="external"><code>f4cf612</code></a></li>
+<li>Added findIndexToken <a href="https://github.com/karmaniverous/entity-manager/commit/d7bf77a95ceed1881aab34df6856477e0f2a9f79" target="_blank" class="external"><code>d7bf77a</code></a></li>
+</ul>
+<h4 id="v6114" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.11.2...v6.11.4" target="_blank" class="external">v6.11.4</a><a href="#v6114" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>12 November 2024</p>
+</blockquote>
+<ul>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/7e3eedd160278872d4a5cd146727fbe99d0fbf0b" target="_blank" class="external"><code>7e3eedd</code></a></li>
+<li>chore: release v6.11.4 <a href="https://github.com/karmaniverous/entity-manager/commit/0936bcee15d7760a4f7ce4e4e207ac86cace6a40" target="_blank" class="external"><code>0936bce</code></a></li>
+<li>improved type handling <a href="https://github.com/karmaniverous/entity-manager/commit/1356a127492aede479b82e861f1d3af3ec25b3fd" target="_blank" class="external"><code>1356a12</code></a></li>
+</ul>
+<h4 id="v6112" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.11.1...v6.11.2" target="_blank" class="external">v6.11.2</a><a href="#v6112" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>12 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.11.2 <a href="https://github.com/karmaniverous/entity-manager/commit/de76ccb8b630319858fe91c3bee888ee5c1888ae" target="_blank" class="external"><code>de76ccb</code></a></li>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/c7c77cfc97eaec0f146d345bf80715bdfeae0ee7" target="_blank" class="external"><code>c7c77cf</code></a></li>
+</ul>
+<h4 id="v6111" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.11.0...v6.11.1" target="_blank" class="external">v6.11.1</a><a href="#v6111" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>12 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.11.1 <a href="https://github.com/karmaniverous/entity-manager/commit/8269dada4637faab895c7c398860ee7ce002fca0" target="_blank" class="external"><code>8269dad</code></a></li>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/8c598e1e7722e4ad5ac2f905e15efc6345db5c58" target="_blank" class="external"><code>8c598e1</code></a></li>
+</ul>
+<h4 id="v6110" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.10.3...v6.11.0" target="_blank" class="external">v6.11.0</a><a href="#v6110" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>12 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.11.0 <a href="https://github.com/karmaniverous/entity-manager/commit/3c58a562d7b38ee519b9a7b614c59bf0829b4bfc" target="_blank" class="external"><code>3c58a56</code></a></li>
+<li>added getPrimaryKey method <a href="https://github.com/karmaniverous/entity-manager/commit/0bef16511fc4f23e5701f1a4e238b068f4e3832e" target="_blank" class="external"><code>0bef165</code></a></li>
+</ul>
+<h4 id="v6103" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.10.2...v6.10.3" target="_blank" class="external">v6.10.3</a><a href="#v6103" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>12 November 2024</p>
+</blockquote>
+<ul>
+<li>integrated entityManager param with BaseEntityClientOptions <a href="https://github.com/karmaniverous/entity-manager/commit/6659766c8c1d153475900be40cdbd92cf4b745e3" target="_blank" class="external"><code>6659766</code></a></li>
+<li>chore: release v6.10.3 <a href="https://github.com/karmaniverous/entity-manager/commit/a8307f7fb6fb1c867dda8f89799a92366217348f" target="_blank" class="external"><code>a8307f7</code></a></li>
+</ul>
+<h4 id="v6102" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.10.1...v6.10.2" target="_blank" class="external">v6.10.2</a><a href="#v6102" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>12 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.10.2 <a href="https://github.com/karmaniverous/entity-manager/commit/456aaba62a6baf36af291ebd05bff87a393182df" target="_blank" class="external"><code>456aaba</code></a></li>
+<li>Added EntityKey &amp; EntityRecord <a href="https://github.com/karmaniverous/entity-manager/commit/42887caf91089068af1abbff293c0da31c278420" target="_blank" class="external"><code>42887ca</code></a></li>
+</ul>
+<h4 id="v6101" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.10.0...v6.10.1" target="_blank" class="external">v6.10.1</a><a href="#v6101" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>12 November 2024</p>
+</blockquote>
+<ul>
+<li>Add EntityManager as EntityClient property <a href="https://github.com/karmaniverous/entity-manager/commit/d7a37f9128ec796b1b3405edd6d198a7fbaf7d45" target="_blank" class="external"><code>d7a37f9</code></a></li>
+<li>chore: release v6.10.1 <a href="https://github.com/karmaniverous/entity-manager/commit/64367b7f349320cf1649480f62a75cc4d079950e" target="_blank" class="external"><code>64367b7</code></a></li>
+<li>removed obsolete files <a href="https://github.com/karmaniverous/entity-manager/commit/6bec050504374afb49da7a52cf87e1ad9f54d5a9" target="_blank" class="external"><code>6bec050</code></a></li>
+</ul>
+<h4 id="v6100" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.9.2...v6.10.0" target="_blank" class="external">v6.10.0</a><a href="#v6100" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>11 November 2024</p>
+</blockquote>
+<ul>
+<li>Added EntityItemize <a href="https://github.com/karmaniverous/entity-manager/commit/921ed45583fa80958bad6f2500ef6b1184974a22" target="_blank" class="external"><code>921ed45</code></a></li>
+<li>chore: release v6.10.0 <a href="https://github.com/karmaniverous/entity-manager/commit/62f04dcb22b239fe4f24ffa0d250ef975cd651e5" target="_blank" class="external"><code>62f04dc</code></a></li>
+</ul>
+<h4 id="v692" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.9.1...v6.9.2" target="_blank" class="external">v6.9.2</a><a href="#v692" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>11 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.9.2 <a href="https://github.com/karmaniverous/entity-manager/commit/65e25327432f7324a6512da175b510057f5f578a" target="_blank" class="external"><code>65e2532</code></a></li>
+<li>improved default type params <a href="https://github.com/karmaniverous/entity-manager/commit/8c03cad5015c2c3a5137ebc661663724f701b075" target="_blank" class="external"><code>8c03cad</code></a></li>
+</ul>
+<h4 id="v691" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.9.0...v6.9.1" target="_blank" class="external">v6.9.1</a><a href="#v691" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>11 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.9.1 <a href="https://github.com/karmaniverous/entity-manager/commit/c3c66a094f89ef1b63e6f5a949c32396c065385d" target="_blank" class="external"><code>c3c66a0</code></a></li>
+<li>exploited PageKey type <a href="https://github.com/karmaniverous/entity-manager/commit/830c259df9ad4c1017e0d592491197d73dae2f3a" target="_blank" class="external"><code>830c259</code></a></li>
+</ul>
+<h4 id="v690" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.8.1...v6.9.0" target="_blank" class="external">v6.9.0</a><a href="#v690" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>11 November 2024</p>
+</blockquote>
+<ul>
+<li>Added PageKey type <a href="https://github.com/karmaniverous/entity-manager/commit/5aa39b081221882172226236edf24c4d5dc2c098" target="_blank" class="external"><code>5aa39b0</code></a></li>
+<li>chore: release v6.9.0 <a href="https://github.com/karmaniverous/entity-manager/commit/66311a6d34aae70656d9ed9f51469ffe79ac2bea" target="_blank" class="external"><code>66311a6</code></a></li>
+</ul>
+<h4 id="v681" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.8.0...v6.8.1" target="_blank" class="external">v6.8.1</a><a href="#v681" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>11 November 2024</p>
+</blockquote>
+<ul>
+<li>updated docs &amp; eliminated PartialTranscodable <a href="https://github.com/karmaniverous/entity-manager/commit/6599ad6d622ac8d6e917772c73b5bd4de6020669" target="_blank" class="external"><code>6599ad6</code></a></li>
+<li>chore: release v6.8.1 <a href="https://github.com/karmaniverous/entity-manager/commit/7e7de9a6a8098e7951f749b6c8303dd7b0347c74" target="_blank" class="external"><code>7e7de9a</code></a></li>
+<li>updated docs &amp; dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/014e5a899cd2ade76d365ef68a287885543858c5" target="_blank" class="external"><code>014e5a8</code></a></li>
+<li>readme update <a href="https://github.com/karmaniverous/entity-manager/commit/6136185fb2ecad0ba79f6b08735647822e4d3f39" target="_blank" class="external"><code>6136185</code></a></li>
+</ul>
+<h4 id="v680" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.7.5...v6.8.0" target="_blank" class="external">v6.8.0</a><a href="#v680" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>10 November 2024</p>
+</blockquote>
+<ul>
+<li>refactored config object <a href="https://github.com/karmaniverous/entity-manager/commit/a6c333f3e3b115d90bd247ff89d9d9dc9a67d7b3" target="_blank" class="external"><code>a6c333f</code></a></li>
+<li>wip config refactor <a href="https://github.com/karmaniverous/entity-manager/commit/f631039f8bcf7cce75959ebe008cd7a03a7555dd" target="_blank" class="external"><code>f631039</code></a></li>
+<li>collapsed type params <a href="https://github.com/karmaniverous/entity-manager/commit/9655b4d808dcb7b444056092adec309f2bae63df" target="_blank" class="external"><code>9655b4d</code></a></li>
+<li>chore: release v6.8.0 <a href="https://github.com/karmaniverous/entity-manager/commit/dda72b0c90a3c13a20f7a5b38f31f3e813690fb8" target="_blank" class="external"><code>dda72b0</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/c2d77d1784e0819e28d8f50362ec1ca466b1abc5" target="_blank" class="external"><code>c2d77d1</code></a></li>
+<li>simplified type params <a href="https://github.com/karmaniverous/entity-manager/commit/5f07347ee8b20d7a9e4964f11e2862ce44ae284d" target="_blank" class="external"><code>5f07347</code></a></li>
+<li>simplified config type params <a href="https://github.com/karmaniverous/entity-manager/commit/dd560f4f876fecd04ce809b7b2fffbe10a5c863d" target="_blank" class="external"><code>dd560f4</code></a></li>
+<li>permit unknown properties on EntityItem <a href="https://github.com/karmaniverous/entity-manager/commit/93eccf2158dc7bdcee9d55b7e7a05719cd8bae99" target="_blank" class="external"><code>93eccf2</code></a></li>
+<li>eliminated redundant file <a href="https://github.com/karmaniverous/entity-manager/commit/3018bb178eaaac99439d70f5e3615ed4137a42bb" target="_blank" class="external"><code>3018bb1</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/45f527bbce287b8e64fe9a5e19223fa9343a25a5" target="_blank" class="external"><code>45f527b</code></a></li>
+</ul>
+<h4 id="v675" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.7.4...v6.7.5" target="_blank" class="external">v6.7.5</a><a href="#v675" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>8 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.7.5 <a href="https://github.com/karmaniverous/entity-manager/commit/a113d8e6a604fc83a0d189552efc15e164279936" target="_blank" class="external"><code>a113d8e</code></a></li>
+<li>Refactored ShardQueryMapBuilder to QueryBuilder <a href="https://github.com/karmaniverous/entity-manager/commit/d115cb65085be7d0f52400019bfcdd9ecccb8d8e" target="_blank" class="external"><code>d115cb6</code></a></li>
+</ul>
+<h4 id="v674" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.7.3...v6.7.4" target="_blank" class="external">v6.7.4</a><a href="#v674" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>8 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.7.4 <a href="https://github.com/karmaniverous/entity-manager/commit/a0aa05eeaa0f141f5cb1e760aef6561ca2b54d14" target="_blank" class="external"><code>a0aa05e</code></a></li>
+<li>added BaseEntityClient <a href="https://github.com/karmaniverous/entity-manager/commit/e95e64568ec2d7dbacaebdd2e03f173adf6c6293" target="_blank" class="external"><code>e95e645</code></a></li>
+</ul>
+<h4 id="v673" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.7.2...v6.7.3" target="_blank" class="external">v6.7.3</a><a href="#v673" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.7.3 <a href="https://github.com/karmaniverous/entity-manager/commit/c5f0f6a75f42802314116f60f70d08c2314409d0" target="_blank" class="external"><code>c5f0f6a</code></a></li>
+<li>Objectified options <a href="https://github.com/karmaniverous/entity-manager/commit/9640e0f11631bf2995bcf74a91e8dbf23d82b9f1" target="_blank" class="external"><code>9640e0f</code></a></li>
+</ul>
+<h4 id="v672" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.7.1...v6.7.2" target="_blank" class="external">v6.7.2</a><a href="#v672" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 November 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.7.2 <a href="https://github.com/karmaniverous/entity-manager/commit/ace2c159689f39b2dfeeceed9cf278eda202d769" target="_blank" class="external"><code>ace2c15</code></a></li>
+<li>added query method to BaseSHardQueryMapBuilder <a href="https://github.com/karmaniverous/entity-manager/commit/bf3a4fda5fbff2ab6b605fe7954c7fff2ab8911a" target="_blank" class="external"><code>bf3a4fd</code></a></li>
+</ul>
+<h4 id="v671" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.7.0...v6.7.1" target="_blank" class="external">v6.7.1</a><a href="#v671" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 November 2024</p>
+</blockquote>
+<ul>
+<li>wip resolving page key issues <a href="https://github.com/karmaniverous/entity-manager/commit/51331b9f4cd0228d0fda84aaf9e95ddf04b35ee9" target="_blank" class="external"><code>51331b9</code></a></li>
+<li>update dependencies &amp; build script <a href="https://github.com/karmaniverous/entity-manager/commit/80128628b372bdba0a0c8f24ea52de876d67466b" target="_blank" class="external"><code>8012862</code></a></li>
+<li>rationalized query options <a href="https://github.com/karmaniverous/entity-manager/commit/bc2ce7848f19322400cfe9aca34961c59606408c" target="_blank" class="external"><code>bc2ce78</code></a></li>
+<li>chore: release v6.7.1 <a href="https://github.com/karmaniverous/entity-manager/commit/9528550a5c4cfed2b7a9e1508c2030ebd04ce124" target="_blank" class="external"><code>9528550</code></a></li>
+<li>resolved page key issues <a href="https://github.com/karmaniverous/entity-manager/commit/34d19ce0927f13590c6f5da25ab1d9a4c626c67f" target="_blank" class="external"><code>34d19ce</code></a></li>
+</ul>
+<h4 id="v670" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.6.0...v6.7.0" target="_blank" class="external">v6.7.0</a><a href="#v670" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>5 November 2024</p>
+</blockquote>
+<ul>
+<li>Added BaseShardQueryMapBuilder <a href="https://github.com/karmaniverous/entity-manager/commit/ceae101c20ca0ec5837273ecad35c47e43e92953" target="_blank" class="external"><code>ceae101</code></a></li>
+<li>chore: release v6.7.0 <a href="https://github.com/karmaniverous/entity-manager/commit/2aff01b0a8756c191eec2b28cbce54c7b0f7ca95" target="_blank" class="external"><code>2aff01b</code></a></li>
+</ul>
+<h4 id="v660" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.5.1...v6.6.0" target="_blank" class="external">v6.6.0</a><a href="#v660" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>4 November 2024</p>
+</blockquote>
+<ul>
+<li>rationalized function parameters <a href="https://github.com/karmaniverous/entity-manager/commit/2d031129ff2dbc6d9fa57974da05445ad3fecf1c" target="_blank" class="external"><code>2d03112</code></a></li>
+<li>chore: release v6.6.0 <a href="https://github.com/karmaniverous/entity-manager/commit/52ae593d069a78ab4b1bedcab2011ff901d55680" target="_blank" class="external"><code>52ae593</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/285344353109edf4a4182c6586da240ebddf5d04" target="_blank" class="external"><code>2853443</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/ebf8b36a6a0aef27a79bc44d1a0a93e2a60aae50" target="_blank" class="external"><code>ebf8b36</code></a></li>
+</ul>
+<h4 id="v651" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.5.0...v6.5.1" target="_blank" class="external">v6.5.1</a><a href="#v651" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>2 November 2024</p>
+</blockquote>
+<ul>
+<li>refactored indexes for explicit hash &amp; range keys <a href="https://github.com/karmaniverous/entity-manager/commit/0e51596918a29690ce74345ca8a1f1be82eabe11" target="_blank" class="external"><code>0e51596</code></a></li>
+<li>refactored indexes for explicit hash &amp; range keys <a href="https://github.com/karmaniverous/entity-manager/commit/37534ab1d46f234df5506e626f0fef24b03cff8d" target="_blank" class="external"><code>37534ab</code></a></li>
+<li>chore: release v6.5.1 <a href="https://github.com/karmaniverous/entity-manager/commit/80a65c8d1b7c62c0881a3b09f10cd957d3e7effa" target="_blank" class="external"><code>80a65c8</code></a></li>
+<li>test bugfix <a href="https://github.com/karmaniverous/entity-manager/commit/f2b8757485e96ef59b7b5321568a63fca2e3d581" target="_blank" class="external"><code>f2b8757</code></a></li>
+<li>extended test timeout <a href="https://github.com/karmaniverous/entity-manager/commit/e7c514b833113434ee63d83e366e7743fa5cb689" target="_blank" class="external"><code>e7c514b</code></a></li>
+</ul>
+<h4 id="v650" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.4.10...v6.5.0" target="_blank" class="external">v6.5.0</a><a href="#v650" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>2 November 2024</p>
+</blockquote>
+<ul>
+<li>added index projection support <a href="https://github.com/karmaniverous/entity-manager/commit/ef88d83b3691d7f3cdf6c6a6013afc5a5457d6f3" target="_blank" class="external"><code>ef88d83</code></a></li>
+<li>chore: release v6.5.0 <a href="https://github.com/karmaniverous/entity-manager/commit/7d7e82d6bac0c93d5b7a1298a5b96f5e1c39b29c" target="_blank" class="external"><code>7d7e82d</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/7d4b25ca3bc97dca1e78e11b72680149ce746a15" target="_blank" class="external"><code>7d4b25c</code></a></li>
+</ul>
+<h4 id="v6410" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.4.9...v6.4.10" target="_blank" class="external">v6.4.10</a><a href="#v6410" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>29 October 2024</p>
+</blockquote>
+<ul>
+<li>rationalized external documentation <a href="https://github.com/karmaniverous/entity-manager/commit/275af19ccd81e739c76dfd9a11edde43d8116c5b" target="_blank" class="external"><code>275af19</code></a></li>
+<li>chore: release v6.4.10 <a href="https://github.com/karmaniverous/entity-manager/commit/d5b930374232bb26c7ac0c70f3ca049ba8fa4c6f" target="_blank" class="external"><code>d5b9303</code></a></li>
+<li>lintfix <a href="https://github.com/karmaniverous/entity-manager/commit/b0d94a624e5e017b38660fcfedd4e42d508d4e2d" target="_blank" class="external"><code>b0d94a6</code></a></li>
+</ul>
+<h4 id="v649" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.4.8...v6.4.9" target="_blank" class="external">v6.4.9</a><a href="#v649" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>28 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.4.9 <a href="https://github.com/karmaniverous/entity-manager/commit/a8f5310051915376c5bb0b2689925780fb663a63" target="_blank" class="external"><code>a8f5310</code></a></li>
+<li>re-export Nil from entity-tools <a href="https://github.com/karmaniverous/entity-manager/commit/91e541209fd35e386afc7eeaf023874ffa622cab" target="_blank" class="external"><code>91e5412</code></a></li>
+</ul>
+<h4 id="v648" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.4.7...v6.4.8" target="_blank" class="external">v6.4.8</a><a href="#v648" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>28 October 2024</p>
+</blockquote>
+<ul>
+<li>removed BaseShardQueryMapBuilder class <a href="https://github.com/karmaniverous/entity-manager/commit/4570991bf6234907c14530d04f3f4b3b0663967e" target="_blank" class="external"><code>4570991</code></a></li>
+<li>chore: release v6.4.8 <a href="https://github.com/karmaniverous/entity-manager/commit/a64ed134b99a2a0cef3e084f6a64c82dd515e77b" target="_blank" class="external"><code>a64ed13</code></a></li>
+</ul>
+<h4 id="v647" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.4.6...v6.4.7" target="_blank" class="external">v6.4.7</a><a href="#v647" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>27 October 2024</p>
+</blockquote>
+<ul>
+<li>updated base class names <a href="https://github.com/karmaniverous/entity-manager/commit/92c27bdffe43f658a723dc88428cf425af283d0f" target="_blank" class="external"><code>92c27bd</code></a></li>
+<li>chore: release v6.4.7 <a href="https://github.com/karmaniverous/entity-manager/commit/b99014b7b5d2078e896882dd55815ea2c2faf34d" target="_blank" class="external"><code>b99014b</code></a></li>
+</ul>
+<h4 id="v646" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.4.5...v6.4.6" target="_blank" class="external">v6.4.6</a><a href="#v646" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>27 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.4.6 <a href="https://github.com/karmaniverous/entity-manager/commit/667277994d25cd7629f3fdc59190e7203af5d5d1" target="_blank" class="external"><code>6672779</code></a></li>
+<li>extend options <a href="https://github.com/karmaniverous/entity-manager/commit/1a956a4e8bae6390b2868ad2c093a8304b60a8b8" target="_blank" class="external"><code>1a956a4</code></a></li>
+</ul>
+<h4 id="v645" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.4.4...v6.4.5" target="_blank" class="external">v6.4.5</a><a href="#v645" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>27 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.4.5 <a href="https://github.com/karmaniverous/entity-manager/commit/ea84b765da56d74b6dd364eaf7c8e699a3691e6c" target="_blank" class="external"><code>ea84b76</code></a></li>
+<li>removed item from shard query map builder options <a href="https://github.com/karmaniverous/entity-manager/commit/5630b29d84794ece4a014f3799e82796e8a3f43e" target="_blank" class="external"><code>5630b29</code></a></li>
+</ul>
+<h4 id="v644" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.4.3...v6.4.4" target="_blank" class="external">v6.4.4</a><a href="#v644" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>26 October 2024</p>
+</blockquote>
+<ul>
+<li>added injectable logger support <a href="https://github.com/karmaniverous/entity-manager/commit/e2633bd06ed56ad7b55ce628854d1bd3fee77188" target="_blank" class="external"><code>e2633bd</code></a></li>
+<li>chore: release v6.4.4 <a href="https://github.com/karmaniverous/entity-manager/commit/cdfa4538e68808531ae5d77476edc34cb072ad46" target="_blank" class="external"><code>cdfa453</code></a></li>
+<li>eliminated EntityManagerClient base class <a href="https://github.com/karmaniverous/entity-manager/commit/f6cd8e53e34374e3a78b248c820d2d8f7af4f778" target="_blank" class="external"><code>f6cd8e5</code></a></li>
+<li>Refactored ShardQueryFunction &amp; related type params <a href="https://github.com/karmaniverous/entity-manager/commit/3c66c863594429c9e2e9c3fcceaebeb874ebb7d4" target="_blank" class="external"><code>3c66c86</code></a></li>
+<li>rationalize type params <a href="https://github.com/karmaniverous/entity-manager/commit/254f2a57045331d47ff657cc6aeedb1b1af4f301" target="_blank" class="external"><code>254f2a5</code></a></li>
+</ul>
+<h4 id="v643" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.4.2...v6.4.3" target="_blank" class="external">v6.4.3</a><a href="#v643" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>9 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.4.3 <a href="https://github.com/karmaniverous/entity-manager/commit/43161fdde0898e24a1cf26970ab2b32e2de59407" target="_blank" class="external"><code>43161fd</code></a></li>
+<li>export new types <a href="https://github.com/karmaniverous/entity-manager/commit/50f40dce377a69f646ce58dc0a75bf6fab1be417" target="_blank" class="external"><code>50f40dc</code></a></li>
+</ul>
+<h4 id="v642" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.4.1...v6.4.2" target="_blank" class="external">v6.4.2</a><a href="#v642" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>9 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.4.2 <a href="https://github.com/karmaniverous/entity-manager/commit/556100cc13aba74eadec8a0a49cb80824afa876d" target="_blank" class="external"><code>556100c</code></a></li>
+<li>Abstracted out EntityManager from ShardQueryMapBuilder <a href="https://github.com/karmaniverous/entity-manager/commit/8266b27f80800a168a8345a81f3f9e2a635d873d" target="_blank" class="external"><code>8266b27</code></a></li>
+</ul>
+<h4 id="v641" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.4.0...v6.4.1" target="_blank" class="external">v6.4.1</a><a href="#v641" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>9 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.4.1 <a href="https://github.com/karmaniverous/entity-manager/commit/b0c436d6cd2c5572c3e0d07cfb39387ca6b2e12c" target="_blank" class="external"><code>b0c436d</code></a></li>
+<li>made options public <a href="https://github.com/karmaniverous/entity-manager/commit/e7088fe73650168e420106513a130d3d27301e28" target="_blank" class="external"><code>e7088fe</code></a></li>
+</ul>
+<h4 id="v640" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.3.1...v6.4.0" target="_blank" class="external">v6.4.0</a><a href="#v640" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>9 October 2024</p>
+</blockquote>
+<ul>
+<li>non-mutating methods on partial items <a href="https://github.com/karmaniverous/entity-manager/commit/5b09049fcf663099f2524c92a67f5389773d1aaf" target="_blank" class="external"><code>5b09049</code></a></li>
+<li>chore: release v6.4.0 <a href="https://github.com/karmaniverous/entity-manager/commit/4aca9ff1567a863cad9e92ca93a4d83f6c39e4d4" target="_blank" class="external"><code>4aca9ff</code></a></li>
+</ul>
+<h4 id="v631" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.3.0...v6.3.1" target="_blank" class="external">v6.3.1</a><a href="#v631" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>9 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.3.1 <a href="https://github.com/karmaniverous/entity-manager/commit/2526e46ed8126f2a714d2674806acafd81472d4c" target="_blank" class="external"><code>2526e46</code></a></li>
+<li>Allow addKeys to work on partial Item <a href="https://github.com/karmaniverous/entity-manager/commit/ddd60bd508766ca6cafded0746359fa0aa645bc9" target="_blank" class="external"><code>ddd60bd</code></a></li>
+<li>apply removeKeys to partial item <a href="https://github.com/karmaniverous/entity-manager/commit/f8d74c9f99ae94b5747668b90407a1a459458c98" target="_blank" class="external"><code>f8d74c9</code></a></li>
+</ul>
+<h4 id="v630" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.2.4...v6.3.0" target="_blank" class="external">v6.3.0</a><a href="#v630" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>9 October 2024</p>
+</blockquote>
+<ul>
+<li>Refactored QueryFunctionBuilder to QueryMapBuilder <a href="https://github.com/karmaniverous/entity-manager/commit/6c27dca5a2a290b1e5157a5e0f20112962dcd129" target="_blank" class="external"><code>6c27dca</code></a></li>
+<li>chore: release v6.3.0 <a href="https://github.com/karmaniverous/entity-manager/commit/6c1f0e708779baf3cf0ff4c6bc0ff8c52924acf5" target="_blank" class="external"><code>6c1f0e7</code></a></li>
+<li>lintfix <a href="https://github.com/karmaniverous/entity-manager/commit/e36fcb0659c7451202f552319c12be05b2f3993c" target="_blank" class="external"><code>e36fcb0</code></a></li>
+</ul>
+<h4 id="v624" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.2.3...v6.2.4" target="_blank" class="external">v6.2.4</a><a href="#v624" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>8 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.2.4 <a href="https://github.com/karmaniverous/entity-manager/commit/bead3d1420c62304dfaf2d1cecf614044aea3d1d" target="_blank" class="external"><code>bead3d1</code></a></li>
+<li>bugfix <a href="https://github.com/karmaniverous/entity-manager/commit/45db0ea70e9a3a0de943b30613b53417f717446c" target="_blank" class="external"><code>45db0ea</code></a></li>
+</ul>
+<h4 id="v623" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.2.2...v6.2.3" target="_blank" class="external">v6.2.3</a><a href="#v623" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>8 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.2.3 <a href="https://github.com/karmaniverous/entity-manager/commit/0343accd697344522a3eb0a8c052538b96ef11e2" target="_blank" class="external"><code>0343acc</code></a></li>
+<li>bugfix <a href="https://github.com/karmaniverous/entity-manager/commit/744d2633300d65abc9aecd3b2f6065f8b21bbc3e" target="_blank" class="external"><code>744d263</code></a></li>
+</ul>
+<h4 id="v622" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.2.1...v6.2.2" target="_blank" class="external">v6.2.2</a><a href="#v622" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>8 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.2.2 <a href="https://github.com/karmaniverous/entity-manager/commit/03db4c0da8252a78578c0a4eeda1b01022c9cab9" target="_blank" class="external"><code>03db4c0</code></a></li>
+<li>Refactored to PartialTranscodable <a href="https://github.com/karmaniverous/entity-manager/commit/772b26ae42edc2d363a088627fcf7ed0b5752291" target="_blank" class="external"><code>772b26a</code></a></li>
+<li>bugfix <a href="https://github.com/karmaniverous/entity-manager/commit/1192bccccb0acc1232088d3b9e876aa49ffcde60" target="_blank" class="external"><code>1192bcc</code></a></li>
+<li>update exports <a href="https://github.com/karmaniverous/entity-manager/commit/af19fe8ac58b47f8a0f65911eb974cf66aec8a0b" target="_blank" class="external"><code>af19fe8</code></a></li>
+</ul>
+<h4 id="v621" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.2.0...v6.2.1" target="_blank" class="external">v6.2.1</a><a href="#v621" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>8 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.2.1 <a href="https://github.com/karmaniverous/entity-manager/commit/c58bb3fdf4bf5706226b39150d618e7a31e119af" target="_blank" class="external"><code>c58bb3f</code></a></li>
+<li>export Exactify <a href="https://github.com/karmaniverous/entity-manager/commit/c7cf25d321f11c53d6feaf1212636d3b9eb294aa" target="_blank" class="external"><code>c7cf25d</code></a></li>
+</ul>
+<h4 id="v620" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.1.2...v6.2.0" target="_blank" class="external">v6.2.0</a><a href="#v620" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>8 October 2024</p>
+</blockquote>
+<ul>
+<li>Added ShardQueryFunctionBuilder base class <a href="https://github.com/karmaniverous/entity-manager/commit/3e3b51f0c9c9772a696faab398fedbae20e020be" target="_blank" class="external"><code>3e3b51f</code></a></li>
+<li>chore: release v6.2.0 <a href="https://github.com/karmaniverous/entity-manager/commit/80f6dd4d2cb73351f38cbaadcbbf1ade3cd98db3" target="_blank" class="external"><code>80f6dd4</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/1bc50667d7ffa05d57f566ca2e2c1d1168aa5291" target="_blank" class="external"><code>1bc5066</code></a></li>
+</ul>
+<h4 id="v612" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.1.1...v6.1.2" target="_blank" class="external">v6.1.2</a><a href="#v612" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.1.2 <a href="https://github.com/karmaniverous/entity-manager/commit/77a5e2ef61807134256cffe800d6c6dddae9a71a" target="_blank" class="external"><code>77a5e2e</code></a></li>
+<li>updated getUnprocessedItems type <a href="https://github.com/karmaniverous/entity-manager/commit/971defdc57e226d08adb0c8c1d4c78ee20cb7c37" target="_blank" class="external"><code>971defd</code></a></li>
+</ul>
+<h4 id="v611" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.1.0...v6.1.1" target="_blank" class="external">v6.1.1</a><a href="#v611" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.1.1 <a href="https://github.com/karmaniverous/entity-manager/commit/090af5ad3c6b9a0c24912428321ed6a4c421fe21" target="_blank" class="external"><code>090af5a</code></a></li>
+<li>added batchExecute <a href="https://github.com/karmaniverous/entity-manager/commit/246e16402b728c45051b98dcbb4caef7e6fd4cbd" target="_blank" class="external"><code>246e164</code></a></li>
+</ul>
+<h4 id="v610" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.1.0-6...v6.1.0" target="_blank" class="external">v6.1.0</a><a href="#v610" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.1.0 <a href="https://github.com/karmaniverous/entity-manager/commit/0e1705bfee4ad2b798563d3e2e41671d69125f3e" target="_blank" class="external"><code>0e1705b</code></a></li>
+<li>updated rollup config <a href="https://github.com/karmaniverous/entity-manager/commit/8aed42cfa8b4500d2d600b7baaacc247803a756d" target="_blank" class="external"><code>8aed42c</code></a></li>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/76811add9c5c2acdfbbb454d18ee91b0c9359847" target="_blank" class="external"><code>76811ad</code></a></li>
+</ul>
+<h4 id="v610-6" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.1.0-5...v6.1.0-6" target="_blank" class="external">v6.1.0-6</a><a href="#v610-6" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.1.0-6 <a href="https://github.com/karmaniverous/entity-manager/commit/5eda259aaaf41e27468bd1f7f0b6fd9fa40c981c" target="_blank" class="external"><code>5eda259</code></a></li>
+<li>added external dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/613f7e3fc3f450e96912b411edb064af9e8bfcec" target="_blank" class="external"><code>613f7e3</code></a></li>
+</ul>
+<h4 id="v610-5" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.1.0-4...v6.1.0-5" target="_blank" class="external">v6.1.0-5</a><a href="#v610-5" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.1.0-5 <a href="https://github.com/karmaniverous/entity-manager/commit/4c21315402e8465fedc41821061d1c33e768aec7" target="_blank" class="external"><code>4c21315</code></a></li>
+<li>fixed type entry points <a href="https://github.com/karmaniverous/entity-manager/commit/4d9b08091ca0ef445f0411ab837e4fd18899adcf" target="_blank" class="external"><code>4d9b080</code></a></li>
+</ul>
+<h4 id="v610-4" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.1.0-3...v6.1.0-4" target="_blank" class="external">v6.1.0-4</a><a href="#v610-4" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 October 2024</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/cc9d5ada71f3dd8fef9f5ae5a86a130ef9a30f15" target="_blank" class="external"><code>cc9d5ad</code></a></li>
+<li>chore: release v6.1.0-4 <a href="https://github.com/karmaniverous/entity-manager/commit/ad0700c13f0f7e83ccd432cf5e4ae494206fe6df" target="_blank" class="external"><code>ad0700c</code></a></li>
+<li>fixed plugin presentation <a href="https://github.com/karmaniverous/entity-manager/commit/c7ddb5213b31cfa48668bc254ceb30865816ad97" target="_blank" class="external"><code>c7ddb52</code></a></li>
+</ul>
+<h4 id="v610-3" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.1.0-2...v6.1.0-3" target="_blank" class="external">v6.1.0-3</a><a href="#v610-3" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.1.0-3 <a href="https://github.com/karmaniverous/entity-manager/commit/be67eb3d12c6caf5ae4e508d76068677dddbf397" target="_blank" class="external"><code>be67eb3</code></a></li>
+<li>updated module entry paths <a href="https://github.com/karmaniverous/entity-manager/commit/b246f3785e49ddc755849db19e1b9b082780c8da" target="_blank" class="external"><code>b246f37</code></a></li>
+</ul>
+<h4 id="v610-2" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.1.0-1...v6.1.0-2" target="_blank" class="external">v6.1.0-2</a><a href="#v610-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.1.0-2 <a href="https://github.com/karmaniverous/entity-manager/commit/6690429dda02e6149508bb5d46ca757ccdc100ee" target="_blank" class="external"><code>6690429</code></a></li>
+<li>added WithRequiredAndNonNullable <a href="https://github.com/karmaniverous/entity-manager/commit/6322ef73259a1448fe5df9cbf1c7e326b3960653" target="_blank" class="external"><code>6322ef7</code></a></li>
+</ul>
+<h4 id="v610-1" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.1.0-0...v6.1.0-1" target="_blank" class="external">v6.1.0-1</a><a href="#v610-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 October 2024</p>
+</blockquote>
+<ul>
+<li>chore: release v6.1.0-1 <a href="https://github.com/karmaniverous/entity-manager/commit/8d11a3537a61ac4020f712d482c5a35d12ca068b" target="_blank" class="external"><code>8d11a35</code></a></li>
+<li>improved option handling <a href="https://github.com/karmaniverous/entity-manager/commit/07a5f65194d9b935f024f199e212238cdc92051e" target="_blank" class="external"><code>07a5f65</code></a></li>
+<li>rationalized base/child options <a href="https://github.com/karmaniverous/entity-manager/commit/dcddb73ca70f3ec94516645967fe441942c4cb78" target="_blank" class="external"><code>dcddb73</code></a></li>
+</ul>
+<h4 id="v610-0" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.0.1...v6.1.0-0" target="_blank" class="external">v6.1.0-0</a><a href="#v610-0" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>7 October 2024</p>
+</blockquote>
+<ul>
+<li>wip abstract client base class <a href="https://github.com/karmaniverous/entity-manager/commit/1bfc21299e61c98596d6154cd3b8260def499dda" target="_blank" class="external"><code>1bfc212</code></a></li>
+<li>chore: release v6.1.0-0 <a href="https://github.com/karmaniverous/entity-manager/commit/9881fac08fc264f29cb91092b1818643cfdda28c" target="_blank" class="external"><code>9881fac</code></a></li>
+</ul>
+<h4 id="v601" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v6.0.0...v6.0.1" target="_blank" class="external">v6.0.1</a><a href="#v601" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>1 October 2024</p>
+</blockquote>
+<ul>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/42e69a647f916a2df5146af20342e70063baa821" target="_blank" class="external"><code>42e69a6</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/6b4651afde41aa9a300a8b2440256287b50f3682" target="_blank" class="external"><code>6b4651a</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/d7f106465115b0c32bbac3267efcc3a66cc07947" target="_blank" class="external"><code>d7f1064</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/942a310b77b871e224b40e6c97d9638a39b54cd2" target="_blank" class="external"><code>942a310</code></a></li>
+<li>renamed entityTypes to entityTranscodes <a href="https://github.com/karmaniverous/entity-manager/commit/f66d519389e721f8a1deb60d94b94005c0216bca" target="_blank" class="external"><code>f66d519</code></a></li>
+<li>chore: release v6.0.1 <a href="https://github.com/karmaniverous/entity-manager/commit/e84d5821bb74951f923744850bcb3b4861c3b1f8" target="_blank" class="external"><code>e84d582</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/d26ac43161560b9bfac105023888b15a36b03364" target="_blank" class="external"><code>d26ac43</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/e917720d0870c7176c6394cfc25bfa7c76d36c1a" target="_blank" class="external"><code>e917720</code></a></li>
+<li>moved docs <a href="https://github.com/karmaniverous/entity-manager/commit/8698104b9a4ff2eb157158efb7c1043d44faa61a" target="_blank" class="external"><code>8698104</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/f2106110fef3dd4efbc11e6fafa6e52f956d1c29" target="_blank" class="external"><code>f210611</code></a></li>
+<li>updated package description <a href="https://github.com/karmaniverous/entity-manager/commit/35c0fd35ac29dff16ff8cb5987e9c31c31560629" target="_blank" class="external"><code>35c0fd3</code></a></li>
+<li>Delete CNAME <a href="https://github.com/karmaniverous/entity-manager/commit/88af121ed4cd919aabd0056d0ebbf2a9ac98e788" target="_blank" class="external"><code>88af121</code></a></li>
+<li>Create CNAME <a href="https://github.com/karmaniverous/entity-manager/commit/6cca256f289cd3e8787a9ef3a10c49ebc3fa7e30" target="_blank" class="external"><code>6cca256</code></a></li>
+</ul>
+<h3 id="v600" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v5.0.9...v6.0.0" target="_blank" class="external">v6.0.0</a><a href="#v600" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<blockquote>
+<p>17 September 2024</p>
+</blockquote>
+<ul>
+<li>Feature/gh-2-typescript-refactor <a href="https://github.com/karmaniverous/entity-manager/pull/3" target="_blank" class="external"><code>#3</code></a></li>
+<li>[GH-2] finished refactor, all tests passing! <a href="https://github.com/karmaniverous/entity-manager/commit/acfb8f0bb190ebe810f376bdc44d044ffb03e19d" target="_blank" class="external"><code>acfb8f0</code></a></li>
+<li>[GH-2] wip updating for changes in entity-tools &amp; mock-db <a href="https://github.com/karmaniverous/entity-manager/commit/0560dc8d80cf9dce4c4dcf65ecfc6d69146fa756" target="_blank" class="external"><code>0560dc8</code></a></li>
+<li>[GH-2] wip <a href="https://github.com/karmaniverous/entity-manager/commit/3fbeb5ee17f73a54ac624e4c8114794d0731bfa8" target="_blank" class="external"><code>3fbeb5e</code></a></li>
+<li>[GH-2] wip - synced with ts project template <a href="https://github.com/karmaniverous/entity-manager/commit/9852189431ba26878f7a271db690c64c49144a9e" target="_blank" class="external"><code>9852189</code></a></li>
+<li>[GH-2] wip typedoc <a href="https://github.com/karmaniverous/entity-manager/commit/a6fd075e6bb5b423426a30c31436da02b2c8b19f" target="_blank" class="external"><code>a6fd075</code></a></li>
+<li>[GH-2] wip typescript refactor got all tests to pass <a href="https://github.com/karmaniverous/entity-manager/commit/861dfe575165d730dc09d7f41b6c14dca6bb5868" target="_blank" class="external"><code>861dfe5</code></a></li>
+<li>[GH-2] refactored docs <a href="https://github.com/karmaniverous/entity-manager/commit/446635e47400bd42a64269239da8578ed34d8f45" target="_blank" class="external"><code>446635e</code></a></li>
+<li>[GH-2] refactored file names &amp; finished updateItemHashKey <a href="https://github.com/karmaniverous/entity-manager/commit/387bf7dcbb477437b79ff49a0b30bf9837d55b39" target="_blank" class="external"><code>387bf7d</code></a></li>
+<li>[GH-2] Added dedupe &amp; sort to query <a href="https://github.com/karmaniverous/entity-manager/commit/8713d61570de5f13d515296b6e3c72e6040a7848" target="_blank" class="external"><code>8713d61</code></a></li>
+<li>[GH-2] refactored for changes in eneity tools &amp; MockDb <a href="https://github.com/karmaniverous/entity-manager/commit/b18487f64cf4a6ebebe96ed8cd2e3bada94a0566" target="_blank" class="external"><code>b18487f</code></a></li>
+<li>chore: release v6.0.0 <a href="https://github.com/karmaniverous/entity-manager/commit/12011f143cd7e1155f18984d7b169fa5e4c17b33" target="_blank" class="external"><code>12011f1</code></a></li>
+<li>[GH-2] updated query &amp; added support for page key map compression <a href="https://github.com/karmaniverous/entity-manager/commit/212e3c246269ef577e4a31b1c38e2953a7deffe7" target="_blank" class="external"><code>212e3c2</code></a></li>
+<li>[GH-2] refactored test files <a href="https://github.com/karmaniverous/entity-manager/commit/57f467274324b57763b9df8184632834590b2d79" target="_blank" class="external"><code>57f4672</code></a></li>
+<li>[GH-2] refactored file names &amp; updated ParsedConfig tests <a href="https://github.com/karmaniverous/entity-manager/commit/4fb4ee603b3952fa601047d941f441d142b6d41b" target="_blank" class="external"><code>4fb4ee6</code></a></li>
+<li>[GH-2] abstracted out types &amp; private methods <a href="https://github.com/karmaniverous/entity-manager/commit/5508063462ad51fbc1a85b6c10294a299f00ceb2" target="_blank" class="external"><code>5508063</code></a></li>
+<li>[GH-2] rationalized documentation <a href="https://github.com/karmaniverous/entity-manager/commit/4de45825d3c51ea23f292d00ce306b94a12d9ca4" target="_blank" class="external"><code>4de4582</code></a></li>
+<li>[GH-2] rationalized types &amp; params and updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/c87ef5f658cb2574e23393705595b8557d8d75d5" target="_blank" class="external"><code>c87ef5f</code></a></li>
+<li>[GH-2] wip refactoring tests <a href="https://github.com/karmaniverous/entity-manager/commit/650faa2f5b3ee7e91f4ccf9af53fc934550920b6" target="_blank" class="external"><code>650faa2</code></a></li>
+<li>[GH-2] wip typescript <a href="https://github.com/karmaniverous/entity-manager/commit/9f8463257d1a26d72616cd3f4e9b0e7e8c4fafa7" target="_blank" class="external"><code>9f84632</code></a></li>
+<li>[GH-2] rationalized query behavior <a href="https://github.com/karmaniverous/entity-manager/commit/81741a50ce6682e2d5e70c07275a94a7e0775b92" target="_blank" class="external"><code>81741a5</code></a></li>
+<li>[GH-2] added error handling &amp; update/strip generated keys <a href="https://github.com/karmaniverous/entity-manager/commit/6678676df72eb6dfedab13fd42c7523d01de570f" target="_blank" class="external"><code>6678676</code></a></li>
+<li>[GH-2] added rehydrateIndexItem <a href="https://github.com/karmaniverous/entity-manager/commit/97847ddcbdde3e9f67943d707612ae10f801c060" target="_blank" class="external"><code>97847dd</code></a></li>
+<li>[GH-2] stub rehydratePageKeyMap &amp; refactor validations <a href="https://github.com/karmaniverous/entity-manager/commit/4d05f84e4af491037702a1ca54a6af12da3797da" target="_blank" class="external"><code>4d05f84</code></a></li>
+<li>[GH-2] wip <a href="https://github.com/karmaniverous/entity-manager/commit/b756028abadc71069ade080255dd044a3e12fe10" target="_blank" class="external"><code>b756028</code></a></li>
+<li>[GH-2] wip synced with template <a href="https://github.com/karmaniverous/entity-manager/commit/a47485150fadddad7e0de74d675ceeb4eeb8401d" target="_blank" class="external"><code>a474851</code></a></li>
+<li>[GH-2] wip <a href="https://github.com/karmaniverous/entity-manager/commit/fa146469cedcd18ea38a4b9262ae4ef49407f645" target="_blank" class="external"><code>fa14646</code></a></li>
+<li>[GH-2] added rehydratePageKeyMep <a href="https://github.com/karmaniverous/entity-manager/commit/59a74bc54cab88b8a6cb9dde67205b1cdca0640d" target="_blank" class="external"><code>59a74bc</code></a></li>
+<li>[GH-2] added atomic generated property &amp; decode support <a href="https://github.com/karmaniverous/entity-manager/commit/5caeb664a1627e917e63dc6fe8e78f7d809f7c22" target="_blank" class="external"><code>5caeb66</code></a></li>
+<li>[GH-2] refactored types <a href="https://github.com/karmaniverous/entity-manager/commit/14a579f48af5baeb403bd20f8649cefe12a688e9" target="_blank" class="external"><code>14a579f</code></a></li>
+<li>[GH-2] finished refactoring query <a href="https://github.com/karmaniverous/entity-manager/commit/92014ca7b4220bf39b6f2a6c6207ea969d200e3d" target="_blank" class="external"><code>92014ca</code></a></li>
+<li>[GH-2] Refactored EntityItem to ItemMap <a href="https://github.com/karmaniverous/entity-manager/commit/d4632147d0deac42c58f0854130764001346002d" target="_blank" class="external"><code>d463214</code></a></li>
+<li>[GH-2] abstracted types <a href="https://github.com/karmaniverous/entity-manager/commit/41ef3082c643c154d87f318e699a40e73e0a83fa" target="_blank" class="external"><code>41ef308</code></a></li>
+<li>[GH-2] wip query <a href="https://github.com/karmaniverous/entity-manager/commit/24ca831c51eef129b62c502d4d54b8be164a2719" target="_blank" class="external"><code>24ca831</code></a></li>
+<li>[GH-2] refactors <a href="https://github.com/karmaniverous/entity-manager/commit/620032bce1fb8e7f1b5c2ff897e77431923487fb" target="_blank" class="external"><code>620032b</code></a></li>
+<li>[GH-2] wip addig dehydratePageKeys <a href="https://github.com/karmaniverous/entity-manager/commit/e076479d6530172f34374ff3c4cda81d814a5637" target="_blank" class="external"><code>e076479</code></a></li>
+<li>[GH-2] added delimiter config support <a href="https://github.com/karmaniverous/entity-manager/commit/ee91a6ba96fa4ac244dc39d658b7a9e6b785ef5b" target="_blank" class="external"><code>ee91a6b</code></a></li>
+<li>[GH-2] updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/4bf295455c2371a8d39d0a7e59d061f7389c83bf" target="_blank" class="external"><code>4bf2954</code></a></li>
+<li>[GH-2] created type-safe config <a href="https://github.com/karmaniverous/entity-manager/commit/dc2990becbfa9f9d0fe83f11eb228c0ffada98d1" target="_blank" class="external"><code>dc2990b</code></a></li>
+<li>[GH-2] added indexable type map support <a href="https://github.com/karmaniverous/entity-manager/commit/63e5a166a4ac3876004509bd8e3879e91cd47806" target="_blank" class="external"><code>63e5a16</code></a></li>
+<li>[GH-2] created Entity &amp; EntityMap base types <a href="https://github.com/karmaniverous/entity-manager/commit/73f714bbbac737cbcfeb3ff08bbff238f397cc8b" target="_blank" class="external"><code>73f714b</code></a></li>
+<li>[GH-2] unwrapped EntityItem type <a href="https://github.com/karmaniverous/entity-manager/commit/d6a9de275691925e016aa4b6f392d1d14c552947" target="_blank" class="external"><code>d6a9de2</code></a></li>
+<li>[GH-2] added index dehydration <a href="https://github.com/karmaniverous/entity-manager/commit/3f015a07a35da98d3bef61b2e9c9df070788928f" target="_blank" class="external"><code>3f015a0</code></a></li>
+<li>[GH-2] cleaned up never comparisons &amp; introduced types key <a href="https://github.com/karmaniverous/entity-manager/commit/7b8fe3a64fa85f37cac1a525d9ccaf66cbc63a6a" target="_blank" class="external"><code>7b8fe3a</code></a></li>
+<li>[GH-2] replaced injectable logger with console <a href="https://github.com/karmaniverous/entity-manager/commit/4b69ecd9731ffc27d6087b763a6663a55fc3e860" target="_blank" class="external"><code>4b69ecd</code></a></li>
+<li>[GH-2] wip <a href="https://github.com/karmaniverous/entity-manager/commit/4a5e2abaa2ff8d811c3a1b46dbe2be237f4ac8d5" target="_blank" class="external"><code>4a5e2ab</code></a></li>
+<li>[GH-2] refactor wip <a href="https://github.com/karmaniverous/entity-manager/commit/e075df70bca70558e1ab6144895012c56434406d" target="_blank" class="external"><code>e075df7</code></a></li>
+<li>[GH-2] finished dehydratePageKeyMap <a href="https://github.com/karmaniverous/entity-manager/commit/cdae34bb66c7b49b9cc190449827f9266f3a28be" target="_blank" class="external"><code>cdae34b</code></a></li>
+<li>[GH-2] updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/d08f2d841b2b4f24edcec71798481500097c6f55" target="_blank" class="external"><code>d08f2d8</code></a></li>
+<li>[GH-2] titivation <a href="https://github.com/karmaniverous/entity-manager/commit/d5b1f6b4f9ea9d7c9afb46d38229b3b26dc42764" target="_blank" class="external"><code>d5b1f6b</code></a></li>
+<li>[GH-2] eliminated EM options layer <a href="https://github.com/karmaniverous/entity-manager/commit/018d7b06b220c006878ca901fbbcad6e9fbf59bc" target="_blank" class="external"><code>018d7b0</code></a></li>
+<li>[GH-2] added types to ParsedConfig <a href="https://github.com/karmaniverous/entity-manager/commit/374b794acee7219df01572e79e2685722ea0b03e" target="_blank" class="external"><code>374b794</code></a></li>
+<li>[GH-2] wip <a href="https://github.com/karmaniverous/entity-manager/commit/660bcefa33a1625e4ee15bf06439112be2fa8a06" target="_blank" class="external"><code>660bcef</code></a></li>
+<li>[GH-2] ignore key type optionality <a href="https://github.com/karmaniverous/entity-manager/commit/dac19a09ac0a8e24eabb2ac4541b4d41c6edc1b7" target="_blank" class="external"><code>dac19a0</code></a></li>
+<li>[GH-2] Updated TODOs <a href="https://github.com/karmaniverous/entity-manager/commit/251d0868f05ff6867b3789d4b2b9d551015174ba" target="_blank" class="external"><code>251d086</code></a></li>
+<li>lintfix <a href="https://github.com/karmaniverous/entity-manager/commit/c5ca2deccde624b91405f4656d33517b732f74ae" target="_blank" class="external"><code>c5ca2de</code></a></li>
+<li>[GH-2] make never fields optional <a href="https://github.com/karmaniverous/entity-manager/commit/aa0ea4a9bcd137b5c190fefa3b48a1a07d18c45c" target="_blank" class="external"><code>aa0ea4a</code></a></li>
+<li>[GH-2] updated release script <a href="https://github.com/karmaniverous/entity-manager/commit/fe04b501bb95526ed7f9e978d00cd8564890042e" target="_blank" class="external"><code>fe04b50</code></a></li>
+<li>[GH-2] removed test code <a href="https://github.com/karmaniverous/entity-manager/commit/ae81cf6becaf44ff1854c38974e38b954a5b450c" target="_blank" class="external"><code>ae81cf6</code></a></li>
+</ul>
+<h4 id="v509" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v5.0.8...v5.0.9" target="_blank" class="external">v5.0.9</a><a href="#v509" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>21 August 2024</p>
+</blockquote>
+<ul>
+<li>updated readme <a href="https://github.com/karmaniverous/entity-manager/commit/78bb63f1114bbc56c627bf296593264444f9b8f5" target="_blank" class="external"><code>78bb63f</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/fae876708967bdcb6b0b968803db9d9a8848718d" target="_blank" class="external"><code>fae8767</code></a></li>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/72fb9fdb3bf234a6a67808bf67c0b0ec80c50f72" target="_blank" class="external"><code>72fb9fd</code></a></li>
+<li>Release 5.0.9 <a href="https://github.com/karmaniverous/entity-manager/commit/61c3eb2ae0b087acc0737e09e37cd03271095281" target="_blank" class="external"><code>61c3eb2</code></a></li>
+<li>Create FUNDING.yml <a href="https://github.com/karmaniverous/entity-manager/commit/06eeb43f244ab8a9b03f1713f193d21845baa0fc" target="_blank" class="external"><code>06eeb43</code></a></li>
+</ul>
+<h4 id="v508" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v5.0.7...v5.0.8" target="_blank" class="external">v5.0.8</a><a href="#v508" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>30 July 2024</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/4e5c8a80f8005f1df877e979209d21805903f9ed" target="_blank" class="external"><code>4e5c8a8</code></a></li>
+<li>improved logging <a href="https://github.com/karmaniverous/entity-manager/commit/0ffe26bfe58847ca869b7c8ae007f3f9182035af" target="_blank" class="external"><code>0ffe26b</code></a></li>
+<li>Release 5.0.8 <a href="https://github.com/karmaniverous/entity-manager/commit/7fe5e086e5a8b3b100dfa3de0a4f19ae1a053f9b" target="_blank" class="external"><code>7fe5e08</code></a></li>
+</ul>
+<h4 id="v507" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v5.0.6...v5.0.7" target="_blank" class="external">v5.0.7</a><a href="#v507" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>17 July 2024</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/4e2b88827c8141ee8a5f4d8834c24f072462c567" target="_blank" class="external"><code>4e2b888</code></a></li>
+<li>Release 5.0.7 <a href="https://github.com/karmaniverous/entity-manager/commit/ec6f1af43a6e872e5ad043ce2e0e7c5b00d06dcb" target="_blank" class="external"><code>ec6f1af</code></a></li>
+</ul>
+<h4 id="v506" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v5.0.5...v5.0.6" target="_blank" class="external">v5.0.6</a><a href="#v506" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>3 July 2024</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/8df82ec7fa377f873a2431cd0349cf0e0de34327" target="_blank" class="external"><code>8df82ec</code></a></li>
+<li>Release 5.0.6 <a href="https://github.com/karmaniverous/entity-manager/commit/e096b46c0889b2b6177795babf462828e7d01a47" target="_blank" class="external"><code>e096b46</code></a></li>
+</ul>
+<h4 id="v505" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v5.0.4...v5.0.5" target="_blank" class="external">v5.0.5</a><a href="#v505" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>19 June 2024</p>
+</blockquote>
+<ul>
+<li>added knip <a href="https://github.com/karmaniverous/entity-manager/commit/253a91beeb9ffb2e495100a45be17ba6d348028f" target="_blank" class="external"><code>253a91b</code></a></li>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/9db2e622857f9de217f2132a1fb04abb59534dd9" target="_blank" class="external"><code>9db2e62</code></a></li>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/4a98acbd83e42db5dd0d5bfaa6d18dce35d56927" target="_blank" class="external"><code>4a98acb</code></a></li>
+<li>Release 5.0.5 <a href="https://github.com/karmaniverous/entity-manager/commit/835122dc199a71eedaa3dfc297e271a3c018b4ac" target="_blank" class="external"><code>835122d</code></a></li>
+</ul>
+<h4 id="v504" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v5.0.3...v5.0.4" target="_blank" class="external">v5.0.4</a><a href="#v504" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>6 June 2024</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/11671dc4528f6192e1fae762222307bcc1f35692" target="_blank" class="external"><code>11671dc</code></a></li>
+<li>Release 5.0.4 <a href="https://github.com/karmaniverous/entity-manager/commit/5c9240b7ec406713c201f2ad49d69ed88ba05f1c" target="_blank" class="external"><code>5c9240b</code></a></li>
+</ul>
+<h4 id="v503" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v5.0.2...v5.0.3" target="_blank" class="external">v5.0.3</a><a href="#v503" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>22 May 2024</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/ba0ecfcfab44568801391fee875e13c786e39ea7" target="_blank" class="external"><code>ba0ecfc</code></a></li>
+<li>Release 5.0.3 <a href="https://github.com/karmaniverous/entity-manager/commit/7360628dfd0653bb64db408885293941981f0ba4" target="_blank" class="external"><code>7360628</code></a></li>
+</ul>
+<h4 id="v502" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v5.0.1...v5.0.2" target="_blank" class="external">v5.0.2</a><a href="#v502" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>27 March 2024</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/5865d23efeff4d4dd08324fa6989e50e707d1e8a" target="_blank" class="external"><code>5865d23</code></a></li>
+<li>Release 5.0.2 <a href="https://github.com/karmaniverous/entity-manager/commit/11ba543d1fb95baae5b6e78b17842058b348e9a9" target="_blank" class="external"><code>11ba543</code></a></li>
+</ul>
+<h4 id="v501" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v5.0.0...v5.0.1" target="_blank" class="external">v5.0.1</a><a href="#v501" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>23 March 2024</p>
+</blockquote>
+<ul>
+<li>permit limit === Infinity <a href="https://github.com/karmaniverous/entity-manager/commit/d49dd3cf8c68a746636ee205a32b5d38a48b4fad" target="_blank" class="external"><code>d49dd3c</code></a></li>
+<li>Release 5.0.1 <a href="https://github.com/karmaniverous/entity-manager/commit/c223223880702a27bd264680c3c260935f23dbd9" target="_blank" class="external"><code>c223223</code></a></li>
+</ul>
+<h3 id="v500" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.4.3...v5.0.0" target="_blank" class="external">v5.0.0</a><a href="#v500" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<blockquote>
+<p>22 March 2024</p>
+</blockquote>
+<ul>
+<li>removed pages &amp; introduced pageSize <a href="https://github.com/karmaniverous/entity-manager/commit/4a819759d921dd4e0547e5e8ba40ca3eb099084c" target="_blank" class="external"><code>4a81975</code></a></li>
+<li>documentation <a href="https://github.com/karmaniverous/entity-manager/commit/df5bbf3bbe3f7966c0ce6be1cb088c2fa16ed718" target="_blank" class="external"><code>df5bbf3</code></a></li>
+<li>Release 5.0.0 <a href="https://github.com/karmaniverous/entity-manager/commit/7b68e9c778a411a327a3916bd9787e272b1be377" target="_blank" class="external"><code>7b68e9c</code></a></li>
+</ul>
+<h4 id="v443" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.4.2...v4.4.3" target="_blank" class="external">v4.4.3</a><a href="#v443" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>15 March 2024</p>
+</blockquote>
+<ul>
+<li>Release 4.4.3 <a href="https://github.com/karmaniverous/entity-manager/commit/20f93c2532d325a17b3453c204a9ea6951d2a1a6" target="_blank" class="external"><code>20f93c2</code></a></li>
+<li>set default pages to 1 &amp; expand request limit to limit * pages <a href="https://github.com/karmaniverous/entity-manager/commit/8eea3e944b994981084f5d4112e5d6ec4feacf9f" target="_blank" class="external"><code>8eea3e9</code></a></li>
+</ul>
+<h4 id="v442" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.4.1...v4.4.2" target="_blank" class="external">v4.4.2</a><a href="#v442" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>27 February 2024</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/bfbf342de94a2b80b290c267b4a489bf748ef4d2" target="_blank" class="external"><code>bfbf342</code></a></li>
+<li>Release 4.4.2 <a href="https://github.com/karmaniverous/entity-manager/commit/fa4996f33195cb183e56cbc506bb56b1e43442a4" target="_blank" class="external"><code>fa4996f</code></a></li>
+</ul>
+<h4 id="v441" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.4.0...v4.4.1" target="_blank" class="external">v4.4.1</a><a href="#v441" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>6 February 2024</p>
+</blockquote>
+<ul>
+<li>Updated page logic to fill limit on query <a href="https://github.com/karmaniverous/entity-manager/commit/4840f49d494073e960a186c35207e6f82941ce5b" target="_blank" class="external"><code>4840f49</code></a></li>
+<li>Release 4.4.1 <a href="https://github.com/karmaniverous/entity-manager/commit/8184a97d467d519692116fbc29357aa3e2b52712" target="_blank" class="external"><code>8184a97</code></a></li>
+</ul>
+<h4 id="v440" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.3.3...v4.4.0" target="_blank" class="external">v4.4.0</a><a href="#v440" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>5 January 2024</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/4ca63547cd0aaeb4f4ad5a3f3a5226a281eb71d4" target="_blank" class="external"><code>4ca6354</code></a></li>
+<li>updated readme <a href="https://github.com/karmaniverous/entity-manager/commit/2403b220b8f4877ed71278b88af022b1e7be747d" target="_blank" class="external"><code>2403b22</code></a></li>
+<li>Add defaultLimit to entity config <a href="https://github.com/karmaniverous/entity-manager/commit/7a8e79167cfa0d55f30751067a83e9d084445a3e" target="_blank" class="external"><code>7a8e791</code></a></li>
+<li>Release 4.4.0 <a href="https://github.com/karmaniverous/entity-manager/commit/c00abdc761717c2bc487a75e1e40c7e6cd17e05b" target="_blank" class="external"><code>c00abdc</code></a></li>
+</ul>
+<h4 id="v433" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.3.2...v4.3.3" target="_blank" class="external">v4.3.3</a><a href="#v433" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>24 November 2023</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/4f61124f64ada52ced73dbf89aa72319bd1cefae" target="_blank" class="external"><code>4f61124</code></a></li>
+<li>Release 4.3.3 <a href="https://github.com/karmaniverous/entity-manager/commit/68e660bb56863fe02c6a341e19f1c659f1e05aeb" target="_blank" class="external"><code>68e660b</code></a></li>
+</ul>
+<h4 id="v432" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.3.1...v4.3.2" target="_blank" class="external">v4.3.2</a><a href="#v432" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>14 October 2023</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/2130fe277f600c335b9abfcc0c966f6fd1906556" target="_blank" class="external"><code>2130fe2</code></a></li>
+<li>Release 4.3.2 <a href="https://github.com/karmaniverous/entity-manager/commit/a8453ea885bd8b8224ca422f53ab2cbb8565acd9" target="_blank" class="external"><code>a8453ea</code></a></li>
+</ul>
+<h4 id="v431" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.3.0...v4.3.1" target="_blank" class="external">v4.3.1</a><a href="#v431" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>15 August 2023</p>
+</blockquote>
+<ul>
+<li>updated dependencies <a href="https://github.com/karmaniverous/entity-manager/commit/8b283f036f3210e026faff1f1dd3013763bee2ea" target="_blank" class="external"><code>8b283f0</code></a></li>
+<li>Release 4.3.1 <a href="https://github.com/karmaniverous/entity-manager/commit/1779ce2f2a687ba9c509d9918e69f90140419e51" target="_blank" class="external"><code>1779ce2</code></a></li>
+</ul>
+<h4 id="v430" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.3.0-2...v4.3.0" target="_blank" class="external">v4.3.0</a><a href="#v430" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>12 July 2023</p>
+</blockquote>
+<ul>
+<li>added logging <a href="https://github.com/karmaniverous/entity-manager/commit/283ea09cb2da8cd14b110aa23167ef65e689d36d" target="_blank" class="external"><code>283ea09</code></a></li>
+<li>Release 4.3.0 <a href="https://github.com/karmaniverous/entity-manager/commit/812a14e3a84d505171ee9baf0306973997d3a948" target="_blank" class="external"><code>812a14e</code></a></li>
+</ul>
+<h4 id="v430-2" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.3.0-1...v4.3.0-2" target="_blank" class="external">v4.3.0-2</a><a href="#v430-2" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>11 July 2023</p>
+</blockquote>
+<ul>
+<li>Release 4.3.0-2 <a href="https://github.com/karmaniverous/entity-manager/commit/816535fdf319630faf87e2b61e9668a467f0d2fe" target="_blank" class="external"><code>816535f</code></a></li>
+<li>bugfix <a href="https://github.com/karmaniverous/entity-manager/commit/95a80a585ac480be72c7b41a060138c03daf9def" target="_blank" class="external"><code>95a80a5</code></a></li>
+</ul>
+<h4 id="v430-1" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.3.0-0...v4.3.0-1" target="_blank" class="external">v4.3.0-1</a><a href="#v430-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>11 July 2023</p>
+</blockquote>
+<ul>
+<li>bugfix <a href="https://github.com/karmaniverous/entity-manager/commit/22237a65756a7f916701ee77c651692b42d70459" target="_blank" class="external"><code>22237a6</code></a></li>
+<li>Release 4.3.0-1 <a href="https://github.com/karmaniverous/entity-manager/commit/f2fb3aeeed7a2ca56a281161ccf878551002856f" target="_blank" class="external"><code>f2fb3ae</code></a></li>
+</ul>
+<h4 id="v430-0" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.2.1...v4.3.0-0" target="_blank" class="external">v4.3.0-0</a><a href="#v430-0" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>11 July 2023</p>
+</blockquote>
+<ul>
+<li>package updates <a href="https://github.com/karmaniverous/entity-manager/commit/dd414d6d400e67833ed7a030a590f295ef4060da" target="_blank" class="external"><code>dd414d6</code></a></li>
+<li>added multi-page search <a href="https://github.com/karmaniverous/entity-manager/commit/082318668203555780be6cf7612f3854a4c4a6a1" target="_blank" class="external"><code>0823186</code></a></li>
+<li>Release 4.3.0-0 <a href="https://github.com/karmaniverous/entity-manager/commit/0698d0259f634bab05254e258832b9e9fdafc99b" target="_blank" class="external"><code>0698d02</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/5072cadb3b659d2e0139c8b49b6e37d2e7bf9977" target="_blank" class="external"><code>5072cad</code></a></li>
+</ul>
+<h4 id="v421" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.2.0...v4.2.1" target="_blank" class="external">v4.2.1</a><a href="#v421" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>13 May 2023</p>
+</blockquote>
+<ul>
+<li>Release 4.2.1 <a href="https://github.com/karmaniverous/entity-manager/commit/4ab5285e45563c96b5e3b4bde3cef51d892f9d4b" target="_blank" class="external"><code>4ab5285</code></a></li>
+<li>variable name type <a href="https://github.com/karmaniverous/entity-manager/commit/0234130bfc7f618cf4ec630e9e2f9d9c477fcce3" target="_blank" class="external"><code>0234130</code></a></li>
+</ul>
+<h4 id="v420" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.1.0...v4.2.0" target="_blank" class="external">v4.2.0</a><a href="#v420" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>13 May 2023</p>
+</blockquote>
+<ul>
+<li>added key retain support <a href="https://github.com/karmaniverous/entity-manager/commit/3758f5f3bc62177735c981ac3e1351997b1de60c" target="_blank" class="external"><code>3758f5f</code></a></li>
+<li>Release 4.2.0 <a href="https://github.com/karmaniverous/entity-manager/commit/9a0b7829e92de2fd5faafdccf479d5d63711181d" target="_blank" class="external"><code>9a0b782</code></a></li>
+</ul>
+<h4 id="v410" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v4.0.0...v4.1.0" target="_blank" class="external">v4.1.0</a><a href="#v410" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>10 May 2023</p>
+</blockquote>
+<ul>
+<li>added count to query return <a href="https://github.com/karmaniverous/entity-manager/commit/7a5b0eb27837cec24fa479cf66bbca3883bf3f8c" target="_blank" class="external"><code>7a5b0eb</code></a></li>
+<li>Release 4.1.0 <a href="https://github.com/karmaniverous/entity-manager/commit/f5f1506f8a83ec427723bfe2d500ba0ff670afce" target="_blank" class="external"><code>f5f1506</code></a></li>
+</ul>
+<h3 id="v400" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v3.0.0...v4.0.0" target="_blank" class="external">v4.0.0</a><a href="#v400" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<blockquote>
+<p>10 May 2023</p>
+</blockquote>
+<ul>
+<li>refactored query function <a href="https://github.com/karmaniverous/entity-manager/commit/207f43136c2ac7b5fa760328388e345a3f56575e" target="_blank" class="external"><code>207f431</code></a></li>
+<li>Release 4.0.0 <a href="https://github.com/karmaniverous/entity-manager/commit/436f2379bd01797a30ffefdae5a4992dcef146c0" target="_blank" class="external"><code>436f237</code></a></li>
+</ul>
+<h3 id="v300" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v2.2.1...v3.0.0" target="_blank" class="external">v3.0.0</a><a href="#v300" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<blockquote>
+<p>29 March 2023</p>
+</blockquote>
+<ul>
+<li>Exposed getKey method. <a href="https://github.com/karmaniverous/entity-manager/commit/c2b87a6353f6dd04e23cdfcc38c56dc412fc3d27" target="_blank" class="external"><code>c2b87a6</code></a></li>
+<li>Add groups to decode config <a href="https://github.com/karmaniverous/entity-manager/commit/e54cfed93139fbf54d28a90135551bbf86f72981" target="_blank" class="external"><code>e54cfed</code></a></li>
+<li>Release 3.0.0 <a href="https://github.com/karmaniverous/entity-manager/commit/7f48a4342d9d035a13fc30d2c2e2c763849a0092" target="_blank" class="external"><code>7f48a43</code></a></li>
+</ul>
+<h4 id="v221" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v2.2.0...v2.2.1" target="_blank" class="external">v2.2.1</a><a href="#v221" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>28 March 2023</p>
+</blockquote>
+<ul>
+<li>updated indexToken argument <a href="https://github.com/karmaniverous/entity-manager/commit/7776f537ee70999efc4f26baef900a023ef0663c" target="_blank" class="external"><code>7776f53</code></a></li>
+<li>Release 2.2.1 <a href="https://github.com/karmaniverous/entity-manager/commit/a9564e3ff0f7cf1c615596fa82370ab63460f515" target="_blank" class="external"><code>a9564e3</code></a></li>
+</ul>
+<h4 id="v220" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v2.1.3...v2.2.0" target="_blank" class="external">v2.2.0</a><a href="#v220" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>28 March 2023</p>
+</blockquote>
+<ul>
+<li>expanded rehydrateIndex arguments <a href="https://github.com/karmaniverous/entity-manager/commit/d8767e51f02838d2d98c3a0f3b8d31599f39b3ec" target="_blank" class="external"><code>d8767e5</code></a></li>
+<li>Release 2.2.0 <a href="https://github.com/karmaniverous/entity-manager/commit/39e6bc09e11ed2be29739b1b0300bf03e127bc87" target="_blank" class="external"><code>39e6bc0</code></a></li>
+</ul>
+<h4 id="v213" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v2.1.2...v2.1.3" target="_blank" class="external">v2.1.3</a><a href="#v213" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>27 March 2023</p>
+</blockquote>
+<ul>
+<li>simplified decode functions <a href="https://github.com/karmaniverous/entity-manager/commit/3a712ba1525d2a856c7573d5025184d53e3f30e9" target="_blank" class="external"><code>3a712ba</code></a></li>
+<li>Release 2.1.3 <a href="https://github.com/karmaniverous/entity-manager/commit/31520bbd496f6ce0eed16a28cc99c62071fed337" target="_blank" class="external"><code>31520bb</code></a></li>
+</ul>
+<h4 id="v212" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v2.1.0...v2.1.2" target="_blank" class="external">v2.1.2</a><a href="#v212" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>27 March 2023</p>
+</blockquote>
+<ul>
+<li>improved index dehydrate/rehydrate <a href="https://github.com/karmaniverous/entity-manager/commit/82a307cc1f1f0efde7bf0485b14c9d44087278c5" target="_blank" class="external"><code>82a307c</code></a></li>
+<li>simplified decode functions <a href="https://github.com/karmaniverous/entity-manager/commit/944cbefb69cc1fd1f3629e8123b69b5899f5b75d" target="_blank" class="external"><code>944cbef</code></a></li>
+<li>Release 2.1.2 <a href="https://github.com/karmaniverous/entity-manager/commit/cf6cb5848db87e0cfd8ed64273d6d577a6b0a8d1" target="_blank" class="external"><code>cf6cb58</code></a></li>
+<li>Release 2.1.1 <a href="https://github.com/karmaniverous/entity-manager/commit/4e2b1fcce409f21b4f9266b99b5b2ac2679297c0" target="_blank" class="external"><code>4e2b1fc</code></a></li>
+<li>updated test to reflect *! entityPK <a href="https://github.com/karmaniverous/entity-manager/commit/eb7fc93f1f3e520354f9e1f9ae75afa28c1c4bdb" target="_blank" class="external"><code>eb7fc93</code></a></li>
+</ul>
+<h4 id="v210" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v2.0.0...v2.1.0" target="_blank" class="external">v2.1.0</a><a href="#v210" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>27 March 2023</p>
+</blockquote>
+<ul>
+<li>added dehydrate/rehydrate index <a href="https://github.com/karmaniverous/entity-manager/commit/c98b0b84b33a809f7c8d17f5c43dab266508cf8d" target="_blank" class="external"><code>c98b0b8</code></a></li>
+<li>Release 2.1.0 <a href="https://github.com/karmaniverous/entity-manager/commit/e93382d45ca96aee3b6cc1b2728a689460f3c898" target="_blank" class="external"><code>e93382d</code></a></li>
+</ul>
+<h3 id="v200" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v1.0.0...v2.0.0" target="_blank" class="external">v2.0.0</a><a href="#v200" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<blockquote>
+<p>25 March 2023</p>
+</blockquote>
+<ul>
+<li>added options params to query function <a href="https://github.com/karmaniverous/entity-manager/commit/1c4ec36a9975f6baedbc34a4138f17628d2dabd1" target="_blank" class="external"><code>1c4ec36</code></a></li>
+<li>Release 2.0.0 <a href="https://github.com/karmaniverous/entity-manager/commit/d7ce9293f39df0d6af1a5363535183aec132475e" target="_blank" class="external"><code>d7ce929</code></a></li>
+</ul>
+<h3 id="v100" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.1.2-1...v1.0.0" target="_blank" class="external">v1.0.0</a><a href="#v100" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<blockquote>
+<p>25 March 2023</p>
+</blockquote>
+<ul>
+<li>Added removeKeys method <a href="https://github.com/karmaniverous/entity-manager/commit/8166f1e11541b846f4fa79dcf030d4726e9be60f" target="_blank" class="external"><code>8166f1e</code></a></li>
+<li>converted addKeys to non-mutating logic <a href="https://github.com/karmaniverous/entity-manager/commit/03cc225db1221e26843a5dbc32b614841e8dfce9" target="_blank" class="external"><code>03cc225</code></a></li>
+<li>Release 1.0.0 <a href="https://github.com/karmaniverous/entity-manager/commit/e5cffd4e04239d1490757a25e423bf519a09bf7b" target="_blank" class="external"><code>e5cffd4</code></a></li>
+</ul>
+<h4 id="v012-1" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.1.2-0...v0.1.2-1" target="_blank" class="external">v0.1.2-1</a><a href="#v012-1" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>24 March 2023</p>
+</blockquote>
+<ul>
+<li>Release 0.1.2-1 <a href="https://github.com/karmaniverous/entity-manager/commit/54a9bff5d4f131cf5cfaaa4cddbb04ddfd8be4bb" target="_blank" class="external"><code>54a9bff</code></a></li>
+<li>fixed getShardKeySpace <a href="https://github.com/karmaniverous/entity-manager/commit/fbaebd606dc346c9cf599dd5e6500081d265393d" target="_blank" class="external"><code>fbaebd6</code></a></li>
+</ul>
+<h4 id="v012-0" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.1.1...v0.1.2-0" target="_blank" class="external">v0.1.2-0</a><a href="#v012-0" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>24 March 2023</p>
+</blockquote>
+<ul>
+<li>logging <a href="https://github.com/karmaniverous/entity-manager/commit/f0dd069560e47b0ce30b7763592179b86271b895" target="_blank" class="external"><code>f0dd069</code></a></li>
+<li>Release 0.1.2-0 <a href="https://github.com/karmaniverous/entity-manager/commit/bfc84ef33e14d5ce1529b33e0d9c2db08bfe45c6" target="_blank" class="external"><code>bfc84ef</code></a></li>
+</ul>
+<h4 id="v011" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.1.0...v0.1.1" target="_blank" class="external">v0.1.1</a><a href="#v011" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>24 March 2023</p>
+</blockquote>
+<ul>
+<li>refactor shardPageKeys to pageKeys <a href="https://github.com/karmaniverous/entity-manager/commit/408bb66d8e1cbc65cd7587e84142c2dc1f633903" target="_blank" class="external"><code>408bb66</code></a></li>
+<li>Release 0.1.1 <a href="https://github.com/karmaniverous/entity-manager/commit/f0aea12911e4594f24dda65f741c14f5873637d0" target="_blank" class="external"><code>f0aea12</code></a></li>
+</ul>
+<h4 id="v010" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.12...v0.1.0" target="_blank" class="external">v0.1.0</a><a href="#v010" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>23 March 2023</p>
+</blockquote>
+<ul>
+<li>added query method <a href="https://github.com/karmaniverous/entity-manager/commit/f71ad6b436072128d0e70b743e851730c50e568f" target="_blank" class="external"><code>f71ad6b</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/f0c464e8837ab3ca8ac792cbc875f555f714850a" target="_blank" class="external"><code>f0c464e</code></a></li>
+<li>reversed keyToken &amp; item arguments <a href="https://github.com/karmaniverous/entity-manager/commit/ec333f555fcd035e6ddc6fdb681d313ce27c4856" target="_blank" class="external"><code>ec333f5</code></a></li>
+<li>Release 0.1.0 <a href="https://github.com/karmaniverous/entity-manager/commit/a6c327cedbf21e680772c11f1b46dae6e32f2309" target="_blank" class="external"><code>a6c327c</code></a></li>
+</ul>
+<h4 id="v0012" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.11...v0.0.12" target="_blank" class="external">v0.0.12</a><a href="#v0012" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>21 February 2023</p>
+</blockquote>
+<ul>
+<li>Release 0.0.12 <a href="https://github.com/karmaniverous/entity-manager/commit/e2490cdde9772a1ebea4a7fb2498d189f7d7da52" target="_blank" class="external"><code>e2490cd</code></a></li>
+<li>delete nil shard keys <a href="https://github.com/karmaniverous/entity-manager/commit/28650fef1078b4fa1830f4988537f7cc54f4d8dd" target="_blank" class="external"><code>28650fe</code></a></li>
+</ul>
+<h4 id="v0011" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.10...v0.0.11" target="_blank" class="external">v0.0.11</a><a href="#v0011" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>21 February 2023</p>
+</blockquote>
+<ul>
+<li>switched sn2u to sn2n <a href="https://github.com/karmaniverous/entity-manager/commit/7c2610cd0895f7ae1636fb9a5e1af7c6a0497c0e" target="_blank" class="external"><code>7c2610c</code></a></li>
+<li>doc update <a href="https://github.com/karmaniverous/entity-manager/commit/f6a316534dac674febb98891121a992ce76f171c" target="_blank" class="external"><code>f6a3165</code></a></li>
+<li>Release 0.0.11 <a href="https://github.com/karmaniverous/entity-manager/commit/e2b7d802074b6290632f1c2ce1594f22122ae648" target="_blank" class="external"><code>e2b7d80</code></a></li>
+</ul>
+<h4 id="v0010" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.9...v0.0.10" target="_blank" class="external">v0.0.10</a><a href="#v0010" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>21 February 2023</p>
+</blockquote>
+<ul>
+<li>doc update <a href="https://github.com/karmaniverous/entity-manager/commit/cd5ee9c90b1db7635dbcd4318fd0be89016cd035" target="_blank" class="external"><code>cd5ee9c</code></a></li>
+<li>Release 0.0.10 <a href="https://github.com/karmaniverous/entity-manager/commit/0143a6a3fe3fe1aca259c72f3208abf20ffa1710" target="_blank" class="external"><code>0143a6a</code></a></li>
+</ul>
+<h4 id="v009" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.8...v0.0.9" target="_blank" class="external">v0.0.9</a><a href="#v009" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>21 February 2023</p>
+</blockquote>
+<ul>
+<li>Release 0.0.9 <a href="https://github.com/karmaniverous/entity-manager/commit/ee3e985967cf3861a83a7e2dab9461953bc445e3" target="_blank" class="external"><code>ee3e985</code></a></li>
+<li>updated test config obj <a href="https://github.com/karmaniverous/entity-manager/commit/5b654ce3bd7bde3c7f34bd0ce6f66612371c10ce" target="_blank" class="external"><code>5b654ce</code></a></li>
+<li>docs update <a href="https://github.com/karmaniverous/entity-manager/commit/2ad2ad64668387e972bbba6fce030af56fb1ea91" target="_blank" class="external"><code>2ad2ad6</code></a></li>
+</ul>
+<h4 id="v008" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.7...v0.0.8" target="_blank" class="external">v0.0.8</a><a href="#v008" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>20 February 2023</p>
+</blockquote>
+<ul>
+<li>org change <a href="https://github.com/karmaniverous/entity-manager/commit/e2d582ff1bf00135d56c914d3154f8c3ab10eec0" target="_blank" class="external"><code>e2d582f</code></a></li>
+<li>doc update <a href="https://github.com/karmaniverous/entity-manager/commit/38b11dc2ebde62addf1ee85e8db3ada18e4fd40d" target="_blank" class="external"><code>38b11dc</code></a></li>
+<li>Release 0.0.8 <a href="https://github.com/karmaniverous/entity-manager/commit/bd88dda2436c257f2cc8d77014660bcd892d29cb" target="_blank" class="external"><code>bd88dda</code></a></li>
+<li>removed bin entry point <a href="https://github.com/karmaniverous/entity-manager/commit/e5fff10be1290290afaf482ca96a7cb5c25176d6" target="_blank" class="external"><code>e5fff10</code></a></li>
+</ul>
+<h4 id="v007" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.6...v0.0.7" target="_blank" class="external">v0.0.7</a><a href="#v007" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>20 February 2023</p>
+</blockquote>
+<ul>
+<li>Eliminated prod dependency <a href="https://github.com/karmaniverous/entity-manager/commit/1a77c459e948182fb428f4c4242bb6108d0b0673" target="_blank" class="external"><code>1a77c45</code></a></li>
+<li>Release 0.0.7 <a href="https://github.com/karmaniverous/entity-manager/commit/6932a79d0ebee6d34b7044e73df0c0c745b7beae" target="_blank" class="external"><code>6932a79</code></a></li>
+</ul>
+<h4 id="v006" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.5...v0.0.6" target="_blank" class="external">v0.0.6</a><a href="#v006" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>20 February 2023</p>
+</blockquote>
+<ul>
+<li>readability <a href="https://github.com/karmaniverous/entity-manager/commit/1ebed3de130d85b7dc7dbf5d5af1966eea281d1e" target="_blank" class="external"><code>1ebed3d</code></a></li>
+<li>doc update <a href="https://github.com/karmaniverous/entity-manager/commit/b1737a2005a85ab1d627243f631c7715716ea829" target="_blank" class="external"><code>b1737a2</code></a></li>
+<li>Release 0.0.6 <a href="https://github.com/karmaniverous/entity-manager/commit/0d1b776b3dd110b58d1ff46699041a8b91d76db7" target="_blank" class="external"><code>0d1b776</code></a></li>
+<li>doc update <a href="https://github.com/karmaniverous/entity-manager/commit/653beb92905d08e0ebbcb018302a897ea3b6accb" target="_blank" class="external"><code>653beb9</code></a></li>
+<li>doc update <a href="https://github.com/karmaniverous/entity-manager/commit/335adb118b7e6a6adcc98d10f573b59239952007" target="_blank" class="external"><code>335adb1</code></a></li>
+</ul>
+<h4 id="v005" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.4...v0.0.5" target="_blank" class="external">v0.0.5</a><a href="#v005" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>19 February 2023</p>
+</blockquote>
+<ul>
+<li>switched to faster hash algo <a href="https://github.com/karmaniverous/entity-manager/commit/369d6bc22512cf58916551569cd2c8312077a038" target="_blank" class="external"><code>369d6bc</code></a></li>
+<li>Release 0.0.5 <a href="https://github.com/karmaniverous/entity-manager/commit/2584f3c33f16f21aa44dc83d23614c0100164aec" target="_blank" class="external"><code>2584f3c</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/e7dbe40076a8aa7a34b89f8f164c899ade625889" target="_blank" class="external"><code>e7dbe40</code></a></li>
+</ul>
+<h4 id="v004" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.3...v0.0.4" target="_blank" class="external">v0.0.4</a><a href="#v004" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>19 February 2023</p>
+</blockquote>
+<ul>
+<li>Release 0.0.4 <a href="https://github.com/karmaniverous/entity-manager/commit/89eebda8cf37cec2741b01d57ca7ba0b55e6104b" target="_blank" class="external"><code>89eebda</code></a></li>
+</ul>
+<h4 id="v003" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.2...v0.0.3" target="_blank" class="external">v0.0.3</a><a href="#v003" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>19 February 2023</p>
+</blockquote>
+<ul>
+<li>refactored to EntityManager with private class <a href="https://github.com/karmaniverous/entity-manager/commit/e4cadc9237c1550708d56565ffbbf53a259a74e1" target="_blank" class="external"><code>e4cadc9</code></a></li>
+<li>added EntityManager methods <a href="https://github.com/karmaniverous/entity-manager/commit/d9aefbf358ea5d2d90ecb4ddc9f769e68c9beb94" target="_blank" class="external"><code>d9aefbf</code></a></li>
+<li>updated npmenclature <a href="https://github.com/karmaniverous/entity-manager/commit/f5563fb1d3ca1db715533f61c2c44281e59d7340" target="_blank" class="external"><code>f5563fb</code></a></li>
+<li>tested bumped keyspaces <a href="https://github.com/karmaniverous/entity-manager/commit/23172fb5c41b665ecfd1d05092ad32e5909aed5e" target="_blank" class="external"><code>23172fb</code></a></li>
+<li>improved logging <a href="https://github.com/karmaniverous/entity-manager/commit/128aae96b3f62bdc196065b69c0a37b1c91dd84a" target="_blank" class="external"><code>128aae9</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/860d62b369157bbc207abdc7cd41dde389b03bc8" target="_blank" class="external"><code>860d62b</code></a></li>
+<li>Release 0.0.3 <a href="https://github.com/karmaniverous/entity-manager/commit/78b8a8d8d50e68dbc828199c3fb96502bfbae7b0" target="_blank" class="external"><code>78b8a8d</code></a></li>
+<li>doc update <a href="https://github.com/karmaniverous/entity-manager/commit/3c654ce62a0d7adf4850e0b84d77f57df3a2fcbf" target="_blank" class="external"><code>3c654ce</code></a></li>
+<li>doc update <a href="https://github.com/karmaniverous/entity-manager/commit/80afcaca0284155f062cf4d657ae254134794e06" target="_blank" class="external"><code>80afcac</code></a></li>
+<li>fixed test error <a href="https://github.com/karmaniverous/entity-manager/commit/ec5c5d225b05ec9315e8969db26c8cc43e533d81" target="_blank" class="external"><code>ec5c5d2</code></a></li>
+</ul>
+<h4 id="v002" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.1...v0.0.2" target="_blank" class="external">v0.0.2</a><a href="#v002" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>15 February 2023</p>
+</blockquote>
+<ul>
+<li>update docs <a href="https://github.com/karmaniverous/entity-manager/commit/872e5c65bf7bb4038d91961c1aaf15debb8c15e9" target="_blank" class="external"><code>872e5c6</code></a></li>
+<li>Release 0.0.2 <a href="https://github.com/karmaniverous/entity-manager/commit/978d64e855bf4441e88a8eacab659af6b914cdda" target="_blank" class="external"><code>978d64e</code></a></li>
+</ul>
+<h4 id="v001" class="tsd-anchor-link"><a href="https://github.com/karmaniverous/entity-manager/compare/v0.0.0...v0.0.1" target="_blank" class="external">v0.0.1</a><a href="#v001" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>15 February 2023</p>
+</blockquote>
+<ul>
+<li>refactored to shard-key-manager <a href="https://github.com/karmaniverous/entity-manager/commit/89ae74b0955db6731576faf22ecb0e1f6ed46559" target="_blank" class="external"><code>89ae74b</code></a></li>
+<li>basic config <a href="https://github.com/karmaniverous/entity-manager/commit/4244f4b7f0baf12fb7e39f00103549899ed9e775" target="_blank" class="external"><code>4244f4b</code></a></li>
+<li>updated docs <a href="https://github.com/karmaniverous/entity-manager/commit/a919b4c12c515f8d49ddaba6b012df9b80e84214" target="_blank" class="external"><code>a919b4c</code></a></li>
+<li>added jsonschema tests <a href="https://github.com/karmaniverous/entity-manager/commit/94f9c11ca8b22439f80fc6ee0c3c7e1b020b5478" target="_blank" class="external"><code>94f9c11</code></a></li>
+<li>eliminated lodash chaining <a href="https://github.com/karmaniverous/entity-manager/commit/4c53e5dbcf1f5fb5b4cd08cc70fa7f386a168f7c" target="_blank" class="external"><code>4c53e5d</code></a></li>
+<li>renamed to shard-manager <a href="https://github.com/karmaniverous/entity-manager/commit/977e4619862d006743de836e2bb65541530a755d" target="_blank" class="external"><code>977e461</code></a></li>
+<li>Release 0.0.1 <a href="https://github.com/karmaniverous/entity-manager/commit/8d4fdbd5cf046123f3c49772b49c94cd260d6a68" target="_blank" class="external"><code>8d4fdbd</code></a></li>
+</ul>
+<h4 id="v000" class="tsd-anchor-link">v0.0.0<a href="#v000" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h4>
+<blockquote>
+<p>14 February 2023</p>
+</blockquote>
+<ul>
+<li>Initial commit <a href="https://github.com/karmaniverous/entity-manager/commit/ab7a546c405e44552f4ee9b0e348cc8684b6ce7c" target="_blank" class="external"><code>ab7a546</code></a></li>
+</ul>
+</div></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-protected" name="protected"/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Protected</span></label></li></ul></div>
+<div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>On This Page</h3></summary>
+<div class="tsd-accordion-details"><a href="#changelog"><span>Changelog</span></a>
+<ul>
+<li><a href="#v801"><span>v8.0.1</span></a></li></ul><a href="#v800"><span>v8.0.0</span></a>
+<ul>
+<li><a href="#v800-0"><span>v8.0.0-<wbr/>0</span></a></li>
+<li><a href="#v734"><span>v7.3.4</span></a></li>
+<li><a href="#v733"><span>v7.3.3</span></a></li>
+<li><a href="#v732"><span>v7.3.2</span></a></li>
+<li><a href="#v731"><span>v7.3.1</span></a></li>
+<li><a href="#v730"><span>v7.3.0</span></a></li>
+<li><a href="#v720"><span>v7.2.0</span></a></li>
+<li><a href="#v712"><span>v7.1.2</span></a></li>
+<li><a href="#v711"><span>v7.1.1</span></a></li>
+<li><a href="#v710"><span>v7.1.0</span></a></li>
+<li><a href="#v701"><span>v7.0.1</span></a></li></ul><a href="#v700"><span>v7.0.0</span></a>
+<ul>
+<li><a href="#v6143"><span>v6.14.3</span></a></li>
+<li><a href="#v6142"><span>v6.14.2</span></a></li>
+<li><a href="#v6141"><span>v6.14.1</span></a></li>
+<li><a href="#v6140"><span>v6.14.0</span></a></li>
+<li><a href="#v6133"><span>v6.13.3</span></a></li>
+<li><a href="#v6132"><span>v6.13.2</span></a></li>
+<li><a href="#v6131"><span>v6.13.1</span></a></li>
+<li><a href="#v6130"><span>v6.13.0</span></a></li>
+<li><a href="#v6120"><span>v6.12.0</span></a></li>
+<li><a href="#v6114"><span>v6.11.4</span></a></li>
+<li><a href="#v6112"><span>v6.11.2</span></a></li>
+<li><a href="#v6111"><span>v6.11.1</span></a></li>
+<li><a href="#v6110"><span>v6.11.0</span></a></li>
+<li><a href="#v6103"><span>v6.10.3</span></a></li>
+<li><a href="#v6102"><span>v6.10.2</span></a></li>
+<li><a href="#v6101"><span>v6.10.1</span></a></li>
+<li><a href="#v6100"><span>v6.10.0</span></a></li>
+<li><a href="#v692"><span>v6.9.2</span></a></li>
+<li><a href="#v691"><span>v6.9.1</span></a></li>
+<li><a href="#v690"><span>v6.9.0</span></a></li>
+<li><a href="#v681"><span>v6.8.1</span></a></li>
+<li><a href="#v680"><span>v6.8.0</span></a></li>
+<li><a href="#v675"><span>v6.7.5</span></a></li>
+<li><a href="#v674"><span>v6.7.4</span></a></li>
+<li><a href="#v673"><span>v6.7.3</span></a></li>
+<li><a href="#v672"><span>v6.7.2</span></a></li>
+<li><a href="#v671"><span>v6.7.1</span></a></li>
+<li><a href="#v670"><span>v6.7.0</span></a></li>
+<li><a href="#v660"><span>v6.6.0</span></a></li>
+<li><a href="#v651"><span>v6.5.1</span></a></li>
+<li><a href="#v650"><span>v6.5.0</span></a></li>
+<li><a href="#v6410"><span>v6.4.10</span></a></li>
+<li><a href="#v649"><span>v6.4.9</span></a></li>
+<li><a href="#v648"><span>v6.4.8</span></a></li>
+<li><a href="#v647"><span>v6.4.7</span></a></li>
+<li><a href="#v646"><span>v6.4.6</span></a></li>
+<li><a href="#v645"><span>v6.4.5</span></a></li>
+<li><a href="#v644"><span>v6.4.4</span></a></li>
+<li><a href="#v643"><span>v6.4.3</span></a></li>
+<li><a href="#v642"><span>v6.4.2</span></a></li>
+<li><a href="#v641"><span>v6.4.1</span></a></li>
+<li><a href="#v640"><span>v6.4.0</span></a></li>
+<li><a href="#v631"><span>v6.3.1</span></a></li>
+<li><a href="#v630"><span>v6.3.0</span></a></li>
+<li><a href="#v624"><span>v6.2.4</span></a></li>
+<li><a href="#v623"><span>v6.2.3</span></a></li>
+<li><a href="#v622"><span>v6.2.2</span></a></li>
+<li><a href="#v621"><span>v6.2.1</span></a></li>
+<li><a href="#v620"><span>v6.2.0</span></a></li>
+<li><a href="#v612"><span>v6.1.2</span></a></li>
+<li><a href="#v611"><span>v6.1.1</span></a></li>
+<li><a href="#v610"><span>v6.1.0</span></a></li>
+<li><a href="#v610-6"><span>v6.1.0-<wbr/>6</span></a></li>
+<li><a href="#v610-5"><span>v6.1.0-<wbr/>5</span></a></li>
+<li><a href="#v610-4"><span>v6.1.0-<wbr/>4</span></a></li>
+<li><a href="#v610-3"><span>v6.1.0-<wbr/>3</span></a></li>
+<li><a href="#v610-2"><span>v6.1.0-<wbr/>2</span></a></li>
+<li><a href="#v610-1"><span>v6.1.0-<wbr/>1</span></a></li>
+<li><a href="#v610-0"><span>v6.1.0-<wbr/>0</span></a></li>
+<li><a href="#v601"><span>v6.0.1</span></a></li></ul><a href="#v600"><span>v6.0.0</span></a>
+<ul>
+<li><a href="#v509"><span>v5.0.9</span></a></li>
+<li><a href="#v508"><span>v5.0.8</span></a></li>
+<li><a href="#v507"><span>v5.0.7</span></a></li>
+<li><a href="#v506"><span>v5.0.6</span></a></li>
+<li><a href="#v505"><span>v5.0.5</span></a></li>
+<li><a href="#v504"><span>v5.0.4</span></a></li>
+<li><a href="#v503"><span>v5.0.3</span></a></li>
+<li><a href="#v502"><span>v5.0.2</span></a></li>
+<li><a href="#v501"><span>v5.0.1</span></a></li></ul><a href="#v500"><span>v5.0.0</span></a>
+<ul>
+<li><a href="#v443"><span>v4.4.3</span></a></li>
+<li><a href="#v442"><span>v4.4.2</span></a></li>
+<li><a href="#v441"><span>v4.4.1</span></a></li>
+<li><a href="#v440"><span>v4.4.0</span></a></li>
+<li><a href="#v433"><span>v4.3.3</span></a></li>
+<li><a href="#v432"><span>v4.3.2</span></a></li>
+<li><a href="#v431"><span>v4.3.1</span></a></li>
+<li><a href="#v430"><span>v4.3.0</span></a></li>
+<li><a href="#v430-2"><span>v4.3.0-<wbr/>2</span></a></li>
+<li><a href="#v430-1"><span>v4.3.0-<wbr/>1</span></a></li>
+<li><a href="#v430-0"><span>v4.3.0-<wbr/>0</span></a></li>
+<li><a href="#v421"><span>v4.2.1</span></a></li>
+<li><a href="#v420"><span>v4.2.0</span></a></li>
+<li><a href="#v410"><span>v4.1.0</span></a></li></ul><a href="#v400"><span>v4.0.0</span></a><a href="#v300"><span>v3.0.0</span></a>
+<ul>
+<li><a href="#v221"><span>v2.2.1</span></a></li>
+<li><a href="#v220"><span>v2.2.0</span></a></li>
+<li><a href="#v213"><span>v2.1.3</span></a></li>
+<li><a href="#v212"><span>v2.1.2</span></a></li>
+<li><a href="#v210"><span>v2.1.0</span></a></li></ul><a href="#v200"><span>v2.0.0</span></a><a href="#v100"><span>v1.0.0</span></a>
+<ul>
+<li><a href="#v012-1"><span>v0.1.2-<wbr/>1</span></a></li>
+<li><a href="#v012-0"><span>v0.1.2-<wbr/>0</span></a></li>
+<li><a href="#v011"><span>v0.1.1</span></a></li>
+<li><a href="#v010"><span>v0.1.0</span></a></li>
+<li><a href="#v0012"><span>v0.0.12</span></a></li>
+<li><a href="#v0011"><span>v0.0.11</span></a></li>
+<li><a href="#v0010"><span>v0.0.10</span></a></li>
+<li><a href="#v009"><span>v0.0.9</span></a></li>
+<li><a href="#v008"><span>v0.0.8</span></a></li>
+<li><a href="#v007"><span>v0.0.7</span></a></li>
+<li><a href="#v006"><span>v0.0.6</span></a></li>
+<li><a href="#v005"><span>v0.0.5</span></a></li>
+<li><a href="#v004"><span>v0.0.4</span></a></li>
+<li><a href="#v003"><span>v0.0.3</span></a></li>
+<li><a href="#v002"><span>v0.0.2</span></a></li>
+<li><a href="#v001"><span>v0.0.1</span></a></li>
+<li><a href="#v000"><span>v0.0.0</span></a></li></ul></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="../modules.html">@karmaniverous/entity-manager</a>
+<ul class="tsd-small-nested-navigation" id="tsd-nav-container">
+<li>Loading...</li></ul></nav></div></div></div><footer>
+<p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer>
+<div class="overlay"></div></body></html>
